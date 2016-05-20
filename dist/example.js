@@ -362,7 +362,7 @@
 	            }
 	
 	            xhr.open('POST', this.action);
-	
+	            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 	            for (var key in this.request.headers) {
 	                xhr.setRequestHeader(key, this.request.headers[key]);
 	            }
