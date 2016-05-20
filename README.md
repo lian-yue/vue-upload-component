@@ -90,19 +90,31 @@ npm run build
 ## Setting
 
 ### Data
-``` json
+``` js
     {
-        files: [{
-            //
-            request: {
-                headers: {
-                    "X-Csrf-Token": "xxxx",
+        files: [
+            {
+                id: 'String',
+                name: 'filename String',
+                size: 'filesize   Number',
+                progress: 'progress String',
+                active: 'active Boolean',
+                error: 'error String',
+                errno: 'errno String',
+                success: 'success Boolean',
+                data: 'Response data Object or String',
+
+                request: {
+                    headers: {
+                        "X-Csrf-Token": "xxxx",
+                    },
+                    data: {
+                        "_csrf_token": "xxxxxx",
+                    },
                 },
-                data: {
-                    "_csrf_token": "xxxxxx",
-                },
-            },
-        }],
+
+            }
+        ],
 
         // Global
         request: {
