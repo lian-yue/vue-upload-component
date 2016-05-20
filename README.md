@@ -10,17 +10,42 @@
 ``` bash
     npm install vue-upload-component --save
 ```
+### CommonJS
+```js
+    var FileUpload = require('vue-upload-component');
+
+    new Vue({
+        template: '<file-upload action="/"></file-upload>',
+        components: {
+            FileUpload: FileUpload
+        }
+    })
+
+```
+
+### ES6
+```js
+    import FileUpload from 'vue-upload-component'
+    new Vue({
+        template: '<file-upload action="/"></file-upload>',
+        components: {
+            FileUpload
+        }
+    })
+
+```
 
 
-## Demo
+## Example
 ``` html
-    <!-- Demo file ./index.html -->
+    <!-- Example file ./index.html -->
+    <!-- Example file ./src/example.js -->
     <div id="app">
         <file-upload title="Add upload files"></file-upload>
     </div>
 
     <script type="text/javascript">
-    var FileUpload = require('./FileUpload.vue');
+    var FileUpload = require('vue-upload-component');
 
     new Vue({
         el:'#app',

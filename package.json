@@ -1,24 +1,30 @@
 {
   "name": "vue-upload-component",
   "description": "Vue.js file upload component, Support for multiple file uploads, progress, html4, ie9",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "LianYue",
   "scripts": {
     "dev": "webpack-dev-server --inline --hot",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules --config  webpack.config.build.min.js && cross-env NODE_ENV=production webpack --progress --hide-modules --config  webpack.config.build.js && cross-env NODE_ENV=production webpack --progress --hide-modules --config  webpack.config.js"
+
   },
-  "main": "/src/FileUpload.vue",
+
+  "main": "dist/vue-upload-component.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lian-yue/vue-upload-component.git"
   },
   "keywords": [
-    "Vue.js",
-    "File",
-    "Upload",
-    "Uploads",
-    "Multiple",
-    "Component"
+    "vue.js",
+    "file",
+    "upload",
+    "uploads",
+    "multiple",
+    "component",
+    "vue-component",
+    "vue-upload-component",
+    "vue-file-upload",
+    "vue-file-upload-component"
   ],
   "license": "Apache-2.0",
   "bugs": {
@@ -26,9 +32,12 @@
   },
   "homepage": "https://github.com/lian-yue/vue-upload-component#readme",
   "dependencies": {
-    "babel-runtime": "^6.0.0"
+    "vue": "^1.0.24"
+  },
+  "dependencies": {
   },
   "devDependencies": {
+    "babel-runtime": "^6.0.0",
     "babel-core": "^6.0.0",
     "babel-loader": "^6.0.0",
     "babel-plugin-transform-runtime": "^6.0.0",
