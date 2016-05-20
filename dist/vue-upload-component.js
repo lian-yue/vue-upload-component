@@ -57,7 +57,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 	
 	module.exports = __webpack_require__(5);
-	console.log(module.exports);
 
 /***/ },
 /* 1 */
