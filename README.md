@@ -37,6 +37,9 @@
 
 
 ## Example
+
+https://lian-yue.github.io/vue-upload-component/
+
 ``` html
     <!-- Example file ./index.html -->
     <!-- Example file ./src/example.js -->
