@@ -1,7 +1,7 @@
 # vue-upload-component
 
 > Vue.js file upload component, Support for multiple file uploads, progress, html4, ie9
-**Html4 does not support the progress bar, file size, timeout, headers, response status code error of judgment**
+**Html4 does not support the progress bar, file size, accept, timeout, headers, response status code error of judgment**
 
 
 
@@ -14,7 +14,7 @@
 
 ## Demo
 ``` html
-
+    <!-- Demo file ./index.html -->
     <div id="app">
         <file-upload title="Add upload files"></file-upload>
     </div>
@@ -30,8 +30,6 @@
     });
     </script>
 ```
-
-
 
 ## Build Setup
 
