@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>vue-upload-component</title>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.24/vue.min.js"></script>
+    <style type="text/css">
+        .file-uploads-label span{
+            font-size: 18px;
+            padding: 1em;
+            font-weight: bold;
+            border: 1px solid #888;
+        }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+        <table style="width: 100%;	border: 1px solid #ddd;" v-if="$refs.upload && $refs.upload.files">
+            <thead>
+                <tr>
+                    <th>Index</th>
+                    <th>Name</th>
+                    <th>Size</th>
+                    <th>Progress</th>
+                    <th>Active</th>
+                    <th>Error</th>
+                    <th>Errno</th>
+                    <th>Success</th>
+                    <th>Abort</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="file in $refs.upload.files">
+                    <td>{{$index}}</td>
+                    <td>{{file.name}}</td>
+                    <td>{{file.size}}</td>
+                    <td>{{file.progress}}</td>
+                    <td>{{file.active}}</td>
+                    <td>{{file.error}}</td>
+                    <td>{{file.errno}}</td>
+                    <td>{{file.success}}</td>
+                    <td @click="file.active = false">Abort</td>
+                    <td @click="remove(file)">x</td>
+                </tr>
+            </tbody>
+        </table>
+        <br/>
+        <br/>
+        <table style="width: 100%;	border: 1px solid #ddd;" >
+            <tbody>
+                <tr>
+                    <td>
+                        <file-upload title="Add upload files" name="file" action="./upload.php" :accept="accept" :multiple="multiple ? 'true' : null" :size="size" v-ref:upload></file-upload>
+                    </td>
+                    <td>
+                        <button v-if="$refs.upload && $refs.upload.active" type="submit" @click.prevent="$refs.upload.active = !$refs.upload.active">Stop upload</button>
+                        <button v-else type="submit" @click.prevent="$refs.upload.active = !$refs.upload.active">Start upload</button>
+                    </td>
+                    <td>
+                        Accept: <input type="text" v-model="accept">
+                    </td>
+                    <td>
+                        Max file size: <input type="text" v-model="size">
+                    </td>
+                    <td>
+                        Multiple: <input type="checkbox" id="checkbox" v-model="multiple">
+                    </td>
+                    <td>
+                        Status: Active: {{$refs.upload.active}}, Uploaded: {{$refs.upload.uploaded}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script src="./dist/build.js"></script>
+  </body>
+</html>
