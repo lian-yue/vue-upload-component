@@ -109,6 +109,12 @@ export default {
         this._index = 0;
         this._files = {};
     },
+
+    beforeDestroy() {
+        this.active = false;
+        this.files = [];
+    },
+
     watch: {
         files(files) {
             var ids = [];
