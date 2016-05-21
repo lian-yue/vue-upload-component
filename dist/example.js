@@ -153,6 +153,11 @@
 	        this._index = 0;
 	        this._files = {};
 	    },
+	    beforeDestroy: function beforeDestroy() {
+	        this.active = false;
+	        this.files = [];
+	    },
+	
 	
 	    watch: {
 	        files: function files(_files) {
