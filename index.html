@@ -5,11 +5,27 @@
     <title>vue-upload-component</title>
     <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.24/vue.min.js"></script>
     <style type="text/css">
+        #app {
+            position: relative;
+        }
+        .file-uploads-label {
+            display: block;
+        }
         .file-uploads-label span{
+            display: block;
             font-size: 18px;
             padding: 1em;
             font-weight: bold;
             border: 1px solid #888;
+        }
+        .drop-active {
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            position: absolute;
+            opacity: .4;
+            background: #000;
         }
     </style>
   </head>
@@ -19,9 +35,11 @@
             <thead>
                 <tr>
                     <th>Index</th>
+                    <th>ID</th>
                     <th>Name</th>
                     <th>Size</th>
                     <th>Progress</th>
+                    <th>Speed</th>
                     <th>Active</th>
                     <th>Error</th>
                     <th>Errno</th>
@@ -33,9 +51,11 @@
             <tbody>
                 <tr v-for="file in $refs.upload.files">
                     <td>{{$index}}</td>
+                    <td>{{file.id}}</td>
                     <td>{{file.name}}</td>
-                    <td>{{file.size}}</td>
+                    <td>{{file.size | formatSize}}</td>
                     <td>{{file.progress}}</td>
+                    <td>{{file.speed | formatSize}}</td>
                     <td>{{file.active}}</td>
                     <td>{{file.error}}</td>
                     <td>{{file.errno}}</td>
@@ -51,27 +71,54 @@
             <tbody>
                 <tr>
                     <td>
-                        <file-upload title="Add upload files" name="file" action="./upload.php" :accept="accept" :multiple="multiple ? 'true' : null" :size="size" v-ref:upload></file-upload>
+                        <file-upload title="Add upload files" class="file-upload" name="file" post-action="./post.php" put-action="./put.php"  :extensions="extensions" :accept="accept" :multiple="multiple ? 'true' : null" :size="size" v-ref:upload :drop="drop"></file-upload>
                     </td>
                     <td>
                         <button v-if="$refs.upload && $refs.upload.active" type="submit" @click.prevent="$refs.upload.active = !$refs.upload.active">Stop upload</button>
                         <button v-else type="submit" @click.prevent="$refs.upload.active = !$refs.upload.active">Start upload</button>
                     </td>
                     <td>
-                        Accept: <input type="text" v-model="accept">
+                        <label>
+                            Accept: <input type="text" v-model="accept">
+                        </label>
                     </td>
                     <td>
-                        Max file size: <input type="text" v-model="size">
+                        <label>
+                            Extensions: <input type="text" v-model="extensions">
+                        </label>
                     </td>
                     <td>
-                        Multiple: <input type="checkbox" id="checkbox" v-model="multiple">
+                        <label>
+                            Drop: <input type="checkbox" id="checkbox" v-model="drop">
+                        </label>
                     </td>
                     <td>
-                        Status: Active: {{$refs.upload.active}}, Uploaded: {{$refs.upload.uploaded}}
+                        <label>
+                            Max file size: <input type="text" v-model="size">
+                        </label>
+                    </td>
+                    <td>
+                        <label>
+                            Multiple: <input type="checkbox" id="checkbox" v-model="multiple">
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Active: {{$refs.upload.active}}
+                    </td>
+                    <td>
+                        Uploaded: {{$refs.upload.uploaded}}
+                    </td>
+                    <td>
+                        Drop active: {{$refs.upload.dropActive}}
                     </td>
                 </tr>
             </tbody>
         </table>
+        <div v-show="$refs.upload.dropActive" class="drop-active">
+            Drop ing
+        </div>
     </div>
     <script src="./dist/example.js"></script>
   </body>

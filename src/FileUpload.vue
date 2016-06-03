@@ -43,6 +43,11 @@
 </style>
 
 <script>
+
+const createId = function() {
+    return Math.random().toString(36).substr(2);
+}
+
 export default {
     props: {
         title: {
@@ -51,14 +56,18 @@ export default {
         },
         name: {
             type: String,
-            required: true
+            default: 'file',
         },
-        id: {
-            type:String,
+        drop: {
+            default: false,
         },
-        action: {
+        extensions: {
+        },
+        postAction: {
             type: String,
-            required: true
+        },
+        putAction: {
+            type: String,
         },
         accept: {
             type:String,
@@ -91,11 +100,17 @@ export default {
             files: [],
             active: false,
             uploaded: true,
+            dropActive: false,
+            dropElement: false,
             request: {
                 data: {},
                 headers: {},
             },
         }
+    },
+
+    created() {
+        this._drop(this.drop);
     },
 
     init() {
@@ -107,8 +122,10 @@ export default {
             this.$mode = 'html4';
         }
         this._index = 0;
+        this._dropActive = 0;
         this._files = {};
     },
+
 
     beforeDestroy() {
         this.active = false;
@@ -116,6 +133,9 @@ export default {
     },
 
     watch: {
+        drop(value) {
+            this._drop(value);
+        },
         files(files) {
             var ids = [];
             for (var i = 0; i < files.length; i++) {
@@ -162,6 +182,78 @@ export default {
     },
 
     methods: {
+        _drop(value) {
+            if (this.dropElement) {
+                try {
+                    if (this.$mode === 'html5') {
+                        window.document.removeEventListener('dragenter', this._onDragenter, false);
+                        window.document.removeEventListener('dragleave', this._onDragleave, false);
+                        this.dropElement.removeEventListener('dragover', this._onDragover, false);
+                        this.dropElement.removeEventListener('drop', this._onDrop, false);
+                    }
+                } catch (e) {
+                }
+            }
+
+            if (!value) {
+                this.dropElement = false;
+                return;
+            }
+
+            if (typeof value == 'string') {
+                this.dropElement = document.querySelector(value);
+            } else if (typeof value == 'boolean') {
+                this.dropElement = this.$parent.$el;
+            } else {
+                this.dropElement = this.drop;
+            }
+            if (this.$mode === 'html5') {
+                window.document.addEventListener('dragenter', this._onDragenter, false);
+                window.document.addEventListener('dragleave', this._onDragleave, false);
+                this.dropElement.addEventListener('dragover', this._onDragover, false);
+                this.dropElement.addEventListener('drop', this._onDrop, false);
+            }
+        },
+        _onDragenter(e) {
+            this._dropActive++;
+            this.dropActive = !!this._dropActive;
+            e.preventDefault();
+        },
+        _onDragleave(e) {
+            e.preventDefault();
+            this._dropActive--;
+            if (e.target.nodeName == 'HTML' || (e.screenX == 0 && e.screenY == 0)) {
+                this.dropActive = !!this._dropActive;
+            }
+        },
+        _onDragover(e) {
+            e.preventDefault();
+        },
+
+        _onDrop(e) {
+            this._dropActive = 0;
+            this.dropActive = false;
+            e.preventDefault();
+            if (e.dataTransfer.files.length) {
+                for (var i = 0; i < e.dataTransfer.files.length; i++) {
+                    var file = e.dataTransfer.files[i];
+                    var id = createId();
+                    var value = {id: id, size:file.size, name: file.name, progress: '0.00', speed: 0, active: false, error: '', errno: '', success: false, data: {}, request: {headers:{}, data:{}}};
+                    this._files[id] = {file: file};
+
+                    var len;
+                    if (this.multiple) {
+                        len = this.files.push(value);
+                    } else {
+                        this.files = [value];
+                        len = 1;
+                    }
+                    this._files[id]._file = this.files[len-1];
+                    this.$dispatch('addFileUpload', this.files[len-1], this);
+                }
+            }
+        },
+
         _addFileUploads(el) {
             var Component = this.$options.components.inputFile;
             new Component({
@@ -174,8 +266,8 @@ export default {
             if (el.files) {
                 for (var i = 0; i < el.files.length; i++) {
                     var file = el.files[i];
-                    var id = 'upload-file-' + Math.random().toString(36).substr(2);
-                    var value = {id: id, size:file.size, name: file.name, progress: '0.00', active: false, error: '', errno: '', success: false, data: {}, request: {headers:{}, data:{}}};
+                    var id = createId();
+                    var value = {id: id, size:file.size, name: file.name, progress: '0.00', speed: 0, active: false, error: '', errno: '', success: false, data: {}, request: {headers:{}, data:{}}};
                     this._files[id] = {el:el, file: file};
 
                     var len;
@@ -189,8 +281,8 @@ export default {
                     this.$dispatch('addFileUpload', this.files[len-1], this);
                 }
             } else {
-                var id = 'upload-file-' + Math.random().toString(36).substr(2);
-                var value = {id: id, size: -1, name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1'), progress: '0.00', active: false, error: '', errno: '', success: false, data: {}, request: {headers:{}, data:{}}};
+                var id = createId();
+                var value = {id: id, size: -1, name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1'), progress: '0.00', speed:0, active: false, error: '', errno: '', success: false, data: {}, request: {headers:{}, data:{}}};
                 this._files[id] = {el:el};
                 var len;
                 if (this.multiple) {
@@ -220,10 +312,46 @@ export default {
                     continue;
                 }
 
+                if (this.extensions.length || typeof this.extensions.length == 'undefined') {
+                    var extensions = this.extensions;
+                    if (typeof extensions == 'object' && RegExp instanceof extensions) {
+
+                    } else {
+                        if (typeof extensions == 'string') {
+                            extensions = extensions.split(',').map(function(value) {
+                                return value.trim();
+                            }).filter(function(value) {
+                                return value;
+                            });
+                        }
+                        extensions = new RegExp('\\.('+ extensions.join('|').replace(/\./g, '\\.') +')$', 'i');
+                    }
+
+                    if (file.name.search(extensions) == -1) {
+                        file.error = 'Extension';
+                        file.errno = 'extension';
+                        continue;
+                    }
+                }
+
                 if (this.$mode == 'html5') {
-                    this._fileUploadHtml5(file);
+                    if (this.putAction || file.putAction) {
+                        this._fileUploadPut(file);
+                    } else if (this.postAction || file.postAction) {
+                        this._fileUploadHtml5(file);
+                    } else {
+                        file.error = 'Not Support';
+                        file.errno = 'not_support';
+                        continue;
+                    }
                 } else {
-                    this._fileUploadHtml4(file);
+                    if (this.postAction || file.postAction) {
+                        this._fileUploadHtml4(file);
+                    } else {
+                        file.error = 'Not Support';
+                        file.errno = 'not_support';
+                        continue;
+                    }
                 }
                 return;
             }
@@ -231,24 +359,12 @@ export default {
             this.uploaded = true;
         },
 
-        _fileUploadHtml5(file) {
+        _fileUploadXhr(xhr, file, data) {
             var _self = this;
             var file2 = this._files[file.id];
-
             var fileUploads = false;
-
-            var form = new window.FormData();
-            form.append(this.name, file2.file);
-            for (var key in this.request.data) {
-                form.append(key, this.request.data[key]);
-            }
-
-            for (var key in file.request.data) {
-                form.append(key, file.request.data[key]);
-            }
-
-            var xhr = new XMLHttpRequest();
-
+            var speedTime = 0;
+            var speedLoaded = 0;
             xhr.upload.onprogress = function(e) {
                 if (file.removed) {
                     xhr.abort();
@@ -260,6 +376,12 @@ export default {
                 }
                 if (e.lengthComputable) {
                     file.progress = (e.loaded / e.total * 100).toFixed(2);
+                    var speedTime2 = Math.round(Date.now() / 1000);
+                    if (speedTime2 != speedTime) {
+                        file.speed = e.loaded - speedLoaded;
+                        speedLoaded = e.loaded;
+                        speedTime = speedTime2;
+                    }
                 }
                 _self.$dispatch('fileUploadProgress', file, _self);
             };
@@ -329,23 +451,28 @@ export default {
                 xhr.timeout = this.timeout;
             }
 
-            xhr.open('POST', this.action);
+
+            xhr.onload = callback;
+            xhr.onerror = callback;
+            xhr.onabort = callback;
+            xhr.ontimeout = callback;
+
+            if (this.timeout) {
+                xhr.timeout = this.timeout;
+            }
+
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             for (var key in this.request.headers) {
                 xhr.setRequestHeader(key, this.request.headers[key]);
             }
-
             for (var key in file.request.headers) {
                 xhr.setRequestHeader(key, file.request.headers[key]);
             }
 
 
-            xhr.send(form);
-
+            xhr.send(data);
             file.active = true;
-
             file2.xhr = xhr;
-
             var interval = setInterval(function() {
                 if (!_self.active || !file.active || file.success || file.errno) {
                     clearInterval(interval);
@@ -353,8 +480,41 @@ export default {
                         xhr.abort();
                     }
                 }
-            }, 50);
+            }, 100);
             this.$dispatch('beforeFileUpload', file, this);
+        },
+        _fileUploadPut(file) {
+            var _self = this;
+            var querys = Vue.util.extend(Vue.util.extend({}, this.request.data), file.request.data);
+            var queryArray = [];
+            for (let key in querys) {
+                if (querys[key] !== null && typeof querys[key] !== 'undefined') {
+                    queryArray.push(encodeURIComponent(key)  + '=' + encodeURIComponent(querys[key]));
+                }
+            }
+            var queryString = queryArray.length ? '?' + queryArray.join('&')  : '';
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('PUT', (file.putAction || this.putAction) + queryString);
+            this._fileUploadXhr(xhr, file, this._files[file.id].file);
+        },
+
+
+
+        _fileUploadHtml5(file) {
+            var form = new window.FormData();
+            form.append(this.name, this._files[file.id].file);
+            for (var key in this.request.data) {
+                form.append(key, this.request.data[key]);
+            }
+
+            for (var key in file.request.data) {
+                form.append(key, file.request.data[key]);
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', file.postAction || this.postAction);
+            this._fileUploadXhr(xhr, file, form);
         },
 
         _fileUploadHtml4(file) {
@@ -384,7 +544,7 @@ export default {
 
 
             var form = document.createElement('form');
-            form.action = this.action;
+            form.action = file.postAction || this.postAction;
             form.name = 'upload-form-' + file.id;
             form.setAttribute('method', 'POST');
             form.setAttribute('target', 'upload-iframe-' + file.id);

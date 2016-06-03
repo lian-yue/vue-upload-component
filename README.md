@@ -15,7 +15,7 @@
     var FileUpload = require('vue-upload-component');
 
     new Vue({
-        template: '<file-upload action="/"></file-upload>',
+        template: '<file-upload post-action="/post.method" put-action="/put.method"></file-upload>',
         components: {
             FileUpload: FileUpload
         }
@@ -27,7 +27,7 @@
 ```js
     import FileUpload from 'vue-upload-component'
     new Vue({
-        template: '<file-upload action="/"></file-upload>',
+        template: '<file-upload post-action="/post.method" put-action="/put.method"></file-upload>',
         components: {
             FileUpload
         }
@@ -94,16 +94,16 @@ npm run build
     {
         files: [
             {
-                id: 'String',
+                id: 'String', // Read only
                 name: 'filename String',
                 size: 'filesize   Number',
-                progress: 'progress String',
+                progress: 'progress String', // Read only
+                speed: "Speed Number", // Read only
                 active: 'active Boolean',
                 error: 'error String',
                 errno: 'errno String',
-                success: 'success Boolean',
-                data: 'Response data Object or String',
-
+                success: 'success Boolean', // Read only
+                data: 'Response data Object or String', // Read only
                 request: {
                     headers: {
                         "X-Csrf-Token": "xxxx",
@@ -112,9 +112,9 @@ npm run build
                         "_csrf_token": "xxxxxx",
                     },
                 },
-
             }
         ],
+
 
         // Global
         request: {
@@ -125,11 +125,41 @@ npm run build
                 "_csrf_token": "xxxxxx",
             },
         },
+
+
+        active: false,
+
+        uploaded: true,  // Read only
+
+        dropActive: false,  // Read only
     }
 ```
 
 
 ### Props
 ``` html
-<file-upload :title="Add upload files" :name="file" :action="./upload.php" :accept="accept"  :multiple="multiple" :size="size" :timeout="3600000"></file-upload>
+    <file-upload :title="Add upload files" :name="file" :drop="Boolean (true = $parent) or Element or Css Selector" :extensions="Array or String or Regular" :post-action="./post.method" :put-action="./put.method" :accept="accept"  :multiple="multiple" :size="size" :timeout="3600000"></file-upload>
+```
+
+```
+    title="Add upload files"
+
+    name="post file name"
+
+    drop="Boolean (true = $parent) or Element or Css Selector"
+
+    extensions="Array or String or Regular" :post-action="./post.method"
+
+    post-action="./post.method"
+
+    put-action="./put.method"
+
+    accept="accept"
+
+    multiple="multiple"
+
+    size="max Size"
+
+    timeout="3600000"
+
 ```
