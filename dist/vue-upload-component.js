@@ -677,7 +677,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        };
 	    },
-	    created: function created() {
+	    ready: function ready() {
 	        this._drop(this.drop);
 	    },
 	    init: function init() {
@@ -699,9 +699,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	    watch: {
-	        multiple: function multiple(newValue) {
-	            console.log(newValue);
-	        },
 	        drop: function drop(value) {
 	            this._drop(value);
 	        },
@@ -750,14 +747,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    methods: {
 	        _drop: function _drop(value) {
-	            if (this.dropElement) {
+	            if (this.dropElement && this.$mode === 'html5') {
 	                try {
-	                    if (this.$mode === 'html5') {
-	                        window.document.removeEventListener('dragenter', this._onDragenter, false);
-	                        window.document.removeEventListener('dragleave', this._onDragleave, false);
-	                        this.dropElement.removeEventListener('dragover', this._onDragover, false);
-	                        this.dropElement.removeEventListener('drop', this._onDrop, false);
-	                    }
+	                    window.document.removeEventListener('dragenter', this._onDragenter, false);
+	                    window.document.removeEventListener('dragleave', this._onDragleave, false);
+	                    this.dropElement.removeEventListener('dragover', this._onDragover, false);
+	                    this.dropElement.removeEventListener('drop', this._onDrop, false);
 	                } catch (e) {}
 	            }
 	
@@ -767,13 +762,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	
 	            if (typeof value == 'string') {
-	                this.dropElement = document.querySelector(value);
+	                this.dropElement = document.querySelector(value) || this.$root.$el.querySelector(value);
 	            } else if (typeof value == 'boolean') {
 	                this.dropElement = this.$parent.$el;
 	            } else {
 	                this.dropElement = this.drop;
 	            }
-	            if (this.$mode === 'html5') {
+	            if (this.dropElement && this.$mode === 'html5') {
 	                window.document.addEventListener('dragenter', this._onDragenter, false);
 	                window.document.addEventListener('dragleave', this._onDragleave, false);
 	                this.dropElement.addEventListener('dragover', this._onDragover, false);

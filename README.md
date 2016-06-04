@@ -138,7 +138,7 @@ npm run build
 
 ### Props
 ``` html
-    <file-upload :title="Add upload files" :name="file" :drop="Boolean (true = $parent) or Element or Css Selector" :extensions="Array or String or Regular" :post-action="./post.method" :put-action="./put.method" :accept="accept"  :multiple="multiple" :size="size" :timeout="3600000"></file-upload>
+    <file-upload :title="Add upload files" :name="file" :drop="Boolean (true = $parent) or Element or Css Selector" :extensions="Array or String or Regular" :post-action="./post.method" :put-action="./put.method" :accept="accept"  :multiple="true" :size="size" :timeout="3600000"></file-upload>
 ```
 
 ```
@@ -156,7 +156,7 @@ npm run build
 
     accept="accept"
 
-    multiple="multiple"
+    multiple="true or false"
 
     size="max Size"
 
