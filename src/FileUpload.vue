@@ -1,26 +1,24 @@
 <template>
-    <div>
-        <label :for="id||name" :class="{'file-uploads-label': true, 'file-uploads-html5': $mode == 'html5', 'file-uploads-html4': $mode == 'html4'}">
-            <span>{{title}}</span>
-            <input-file></input-file>
-        </label>
-    </div>
+    <label :class="{'file-uploads': true, 'file-uploads-html5': $mode == 'html5', 'file-uploads-html4': $mode == 'html4'}">
+        <span>{{title}}</span>
+        <input-file></input-file>
+    </label>
 </template>
 
 <style>
-    .file-uploads-label {
+    .file-uploads {
         overflow: hidden;
         position: relative;
         text-align: center;
     }
-    .file-uploads-label span{
+    .file-uploads span{
         -webkit-user-select: none;
         -moz-user-select: none;
         -ms-user-select: none;
         -o-user-select: none;
         user-select: none;
     }
-    .file-uploads-label input{
+    .file-uploads input{
         z-index: 1;
         opacity: 0;
         font-size: 20em;
@@ -32,7 +30,8 @@
         width: 100%;
         height: 100%;
     }
-    .file-uploads-label.file-uploads-html5 input{
+    .file-uploads.file-uploads-html5 input{
+        float: left;
         width: 1px !important;
         height: 1px !important;
         top:-1px !important;

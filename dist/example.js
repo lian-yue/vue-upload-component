@@ -1991,7 +1991,7 @@
 	
 	
 	// module
-	exports.push([module.id, "\n.file-uploads-label {\n    overflow: hidden;\n    position: relative;\n    text-align: center;\n}\n.file-uploads-label span{\n    -webkit-user-select: none;\n    -moz-user-select: none;\n    -ms-user-select: none;\n    -o-user-select: none;\n    user-select: none;\n}\n.file-uploads-label input{\n    z-index: 1;\n    opacity: 0;\n    font-size: 20em;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    position: absolute;\n    width: 100%;\n    height: 100%;\n}\n.file-uploads-label.file-uploads-html5 input{\n    width: 1px !important;\n    height: 1px !important;\n    top:-1px !important;\n    left:-1px !important;\n    right:auto !important;\n    bottom:auto !important;\n}\n", ""]);
+	exports.push([module.id, "\n.file-uploads {\n    overflow: hidden;\n    position: relative;\n    text-align: center;\n}\n.file-uploads span{\n    -webkit-user-select: none;\n    -moz-user-select: none;\n    -ms-user-select: none;\n    -o-user-select: none;\n    user-select: none;\n}\n.file-uploads input{\n    z-index: 1;\n    opacity: 0;\n    font-size: 20em;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    position: absolute;\n    width: 100%;\n    height: 100%;\n}\n.file-uploads.file-uploads-html5 input{\n    float: left;\n    width: 1px !important;\n    height: 1px !important;\n    top:-1px !important;\n    left:-1px !important;\n    right:auto !important;\n    bottom:auto !important;\n}\n", ""]);
 	
 	// exports
 
@@ -2056,7 +2056,7 @@
 /* 72 */
 /***/ function(module, exports) {
 
-	module.exports = "\n<div>\n    <label :for=\"id||name\" :class=\"{'file-uploads-label': true, 'file-uploads-html5': $mode == 'html5', 'file-uploads-html4': $mode == 'html4'}\">\n        <span>{{title}}</span>\n        <input-file></input-file>\n    </label>\n</div>\n";
+	module.exports = "\n<label :class=\"{'file-uploads': true, 'file-uploads-html5': $mode == 'html5', 'file-uploads-html4': $mode == 'html4'}\">\n    <span>{{title}}</span>\n    <input-file></input-file>\n</label>\n";
 
 /***/ },
 /* 73 */
