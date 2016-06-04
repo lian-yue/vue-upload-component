@@ -679,7 +679,7 @@
 	            type: String
 	        },
 	        multiple: {
-	            type: String
+	            type: Boolean
 	        },
 	        timeout: {
 	            type: Number
@@ -736,6 +736,9 @@
 	
 	
 	    watch: {
+	        multiple: function multiple(newValue) {
+	            console.log(newValue);
+	        },
 	        drop: function drop(value) {
 	            this._drop(value);
 	        },

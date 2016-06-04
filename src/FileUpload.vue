@@ -73,7 +73,7 @@ export default {
             type:String,
         },
         multiple: {
-            type:String,
+            type: Boolean,
         },
         timeout: {
             type: Number,
@@ -133,6 +133,9 @@ export default {
     },
 
     watch: {
+        multiple(newValue) {
+            console.log(newValue);
+        },
         drop(value) {
             this._drop(value);
         },

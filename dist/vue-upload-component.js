@@ -642,7 +642,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            type: String
 	        },
 	        multiple: {
-	            type: String
+	            type: Boolean
 	        },
 	        timeout: {
 	            type: Number
@@ -699,6 +699,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	    watch: {
+	        multiple: function multiple(newValue) {
+	            console.log(newValue);
+	        },
 	        drop: function drop(value) {
 	            this._drop(value);
 	        },

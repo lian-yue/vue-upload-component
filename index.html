@@ -71,7 +71,7 @@
             <tbody>
                 <tr>
                     <td>
-                        <file-upload title="Add upload files" class="file-upload" name="file" post-action="./post.php" put-action="./put.php"  :extensions="extensions" :accept="accept" :multiple="multiple ? 'true' : null" :size="size" v-ref:upload :drop="drop"></file-upload>
+                        <file-upload title="Add upload files" class="file-upload" name="file" post-action="./post.php" put-action="./put.php"  :extensions="extensions" :accept="accept" :multiple="multiple" :size="size" v-ref:upload :drop="drop"></file-upload>
                     </td>
                     <td>
                         <button v-if="$refs.upload && $refs.upload.active" type="submit" @click.prevent="$refs.upload.active = !$refs.upload.active">Stop upload</button>
