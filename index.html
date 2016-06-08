@@ -66,14 +66,14 @@
         </table>
         <br/>
         <br/>
-        <table style="width: 100%;	border: 1px solid #ddd;" >
+        <table style="width: 100%;	border: 1px solid #ddd;">
             <tbody>
                 <tr>
                     <td>
                         <file-upload title="Add upload files" class="file-upload" name="file" post-action="./post.php" put-action="./put.php"  :extensions="extensions" :accept="accept" :multiple="multiple" :size="size" v-ref:upload :drop="drop"></file-upload>
                     </td>
                     <td>
-                        <button v-if="$refs.upload && $refs.upload.active" type="submit" @click.prevent="$refs.upload.active = !$refs.upload.active">Stop upload</button>
+                        <button v-if="upload.active" type="submit" @click.prevent="$refs.upload.active = !$refs.upload.active">Stop upload</button>
                         <button v-else type="submit" @click.prevent="$refs.upload.active = !$refs.upload.active">Start upload</button>
                     </td>
                     <td>

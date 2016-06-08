@@ -10670,12 +10670,13 @@
 	        extensions: 'gif,jpg,png',
 	
 	        files: [],
+	        upload: {},
 	        drop: true
 	    },
 	
 	    compiled: function compiled() {
-	        this.files = this.$refs.upload.files;
-	        this.$refs.upload.request = {
+	        this.upload = this.$refs.upload;
+	        this.upload.request = {
 	            headers: {
 	                "X-Csrf-Token": "xxxx"
 	            },
@@ -10683,7 +10684,7 @@
 	                "_csrf_token": "xxxxxx"
 	            }
 	        };
-	        this.$refs.upload.$watch('files', function () {});
+	        this.files = this.$refs.upload.files;
 	    },
 	    methods: {
 	        remove: function remove(file) {
