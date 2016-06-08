@@ -61,6 +61,7 @@ export default {
             default: false,
         },
         extensions: {
+            default: [],
         },
         postAction: {
             type: String,
@@ -76,6 +77,7 @@ export default {
         },
         timeout: {
             type: Number,
+            default:0,
         },
         size: {
             type: Number,
@@ -313,7 +315,7 @@ export default {
                     continue;
                 }
 
-                if (this.extensions.length || typeof this.extensions.length == 'undefined') {
+                if (this.extensions && (this.extensions.length || typeof this.extensions.length == 'undefined')) {
                     var extensions = this.extensions;
                     if (typeof extensions == 'object' && RegExp instanceof extensions) {
 

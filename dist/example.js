@@ -668,7 +668,9 @@
 	        drop: {
 	            default: false
 	        },
-	        extensions: {},
+	        extensions: {
+	            default: []
+	        },
 	        postAction: {
 	            type: String
 	        },
@@ -682,7 +684,8 @@
 	            type: Boolean
 	        },
 	        timeout: {
-	            type: Number
+	            type: Number,
+	            default: 0
 	        },
 	        size: {
 	            type: Number
@@ -909,7 +912,7 @@
 	                    continue;
 	                }
 	
-	                if (this.extensions.length || typeof this.extensions.length == 'undefined') {
+	                if (this.extensions && (this.extensions.length || typeof this.extensions.length == 'undefined')) {
 	                    var extensions = this.extensions;
 	                    if ((typeof extensions === 'undefined' ? 'undefined' : (0, _typeof3.default)(extensions)) == 'object' && RegExp instanceof extensions) {} else {
 	                        if (typeof extensions == 'string') {
