@@ -61,7 +61,7 @@ export default {
             default: false,
         },
         extensions: {
-            default: [],
+            default:  () => [],
         },
         postAction: {
             type: String,
@@ -491,7 +491,14 @@ export default {
         },
         _fileUploadPut(file) {
             var _self = this;
-            var querys = Vue.util.extend(Vue.util.extend({}, this.request.data), file.request.data);
+
+            var querys = {};
+            for (let key in this.request.data) {
+                querys[key] = this.request.data[key];
+            }
+            for (let key in file.request.data) {
+                querys[key] = file.request.data[key];
+            }
             var queryArray = [];
             for (let key in querys) {
                 if (querys[key] !== null && typeof querys[key] !== 'undefined') {

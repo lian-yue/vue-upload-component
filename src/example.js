@@ -1,7 +1,12 @@
-// var FileUpload = require('./FileUpload.vue');
+import Vue from 'vue';
 
+// var FileUpload = require('./FileUpload.vue');
 import FileUpload from './FileUpload.vue';
 
+Vue.config.debug = true;
+Vue.config.silent = false;
+Vue.config.async = false;
+Vue.config.devtools = true;
 
 Vue.filter('formatSize', function(size) {
     if (size > 1024 * 1024 * 1024 * 1024) {
@@ -28,9 +33,12 @@ new Vue({
         extensions: 'gif,jpg,png',
         // extensions: ['gif','jpg','png'],
         // extensions: /\.(gif|png|jpg)$/i,
+        files: [],
         drop: true,
     },
+
     compiled: function() {
+        this.files = this.$refs.upload.files;
         this.$refs.upload.request = {
             headers: {
                 "X-Csrf-Token": "xxxx",
@@ -39,6 +47,9 @@ new Vue({
                 "_csrf_token": "xxxxxx",
             },
         };
+        this.$refs.upload.$watch('files', function() {
+
+        });
     },
     methods: {
         remove: function(file) {

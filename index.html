@@ -3,7 +3,6 @@
   <head>
     <meta charset="utf-8">
     <title>vue-upload-component</title>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.24/vue.min.js"></script>
     <style type="text/css">
         #app {
             position: relative;
@@ -31,7 +30,7 @@
   </head>
   <body>
     <div id="app">
-        <table style="width: 100%;	border: 1px solid #ddd;" v-if="$refs.upload && $refs.upload.files">
+        <table style="width: 100%;	border: 1px solid #ddd;">
             <thead>
                 <tr>
                     <th>Index</th>
@@ -49,7 +48,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="file in $refs.upload.files">
+                <tr v-for="file in files">
                     <td>{{$index}}</td>
                     <td>{{file.id}}</td>
                     <td>{{file.name}}</td>

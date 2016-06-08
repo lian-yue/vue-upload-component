@@ -3,7 +3,7 @@ var webpack = require('webpack')
 
 module.exports = {
     entry: {
-        example: './src/example.js',
+        example: ['vue', './src/example.js'],
     },
 
     output: {

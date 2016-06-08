@@ -632,7 +632,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            default: false
 	        },
 	        extensions: {
-	            default: []
+	            default: function _default() {
+	                return [];
+	            }
 	        },
 	        postAction: {
 	            type: String
@@ -1044,11 +1046,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        },
 	        _fileUploadPut: function _fileUploadPut(file) {
 	            var _self = this;
-	            var querys = Vue.util.extend(Vue.util.extend({}, this.request.data), file.request.data);
+	
+	            var querys = {};
+	            for (var key in this.request.data) {
+	                querys[key] = this.request.data[key];
+	            }
+	            for (var _key in file.request.data) {
+	                querys[_key] = file.request.data[_key];
+	            }
 	            var queryArray = [];
-	            for (var key in querys) {
-	                if (querys[key] !== null && typeof querys[key] !== 'undefined') {
-	                    queryArray.push(encodeURIComponent(key) + '=' + encodeURIComponent(querys[key]));
+	            for (var _key2 in querys) {
+	                if (querys[_key2] !== null && typeof querys[_key2] !== 'undefined') {
+	                    queryArray.push(encodeURIComponent(_key2) + '=' + encodeURIComponent(querys[_key2]));
 	                }
 	            }
 	            var queryString = queryArray.length ? '?' + queryArray.join('&') : '';
@@ -1965,7 +1974,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "\n.file-uploads {\n    overflow: hidden;\n    position: relative;\n    text-align: center;\n}\n.file-uploads span{\n    -webkit-user-select: none;\n    -moz-user-select: none;\n    -ms-user-select: none;\n    -o-user-select: none;\n    user-select: none;\n}\n.file-uploads input{\n    z-index: 1;\n    opacity: 0;\n    font-size: 20em;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    position: absolute;\n    width: 100%;\n    height: 100%;\n}\n.file-uploads.file-uploads-html5 input{\n    float: left;\n    width: 1px !important;\n    height: 1px !important;\n    top:-1px !important;\n    left:-1px !important;\n    right:auto !important;\n    bottom:auto !important;\n}\n", ""]);
+	exports.push([module.id, "\n\n\n\n\n\n\n\n.file-uploads {\n    overflow: hidden;\n    position: relative;\n    text-align: center;\n}\n.file-uploads span{\n    -webkit-user-select: none;\n    -moz-user-select: none;\n    -ms-user-select: none;\n    -o-user-select: none;\n    user-select: none;\n}\n.file-uploads input{\n    z-index: 1;\n    opacity: 0;\n    font-size: 20em;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    position: absolute;\n    width: 100%;\n    height: 100%;\n}\n.file-uploads.file-uploads-html5 input{\n    float: left;\n    width: 1px !important;\n    height: 1px !important;\n    top:-1px !important;\n    left:-1px !important;\n    right:auto !important;\n    bottom:auto !important;\n}\n", ""]);
 	
 	// exports
 
