@@ -163,7 +163,8 @@ export default {
                     iframe.onabort({type:'abort'});
                 }
                 delete this._files[id];
-                this.$dispatch('removeFileUpload', file, this);
+                this.$dispatch && this.$dispatch('removeFileUpload', file, this);
+                this.removeFileUpload && this.removeFileUpload(file);
             }
             this._index = 0;
         },
@@ -276,7 +277,8 @@ export default {
                         len = 1;
                     }
                     this._files[id]._file = this.files[len-1];
-                    this.$dispatch('addFileUpload', this.files[len-1], this);
+                    this.$dispatch && this.$dispatch('addFileUpload', this.files[len-1], this);
+                    this.addFileUpload && this.addFileUpload(this.files[len-1]);
                 }
             } else {
                 var id = createId();
@@ -291,7 +293,8 @@ export default {
                 }
                 var len = this.files.push(file);
                 this._files[id]._file = this.files[len-1];
-                this.$dispatch('addFileUpload', this.files[len-1], this);
+                this.$dispatch && this.$dispatch('addFileUpload', this.files[len-1], this);
+                this.addFileUpload && this.addFileUpload(this.files[len-1]);
             }
         },
 
@@ -381,7 +384,8 @@ export default {
                         speedTime = speedTime2;
                     }
                 }
-                _self.$dispatch('fileUploadProgress', file, _self);
+                _self.$dispatch && _self.$dispatch('fileUploadProgress', file, _self);
+                _self.fileUploadProgress && _self.fileUploadProgress(file);
             };
 
 
@@ -431,7 +435,8 @@ export default {
                 if (!fileUploads) {
                     fileUploads = true;
                     if (!file.removed) {
-                        _self.$dispatch('afterFileUpload', file, _self);
+                        _self.$dispatch && _self.$dispatch('afterFileUpload', file, _self);
+                        _self.afterFileUpload && _self.afterFileUpload(file);
                     }
                     setTimeout(function() {
                         _self._fileUploads();
@@ -479,7 +484,8 @@ export default {
                     }
                 }
             }, 100);
-            this.$dispatch('beforeFileUpload', file, this);
+            this.$dispatch && this.$dispatch('beforeFileUpload', file, this);
+            this.beforeFileUpload && this.beforeFileUpload(file);
         },
         _fileUploadPut(file) {
             var _self = this;
@@ -634,7 +640,9 @@ export default {
                     fileUploads = true;
                     iframe.parentNode && iframe.parentNode.removeChild(iframe);
                     if (!file.removed) {
-                        _self.$dispatch('afterFileUpload', file, _self);
+                        _self.$dispatch && _self.$dispatch('afterFileUpload', file, _self);
+                        _self.afterFileUpload && _self.afterFileUpload(file);
+
                     }
                     setTimeout(function() {
                         _self._fileUploads();
@@ -663,7 +671,8 @@ export default {
                         }
                     }
                 }, 50);
-                _self.$dispatch('beforeFileUpload', file, this);
+                _self.$dispatch && _self.$dispatch('beforeFileUpload', file, this);
+                _self.beforeFileUpload && _self.beforeFileUpload(file);
             }, 10);
 
         },

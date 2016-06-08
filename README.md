@@ -73,7 +73,7 @@ npm run build
 ```
 
 
-## Dispatch
+## $dispatch, methods
     addFileUpload
 
     removeFileUpload
