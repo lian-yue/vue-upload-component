@@ -21,6 +21,7 @@ Vue.filter('formatSize', function(size) {
 	return size.toString() + ' B';
 });
 
+
 new Vue({
     el:'#app',
     components: {
@@ -36,9 +37,10 @@ new Vue({
         files: [],
         upload: {},
         drop: true,
+        auto: false,
     },
 
-    compiled: function() {
+    compiled() {
         this.upload = this.$refs.upload;
         this.upload.request = {
             headers: {
@@ -51,8 +53,25 @@ new Vue({
         this.files = this.$refs.upload.files;
     },
     methods: {
-        remove: function(file) {
+        remove(file) {
             this.$refs.upload.files.$remove(file);
+        },
+    },
+    events: {
+        addFileUpload(file, component) {
+            console.log('addFileUpload');
+            if (this.auto) {
+                component.active = true;
+            }
+        },
+        fileUploadProgress(file, component) {
+            console.log('fileUploadProgress ' + file.progress);
+        },
+        afterFileUpload(file, component) {
+            console.log('afterFileUpload');
+        },
+        beforeFileUpload(file, component) {
+            console.log('beforeFileUpload');
         },
     }
 });

@@ -10671,7 +10671,8 @@
 	
 	        files: [],
 	        upload: {},
-	        drop: true
+	        drop: true,
+	        auto: false
 	    },
 	
 	    compiled: function compiled() {
@@ -10686,9 +10687,27 @@
 	        };
 	        this.files = this.$refs.upload.files;
 	    },
+	
 	    methods: {
 	        remove: function remove(file) {
 	            this.$refs.upload.files.$remove(file);
+	        }
+	    },
+	    events: {
+	        addFileUpload: function addFileUpload(file, component) {
+	            console.log('addFileUpload');
+	            if (this.auto) {
+	                component.active = true;
+	            }
+	        },
+	        fileUploadProgress: function fileUploadProgress(file, component) {
+	            console.log('fileUploadProgress ' + file.progress);
+	        },
+	        afterFileUpload: function afterFileUpload(file, component) {
+	            console.log('afterFileUpload');
+	        },
+	        beforeFileUpload: function beforeFileUpload(file, component) {
+	            console.log('beforeFileUpload');
 	        }
 	    }
 	});
@@ -10708,10 +10727,6 @@
 	var _typeof3 = _interopRequireDefault(_typeof2);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var createId = function createId() {
-	    return Math.random().toString(36).substr(2);
-	};
 	
 	exports.default = {
 	    props: {
@@ -10847,6 +10862,11 @@
 	    },
 	
 	    methods: {
+	        clear: function clear() {
+	            if (this.files.length) {
+	                this.files.splice(0, this.files.length);
+	            }
+	        },
 	        _drop: function _drop(value) {
 	            if (this.dropElement && this.$mode === 'html5') {
 	                try {
@@ -10891,6 +10911,41 @@
 	        _onDragover: function _onDragover(e) {
 	            e.preventDefault();
 	        },
+	        _addFileUpload: function _addFileUpload(hiddenData, file) {
+	            var defaultFile = {
+	                size: -1,
+	                name: 'Filename',
+	                progress: '0.00',
+	                speed: 0,
+	                active: false,
+	                error: '',
+	                errno: '',
+	                success: false,
+	                data: {},
+	                request: {
+	                    headers: {},
+	                    data: {}
+	                }
+	            };
+	            for (var key in defaultFile) {
+	                if (typeof file[key] == 'undefined') {
+	                    file[key] = defaultFile[key];
+	                }
+	            }
+	            if (!file.id) {
+	                file.id = Math.random().toString(36).substr(2);
+	            }
+	
+	            if (!this.multiple) {
+	                this.clear();
+	            }
+	
+	            this._files[file.id] = hiddenData;
+	            file = this.files[this.files.push(file) - 1];
+	            this._files[file.id]._file = file;
+	            this.$dispatch && this.$dispatch('addFileUpload', file, this);
+	            this.addFileUpload && this.addFileUpload(file);
+	        },
 	        _onDrop: function _onDrop(e) {
 	            this._dropActive = 0;
 	            this.dropActive = false;
@@ -10898,19 +10953,10 @@
 	            if (e.dataTransfer.files.length) {
 	                for (var i = 0; i < e.dataTransfer.files.length; i++) {
 	                    var file = e.dataTransfer.files[i];
-	                    var id = createId();
-	                    var value = { id: id, size: file.size, name: file.name, progress: '0.00', speed: 0, active: false, error: '', errno: '', success: false, data: {}, request: { headers: {}, data: {} } };
-	                    this._files[id] = { file: file };
-	
-	                    var len;
-	                    if (this.multiple) {
-	                        len = this.files.push(value);
-	                    } else {
-	                        this.files = [value];
-	                        len = 1;
+	                    this._addFileUpload({ file: file }, { size: file.size, name: file.name });
+	                    if (!this.multiple) {
+	                        break;
 	                    }
-	                    this._files[id]._file = this.files[len - 1];
-	                    this.$dispatch('addFileUpload', this.files[len - 1], this);
 	                }
 	            }
 	        },
@@ -10925,36 +10971,10 @@
 	            if (el.files) {
 	                for (var i = 0; i < el.files.length; i++) {
 	                    var file = el.files[i];
-	                    var id = createId();
-	                    var value = { id: id, size: file.size, name: file.name, progress: '0.00', speed: 0, active: false, error: '', errno: '', success: false, data: {}, request: { headers: {}, data: {} } };
-	                    this._files[id] = { el: el, file: file };
-	
-	                    var len;
-	                    if (this.multiple) {
-	                        len = this.files.push(value);
-	                    } else {
-	                        this.files = [value];
-	                        len = 1;
-	                    }
-	                    this._files[id]._file = this.files[len - 1];
-	                    this.$dispatch && this.$dispatch('addFileUpload', this.files[len - 1], this);
-	                    this.addFileUpload && this.addFileUpload(this.files[len - 1]);
+	                    this._addFileUpload({ file: file, el: el }, { size: file.size, name: file.name });
 	                }
 	            } else {
-	                var id = createId();
-	                var value = { id: id, size: -1, name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1'), progress: '0.00', speed: 0, active: false, error: '', errno: '', success: false, data: {}, request: { headers: {}, data: {} } };
-	                this._files[id] = { el: el };
-	                var len;
-	                if (this.multiple) {
-	                    len = this.files.push(value);
-	                } else {
-	                    this.files = [value];
-	                    len = 1;
-	                }
-	                var len = this.files.push(file);
-	                this._files[id]._file = this.files[len - 1];
-	                this.$dispatch && this.$dispatch('addFileUpload', this.files[len - 1], this);
-	                this.addFileUpload && this.addFileUpload(this.files[len - 1]);
+	                this._addFileUpload({ el: el }, { size: -1, name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1') });
 	            }
 	        },
 	        _fileUploads: function _fileUploads() {
@@ -11018,7 +11038,7 @@
 	        },
 	        _fileUploadXhr: function _fileUploadXhr(xhr, file, data) {
 	            var _self = this;
-	            var file2 = this._files[file.id];
+	            var hiddenData = this._files[file.id];
 	            var fileUploads = false;
 	            var speedTime = 0;
 	            var speedLoaded = 0;
@@ -11127,7 +11147,7 @@
 	
 	            xhr.send(data);
 	            file.active = true;
-	            file2.xhr = xhr;
+	            hiddenData.xhr = xhr;
 	            var interval = setInterval(function () {
 	                if (!_self.active || !file.active || file.success || file.errno) {
 	                    clearInterval(interval);
@@ -11178,7 +11198,7 @@
 	        },
 	        _fileUploadHtml4: function _fileUploadHtml4(file) {
 	            var _self = this;
-	            var file2 = this._files[file.id];
+	            var hiddenData = this._files[file.id];
 	
 	            var fileUploads = false;
 	
@@ -11205,7 +11225,7 @@
 	            form.setAttribute('method', 'POST');
 	            form.setAttribute('target', 'upload-iframe-' + file.id);
 	            form.setAttribute('enctype', 'multipart/form-data');
-	            form.appendChild(file2.el);
+	            form.appendChild(hiddenData.el);
 	            for (var key in this.request.data) {
 	                var input = document.createElement('input');
 	                input.type = 'hidden';
@@ -11301,7 +11321,7 @@
 	
 	                file.active = true;
 	
-	                file2.iframe = iframe;
+	                hiddenData.iframe = iframe;
 	
 	                document.body.addEventListener('keydown', keydown);
 	                var interval = setInterval(function () {

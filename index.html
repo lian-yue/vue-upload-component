@@ -78,6 +78,11 @@
                     </td>
                     <td>
                         <label>
+                            Auto start: <input type="checkbox" id="checkbox" v-model="auto">
+                        </label>
+                    </td>
+                    <td>
+                        <label>
                             Accept: <input type="text" v-model="accept">
                         </label>
                     </td>
@@ -103,6 +108,9 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>
+                        Auto start: {{auto}}
+                    </td>
                     <td>
                         Active: {{$refs.upload.active}}
                     </td>
