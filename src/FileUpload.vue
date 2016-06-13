@@ -78,6 +78,10 @@ export default {
         size: {
             type: Number,
         },
+        events: {
+            type: Object,
+            default: () => {},
+        },
     },
 
     components: {
@@ -162,8 +166,7 @@ export default {
                     iframe.onabort({type:'abort'});
                 }
                 delete this._files[id];
-                this.$dispatch && this.$dispatch('removeFileUpload', file, this);
-                this.removeFileUpload && this.removeFileUpload(file);
+                this._events('removeFileUpload', file);
             }
             this._index = 0;
         },
@@ -186,6 +189,12 @@ export default {
             if (this.files.length) {
                 this.files.splice(0, this.files.length);
             }
+        },
+
+        _events(name, file) {
+            this.$dispatch && this.$dispatch(name, file, this);
+            this[name] && this[name](file);
+            this.events && this.events[name] && this.events[name](file, this);
         },
 
         _drop(value) {
@@ -266,8 +275,7 @@ export default {
             this._files[file.id] = hiddenData;
             file = this.files[this.files.push(file) - 1];
             this._files[file.id]._file = file;
-            this.$dispatch && this.$dispatch('addFileUpload', file, this);
-            this.addFileUpload && this.addFileUpload(file);
+            this._events('addFileUpload', file);
         },
         _onDrop(e) {
             this._dropActive = 0;
@@ -389,8 +397,7 @@ export default {
                         speedTime = speedTime2;
                     }
                 }
-                _self.$dispatch && _self.$dispatch('fileUploadProgress', file, _self);
-                _self.fileUploadProgress && _self.fileUploadProgress(file);
+                _self._events('fileUploadProgress', file);
             };
 
 
@@ -440,8 +447,7 @@ export default {
                 if (!fileUploads) {
                     fileUploads = true;
                     if (!file.removed) {
-                        _self.$dispatch && _self.$dispatch('afterFileUpload', file, _self);
-                        _self.afterFileUpload && _self.afterFileUpload(file);
+                        _self._events('afterFileUpload', file);
                     }
                     setTimeout(function() {
                         _self._fileUploads();
@@ -489,8 +495,7 @@ export default {
                     }
                 }
             }, 100);
-            this.$dispatch && this.$dispatch('beforeFileUpload', file, this);
-            this.beforeFileUpload && this.beforeFileUpload(file);
+            this._events('beforeFileUpload', file);
         },
         _fileUploadPut(file) {
             var _self = this;
@@ -652,8 +657,7 @@ export default {
                     fileUploads = true;
                     iframe.parentNode && iframe.parentNode.removeChild(iframe);
                     if (!file.removed) {
-                        _self.$dispatch && _self.$dispatch('afterFileUpload', file, _self);
-                        _self.afterFileUpload && _self.afterFileUpload(file);
+                        _self._events('afterFileUpload', file);
 
                     }
                     setTimeout(function() {
@@ -661,7 +665,6 @@ export default {
                     }, 50);
                 }
             };
-
 
 
             setTimeout(function() {
@@ -683,8 +686,7 @@ export default {
                         }
                     }
                 }, 50);
-                _self.$dispatch && _self.$dispatch('beforeFileUpload', file, this);
-                _self.beforeFileUpload && _self.beforeFileUpload(file);
+                _self._events('beforeFileUpload', file);
             }, 10);
 
         },
