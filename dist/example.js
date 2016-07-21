@@ -593,7 +593,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/*!
-	 * Vue.js v1.0.24
+	 * Vue.js v1.0.26
 	 * (c) 2016 Evan You
 	 * Released under the MIT License.
 	 */
@@ -992,10 +992,15 @@
 	
 	// UA sniffing for working around browser-specific quirks
 	var UA = inBrowser && window.navigator.userAgent.toLowerCase();
+	var isIE = UA && UA.indexOf('trident') > 0;
 	var isIE9 = UA && UA.indexOf('msie 9.0') > 0;
 	var isAndroid = UA && UA.indexOf('android') > 0;
 	var isIos = UA && /(iphone|ipad|ipod|ios)/i.test(UA);
-	var isWechat = UA && UA.indexOf('micromessenger') > 0;
+	var iosVersionMatch = isIos && UA.match(/os ([\d_]+)/);
+	var iosVersion = iosVersionMatch && iosVersionMatch[1].split('_');
+	
+	// detecting iOS UIWebView by indexedDB
+	var hasMutationObserverBug = iosVersion && Number(iosVersion[0]) >= 9 && Number(iosVersion[1]) >= 3 && !window.indexedDB;
 	
 	var transitionProp = undefined;
 	var transitionEndEvent = undefined;
@@ -1036,7 +1041,7 @@
 	  }
 	
 	  /* istanbul ignore if */
-	  if (typeof MutationObserver !== 'undefined' && !(isWechat && isIos)) {
+	  if (typeof MutationObserver !== 'undefined' && !hasMutationObserverBug) {
 	    var counter = 1;
 	    var observer = new MutationObserver(nextTickHandler);
 	    var textNode = document.createTextNode(counter);
@@ -1108,12 +1113,12 @@
 	
 	p.put = function (key, value) {
 	  var removed;
-	  if (this.size === this.limit) {
-	    removed = this.shift();
-	  }
 	
 	  var entry = this.get(key, true);
 	  if (!entry) {
+	    if (this.size === this.limit) {
+	      removed = this.shift();
+	    }
 	    entry = {
 	      key: key
 	    };
@@ -1358,7 +1363,7 @@
 	  var unsafeOpen = escapeRegex(config.unsafeDelimiters[0]);
 	  var unsafeClose = escapeRegex(config.unsafeDelimiters[1]);
 	  tagRE = new RegExp(unsafeOpen + '((?:.|\\n)+?)' + unsafeClose + '|' + open + '((?:.|\\n)+?)' + close, 'g');
-	  htmlRE = new RegExp('^' + unsafeOpen + '.*' + unsafeClose + '$');
+	  htmlRE = new RegExp('^' + unsafeOpen + '((?:.|\\n)+?)' + unsafeClose + '$');
 	  // reset cache
 	  cache = new Cache(1000);
 	}
@@ -2145,7 +2150,8 @@
 	      return (/HTMLUnknownElement/.test(el.toString()) &&
 	        // Chrome returns unknown for several HTML5 elements.
 	        // https://code.google.com/p/chromium/issues/detail?id=540526
-	        !/^(data|time|rtc|rb)$/.test(tag)
+	        // Firefox returns unknown for some "Interactive elements."
+	        !/^(data|time|rtc|rb|details|dialog|summary)$/.test(tag)
 	      );
 	    }
 	  };
@@ -2481,7 +2487,9 @@
 	  }
 	  if (child.mixins) {
 	    for (var i = 0, l = child.mixins.length; i < l; i++) {
-	      parent = mergeOptions(parent, child.mixins[i], vm);
+	      var mixin = child.mixins[i];
+	      var mixinOptions = mixin.prototype instanceof Vue ? mixin.options : mixin;
+	      parent = mergeOptions(parent, mixinOptions, vm);
 	    }
 	  }
 	  for (key in parent) {
@@ -2909,10 +2917,13 @@
 		hasProto: hasProto,
 		inBrowser: inBrowser,
 		devtools: devtools,
+		isIE: isIE,
 		isIE9: isIE9,
 		isAndroid: isAndroid,
 		isIos: isIos,
-		isWechat: isWechat,
+		iosVersionMatch: iosVersionMatch,
+		iosVersion: iosVersion,
+		hasMutationObserverBug: hasMutationObserverBug,
 		get transitionProp () { return transitionProp; },
 		get transitionEndEvent () { return transitionEndEvent; },
 		get animationProp () { return animationProp; },
@@ -3400,7 +3411,9 @@
 	var restoreRE = /"(\d+)"/g;
 	var pathTestRE = /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\['.*?'\]|\[".*?"\]|\[\d+\]|\[[A-Za-z_$][\w$]*\])*$/;
 	var identRE = /[^\w$\.](?:[A-Za-z_$][\w$]*)/g;
-	var booleanLiteralRE = /^(?:true|false)$/;
+	var literalValueRE$1 = /^(?:true|false|null|undefined|Infinity|NaN)$/;
+	
+	function noop() {}
 	
 	/**
 	 * Save / Rewrite / Restore
@@ -3482,7 +3495,7 @@
 	  // save strings and object literal keys
 	  var body = exp.replace(saveRE, save).replace(wsRE, '');
 	  // rewrite all paths
-	  // pad 1 space here becaue the regex matches 1 extra char
+	  // pad 1 space here because the regex matches 1 extra char
 	  body = (' ' + body).replace(identRE, rewrite).replace(restoreRE, restore);
 	  return makeGetterFn(body);
 	}
@@ -3503,7 +3516,15 @@
 	    return new Function('scope', 'return ' + body + ';');
 	    /* eslint-enable no-new-func */
 	  } catch (e) {
-	    ("production") !== 'production' && warn('Invalid expression. ' + 'Generated function body: ' + body);
+	    if (false) {
+	      /* istanbul ignore if */
+	      if (e.toString().match(/unsafe-eval|CSP/)) {
+	        warn('It seems you are using the default build of Vue.js in an environment ' + 'with Content Security Policy that prohibits unsafe-eval. ' + 'Use the CSP-compliant build instead: ' + 'http://vuejs.org/guide/installation.html#CSP-compliant-build');
+	      } else {
+	        warn('Invalid expression. ' + 'Generated function body: ' + body);
+	      }
+	    }
+	    return noop;
 	  }
 	}
 	
@@ -3565,8 +3586,8 @@
 	
 	function isSimplePath(exp) {
 	  return pathTestRE.test(exp) &&
-	  // don't treat true/false as paths
-	  !booleanLiteralRE.test(exp) &&
+	  // don't treat literal values as paths
+	  !literalValueRE$1.test(exp) &&
 	  // Math constants e.g. Math.PI, Math.E etc.
 	  exp.slice(0, 5) !== 'Math.';
 	}
@@ -3982,7 +4003,7 @@
 	  }
 	  var isA = isArray(val);
 	  var isO = isObject(val);
-	  if (isA || isO) {
+	  if ((isA || isO) && Object.isExtensible(val)) {
 	    if (val.__ob__) {
 	      var depId = val.__ob__.dep.id;
 	      if (seen.has(depId)) {
@@ -4045,6 +4066,7 @@
 	
 	var tagRE$1 = /<([\w:-]+)/;
 	var entityRE = /&#?\w+?;/;
+	var commentRE = /<!--/;
 	
 	/**
 	 * Convert a string template to a DocumentFragment.
@@ -4067,8 +4089,9 @@
 	  var frag = document.createDocumentFragment();
 	  var tagMatch = templateString.match(tagRE$1);
 	  var entityMatch = entityRE.test(templateString);
+	  var commentMatch = commentRE.test(templateString);
 	
-	  if (!tagMatch && !entityMatch) {
+	  if (!tagMatch && !entityMatch && !commentMatch) {
 	    // text only, return a single text node.
 	    frag.appendChild(document.createTextNode(templateString));
 	  } else {
@@ -5035,7 +5058,7 @@
 	   * the filters. This is passed to and called by the watcher.
 	   *
 	   * It is necessary for this to be called during the
-	   * wathcer's dependency collection phase because we want
+	   * watcher's dependency collection phase because we want
 	   * the v-for to update when the source Object is mutated.
 	   */
 	
@@ -5378,7 +5401,10 @@
 	  },
 	
 	  update: function update(value) {
-	    this.el.value = _toString(value);
+	    // #3029 only update when the value changes. This prevent
+	    // browsers from overwriting values like selectionStart
+	    value = _toString(value);
+	    if (value !== this.el.value) this.el.value = value;
 	  },
 	
 	  unbind: function unbind() {
@@ -5427,6 +5453,8 @@
 	var select = {
 	
 	  bind: function bind() {
+	    var _this = this;
+	
 	    var self = this;
 	    var el = this.el;
 	
@@ -5458,7 +5486,12 @@
 	    // selectedIndex with value -1 to 0 when the element
 	    // is appended to a new parent, therefore we have to
 	    // force a DOM update whenever that happens...
-	    this.vm.$on('hook:attached', this.forceUpdate);
+	    this.vm.$on('hook:attached', function () {
+	      nextTick(_this.forceUpdate);
+	    });
+	    if (!inDoc(el)) {
+	      nextTick(this.forceUpdate);
+	    }
 	  },
 	
 	  update: function update(value) {
@@ -6728,7 +6761,7 @@
 	  if (value === undefined) {
 	    value = getPropDefaultValue(vm, prop);
 	  }
-	  value = coerceProp(prop, value);
+	  value = coerceProp(prop, value, vm);
 	  var coerced = value !== rawValue;
 	  if (!assertProp(prop, value, vm)) {
 	    value = undefined;
@@ -6847,13 +6880,17 @@
 	 * @return {*}
 	 */
 	
-	function coerceProp(prop, value) {
+	function coerceProp(prop, value, vm) {
 	  var coerce = prop.options.coerce;
 	  if (!coerce) {
 	    return value;
 	  }
-	  // coerce is a function
-	  return coerce(value);
+	  if (typeof coerce === 'function') {
+	    return coerce(value);
+	  } else {
+	    ("production") !== 'production' && warn('Invalid coerce for prop "' + prop.name + '": expected function, got ' + typeof coerce + '.', vm);
+	    return value;
+	  }
 	}
 	
 	/**
@@ -7385,10 +7422,9 @@
 	    // resolve on owner vm
 	    var hooks = resolveAsset(this.vm.$options, 'transitions', id);
 	    id = id || 'v';
+	    oldId = oldId || 'v';
 	    el.__v_trans = new Transition(el, id, hooks, this.vm);
-	    if (oldId) {
-	      removeClass(el, oldId + '-transition');
-	    }
+	    removeClass(el, oldId + '-transition');
 	    addClass(el, id + '-transition');
 	  }
 	};
@@ -7813,7 +7849,7 @@
 	          if (token.html) {
 	            replace(node, parseTemplate(value, true));
 	          } else {
-	            node.data = value;
+	            node.data = _toString(value);
 	          }
 	        } else {
 	          vm._bindDir(token.descriptor, node, host, scope);
@@ -8797,7 +8833,7 @@
 	  };
 	}
 	
-	function noop() {}
+	function noop$1() {}
 	
 	/**
 	 * A directive links a DOM element with a piece of data,
@@ -8896,7 +8932,7 @@
 	        }
 	      };
 	    } else {
-	      this._update = noop;
+	      this._update = noop$1;
 	    }
 	    var preProcess = this._preProcess ? bind(this._preProcess, this) : null;
 	    var postProcess = this._postProcess ? bind(this._postProcess, this) : null;
@@ -10334,7 +10370,7 @@
 	
 	  json: {
 	    read: function read(value, indent) {
-	      return typeof value === 'string' ? value : JSON.stringify(value, null, Number(indent) || 2);
+	      return typeof value === 'string' ? value : JSON.stringify(value, null, arguments.length > 1 ? indent : 2);
 	    },
 	    write: function write(value) {
 	      try {
@@ -10407,7 +10443,13 @@
 	
 	  pluralize: function pluralize(value) {
 	    var args = toArray(arguments, 1);
-	    return args.length > 1 ? args[value % 10 - 1] || args[args.length - 1] : args[0] + (value === 1 ? '' : 's');
+	    var length = args.length;
+	    if (length > 1) {
+	      var index = value % 10 - 1;
+	      return index in args ? args[index] : args[length - 1];
+	    } else {
+	      return args[0] + (value === 1 ? '' : 's');
+	    }
 	  },
 	
 	  /**
@@ -10592,7 +10634,9 @@
 	          }
 	        }
 	        if (type === 'component' && isPlainObject(definition)) {
-	          definition.name = id;
+	          if (!definition.name) {
+	            definition.name = id;
+	          }
 	          definition = Vue.extend(definition);
 	        }
 	        this.options[type + 's'][id] = definition;
@@ -10607,7 +10651,7 @@
 	
 	installGlobalAPI(Vue);
 	
-	Vue.version = '1.0.24';
+	Vue.version = '1.0.26';
 	
 	// devtools global hook
 	/* istanbul ignore next */
@@ -10646,70 +10690,70 @@
 	_vue2.default.config.devtools = true;
 	
 	_vue2.default.filter('formatSize', function (size) {
-	    if (size > 1024 * 1024 * 1024 * 1024) {
-	        return (size / 1024 / 1024 / 1024 / 1024).toFixed(2) + ' TB';
-	    } else if (size > 1024 * 1024 * 1024) {
-	        return (size / 1024 / 1024 / 1024).toFixed(2) + ' GB';
-	    } else if (size > 1024 * 1024) {
-	        return (size / 1024 / 1024).toFixed(2) + ' MB';
-	    } else if (size > 1024) {
-	        return (size / 1024).toFixed(2) + ' KB';
-	    }
-	    return size.toString() + ' B';
+	  if (size > 1024 * 1024 * 1024 * 1024) {
+	    return (size / 1024 / 1024 / 1024 / 1024).toFixed(2) + ' TB';
+	  } else if (size > 1024 * 1024 * 1024) {
+	    return (size / 1024 / 1024 / 1024).toFixed(2) + ' GB';
+	  } else if (size > 1024 * 1024) {
+	    return (size / 1024 / 1024).toFixed(2) + ' MB';
+	  } else if (size > 1024) {
+	    return (size / 1024).toFixed(2) + ' KB';
+	  }
+	  return size.toString() + ' B';
 	});
 	
 	new _vue2.default({
-	    el: '#app',
-	    components: {
-	        FileUpload: _FileUpload2.default
-	    },
-	    data: {
-	        accept: 'image/*',
-	        size: 1024 * 1024 * 10,
-	        multiple: true,
-	        extensions: 'gif,jpg,png',
+	  el: '#app',
+	  components: {
+	    FileUpload: _FileUpload2.default
+	  },
+	  data: {
+	    accept: 'image/*',
+	    size: 1024 * 1024 * 10,
+	    multiple: true,
+	    extensions: 'gif,jpg,png',
 	
-	        files: [],
-	        upload: {},
-	        drop: true,
-	        auto: false
-	    },
+	    files: [],
+	    upload: {},
+	    drop: true,
+	    auto: false
+	  },
 	
-	    compiled: function compiled() {
-	        this.upload = this.$refs.upload;
-	        this.upload.request = {
-	            headers: {
-	                "X-Csrf-Token": "xxxx"
-	            },
-	            data: {
-	                "_csrf_token": "xxxxxx"
-	            }
-	        };
-	        this.files = this.$refs.upload.files;
-	    },
+	  compiled: function compiled() {
+	    this.upload = this.$refs.upload;
+	    this.upload.request = {
+	      headers: {
+	        "X-Csrf-Token": "xxxx"
+	      },
+	      data: {
+	        "_csrf_token": "xxxxxx"
+	      }
+	    };
+	    this.files = this.$refs.upload.files;
+	  },
 	
-	    methods: {
-	        remove: function remove(file) {
-	            this.$refs.upload.files.$remove(file);
-	        }
-	    },
-	    events: {
-	        addFileUpload: function addFileUpload(file, component) {
-	            console.log('addFileUpload');
-	            if (this.auto) {
-	                component.active = true;
-	            }
-	        },
-	        fileUploadProgress: function fileUploadProgress(file, component) {
-	            console.log('fileUploadProgress ' + file.progress);
-	        },
-	        afterFileUpload: function afterFileUpload(file, component) {
-	            console.log('afterFileUpload');
-	        },
-	        beforeFileUpload: function beforeFileUpload(file, component) {
-	            console.log('beforeFileUpload');
-	        }
+	  methods: {
+	    remove: function remove(file) {
+	      this.$refs.upload.files.$remove(file);
 	    }
+	  },
+	  events: {
+	    addFileUpload: function addFileUpload(file, component) {
+	      console.log('addFileUpload');
+	      if (this.auto) {
+	        component.active = true;
+	      }
+	    },
+	    fileUploadProgress: function fileUploadProgress(file, component) {
+	      console.log('fileUploadProgress ' + file.progress);
+	    },
+	    afterFileUpload: function afterFileUpload(file, component) {
+	      console.log('afterFileUpload');
+	    },
+	    beforeFileUpload: function beforeFileUpload(file, component) {
+	      console.log('beforeFileUpload');
+	    }
+	  }
 	});
 
 /***/ },
@@ -10719,7 +10763,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	
 	var _typeof2 = __webpack_require__(42);
@@ -10729,616 +10773,616 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = {
-	    props: {
-	        title: {
-	            type: String,
-	            default: 'Upload file'
-	        },
-	        name: {
-	            type: String,
-	            default: 'file'
-	        },
-	        drop: {
-	            default: false
-	        },
-	        extensions: {
-	            default: function _default() {
-	                return [];
-	            }
-	        },
-	        postAction: {
-	            type: String
-	        },
-	        putAction: {
-	            type: String
-	        },
-	        accept: {
-	            type: String
-	        },
-	        multiple: {
-	            type: Boolean
-	        },
-	        timeout: {
-	            type: Number,
-	            default: 0
-	        },
-	        size: {
-	            type: Number
-	        },
-	        events: {
-	            type: Object,
-	            default: function _default() {}
-	        }
+	  props: {
+	    title: {
+	      type: String,
+	      default: 'Upload file'
 	    },
-	
-	    components: {
-	        inputFile: {
-	            template: '<input type="file" :name="$parent.name" :id="$parent.id||$parent.name" :accept="$parent.accept" @change="change" :multiple="$parent.multiple && $parent.$mode == \'html5\'">',
-	            methods: {
-	                change: function change(e) {
-	                    this.$parent._addFileUploads(e.target);
-	                    this.$destroy();
-	                }
-	            }
-	        }
+	    name: {
+	      type: String,
+	      default: 'file'
 	    },
-	
-	    data: function data() {
-	        return {
-	            files: [],
-	            active: false,
-	            uploaded: true,
-	            dropActive: false,
-	            dropElement: false,
-	            request: {
-	                data: {},
-	                headers: {}
-	            }
-	        };
+	    drop: {
+	      default: false
 	    },
-	    ready: function ready() {
-	        this._drop(this.drop);
+	    extensions: {
+	      default: function _default() {
+	        return [];
+	      }
 	    },
-	    init: function init() {
-	        var input = document.createElement('input');
-	        input.type = 'file';
-	        if (window.FormData && input.files) {
-	            this.$mode = 'html5';
-	        } else {
-	            this.$mode = 'html4';
-	        }
-	        this._index = 0;
-	        this._dropActive = 0;
-	        this._files = {};
+	    postAction: {
+	      type: String
 	    },
-	    beforeDestroy: function beforeDestroy() {
-	        this.active = false;
-	        this.files = [];
+	    putAction: {
+	      type: String
 	    },
-	
-	
-	    watch: {
-	        drop: function drop(value) {
-	            this._drop(value);
-	        },
-	        files: function files(_files) {
-	            var ids = [];
-	            for (var i = 0; i < _files.length; i++) {
-	                var file = _files[i];
-	                if (!file.errno && !file.success) {
-	                    this.uploaded = false;
-	                }
-	                ids.push(file.id);
-	            }
-	            for (var id in this._files) {
-	                if (ids.indexOf(id) != -1) {
-	                    continue;
-	                }
-	
-	                var file = this._files[id]._file;
-	
-	                file.removed = true;
-	                var xhr = this._files[id].xhr;
-	                if (xhr) {
-	                    xhr.abort();
-	                    xhr.timeout = 1;
-	                }
-	                var iframe = this._files[id].iframe;
-	                if (iframe) {
-	                    iframe.onabort({ type: 'abort' });
-	                }
-	                delete this._files[id];
-	                this._events('removeFileUpload', file);
-	            }
-	            this._index = 0;
-	        },
-	        active: function active(newValue, oldValue) {
-	            if (newValue && !oldValue) {
-	                this._fileUploads();
-	            }
-	        },
-	        uploaded: function uploaded(_uploaded) {
-	            if (_uploaded) {
-	                this.active = false;
-	            }
-	        }
+	    accept: {
+	      type: String
 	    },
-	
-	    methods: {
-	        clear: function clear() {
-	            if (this.files.length) {
-	                this.files.splice(0, this.files.length);
-	            }
-	        },
-	        _events: function _events(name, file) {
-	            this.$dispatch && this.$dispatch(name, file, this);
-	            this[name] && this[name](file);
-	            this.events && this.events[name] && this.events[name](file, this);
-	        },
-	        _drop: function _drop(value) {
-	            if (this.dropElement && this.$mode === 'html5') {
-	                try {
-	                    window.document.removeEventListener('dragenter', this._onDragenter, false);
-	                    window.document.removeEventListener('dragleave', this._onDragleave, false);
-	                    this.dropElement.removeEventListener('dragover', this._onDragover, false);
-	                    this.dropElement.removeEventListener('drop', this._onDrop, false);
-	                } catch (e) {}
-	            }
-	
-	            if (!value) {
-	                this.dropElement = false;
-	                return;
-	            }
-	
-	            if (typeof value == 'string') {
-	                this.dropElement = document.querySelector(value) || this.$root.$el.querySelector(value);
-	            } else if (typeof value == 'boolean') {
-	                this.dropElement = this.$parent.$el;
-	            } else {
-	                this.dropElement = this.drop;
-	            }
-	            if (this.dropElement && this.$mode === 'html5') {
-	                window.document.addEventListener('dragenter', this._onDragenter, false);
-	                window.document.addEventListener('dragleave', this._onDragleave, false);
-	                this.dropElement.addEventListener('dragover', this._onDragover, false);
-	                this.dropElement.addEventListener('drop', this._onDrop, false);
-	            }
-	        },
-	        _onDragenter: function _onDragenter(e) {
-	            this._dropActive++;
-	            this.dropActive = !!this._dropActive;
-	            e.preventDefault();
-	        },
-	        _onDragleave: function _onDragleave(e) {
-	            e.preventDefault();
-	            this._dropActive--;
-	            if (e.target.nodeName == 'HTML' || e.screenX == 0 && e.screenY == 0) {
-	                this.dropActive = !!this._dropActive;
-	            }
-	        },
-	        _onDragover: function _onDragover(e) {
-	            e.preventDefault();
-	        },
-	        _addFileUpload: function _addFileUpload(hiddenData, file) {
-	            var defaultFile = {
-	                size: -1,
-	                name: 'Filename',
-	                progress: '0.00',
-	                speed: 0,
-	                active: false,
-	                error: '',
-	                errno: '',
-	                success: false,
-	                data: {},
-	                request: {
-	                    headers: {},
-	                    data: {}
-	                }
-	            };
-	            for (var key in defaultFile) {
-	                if (typeof file[key] == 'undefined') {
-	                    file[key] = defaultFile[key];
-	                }
-	            }
-	            if (!file.id) {
-	                file.id = Math.random().toString(36).substr(2);
-	            }
-	
-	            if (!this.multiple) {
-	                this.clear();
-	            }
-	
-	            this._files[file.id] = hiddenData;
-	            file = this.files[this.files.push(file) - 1];
-	            this._files[file.id]._file = file;
-	            this._events('addFileUpload', file);
-	        },
-	        _onDrop: function _onDrop(e) {
-	            this._dropActive = 0;
-	            this.dropActive = false;
-	            e.preventDefault();
-	            if (e.dataTransfer.files.length) {
-	                for (var i = 0; i < e.dataTransfer.files.length; i++) {
-	                    var file = e.dataTransfer.files[i];
-	                    this._addFileUpload({ file: file }, { size: file.size, name: file.name });
-	                    if (!this.multiple) {
-	                        break;
-	                    }
-	                }
-	            }
-	        },
-	        _addFileUploads: function _addFileUploads(el) {
-	            var Component = this.$options.components.inputFile;
-	            new Component({
-	                parent: this,
-	                el: el
-	            });
-	            this.uploaded = false;
-	
-	            if (el.files) {
-	                for (var i = 0; i < el.files.length; i++) {
-	                    var file = el.files[i];
-	                    this._addFileUpload({ file: file, el: el }, { size: file.size, name: file.name });
-	                }
-	            } else {
-	                this._addFileUpload({ el: el }, { size: -1, name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1') });
-	            }
-	        },
-	        _fileUploads: function _fileUploads() {
-	            if (!this.active) {
-	                return;
-	            }
-	            for (; this._index < this.files.length; this._index++) {
-	                var file = this.files[this._index];
-	                if (file.active || file.success || file.errno) {
-	                    continue;
-	                }
-	                if (this.size && this.size > 0 && file.size >= 0 && file.size > this.size) {
-	                    file.error = 'Size';
-	                    file.errno = 'size';
-	                    continue;
-	                }
-	
-	                if (this.extensions && (this.extensions.length || typeof this.extensions.length == 'undefined')) {
-	                    var extensions = this.extensions;
-	                    if ((typeof extensions === 'undefined' ? 'undefined' : (0, _typeof3.default)(extensions)) == 'object' && RegExp instanceof extensions) {} else {
-	                        if (typeof extensions == 'string') {
-	                            extensions = extensions.split(',').map(function (value) {
-	                                return value.trim();
-	                            }).filter(function (value) {
-	                                return value;
-	                            });
-	                        }
-	                        extensions = new RegExp('\\.(' + extensions.join('|').replace(/\./g, '\\.') + ')$', 'i');
-	                    }
-	
-	                    if (file.name.search(extensions) == -1) {
-	                        file.error = 'Extension';
-	                        file.errno = 'extension';
-	                        continue;
-	                    }
-	                }
-	
-	                if (this.$mode == 'html5') {
-	                    if (this.putAction || file.putAction) {
-	                        this._fileUploadPut(file);
-	                    } else if (this.postAction || file.postAction) {
-	                        this._fileUploadHtml5(file);
-	                    } else {
-	                        file.error = 'Not Support';
-	                        file.errno = 'not_support';
-	                        continue;
-	                    }
-	                } else {
-	                    if (this.postAction || file.postAction) {
-	                        this._fileUploadHtml4(file);
-	                    } else {
-	                        file.error = 'Not Support';
-	                        file.errno = 'not_support';
-	                        continue;
-	                    }
-	                }
-	                return;
-	            }
-	            this.active = false;
-	            this.uploaded = true;
-	        },
-	        _fileUploadXhr: function _fileUploadXhr(xhr, file, data) {
-	            var _self = this;
-	            var hiddenData = this._files[file.id];
-	            var fileUploads = false;
-	            var speedTime = 0;
-	            var speedLoaded = 0;
-	            xhr.upload.onprogress = function (e) {
-	                if (file.removed) {
-	                    xhr.abort();
-	                    return;
-	                }
-	                if (!_self.active || !file.active) {
-	                    xhr.abort();
-	                    return;
-	                }
-	                if (e.lengthComputable) {
-	                    file.progress = (e.loaded / e.total * 100).toFixed(2);
-	                    var speedTime2 = Math.round(Date.now() / 1000);
-	                    if (speedTime2 != speedTime) {
-	                        file.speed = e.loaded - speedLoaded;
-	                        speedLoaded = e.loaded;
-	                        speedTime = speedTime2;
-	                    }
-	                }
-	                _self._events('fileUploadProgress', file);
-	            };
-	
-	            var callback = function callback(e) {
-	                switch (e.type) {
-	                    case 'timeout':
-	                        file.errno = 'timeout';
-	                        file.error = 'Timeout';
-	                        break;
-	                    case 'abort':
-	                        file.errno = 'abort';
-	                        file.error = 'Abort';
-	                        break;
-	                    case 'error':
-	                        if (!xhr.status) {
-	                            file.errno = 'network';
-	                            file.error = 'Network';
-	                        } else if (xhr.status >= 500) {
-	                            file.errno = 'server';
-	                            file.error = 'Server';
-	                        } else if (xhr.status >= 400) {
-	                            file.errno = 'denied';
-	                            file.error = 'Denied';
-	                        }
-	                        break;
-	                    default:
-	                        if (xhr.status >= 500) {
-	                            file.errno = 'server';
-	                            file.error = 'Server';
-	                        } else if (xhr.status >= 400) {
-	                            file.errno = 'denied';
-	                            file.error = 'Denied';
-	                        } else {
-	                            file.progress = '100.00';
-	                            file.success = true;
-	                        }
-	                }
-	                file.active = false;
-	                if (xhr.responseText) {
-	                    var contentType = xhr.getResponseHeader('Content-Type');
-	                    if (contentType && contentType.indexOf('/json') != -1) {
-	                        file.data = JSON.parse(xhr.responseText);
-	                    } else {
-	                        file.data = xhr.responseText;
-	                    }
-	                }
-	                if (!fileUploads) {
-	                    fileUploads = true;
-	                    if (!file.removed) {
-	                        _self._events('afterFileUpload', file);
-	                    }
-	                    setTimeout(function () {
-	                        _self._fileUploads();
-	                    }, 50);
-	                }
-	            };
-	
-	            xhr.onload = callback;
-	            xhr.onerror = callback;
-	            xhr.onabort = callback;
-	            xhr.ontimeout = callback;
-	
-	            if (this.timeout) {
-	                xhr.timeout = this.timeout;
-	            }
-	
-	            xhr.onload = callback;
-	            xhr.onerror = callback;
-	            xhr.onabort = callback;
-	            xhr.ontimeout = callback;
-	
-	            if (this.timeout) {
-	                xhr.timeout = this.timeout;
-	            }
-	
-	            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-	            for (var key in this.request.headers) {
-	                xhr.setRequestHeader(key, this.request.headers[key]);
-	            }
-	            for (var key in file.request.headers) {
-	                xhr.setRequestHeader(key, file.request.headers[key]);
-	            }
-	
-	            xhr.send(data);
-	            file.active = true;
-	            hiddenData.xhr = xhr;
-	            var interval = setInterval(function () {
-	                if (!_self.active || !file.active || file.success || file.errno) {
-	                    clearInterval(interval);
-	                    if (!file.success && !file.errno) {
-	                        xhr.abort();
-	                    }
-	                }
-	            }, 100);
-	            this._events('beforeFileUpload', file);
-	        },
-	        _fileUploadPut: function _fileUploadPut(file) {
-	            var _self = this;
-	
-	            var querys = {};
-	            for (var key in this.request.data) {
-	                querys[key] = this.request.data[key];
-	            }
-	            for (var _key in file.request.data) {
-	                querys[_key] = file.request.data[_key];
-	            }
-	            var queryArray = [];
-	            for (var _key2 in querys) {
-	                if (querys[_key2] !== null && typeof querys[_key2] !== 'undefined') {
-	                    queryArray.push(encodeURIComponent(_key2) + '=' + encodeURIComponent(querys[_key2]));
-	                }
-	            }
-	            var queryString = queryArray.length ? '?' + queryArray.join('&') : '';
-	
-	            var xhr = new XMLHttpRequest();
-	            xhr.open('PUT', (file.putAction || this.putAction) + queryString);
-	            this._fileUploadXhr(xhr, file, this._files[file.id].file);
-	        },
-	        _fileUploadHtml5: function _fileUploadHtml5(file) {
-	            var form = new window.FormData();
-	            form.append(this.name, this._files[file.id].file);
-	            for (var key in this.request.data) {
-	                form.append(key, this.request.data[key]);
-	            }
-	
-	            for (var key in file.request.data) {
-	                form.append(key, file.request.data[key]);
-	            }
-	
-	            var xhr = new XMLHttpRequest();
-	            xhr.open('POST', file.postAction || this.postAction);
-	            this._fileUploadXhr(xhr, file, form);
-	        },
-	        _fileUploadHtml4: function _fileUploadHtml4(file) {
-	            var _self = this;
-	            var hiddenData = this._files[file.id];
-	
-	            var fileUploads = false;
-	
-	            var keydown = function keydown(e) {
-	                if (e.keyCode == 27) {
-	                    e.preventDefault();
-	                }
-	            };
-	
-	            var iframe = document.createElement('iframe');
-	            iframe.id = 'upload-iframe-' + file.id;
-	            iframe.name = 'upload-iframe-' + file.id;
-	            iframe.src = 'about:blank';
-	            iframe.style.width = '1px';
-	            iframe.style.height = '1px';
-	            iframe.style.top = '-9999px';
-	            iframe.style.left = '-9999px';
-	            iframe.style.position = 'absolute';
-	            iframe.style.marginTop = '-9999em';
-	
-	            var form = document.createElement('form');
-	            form.action = file.postAction || this.postAction;
-	            form.name = 'upload-form-' + file.id;
-	            form.setAttribute('method', 'POST');
-	            form.setAttribute('target', 'upload-iframe-' + file.id);
-	            form.setAttribute('enctype', 'multipart/form-data');
-	            form.appendChild(hiddenData.el);
-	            for (var key in this.request.data) {
-	                var input = document.createElement('input');
-	                input.type = 'hidden';
-	                input.name = key;
-	                input.value = this.request.data[key];
-	                form.appendChild(input);
-	            }
-	
-	            for (var key in file.request.data) {
-	                var input = document.createElement('input');
-	                input.type = 'hidden';
-	                input.name = key;
-	                input.value = file.request.data[key];
-	                form.appendChild(input);
-	            }
-	
-	            var getDocumentData = function getDocumentData() {
-	                var doc;
-	                try {
-	                    if (iframe.contentWindow) {
-	                        doc = iframe.contentWindow.document;
-	                    }
-	                } catch (err) {}
-	                if (!doc) {
-	                    try {
-	                        doc = iframe.contentDocument ? iframe.contentDocument : iframe.document;
-	                    } catch (err) {
-	                        doc = iframe.document;
-	                    }
-	                }
-	                if (doc && doc.body) {
-	                    return doc.body.innerHTML;
-	                }
-	                return null;
-	            };
-	
-	            var callback = function callback(e) {
-	                switch (e.type) {
-	                    case 'abort':
-	                        file.errno = 'abort';
-	                        file.error = 'Abort';
-	                        break;
-	                    case 'error':
-	                        var data = getDocumentData();
-	                        if (file.errno) {} else if (data === null) {
-	                            file.errno = 'network';
-	                            file.error = 'Network';
-	                        } else {
-	                            file.errno = 'denied';
-	                            file.error = 'Denied';
-	                        }
-	                        break;
-	                    default:
-	                        var data = getDocumentData();
-	                        if (file.errno) {} else if (data === null) {
-	                            file.errno = 'network';
-	                            file.error = 'Network';
-	                        } else {
-	                            file.progress = '100.00';
-	                            file.success = true;
-	                        }
-	                }
-	
-	                file.active = false;
-	                if (typeof data != "undefined") {
-	                    if (data && data.substr(0, 1) == '{' && data.substr(data.length - 1, 1) == '}') {
-	                        try {
-	                            data = JSON.parse(data);
-	                        } catch (err) {}
-	                    }
-	                    file.data = data;
-	                }
-	                if (!fileUploads) {
-	                    document.body.removeEventListener('keydown', keydown);
-	                    document.body.removeEventListener('keydown', keydown);
-	                    fileUploads = true;
-	                    iframe.parentNode && iframe.parentNode.removeChild(iframe);
-	                    if (!file.removed) {
-	                        _self._events('afterFileUpload', file);
-	                    }
-	                    setTimeout(function () {
-	                        _self._fileUploads();
-	                    }, 50);
-	                }
-	            };
-	
-	            setTimeout(function () {
-	                document.body.appendChild(iframe).appendChild(form).submit();
-	                iframe.onload = callback;
-	                iframe.onerror = callback;
-	                iframe.onabort = callback;
-	
-	                file.active = true;
-	
-	                hiddenData.iframe = iframe;
-	
-	                document.body.addEventListener('keydown', keydown);
-	                var interval = setInterval(function () {
-	                    if (!_self.active || !file.active || file.success || file.errno) {
-	                        clearInterval(interval);
-	                        if (!file.success && !file.errno) {
-	                            iframe.onabort({ type: 'abort' });
-	                        }
-	                    }
-	                }, 50);
-	                _self._events('beforeFileUpload', file);
-	            }, 10);
-	        }
+	    multiple: {
+	      type: Boolean
+	    },
+	    timeout: {
+	      type: Number,
+	      default: 0
+	    },
+	    size: {
+	      type: Number
+	    },
+	    events: {
+	      type: Object,
+	      default: function _default() {}
 	    }
+	  },
+	
+	  components: {
+	    inputFile: {
+	      template: '<input type="file" :name="$parent.name" :id="$parent.id||$parent.name" :accept="$parent.accept" @change="change" :multiple="$parent.multiple && $parent.$mode == \'html5\'">',
+	      methods: {
+	        change: function change(e) {
+	          this.$parent._addFileUploads(e.target);
+	          this.$destroy();
+	        }
+	      }
+	    }
+	  },
+	
+	  data: function data() {
+	    return {
+	      files: [],
+	      active: false,
+	      uploaded: true,
+	      dropActive: false,
+	      dropElement: false,
+	      request: {
+	        data: {},
+	        headers: {}
+	      }
+	    };
+	  },
+	  ready: function ready() {
+	    this._drop(this.drop);
+	  },
+	  init: function init() {
+	    var input = document.createElement('input');
+	    input.type = 'file';
+	    if (window.FormData && input.files) {
+	      this.$mode = 'html5';
+	    } else {
+	      this.$mode = 'html4';
+	    }
+	    this._index = 0;
+	    this._dropActive = 0;
+	    this._files = {};
+	  },
+	  beforeDestroy: function beforeDestroy() {
+	    this.active = false;
+	    this.files = [];
+	  },
+	
+	
+	  watch: {
+	    drop: function drop(value) {
+	      this._drop(value);
+	    },
+	    files: function files(_files) {
+	      var ids = [];
+	      for (var i = 0; i < _files.length; i++) {
+	        var file = _files[i];
+	        if (!file.errno && !file.success) {
+	          this.uploaded = false;
+	        }
+	        ids.push(file.id);
+	      }
+	      for (var id in this._files) {
+	        if (ids.indexOf(id) != -1) {
+	          continue;
+	        }
+	
+	        var file = this._files[id]._file;
+	
+	        file.removed = true;
+	        var xhr = this._files[id].xhr;
+	        if (xhr) {
+	          xhr.abort();
+	          xhr.timeout = 1;
+	        }
+	        var iframe = this._files[id].iframe;
+	        if (iframe) {
+	          iframe.onabort({ type: 'abort' });
+	        }
+	        delete this._files[id];
+	        this._events('removeFileUpload', file);
+	      }
+	      this._index = 0;
+	    },
+	    active: function active(newValue, oldValue) {
+	      if (newValue && !oldValue) {
+	        this._fileUploads();
+	      }
+	    },
+	    uploaded: function uploaded(_uploaded) {
+	      if (_uploaded) {
+	        this.active = false;
+	      }
+	    }
+	  },
+	
+	  methods: {
+	    clear: function clear() {
+	      if (this.files.length) {
+	        this.files.splice(0, this.files.length);
+	      }
+	    },
+	    _events: function _events(name, file) {
+	      this.$dispatch && this.$dispatch(name, file, this);
+	      this[name] && this[name](file);
+	      this.events && this.events[name] && this.events[name](file, this);
+	    },
+	    _drop: function _drop(value) {
+	      if (this.dropElement && this.$mode === 'html5') {
+	        try {
+	          window.document.removeEventListener('dragenter', this._onDragenter, false);
+	          window.document.removeEventListener('dragleave', this._onDragleave, false);
+	          this.dropElement.removeEventListener('dragover', this._onDragover, false);
+	          this.dropElement.removeEventListener('drop', this._onDrop, false);
+	        } catch (e) {}
+	      }
+	
+	      if (!value) {
+	        this.dropElement = false;
+	        return;
+	      }
+	
+	      if (typeof value == 'string') {
+	        this.dropElement = document.querySelector(value) || this.$root.$el.querySelector(value);
+	      } else if (typeof value == 'boolean') {
+	        this.dropElement = this.$parent.$el;
+	      } else {
+	        this.dropElement = this.drop;
+	      }
+	      if (this.dropElement && this.$mode === 'html5') {
+	        window.document.addEventListener('dragenter', this._onDragenter, false);
+	        window.document.addEventListener('dragleave', this._onDragleave, false);
+	        this.dropElement.addEventListener('dragover', this._onDragover, false);
+	        this.dropElement.addEventListener('drop', this._onDrop, false);
+	      }
+	    },
+	    _onDragenter: function _onDragenter(e) {
+	      this._dropActive++;
+	      this.dropActive = !!this._dropActive;
+	      e.preventDefault();
+	    },
+	    _onDragleave: function _onDragleave(e) {
+	      e.preventDefault();
+	      this._dropActive--;
+	      if (e.target.nodeName == 'HTML' || e.screenX == 0 && e.screenY == 0) {
+	        this.dropActive = !!this._dropActive;
+	      }
+	    },
+	    _onDragover: function _onDragover(e) {
+	      e.preventDefault();
+	    },
+	    _addFileUpload: function _addFileUpload(hiddenData, file) {
+	      var defaultFile = {
+	        size: -1,
+	        name: 'Filename',
+	        progress: '0.00',
+	        speed: 0,
+	        active: false,
+	        error: '',
+	        errno: '',
+	        success: false,
+	        data: {},
+	        request: {
+	          headers: {},
+	          data: {}
+	        }
+	      };
+	      for (var key in defaultFile) {
+	        if (typeof file[key] == 'undefined') {
+	          file[key] = defaultFile[key];
+	        }
+	      }
+	      if (!file.id) {
+	        file.id = Math.random().toString(36).substr(2);
+	      }
+	
+	      if (!this.multiple) {
+	        this.clear();
+	      }
+	
+	      this._files[file.id] = hiddenData;
+	      file = this.files[this.files.push(file) - 1];
+	      this._files[file.id]._file = file;
+	      this._events('addFileUpload', file);
+	    },
+	    _onDrop: function _onDrop(e) {
+	      this._dropActive = 0;
+	      this.dropActive = false;
+	      e.preventDefault();
+	      if (e.dataTransfer.files.length) {
+	        for (var i = 0; i < e.dataTransfer.files.length; i++) {
+	          var file = e.dataTransfer.files[i];
+	          this._addFileUpload({ file: file }, { size: file.size, name: file.name });
+	          if (!this.multiple) {
+	            break;
+	          }
+	        }
+	      }
+	    },
+	    _addFileUploads: function _addFileUploads(el) {
+	      var Component = this.$options.components.inputFile;
+	      new Component({
+	        parent: this,
+	        el: el
+	      });
+	      this.uploaded = false;
+	
+	      if (el.files) {
+	        for (var i = 0; i < el.files.length; i++) {
+	          var file = el.files[i];
+	          this._addFileUpload({ file: file, el: el }, { size: file.size, name: file.name });
+	        }
+	      } else {
+	        this._addFileUpload({ el: el }, { size: -1, name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1') });
+	      }
+	    },
+	    _fileUploads: function _fileUploads() {
+	      if (!this.active) {
+	        return;
+	      }
+	      for (; this._index < this.files.length; this._index++) {
+	        var file = this.files[this._index];
+	        if (file.active || file.success || file.errno) {
+	          continue;
+	        }
+	        if (this.size && this.size > 0 && file.size >= 0 && file.size > this.size) {
+	          file.error = 'Size';
+	          file.errno = 'size';
+	          continue;
+	        }
+	
+	        if (this.extensions && (this.extensions.length || typeof this.extensions.length == 'undefined')) {
+	          var extensions = this.extensions;
+	          if ((typeof extensions === 'undefined' ? 'undefined' : (0, _typeof3.default)(extensions)) == 'object' && extensions instanceof RegExp) {} else {
+	            if (typeof extensions == 'string') {
+	              extensions = extensions.split(',').map(function (value) {
+	                return value.trim();
+	              }).filter(function (value) {
+	                return value;
+	              });
+	            }
+	            extensions = new RegExp('\\.(' + extensions.join('|').replace(/\./g, '\\.') + ')$', 'i');
+	          }
+	
+	          if (file.name.search(extensions) == -1) {
+	            file.error = 'Extension';
+	            file.errno = 'extension';
+	            continue;
+	          }
+	        }
+	
+	        if (this.$mode == 'html5') {
+	          if (this.putAction || file.putAction) {
+	            this._fileUploadPut(file);
+	          } else if (this.postAction || file.postAction) {
+	            this._fileUploadHtml5(file);
+	          } else {
+	            file.error = 'Not Support';
+	            file.errno = 'not_support';
+	            continue;
+	          }
+	        } else {
+	          if (this.postAction || file.postAction) {
+	            this._fileUploadHtml4(file);
+	          } else {
+	            file.error = 'Not Support';
+	            file.errno = 'not_support';
+	            continue;
+	          }
+	        }
+	        return;
+	      }
+	      this.active = false;
+	      this.uploaded = true;
+	    },
+	    _fileUploadXhr: function _fileUploadXhr(xhr, file, data) {
+	      var _self = this;
+	      var hiddenData = this._files[file.id];
+	      var fileUploads = false;
+	      var speedTime = 0;
+	      var speedLoaded = 0;
+	      xhr.upload.onprogress = function (e) {
+	        if (file.removed) {
+	          xhr.abort();
+	          return;
+	        }
+	        if (!_self.active || !file.active) {
+	          xhr.abort();
+	          return;
+	        }
+	        if (e.lengthComputable) {
+	          file.progress = (e.loaded / e.total * 100).toFixed(2);
+	          var speedTime2 = Math.round(Date.now() / 1000);
+	          if (speedTime2 != speedTime) {
+	            file.speed = e.loaded - speedLoaded;
+	            speedLoaded = e.loaded;
+	            speedTime = speedTime2;
+	          }
+	        }
+	        _self._events('fileUploadProgress', file);
+	      };
+	
+	      var callback = function callback(e) {
+	        switch (e.type) {
+	          case 'timeout':
+	            file.errno = 'timeout';
+	            file.error = 'Timeout';
+	            break;
+	          case 'abort':
+	            file.errno = 'abort';
+	            file.error = 'Abort';
+	            break;
+	          case 'error':
+	            if (!xhr.status) {
+	              file.errno = 'network';
+	              file.error = 'Network';
+	            } else if (xhr.status >= 500) {
+	              file.errno = 'server';
+	              file.error = 'Server';
+	            } else if (xhr.status >= 400) {
+	              file.errno = 'denied';
+	              file.error = 'Denied';
+	            }
+	            break;
+	          default:
+	            if (xhr.status >= 500) {
+	              file.errno = 'server';
+	              file.error = 'Server';
+	            } else if (xhr.status >= 400) {
+	              file.errno = 'denied';
+	              file.error = 'Denied';
+	            } else {
+	              file.progress = '100.00';
+	              file.success = true;
+	            }
+	        }
+	        file.active = false;
+	        if (xhr.responseText) {
+	          var contentType = xhr.getResponseHeader('Content-Type');
+	          if (contentType && contentType.indexOf('/json') != -1) {
+	            file.data = JSON.parse(xhr.responseText);
+	          } else {
+	            file.data = xhr.responseText;
+	          }
+	        }
+	        if (!fileUploads) {
+	          fileUploads = true;
+	          if (!file.removed) {
+	            _self._events('afterFileUpload', file);
+	          }
+	          setTimeout(function () {
+	            _self._fileUploads();
+	          }, 50);
+	        }
+	      };
+	
+	      xhr.onload = callback;
+	      xhr.onerror = callback;
+	      xhr.onabort = callback;
+	      xhr.ontimeout = callback;
+	
+	      if (this.timeout) {
+	        xhr.timeout = this.timeout;
+	      }
+	
+	      xhr.onload = callback;
+	      xhr.onerror = callback;
+	      xhr.onabort = callback;
+	      xhr.ontimeout = callback;
+	
+	      if (this.timeout) {
+	        xhr.timeout = this.timeout;
+	      }
+	
+	      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+	      for (var key in this.request.headers) {
+	        xhr.setRequestHeader(key, this.request.headers[key]);
+	      }
+	      for (var key in file.request.headers) {
+	        xhr.setRequestHeader(key, file.request.headers[key]);
+	      }
+	
+	      xhr.send(data);
+	      file.active = true;
+	      hiddenData.xhr = xhr;
+	      var interval = setInterval(function () {
+	        if (!_self.active || !file.active || file.success || file.errno) {
+	          clearInterval(interval);
+	          if (!file.success && !file.errno) {
+	            xhr.abort();
+	          }
+	        }
+	      }, 100);
+	      this._events('beforeFileUpload', file);
+	    },
+	    _fileUploadPut: function _fileUploadPut(file) {
+	      var _self = this;
+	
+	      var querys = {};
+	      for (var key in this.request.data) {
+	        querys[key] = this.request.data[key];
+	      }
+	      for (var _key in file.request.data) {
+	        querys[_key] = file.request.data[_key];
+	      }
+	      var queryArray = [];
+	      for (var _key2 in querys) {
+	        if (querys[_key2] !== null && typeof querys[_key2] !== 'undefined') {
+	          queryArray.push(encodeURIComponent(_key2) + '=' + encodeURIComponent(querys[_key2]));
+	        }
+	      }
+	      var queryString = queryArray.length ? '?' + queryArray.join('&') : '';
+	
+	      var xhr = new XMLHttpRequest();
+	      xhr.open('PUT', (file.putAction || this.putAction) + queryString);
+	      this._fileUploadXhr(xhr, file, this._files[file.id].file);
+	    },
+	    _fileUploadHtml5: function _fileUploadHtml5(file) {
+	      var form = new window.FormData();
+	      form.append(this.name, this._files[file.id].file);
+	      for (var key in this.request.data) {
+	        form.append(key, this.request.data[key]);
+	      }
+	
+	      for (var key in file.request.data) {
+	        form.append(key, file.request.data[key]);
+	      }
+	
+	      var xhr = new XMLHttpRequest();
+	      xhr.open('POST', file.postAction || this.postAction);
+	      this._fileUploadXhr(xhr, file, form);
+	    },
+	    _fileUploadHtml4: function _fileUploadHtml4(file) {
+	      var _self = this;
+	      var hiddenData = this._files[file.id];
+	
+	      var fileUploads = false;
+	
+	      var keydown = function keydown(e) {
+	        if (e.keyCode == 27) {
+	          e.preventDefault();
+	        }
+	      };
+	
+	      var iframe = document.createElement('iframe');
+	      iframe.id = 'upload-iframe-' + file.id;
+	      iframe.name = 'upload-iframe-' + file.id;
+	      iframe.src = 'about:blank';
+	      iframe.style.width = '1px';
+	      iframe.style.height = '1px';
+	      iframe.style.top = '-9999px';
+	      iframe.style.left = '-9999px';
+	      iframe.style.position = 'absolute';
+	      iframe.style.marginTop = '-9999em';
+	
+	      var form = document.createElement('form');
+	      form.action = file.postAction || this.postAction;
+	      form.name = 'upload-form-' + file.id;
+	      form.setAttribute('method', 'POST');
+	      form.setAttribute('target', 'upload-iframe-' + file.id);
+	      form.setAttribute('enctype', 'multipart/form-data');
+	      form.appendChild(hiddenData.el);
+	      for (var key in this.request.data) {
+	        var input = document.createElement('input');
+	        input.type = 'hidden';
+	        input.name = key;
+	        input.value = this.request.data[key];
+	        form.appendChild(input);
+	      }
+	
+	      for (var key in file.request.data) {
+	        var input = document.createElement('input');
+	        input.type = 'hidden';
+	        input.name = key;
+	        input.value = file.request.data[key];
+	        form.appendChild(input);
+	      }
+	
+	      var getDocumentData = function getDocumentData() {
+	        var doc;
+	        try {
+	          if (iframe.contentWindow) {
+	            doc = iframe.contentWindow.document;
+	          }
+	        } catch (err) {}
+	        if (!doc) {
+	          try {
+	            doc = iframe.contentDocument ? iframe.contentDocument : iframe.document;
+	          } catch (err) {
+	            doc = iframe.document;
+	          }
+	        }
+	        if (doc && doc.body) {
+	          return doc.body.innerHTML;
+	        }
+	        return null;
+	      };
+	
+	      var callback = function callback(e) {
+	        switch (e.type) {
+	          case 'abort':
+	            file.errno = 'abort';
+	            file.error = 'Abort';
+	            break;
+	          case 'error':
+	            var data = getDocumentData();
+	            if (file.errno) {} else if (data === null) {
+	              file.errno = 'network';
+	              file.error = 'Network';
+	            } else {
+	              file.errno = 'denied';
+	              file.error = 'Denied';
+	            }
+	            break;
+	          default:
+	            var data = getDocumentData();
+	            if (file.errno) {} else if (data === null) {
+	              file.errno = 'network';
+	              file.error = 'Network';
+	            } else {
+	              file.progress = '100.00';
+	              file.success = true;
+	            }
+	        }
+	
+	        file.active = false;
+	        if (typeof data != "undefined") {
+	          if (data && data.substr(0, 1) == '{' && data.substr(data.length - 1, 1) == '}') {
+	            try {
+	              data = JSON.parse(data);
+	            } catch (err) {}
+	          }
+	          file.data = data;
+	        }
+	        if (!fileUploads) {
+	          document.body.removeEventListener('keydown', keydown);
+	          document.body.removeEventListener('keydown', keydown);
+	          fileUploads = true;
+	          iframe.parentNode && iframe.parentNode.removeChild(iframe);
+	          if (!file.removed) {
+	            _self._events('afterFileUpload', file);
+	          }
+	          setTimeout(function () {
+	            _self._fileUploads();
+	          }, 50);
+	        }
+	      };
+	
+	      setTimeout(function () {
+	        document.body.appendChild(iframe).appendChild(form).submit();
+	        iframe.onload = callback;
+	        iframe.onerror = callback;
+	        iframe.onabort = callback;
+	
+	        file.active = true;
+	
+	        hiddenData.iframe = iframe;
+	
+	        document.body.addEventListener('keydown', keydown);
+	        var interval = setInterval(function () {
+	          if (!_self.active || !file.active || file.success || file.errno) {
+	            clearInterval(interval);
+	            if (!file.success && !file.errno) {
+	              iframe.onabort({ type: 'abort' });
+	            }
+	          }
+	        }, 50);
+	        _self._events('beforeFileUpload', file);
+	      }, 10);
+	    }
+	  }
 	};
 
 /***/ },
