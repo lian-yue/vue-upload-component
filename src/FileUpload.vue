@@ -133,7 +133,7 @@ export default {
     this.files = [];
   },
 
-watch: {
+  watch: {
     drop(value) {
       this._drop(value);
     },
@@ -157,15 +157,19 @@ watch: {
         file.removed = true;
         var xhr = this._files[id].xhr;
         if (xhr) {
-          xhr.abort();
-          xhr.timeout = 1;
+          try {
+            xhr.abort();
+            xhr.timeout = 1;
+          } catch (e) {
+
+          }
         }
         var iframe = this._files[id].iframe;
         if (iframe) {
           iframe.onabort({type:'abort'});
         }
         delete this._files[id];
-        this._events('removeFileUpload', file);
+        this._uploadEvents('removeFileUpload', file);
       }
       this._index = 0;
     },
@@ -190,7 +194,7 @@ watch: {
       }
     },
 
-    _events(name, file) {
+    _uploadEvents(name, file) {
       this.$dispatch && this.$dispatch(name, file, this);
       this[name] && this[name](file);
       this.events && this.events[name] && this.events[name](file, this);
@@ -274,7 +278,7 @@ watch: {
       this._files[file.id] = hiddenData;
       file = this.files[this.files.push(file) - 1];
       this._files[file.id]._file = file;
-      this._events('addFileUpload', file);
+      this._uploadEvents('addFileUpload', file);
     },
     _onDrop(e) {
       this._dropActive = 0;
@@ -396,7 +400,7 @@ watch: {
             speedTime = speedTime2;
           }
         }
-        _self._events('fileUploadProgress', file);
+        _self._uploadEvents('fileUploadProgress', file);
       };
 
 
@@ -446,7 +450,7 @@ watch: {
           if (!fileUploads) {
             fileUploads = true;
             if (!file.removed) {
-              _self._events('afterFileUpload', file);
+              _self._uploadEvents('afterFileUpload', file);
             }
             setTimeout(function() {
               _self._fileUploads();
@@ -494,7 +498,7 @@ watch: {
           }
         }
       }, 100);
-      this._events('beforeFileUpload', file);
+      this._uploadEvents('beforeFileUpload', file);
     },
     _fileUploadPut(file) {
         var _self = this;
@@ -656,7 +660,7 @@ watch: {
             fileUploads = true;
             iframe.parentNode && iframe.parentNode.removeChild(iframe);
             if (!file.removed) {
-              _self._events('afterFileUpload', file);
+              _self._uploadEvents('afterFileUpload', file);
             }
             setTimeout(function() {
               _self._fileUploads();
@@ -684,7 +688,7 @@ watch: {
             }
           }
         }, 50);
-        _self._events('beforeFileUpload', file);
+        _self._uploadEvents('beforeFileUpload', file);
       }, 10);
     },
   }
