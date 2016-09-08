@@ -1,6 +1,6 @@
 <template>
     <label :class="{'file-uploads': true, 'file-uploads-html5': $mode == 'html5', 'file-uploads-html4': $mode == 'html4'}">
-        <span>{{title}}</span>
+        <span>{{{title}}}</span>
         <input-file></input-file>
     </label>
 </template>
