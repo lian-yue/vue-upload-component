@@ -12202,7 +12202,7 @@
 /* 74 */
 /***/ function(module, exports) {
 
-	module.exports = "\n<label :class=\"{'file-uploads': true, 'file-uploads-html5': $mode == 'html5', 'file-uploads-html4': $mode == 'html4'}\">\n    <span>{{title}}</span>\n    <input-file></input-file>\n</label>\n";
+	module.exports = "\n<label :class=\"{'file-uploads': true, 'file-uploads-html5': $mode == 'html5', 'file-uploads-html4': $mode == 'html4'}\">\n    <span>{{{title}}}</span>\n    <input-file></input-file>\n</label>\n";
 
 /***/ },
 /* 75 */
