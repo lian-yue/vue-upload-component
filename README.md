@@ -8,8 +8,9 @@
 ## Install
 
 ``` bash
-    npm install vue-upload-component --save
+    npm install vue-upload-component@next --save
 ```
+
 ### CommonJS
 ```js
     var FileUpload = require('vue-upload-component');
@@ -73,82 +74,20 @@ npm run build
 ```
 
 
-## $dispatch, methods
-    addFileUpload
 
-    removeFileUpload
-
-    fileUploadProgress
-
-    beforeFileUpload
-
-    afterFileUpload
+# Setting
 
 
-
-
-## Setting
-
-### Data
-``` js
-    {
-        files: [
-            {
-                id: 'String', // Read only
-                name: 'filename String',
-                size: 'filesize   Number',
-                progress: 'progress String', // Read only
-                speed: "Speed Number", // Read only
-                active: 'active Boolean',
-                error: 'error String',
-                errno: 'errno String',
-                success: 'success Boolean', // Read only
-                data: 'Response data Object or String', // Read only
-                request: {
-                    headers: {
-                        "X-Csrf-Token": "xxxx",
-                    },
-                    data: {
-                        "_csrf_token": "xxxxxx",
-                    },
-                },
-            }
-        ],
-
-
-        // Global
-        request: {
-            headers: {
-                "X-Csrf-Token": "xxxx",
-            },
-            data: {
-                "_csrf_token": "xxxxxx",
-            },
-        },
-
-
-        active: false,
-
-        uploaded: true,  // Read only
-
-        dropActive: false,  // Read only
-    }
-```
-
-
-### Props
+## Props
 ``` html
-    <file-upload :title="Add upload files" :name="file" :drop="Boolean (true = $parent) or Element or Css Selector" :extensions="Array or String or Regular" :post-action="./post.method" :put-action="./put.method" :accept="accept"  :multiple="true" :size="size" :timeout="3600000"></file-upload>
-```
-
-```
+<file-upload
     title="Add upload files"
 
     name="post file name"
 
     drop="Boolean (true = $parent) or Element or Css Selector"
 
-    extensions="Array or String or Regular" :post-action="./post.method"
+    extensions="Array or String or Regular"
 
     post-action="./post.method"
 
@@ -162,4 +101,92 @@ npm run build
 
     timeout="3600000"
 
+    events="Object"
+
+    headers="Request headers object"
+
+    data="Request data object"
+
+    files="Upload files"
+    >
+</file-upload>
+```
+
+
+
+
+### Props events
+``` js
+    events: {
+        add(file, component) {
+            console.log('add');
+            if (this.auto) {
+                component.active = true;
+            }
+            file.headers['X-Filename'] = encodeURIComponent(file.name)
+            file.data.finename = file.name
+
+            // file.putAction = 'xxx'
+            // file.postAction = 'xxx'
+        },
+        progress(file, component) {
+            console.log('progress ' + file.progress);
+        },
+        after(file, component) {
+            console.log('after');
+        },
+        before(file, component) {
+            console.log('before');
+        }
+    }
+```
+
+
+
+### Props files
+``` js
+    [
+        {
+            id: 'String', // Read only
+            name: 'filename String',
+            size: 'filesize   Number',   // -1  = html4
+            progress: 'progress String', // Read only
+            speed: "Speed Number", // Read only
+            active: 'active Boolean',   // set active = fasle  abort upload
+            error: 'error String',  // Read only
+            success: 'success Boolean', // Read only
+            data: 'Response data Object or String', // Read only
+            putAction: 'String uri',
+            postAction: 'String uri',
+            timeout: "Number",
+            headers: {
+                "X-Csrf-Token": "xxxx",
+            },
+            data: {
+                "_csrf_token": "xxxxxx",
+            },
+
+            xhr: "False or XMLHttpRequest object",             // html5
+            iframe: "False or Element object",  // html4
+            file: "undefined or File object"               // html5
+            el: "undefined or Input object"
+        }
+    ]
+```
+
+
+
+
+
+## data
+``` js
+    {
+        mode: 'html5',  // html5 or html4
+
+        active: false,   // set active = fasle  abort upload
+
+        uploaded: true,  // Read only
+
+        dropActive: false,  // Read only
+    }
 ```

@@ -1,12 +1,13 @@
-import Vue from 'vue';
+import Vue from 'vue/dist/vue.js'
 
-// var FileUpload = require('./FileUpload.vue');
-import FileUpload from './FileUpload.vue';
+var FileUpload = require('./FileUpload.vue');
+// import FileUpload from './FileUpload.vue';
 
-Vue.config.debug = true;
+
 Vue.config.silent = false;
-Vue.config.async = false;
 Vue.config.devtools = true;
+
+
 
 Vue.filter('formatSize', function(size) {
   if (size > 1024 * 1024 * 1024 * 1024) {
@@ -22,6 +23,8 @@ Vue.filter('formatSize', function(size) {
 });
 
 
+
+
 new Vue({
   el:'#app',
   components: {
@@ -35,43 +38,58 @@ new Vue({
     // extensions: ['gif','jpg','png'],
     // extensions: /\.(gif|png|jpg)$/i,
     files: [],
-    upload: {},
+    upload: [],
+    title: 'Add upload files',
     drop: true,
     auto: false,
+
+    name: 'file',
+
+    postAction: './post.php',
+    putAction: './put.php',
+
+    headers: {
+      "X-Csrf-Token": "xxxx",
+    },
+
+    data: {
+      "_csrf_token": "xxxxxx",
+    },
+
+    events: {
+      add(file, component) {
+        console.log('add');
+        if (this.auto) {
+          component.active = true;
+        }
+        file.headers['X-Filename'] = encodeURIComponent(file.name)
+        file.data.finename = file.name
+
+        // file.putAction = 'xxx'
+        // file.postAction = 'xxx'
+      },
+      progress(file, component) {
+        console.log('progress ' + file.progress);
+      },
+      after(file, component) {
+        console.log('after');
+      },
+      before(file, component) {
+        console.log('before');
+      },
+    }
   },
 
-  compiled() {
-    this.upload = this.$refs.upload;
-    this.upload.request = {
-      headers: {
-        "X-Csrf-Token": "xxxx",
-      },
-      data: {
-        "_csrf_token": "xxxxxx",
-      },
-    };
-    this.files = this.$refs.upload.files;
+  mounted() {
+    this.upload = this.$refs.upload.$data
   },
+
   methods: {
     remove(file) {
-      this.$refs.upload.files.$remove(file);
-    },
-  },
-  events: {
-    addFileUpload(file, component) {
-      console.log('addFileUpload');
-      if (this.auto) {
-        component.active = true;
+      var index = this.files.indexOf(file)
+      if (index != -1) {
+        this.files.splice(index, 1);
       }
     },
-    fileUploadProgress(file, component) {
-      console.log('fileUploadProgress ' + file.progress);
-    },
-    afterFileUpload(file, component) {
-      console.log('afterFileUpload');
-    },
-    beforeFileUpload(file, component) {
-      console.log('beforeFileUpload');
-    },
-  }
+  },
 });

@@ -41,15 +41,14 @@
                     <th>Speed</th>
                     <th>Active</th>
                     <th>Error</th>
-                    <th>Errno</th>
                     <th>Success</th>
                     <th>Abort</th>
                     <th>Delete</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="file in files">
-                    <td>{{$index}}</td>
+                <tr v-for="(file, index) in files">
+                    <td>{{index}}</td>
                     <td>{{file.id}}</td>
                     <td>{{file.name}}</td>
                     <td>{{file.size | formatSize}}</td>
@@ -57,7 +56,6 @@
                     <td>{{file.speed | formatSize}}</td>
                     <td>{{file.active}}</td>
                     <td>{{file.error}}</td>
-                    <td>{{file.errno}}</td>
                     <td>{{file.success}}</td>
                     <td @click="file.active = false">Abort</td>
                     <td @click="remove(file)">x</td>
@@ -70,11 +68,27 @@
             <tbody>
                 <tr>
                     <td>
-                        <file-upload title="Add upload files" class="file-upload" name="file" post-action="./post.php" put-action="./put.php"  :extensions="extensions" :accept="accept" :multiple="multiple" :size="size" v-ref:upload :drop="drop"></file-upload>
+                        <file-upload
+                            :title="title"
+                            class="file-upload"
+                            :events="events"
+                            :name="name"
+                            :post-action="postAction"
+                            :put-action="putAction"
+                            :extensions="extensions"
+                            :accept="accept"
+                            :multiple="multiple"
+                            :size="size"
+                            :headers="headers"
+                            :data="data"
+                            :drop="drop"
+                            :files="files"
+                            ref="upload">
+                        </file-upload>
                     </td>
                     <td>
-                        <button v-if="upload.active" type="submit" @click.prevent="$refs.upload.active = !$refs.upload.active">Stop upload</button>
-                        <button v-else type="submit" @click.prevent="$refs.upload.active = !$refs.upload.active">Start upload</button>
+                        <button v-if="upload.active" type="submit" @click.prevent="upload.active = !upload.active">Stop upload</button>
+                        <button v-else type="submit" @click.prevent="upload.active = !upload.active">Start upload</button>
                     </td>
                     <td>
                         <label>
@@ -98,7 +112,7 @@
                     </td>
                     <td>
                         <label>
-                            Max file size: <input type="text" v-model="size">
+                            Max file size: <input type="text" v-model.number="size">
                         </label>
                     </td>
                     <td>
@@ -112,18 +126,18 @@
                         Auto start: {{auto}}
                     </td>
                     <td>
-                        Active: {{$refs.upload.active}}
+                        Active: {{upload.active}}
                     </td>
                     <td>
-                        Uploaded: {{$refs.upload.uploaded}}
+                        Uploaded: {{upload.uploaded}}
                     </td>
                     <td>
-                        Drop active: {{$refs.upload.dropActive}}
+                        Drop active: {{upload.dropActive}}
                     </td>
                 </tr>
             </tbody>
         </table>
-        <div v-show="$refs.upload.dropActive" class="drop-active">
+        <div v-show="upload.dropActive" class="drop-active">
             Drop ing
         </div>
     </div>

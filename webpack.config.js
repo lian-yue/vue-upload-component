@@ -2,19 +2,24 @@ var path = require('path')
 var webpack = require('webpack')
 
 module.exports = {
-    entry: {
-      example: ['vue', './src/example.js'],
-    },
-
-    output: {
-        path: './dist',
-        publicPath: '/dist/',
-        filename: "[name].js",
-    },
-
-  resolveLoader: {
-    root: path.join(__dirname, 'node_modules'),
+  entry: {
+    example: ['./src/example.js'],
   },
+
+  output: {
+    path: './dist',
+    publicPath: '/dist/',
+    filename: "[name].js",
+  },
+
+
+  resolve: {
+    root: path.join(__dirname, 'node_modules'),
+    alias: {
+    },
+    extensions: ['', '.js', '.vue', '.json'],
+  },
+
   module: {
     loaders: [
       {
@@ -44,6 +49,12 @@ module.exports = {
       }
     ]
   },
+
+  babel: {
+    presets: ['es2015', 'stage-0'],
+    plugins: ['transform-runtime', 'transform-vue-jsx'],
+  },
+
   devServer: {
     historyApiFallback: true,
     noInfo: true
