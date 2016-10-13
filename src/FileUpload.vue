@@ -108,7 +108,7 @@ export default {
     }
   },
 
-  // 挂在后
+  // 挂载后
   mounted() {
     var input = document.createElement('input');
     input.type = 'file';
