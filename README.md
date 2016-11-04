@@ -10,9 +10,9 @@
 ``` bash
     npm install vue-upload-component --save
 ```
-### Vue 2.0.0
+### Vue 2.x
 
-https://github.com/lian-yue/vue-upload-component/tree/next
+https://github.com/lian-yue/vue-upload-component/tree/2.0
 
 ``` bash
     npm install vue-upload-component@next --save
