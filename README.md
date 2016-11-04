@@ -155,7 +155,7 @@ npm run build
             active: 'active Boolean',   // set active = fasle  abort upload
             error: 'error String',  // Read only
             success: 'success Boolean', // Read only
-            data: 'Response data Object or String', // Read only
+            response: 'Response data Object or String', // Read only
             putAction: 'String uri',
             postAction: 'String uri',
             timeout: "Number",
@@ -167,7 +167,7 @@ npm run build
             },
 
             xhr: "False or XMLHttpRequest object",             // html5
-            iframe: "False or Element object",  // html4
+            iframe: "False or Element object",                  // html4
             file: "undefined or File object"               // html5
             el: "undefined or Input object"
         }
