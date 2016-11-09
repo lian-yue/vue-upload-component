@@ -929,6 +929,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      var Component = this.$options.components.InputFile;
+	      if (Component._Ctor) {
+	        Component = Component._Ctor;
+	      }
 	      var inputFile = new Component({
 	        parent: this,
 	        el: el
@@ -1283,7 +1286,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          multiple: parent.multiple && parent.mode == 'html5'
 	        },
 	        on: {
-	          change: this.change
+	          "change": this.change
 	        }
 	      },
 	      []
@@ -1360,14 +1363,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _symbol2 = _interopRequireDefault(_symbol);
 	
-	var _typeof = typeof _symbol2.default === "function" && typeof _iterator2.default === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default ? "symbol" : typeof obj; };
+	var _typeof = typeof _symbol2.default === "function" && typeof _iterator2.default === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj; };
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = typeof _symbol2.default === "function" && _typeof(_iterator2.default) === "symbol" ? function (obj) {
 	  return typeof obj === "undefined" ? "undefined" : _typeof(obj);
 	} : function (obj) {
-	  return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
+	  return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
 	};
 
 /***/ },
@@ -2200,6 +2203,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
+	var __vue_styles__ = {}
 	
 	/* styles */
 	__webpack_require__(84)
@@ -2217,6 +2221,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  __vue_options__ = __vue_options__.options
 	}
 	
+	
 	module.exports = __vue_exports__
 
 
@@ -2225,6 +2230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_exports__, __vue_options__
+	var __vue_styles__ = {}
 	
 	/* script */
 	__vue_exports__ = __webpack_require__(40)
@@ -2238,6 +2244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	if (typeof __vue_options__ === "function") {
 	  __vue_options__ = __vue_options__.options
 	}
+	
 	
 	module.exports = __vue_exports__
 
@@ -2480,8 +2487,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-1!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue", function() {
-				var newContent = require("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-1!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue");
+			module.hot.accept("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-4563ebb1!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue", function() {
+				var newContent = require("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-4563ebb1!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});

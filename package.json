@@ -1,7 +1,7 @@
 {
   "name": "vue-upload-component",
   "description": "Vue.js file upload component, Support for multiple file uploads, progress, html5, html4, support ie9",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "author": "LianYue",
   "scripts": {
     "dev": "webpack-dev-server --inline --hot",
@@ -48,7 +48,7 @@
     "file-loader": "^0.8.4",
     "json-loader": "^0.5.4",
     "url-loader": "^0.5.7",
-    "vue": "^2.0.0-rc.6",
+    "vue": "^2.0.5",
     "vue-hot-reload-api": "^1.2.0",
     "vue-html-loader": "^1.0.0",
     "vue-loader": "^9.5.0",
