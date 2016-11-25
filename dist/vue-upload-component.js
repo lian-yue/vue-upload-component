@@ -929,9 +929,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	
 	      var Component = this.$options.components.InputFile;
-	      if (Component._Ctor) {
+	
+	      if (!Component._Ctor) {} else if (Component._Ctor == 'function') {
 	        Component = Component._Ctor;
+	      } else {
+	        Component = Component._Ctor[0];
 	      }
+	
 	      var inputFile = new Component({
 	        parent: this,
 	        el: el

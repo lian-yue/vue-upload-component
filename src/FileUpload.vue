@@ -331,9 +331,18 @@ export default {
       }
 
       var Component = this.$options.components.InputFile;
-      if (Component._Ctor) {
+
+      // vue 2.0.0  = Component
+      // vue 2.0.x  = Component._Ctor
+      // vue 2.1.x = Component._Ctor[0]
+      if (!Component._Ctor) {
+
+      } else if (Component._Ctor == 'function') {
         Component = Component._Ctor
+      } else {
+        Component = Component._Ctor[0]
       }
+
       var inputFile = new Component({
         parent: this,
         el: el,
