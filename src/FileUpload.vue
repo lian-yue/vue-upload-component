@@ -332,7 +332,7 @@ export default {
 
       var Component = this.$options.components.InputFile;
       if (Component._Ctor) {
-        Component = Component._Ctor
+        Component = Component._Ctor[0]
       }
       var inputFile = new Component({
         parent: this,
