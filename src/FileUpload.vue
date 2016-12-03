@@ -129,7 +129,7 @@ export default {
   // 销毁前
   beforeDestroy() {
     this.active = false;
-    this.files = [];
+    this.files.splice(0, this.files.length);
   },
 
   render (h) {

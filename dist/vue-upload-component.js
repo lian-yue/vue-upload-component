@@ -742,7 +742,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	  beforeDestroy: function beforeDestroy() {
 	    this.active = false;
-	    this.files = [];
+	    this.files.splice(0, this.files.length);
 	  },
 	  render: function render(h) {
 	    return h(
