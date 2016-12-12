@@ -505,7 +505,7 @@ export default {
 
 
       // headers
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      // xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       for (let key in file.headers) {
         xhr.setRequestHeader(key, file.headers[key]);
       }

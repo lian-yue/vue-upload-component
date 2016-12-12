@@ -1074,7 +1074,6 @@
 	        xhr.timeout = file.timeout;
 	      }
 	
-	      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 	      for (var key in file.headers) {
 	        xhr.setRequestHeader(key, file.headers[key]);
 	      }
