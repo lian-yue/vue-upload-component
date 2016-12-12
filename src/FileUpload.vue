@@ -478,7 +478,7 @@ export default {
         xhr.timeout = this.timeout;
       }
 
-      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+      // xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       for (var key in this.request.headers) {
         xhr.setRequestHeader(key, this.request.headers[key]);
       }
