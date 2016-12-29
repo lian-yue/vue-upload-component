@@ -930,7 +930,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      var Component = this.$options.components.InputFile;
 	
-	      if (!Component._Ctor) {} else if (Component._Ctor == 'function') {
+	      if (!Component._Ctor) {} else if (typeof Component._Ctor == 'function') {
 	        Component = Component._Ctor;
 	      } else {
 	        Component = Component._Ctor[0];

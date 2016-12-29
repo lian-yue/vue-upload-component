@@ -337,7 +337,7 @@ export default {
       // vue 2.1.x = Component._Ctor[0]
       if (!Component._Ctor) {
 
-      } else if (Component._Ctor == 'function') {
+      } else if (typeof Component._Ctor == 'function') {  ///... 蠢死我 没加 typeof
         Component = Component._Ctor
       } else {
         Component = Component._Ctor[0]
