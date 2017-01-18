@@ -547,10 +547,10 @@ export default {
 
     _fileUploadHtml5(file) {
       var form = new window.FormData();
-      form.append(this.name, file.file);
       for (var key in file.data) {
         form.append(key, file.data[key]);
       }
+      form.append(this.name, file.file);
       var xhr = new XMLHttpRequest();
       xhr.open('POST', file.postAction);
       this._fileUploadXhr(xhr, file, form);
@@ -588,7 +588,6 @@ export default {
       form.setAttribute('method', 'POST');
       form.setAttribute('target', 'upload-iframe-' + file.id);
       form.setAttribute('enctype', 'multipart/form-data');
-      form.appendChild(file.el);
 
       for (let key in file.data) {
         let input = document.createElement('input');
@@ -598,6 +597,7 @@ export default {
         form.appendChild(input);
       }
 
+      form.appendChild(file.el);
 
 
       var getDocumentData = function() {
