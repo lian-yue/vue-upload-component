@@ -1119,10 +1119,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    _fileUploadHtml5: function _fileUploadHtml5(file) {
 	      var form = new window.FormData();
-	      form.append(this.name, file.file);
 	      for (var key in file.data) {
 	        form.append(key, file.data[key]);
 	      }
+	      form.append(this.name, file.file);
 	      var xhr = new XMLHttpRequest();
 	      xhr.open('POST', file.postAction);
 	      this._fileUploadXhr(xhr, file, form);
@@ -1158,7 +1158,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      form.setAttribute('method', 'POST');
 	      form.setAttribute('target', 'upload-iframe-' + file.id);
 	      form.setAttribute('enctype', 'multipart/form-data');
-	      form.appendChild(file.el);
 	
 	      for (var key in file.data) {
 	        var input = document.createElement('input');
@@ -1167,6 +1166,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        input.value = file[key];
 	        form.appendChild(input);
 	      }
+	
+	      form.appendChild(file.el);
 	
 	      var getDocumentData = function getDocumentData() {
 	        var doc;
@@ -2490,8 +2491,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-4563ebb1!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue", function() {
-				var newContent = require("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-4563ebb1!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue");
+			module.hot.accept("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-530f2599!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue", function() {
+				var newContent = require("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-530f2599!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
