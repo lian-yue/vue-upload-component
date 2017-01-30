@@ -50,7 +50,8 @@ export default {
       type: String,
       default: 'file',
     },
-    drop: {
+    auto: {
+      type: Boolean,
       default: false,
     },
     extensions: {
