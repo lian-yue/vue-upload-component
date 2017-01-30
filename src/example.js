@@ -59,7 +59,7 @@ new Vue({
     events: {
       add(file, component) {
         console.log('add');
-        if (this.auto) {
+        if (component.auto) {
           component.active = true;
         }
         file.headers['X-Filename'] = encodeURIComponent(file.name)
