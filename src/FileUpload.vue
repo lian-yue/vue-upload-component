@@ -249,7 +249,7 @@ export default {
     },
 
     _uploadEvents(name, file) {
-      this.events && this.events[name] && this.events[name](file, this);
+      this.events && this.events[name] && this.events[name].call(this, file, this);
     },
 
     _drop(value) {
