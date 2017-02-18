@@ -548,7 +548,11 @@ export default {
     _fileUploadHtml5(file) {
       var form = new window.FormData();
       for (var key in file.data) {
-        form.append(key, file.data[key]);
+        if (typeof file.data[key] != 'string') {
+          form.append(key, JSON.stringify(file.data[key]));
+        } else {
+          form.append(key, file.data[key]);
+        }
       }
       form.append(this.name, file.file);
       var xhr = new XMLHttpRequest();
@@ -593,7 +597,11 @@ export default {
         let input = document.createElement('input');
         input.type = 'hidden';
         input.name =  key;
-        input.value = file[key];
+        if (typeof file.data[key] != 'string') {
+          input.value = JSON.stringify(file.data[key]);
+        } else {
+          input.value = file[key];
+        }
         form.appendChild(input);
       }
 
