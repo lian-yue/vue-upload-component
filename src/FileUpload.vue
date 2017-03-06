@@ -3,6 +3,7 @@
     overflow: hidden;
     position: relative;
     text-align: center;
+    display: inline-block;
 }
 .file-uploads span{
     -webkit-user-select: none;
@@ -24,11 +25,11 @@
     height: 100%;
 }
 .file-uploads.file-uploads-html5 input{
-    float: left;
+    position: fixed;
     width: 1px !important;
     height: 1px !important;
-    top:-1px !important;
-    left:-1px !important;
+    top: -999em !important;
+    left:0 !important;
     right:auto !important;
     bottom:auto !important;
 }
@@ -104,6 +105,7 @@ export default {
       mode: 'html5',
       active: false,
       uploaded: true,
+      destroy: false,
       dropActive: false,
     }
   },
@@ -129,6 +131,7 @@ export default {
   // 销毁前
   beforeDestroy() {
     this.active = false;
+    this.destroy = true;
     this.files.splice(0, this.files.length);
   },
 
@@ -153,20 +156,35 @@ export default {
       this._drop(value);
     },
     files(files) {
-      var ids = [];
+      var diffCount = 0
+      var fileMaps = {};
+
+
       for (var i = 0; i < files.length; i++) {
         let file = files[i];
+        // 是否 全部上传完成
         if (!file.error && !file.success) {
           this.uploaded = false;
         }
-        ids.push(file.id);
+
+        // 新增的
+        if (!this._files[file.id]) {
+          diffCount++
+          this._files[file.id] = file
+          this._uploadEvents('add', file);
+        }
+
+        // 储存 maps
+        fileMaps[file.id] = true
       }
 
+      // 删除文件
       for (var id in this._files) {
-        if (ids.indexOf(id) != -1) {
+        if (fileMaps[id]) {
           continue;
         }
-        let file = this._files;
+        diffCount++
+        let file = this._files[id];
 
         // 已移除的记录
         file.removed = true;
@@ -188,7 +206,9 @@ export default {
         delete this._files[id];
         this._uploadEvents('remove', file);
       }
-      this._index = 0;
+      if (diffCount) {
+        this._index = 0;
+      }
     },
 
     active(newValue, oldValue) {
@@ -211,6 +231,40 @@ export default {
       }
     },
 
+    select(file) {
+      if (typeof file == 'object') {
+        var index = this.files.indexOf(file)
+        if (index == -1) {
+          return false
+        }
+        return file
+      }
+      var id = file
+      for (var i = 0; i < this.files.length; i++) {
+        file = this.files[i]
+        if (file.id == id) {
+          return file
+        }
+      }
+      return false
+    },
+
+    remove(file) {
+      file = this.select(file)
+      if (file) {
+        this.files.splice(this.files.indexOf(file), 1)
+      }
+      return file
+    },
+
+    abort(file) {
+      file = this.select(file)
+      if (file) {
+        file.active = false
+      }
+      return file
+    },
+
     addFileUpload(file) {
       this.uploaded = false;
       var defaultFile = {
@@ -221,6 +275,7 @@ export default {
         active: false,
         error: '',
         success: false,
+        removed: false,
         putAction: this.putAction,
         postAction: this.postAction,
         timeout: this.timeout,
@@ -241,11 +296,7 @@ export default {
       if (!this.multiple) {
         this.clear();
       }
-
-
-      file = this.files[this.files.push(file) - 1];
-      this._files[file.id] = file;
-      this._uploadEvents('add', file);
+      var index = this.files.push(file)
     },
 
     _uploadEvents(name, file) {

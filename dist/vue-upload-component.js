@@ -634,13 +634,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _stringify2 = _interopRequireDefault(_stringify);
 	
-	var _typeof2 = __webpack_require__(47);
-	
-	var _typeof3 = _interopRequireDefault(_typeof2);
-	
 	var _assign = __webpack_require__(42);
 	
 	var _assign2 = _interopRequireDefault(_assign);
+	
+	var _typeof2 = __webpack_require__(47);
+	
+	var _typeof3 = _interopRequireDefault(_typeof2);
 	
 	var _defineProperty2 = __webpack_require__(46);
 	
@@ -723,6 +723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      mode: 'html5',
 	      active: false,
 	      uploaded: true,
+	      destroy: false,
 	      dropActive: false
 	    };
 	  },
@@ -746,6 +747,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 	  beforeDestroy: function beforeDestroy() {
 	    this.active = false;
+	    this.destroy = true;
 	    this.files.splice(0, this.files.length);
 	  },
 	  render: function render(h) {
@@ -774,20 +776,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._drop(value);
 	    },
 	    files: function files(_files) {
-	      var ids = [];
+	      var diffCount = 0;
+	      var fileMaps = {};
+	
 	      for (var i = 0; i < _files.length; i++) {
 	        var file = _files[i];
+	
 	        if (!file.error && !file.success) {
 	          this.uploaded = false;
 	        }
-	        ids.push(file.id);
+	
+	        if (!this._files[file.id]) {
+	          diffCount++;
+	          this._files[file.id] = file;
+	          this._uploadEvents('add', file);
+	        }
+	
+	        fileMaps[file.id] = true;
 	      }
 	
 	      for (var id in this._files) {
-	        if (ids.indexOf(id) != -1) {
+	        if (fileMaps[id]) {
 	          continue;
 	        }
-	        var _file = this._files;
+	        diffCount++;
+	        var _file = this._files[id];
 	
 	        _file.removed = true;
 	
@@ -805,7 +818,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        delete this._files[id];
 	        this._uploadEvents('remove', _file);
 	      }
-	      this._index = 0;
+	      if (diffCount) {
+	        this._index = 0;
+	      }
 	    },
 	    active: function active(newValue, oldValue) {
 	      if (newValue && !oldValue) {
@@ -825,6 +840,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.files.splice(0, this.files.length);
 	      }
 	    },
+	    select: function select(file) {
+	      if ((typeof file === 'undefined' ? 'undefined' : (0, _typeof3.default)(file)) == 'object') {
+	        var index = this.files.indexOf(file);
+	        if (index == -1) {
+	          return false;
+	        }
+	        return file;
+	      }
+	      var id = file;
+	      for (var i = 0; i < this.files.length; i++) {
+	        file = this.files[i];
+	        if (file.id == id) {
+	          return file;
+	        }
+	      }
+	      return false;
+	    },
+	    remove: function remove(file) {
+	      file = this.select(file);
+	      if (file) {
+	        this.files.splice(this.files.indexOf(file), 1);
+	      }
+	      return file;
+	    },
+	    abort: function abort(file) {
+	      file = this.select(file);
+	      if (file) {
+	        file.active = false;
+	      }
+	      return file;
+	    },
 	    addFileUpload: function addFileUpload(file) {
 	      this.uploaded = false;
 	      var defaultFile = {
@@ -835,6 +881,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        active: false,
 	        error: '',
 	        success: false,
+	        removed: false,
 	        putAction: this.putAction,
 	        postAction: this.postAction,
 	        timeout: this.timeout,
@@ -855,10 +902,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (!this.multiple) {
 	        this.clear();
 	      }
-	
-	      file = this.files[this.files.push(file) - 1];
-	      this._files[file.id] = file;
-	      this._uploadEvents('add', file);
+	      var index = this.files.push(file);
 	    },
 	    _uploadEvents: function _uploadEvents(name, file) {
 	      this.events && this.events[name] && this.events[name].call(this, file, this);
@@ -2169,7 +2213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	// module
-	exports.push([module.id, "\n.file-uploads {\n    overflow: hidden;\n    position: relative;\n    text-align: center;\n}\n.file-uploads span{\n    -webkit-user-select: none;\n    -moz-user-select: none;\n    -ms-user-select: none;\n    -o-user-select: none;\n    user-select: none;\n}\n.file-uploads input{\n    z-index: 1;\n    opacity: 0;\n    font-size: 20em;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    position: absolute;\n    width: 100%;\n    height: 100%;\n}\n.file-uploads.file-uploads-html5 input{\n    float: left;\n    width: 1px !important;\n    height: 1px !important;\n    top:-1px !important;\n    left:-1px !important;\n    right:auto !important;\n    bottom:auto !important;\n}\n", ""]);
+	exports.push([module.id, "\n.file-uploads {\n    overflow: hidden;\n    position: relative;\n    text-align: center;\n    display: inline-block;\n}\n.file-uploads span{\n    -webkit-user-select: none;\n    -moz-user-select: none;\n    -ms-user-select: none;\n    -o-user-select: none;\n    user-select: none;\n}\n.file-uploads input{\n    z-index: 1;\n    opacity: 0;\n    font-size: 20em;\n    top: 0;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    position: absolute;\n    width: 100%;\n    height: 100%;\n}\n.file-uploads.file-uploads-html5 input{\n    position: fixed;\n    width: 1px !important;\n    height: 1px !important;\n    top: -999em !important;\n    left:0 !important;\n    right:auto !important;\n    bottom:auto !important;\n}\n", ""]);
 	
 	// exports
 
@@ -2519,8 +2563,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-62f6c1f3!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue", function() {
-				var newContent = require("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-62f6c1f3!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue");
+			module.hot.accept("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-4563ebb1!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue", function() {
+				var newContent = require("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-4563ebb1!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});

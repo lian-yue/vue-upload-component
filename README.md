@@ -37,9 +37,12 @@
 ```
 
 
-## Example
+## Examples
 
 https://lian-yue.github.io/vue-upload-component/
+
+
+https://github.com/lian-yue/vue-upload-component/tree/2.0/examples/
 
 ``` html
     <!-- Example file ./index.html -->
@@ -54,7 +57,7 @@ https://lian-yue.github.io/vue-upload-component/
     new Vue({
         el:'#app',
         components: {
-            FileUpload:FileUpload,
+            FileUpload: FileUpload,
         },
     });
     </script>
@@ -188,5 +191,15 @@ npm run build
         uploaded: true,  // Read only
 
         dropActive: false,  // Read only
+
+        destroy: false,  // Read only    Component destroy = true
     }
+```
+
+
+## methods
+````
+    clear()  // Clear all files
+    remove(id or file Object)  // Remove a file   return   file object or  false
+    abort(id or file Object)  // Stop a file upload return   file object or  false
 ```

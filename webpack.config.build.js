@@ -5,7 +5,7 @@ module.exports = require('./webpack.config.js');
 
 
 module.exports.entry = {
-    'vue-upload-component': './src/main.js',
+    'vue-upload-component': './src',
 }
 
 module.exports.output.library = 'VueUploadComponent';
