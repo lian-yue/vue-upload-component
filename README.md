@@ -127,7 +127,7 @@ npm run build
                 component.active = true;
             }
             file.headers['X-Filename'] = encodeURIComponent(file.name)
-            file.data.finename = file.name
+            file.data.filename = file.name
 
             // file.putAction = 'xxx'
             // file.postAction = 'xxx'
@@ -186,7 +186,7 @@ npm run build
     {
         mode: 'html5',  // html5 or html4
 
-        active: false,   // set active = fasle  abort upload
+        active: false,   // set active = false abort upload
 
         uploaded: true,  // Read only
 
