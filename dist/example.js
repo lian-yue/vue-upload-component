@@ -8823,7 +8823,7 @@
 	
 	    return _ref = {
 	      accept: 'image/*'
-	    }, (0, _defineProperty3.default)(_ref, 'accept', ''), (0, _defineProperty3.default)(_ref, 'size', 1024 * 1024 * 10), (0, _defineProperty3.default)(_ref, 'multiple', true), (0, _defineProperty3.default)(_ref, 'extensions', 'gif,jpg,png'), (0, _defineProperty3.default)(_ref, 'files', []), (0, _defineProperty3.default)(_ref, 'upload', {}), (0, _defineProperty3.default)(_ref, 'title', 'Add upload files'), (0, _defineProperty3.default)(_ref, 'drop', true), (0, _defineProperty3.default)(_ref, 'auto', false), (0, _defineProperty3.default)(_ref, 'name', 'file'), (0, _defineProperty3.default)(_ref, 'postAction', './post.php'), (0, _defineProperty3.default)(_ref, 'putAction', './put.php'), (0, _defineProperty3.default)(_ref, 'headers', {
+	    }, (0, _defineProperty3.default)(_ref, 'accept', ''), (0, _defineProperty3.default)(_ref, 'size', 1024 * 1024 * 10), (0, _defineProperty3.default)(_ref, 'multiple', true), (0, _defineProperty3.default)(_ref, 'extensions', 'gif,jpg,png'), (0, _defineProperty3.default)(_ref, 'files', []), (0, _defineProperty3.default)(_ref, 'upload', {}), (0, _defineProperty3.default)(_ref, 'title', 'Add upload files'), (0, _defineProperty3.default)(_ref, 'drop', true), (0, _defineProperty3.default)(_ref, 'auto', false), (0, _defineProperty3.default)(_ref, 'thread', 1), (0, _defineProperty3.default)(_ref, 'name', 'file'), (0, _defineProperty3.default)(_ref, 'postAction', './post.php'), (0, _defineProperty3.default)(_ref, 'putAction', './put.php'), (0, _defineProperty3.default)(_ref, 'headers', {
 	      "X-Csrf-Token": "xxxx"
 	    }), (0, _defineProperty3.default)(_ref, 'data', {
 	      "_csrf_token": "xxxxxx"
@@ -9072,6 +9072,9 @@
 	    default: function _default() {
 	      return [];
 	    }
+	  }), (0, _defineProperty3.default)(_props, 'thread', {
+	    type: Number,
+	    default: 1
 	  }), _props),
 	
 	  data: function data() {
@@ -9180,7 +9183,12 @@
 	    },
 	    active: function active(newValue, oldValue) {
 	      if (newValue && !oldValue) {
-	        this._fileUploads();
+	        for (var i = 0; i < this.thread; i++) {
+	          this._fileUploads();
+	          if (this.mode != 'html5') {
+	            break;
+	          }
+	        }
 	      }
 	    },
 	    uploaded: function uploaded(_uploaded) {
@@ -11024,6 +11032,7 @@
 	      "accept": _vm.accept,
 	      "multiple": _vm.multiple,
 	      "size": _vm.size || 0,
+	      "thread": _vm.thread < 1 ? 1 : (_vm.thread > 5 ? 5 : _vm.thread),
 	      "headers": _vm.headers,
 	      "data": _vm.data,
 	      "drop": _vm.drop,
@@ -11218,6 +11227,31 @@
 	        } else {
 	          _vm.multiple = $$c
 	        }
+	      }
+	    }
+	  })])]), _vm._v(" "), _c('td', [_c('label', [_vm._v("\n              Thread: "), _c('input', {
+	    directives: [{
+	      name: "model",
+	      rawName: "v-model.number",
+	      value: (_vm.thread),
+	      expression: "thread",
+	      modifiers: {
+	        "number": true
+	      }
+	    }],
+	    attrs: {
+	      "type": "text"
+	    },
+	    domProps: {
+	      "value": (_vm.thread)
+	    },
+	    on: {
+	      "input": function($event) {
+	        if ($event.target.composing) { return; }
+	        _vm.thread = _vm._n($event.target.value)
+	      },
+	      "blur": function($event) {
+	        _vm.$forceUpdate()
 	      }
 	    }
 	  })])])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("\n            Auto start: " + _vm._s(_vm.auto) + "\n          ")]), _vm._v(" "), _c('td', [_vm._v("\n            Active: " + _vm._s(_vm.upload.active) + "\n          ")]), _vm._v(" "), _c('td', [_vm._v("\n            Uploaded: " + _vm._s(_vm.upload.uploaded) + "\n          ")]), _vm._v(" "), _c('td', [_vm._v("\n            Drop active: " + _vm._s(_vm.upload.dropActive) + "\n          ")])])])])]), _vm._v(" "), _c('div', {

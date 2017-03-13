@@ -716,6 +716,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    default: function _default() {
 	      return [];
 	    }
+	  }), (0, _defineProperty3.default)(_props, 'thread', {
+	    type: Number,
+	    default: 1
 	  }), _props),
 	
 	  data: function data() {
@@ -824,7 +827,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    active: function active(newValue, oldValue) {
 	      if (newValue && !oldValue) {
-	        this._fileUploads();
+	        for (var i = 0; i < this.thread; i++) {
+	          this._fileUploads();
+	          if (this.mode != 'html5') {
+	            break;
+	          }
+	        }
 	      }
 	    },
 	    uploaded: function uploaded(_uploaded) {

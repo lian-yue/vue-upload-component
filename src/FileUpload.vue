@@ -97,6 +97,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    thread: {
+      type: Number,
+      default: 1,
+    },
   },
 
 
@@ -213,7 +217,12 @@ export default {
 
     active(newValue, oldValue) {
       if (newValue && !oldValue) {
-        this._fileUploads();
+        for (var i = 0; i < this.thread; i++) {
+          this._fileUploads();
+          if (this.mode != 'html5') {
+            break
+          }
+        }
       }
     },
 

@@ -85,6 +85,7 @@ table th,table td {
                 :accept="accept"
                 :multiple="multiple"
                 :size="size || 0"
+                :thread="thread < 1 ? 1 : (thread > 5 ? 5 : thread)"
                 :headers="headers"
                 :data="data"
                 :drop="drop"
@@ -124,6 +125,11 @@ table th,table td {
             <td>
               <label>
                 Multiple: <input type="checkbox" id="checkbox" v-model="multiple">
+              </label>
+            </td>
+            <td>
+              <label>
+                Thread: <input type="text" v-model.number="thread">
               </label>
             </td>
           </tr>
@@ -173,7 +179,7 @@ export default {
       title: 'Add upload files',
       drop: true,
       auto: false,
-
+      thread: 1,
       name: 'file',
 
       postAction: './post.php',
