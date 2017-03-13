@@ -111,6 +111,8 @@ npm run build
     data="Request data object"
 
     files="Upload files"
+
+    thread="Number  (Multi-file uploads at the same time)"
     >
 </file-upload>
 ```
