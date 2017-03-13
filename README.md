@@ -42,7 +42,7 @@
 https://lian-yue.github.io/vue-upload-component/
 
 
-https://github.com/lian-yue/vue-upload-component/tree/2.0/examples/
+https://github.com/lian-yue/vue-upload-component/tree/2.0/example/
 
 ``` html
     <!-- Example file ./index.html -->
