@@ -11,8 +11,8 @@ export default {
         <header id="header">
           <h1>Upload test</h1>
           <nav>
-            <h3>Navigation</h3>
-            <h3>Need to run local <code>`npm run dev`</code></h3>
+            <h2>Navigation</h2>
+            <h3>Please click on the navigation</h3>
             <ul>
               <li><router-link to="/">Home</router-link></li>
               <li><router-link to="/multi">Multi components</router-link></li>
