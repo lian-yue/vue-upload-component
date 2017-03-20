@@ -146,6 +146,9 @@ table th,table td {
             <td>
               Drop active: {{upload.dropActive}}
             </td>
+            <td>
+              <label for="file">Click</label>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -231,4 +234,7 @@ export default {
     },
   },
 }
+
+
+
 </script>

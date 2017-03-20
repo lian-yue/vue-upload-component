@@ -108,6 +108,7 @@ export default {
     return {
       mode: 'html5',
       active: false,
+      uploading: 0,
       uploaded: true,
       destroy: false,
       dropActive: false,
@@ -411,6 +412,9 @@ export default {
 
 
     _fileUploads() {
+      if (this.uploading > 0) {
+        this.uploading--
+      }
       if (!this.active) {
         return;
       }
@@ -462,11 +466,15 @@ export default {
             continue;
           }
         }
+
+        this.uploading++
         return;
       }
 
-      this.active = false;
-      this.uploaded = true;
+      if (!this.uploading) {
+        this.active = false;
+        this.uploaded = true;
+      }
     },
 
 

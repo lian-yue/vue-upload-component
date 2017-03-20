@@ -725,6 +725,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return {
 	      mode: 'html5',
 	      active: false,
+	      uploading: 0,
 	      uploaded: true,
 	      destroy: false,
 	      dropActive: false
@@ -998,6 +999,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    },
 	    _fileUploads: function _fileUploads() {
+	      if (this.uploading > 0) {
+	        this.uploading--;
+	      }
 	      if (!this.active) {
 	        return;
 	      }
@@ -1049,11 +1053,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            continue;
 	          }
 	        }
+	
+	        this.uploading++;
 	        return;
 	      }
 	
-	      this.active = false;
-	      this.uploaded = true;
+	      if (!this.uploading) {
+	        this.active = false;
+	        this.uploaded = true;
+	      }
 	    },
 	    _fileUploadXhr: function _fileUploadXhr(xhr, file, data) {
 	      var _self = this;
