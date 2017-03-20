@@ -8634,17 +8634,13 @@
 	          "nav",
 	          null,
 	          [h(
-	            "h3",
+	            "h2",
 	            null,
 	            ["Navigation"]
 	          ), h(
 	            "h3",
 	            null,
-	            ["Need to run local ", h(
-	              "code",
-	              null,
-	              ["`npm run dev`"]
-	            )]
+	            ["Please click on the navigation"]
 	          ), h(
 	            "ul",
 	            null,
@@ -9081,6 +9077,7 @@
 	    return {
 	      mode: 'html5',
 	      active: false,
+	      uploading: 0,
 	      uploaded: true,
 	      destroy: false,
 	      dropActive: false
@@ -9354,6 +9351,9 @@
 	      });
 	    },
 	    _fileUploads: function _fileUploads() {
+	      if (this.uploading > 0) {
+	        this.uploading--;
+	      }
 	      if (!this.active) {
 	        return;
 	      }
@@ -9405,11 +9405,15 @@
 	            continue;
 	          }
 	        }
+	
+	        this.uploading++;
 	        return;
 	      }
 	
-	      this.active = false;
-	      this.uploaded = true;
+	      if (!this.uploading) {
+	        this.active = false;
+	        this.uploaded = true;
+	      }
 	    },
 	    _fileUploadXhr: function _fileUploadXhr(xhr, file, data) {
 	      var _self = this;
@@ -11254,7 +11258,7 @@
 	        _vm.$forceUpdate()
 	      }
 	    }
-	  })])])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("\n            Auto start: " + _vm._s(_vm.auto) + "\n          ")]), _vm._v(" "), _c('td', [_vm._v("\n            Active: " + _vm._s(_vm.upload.active) + "\n          ")]), _vm._v(" "), _c('td', [_vm._v("\n            Uploaded: " + _vm._s(_vm.upload.uploaded) + "\n          ")]), _vm._v(" "), _c('td', [_vm._v("\n            Drop active: " + _vm._s(_vm.upload.dropActive) + "\n          ")])])])])]), _vm._v(" "), _c('div', {
+	  })])])]), _vm._v(" "), _c('tr', [_c('td', [_vm._v("\n            Auto start: " + _vm._s(_vm.auto) + "\n          ")]), _vm._v(" "), _c('td', [_vm._v("\n            Active: " + _vm._s(_vm.upload.active) + "\n          ")]), _vm._v(" "), _c('td', [_vm._v("\n            Uploaded: " + _vm._s(_vm.upload.uploaded) + "\n          ")]), _vm._v(" "), _c('td', [_vm._v("\n            Drop active: " + _vm._s(_vm.upload.dropActive) + "\n          ")]), _vm._v(" "), _vm._m(1)])])])]), _vm._v(" "), _c('div', {
 	    directives: [{
 	      name: "show",
 	      rawName: "v-show",
@@ -11265,6 +11269,12 @@
 	  }, [_vm._v("\n    Drop ing\n  ")])])
 	},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
 	  return _c('thead', [_c('tr', [_c('th', [_vm._v("Index")]), _vm._v(" "), _c('th', [_vm._v("ID")]), _vm._v(" "), _c('th', [_vm._v("Name")]), _vm._v(" "), _c('th', [_vm._v("Size")]), _vm._v(" "), _c('th', [_vm._v("Progress")]), _vm._v(" "), _c('th', [_vm._v("Speed")]), _vm._v(" "), _c('th', [_vm._v("Active")]), _vm._v(" "), _c('th', [_vm._v("Error")]), _vm._v(" "), _c('th', [_vm._v("Success")]), _vm._v(" "), _c('th', [_vm._v("Abort")]), _vm._v(" "), _c('th', [_vm._v("Delete")])])])
+	},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+	  return _c('td', [_c('label', {
+	    attrs: {
+	      "for": "file"
+	    }
+	  }, [_vm._v("Click")])])
 	}]}
 
 /***/ },
