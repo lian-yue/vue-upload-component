@@ -2316,16 +2316,18 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-	  return _c('input', {
+	  return _c('div', [_c('input', {
 	    attrs: {
 	      "type": "file",
-	      "name": "$parent.name",
-	      "id": "$parent.id || $parent.name",
-	      "accept": "$parent.accept",
-	      "on-change": "change",
-	      "multiple": "$parent.multiple && $parent.mode == 'html5'"
+	      "name": _vm.$parent.name,
+	      "id": _vm.$parent.id || _vm.$parent.name,
+	      "accept": _vm.$parent.accept,
+	      "multiple": _vm.$parent.multiple && _vm.$parent.mode === 'html5'
+	    },
+	    on: {
+	      "change": _vm.change
 	    }
-	  })
+	  })])
 	},staticRenderFns: []}
 
 /***/ },
