@@ -754,25 +754,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.destroy = true;
 	    this.files.splice(0, this.files.length);
 	  },
-	  render: function render(h) {
-	    return h(
-	      'label',
-	      { 'class': {
-	          'file-uploads': true,
-	          'file-uploads-html5': this.mode == 'html5',
-	          'file-uploads-html4': this.mode == 'html4'
-	        } },
-	      [h(
-	        'span',
-	        null,
-	        [this.title]
-	      ), h(
-	        'input-file',
-	        null,
-	        []
-	      )]
-	    );
-	  },
 	
 	
 	  watch: {
@@ -1346,27 +1327,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.$destroy();
 	      this.$parent._addInputFileElement(e.target);
 	    }
-	  },
-	
-	  render: function render(h) {
-	    var parent = this.$parent;
-	    return h(
-	      "input",
-	      {
-	        attrs: {
-	          type: "file",
-	          name: parent.name,
-	          id: parent.id || parent.name,
-	          accept: parent.accept,
-	
-	          multiple: parent.multiple && parent.mode == 'html5'
-	        },
-	        on: {
-	          "change": this.change
-	        }
-	      },
-	      []
-	    );
 	  }
 	};
 
@@ -2298,10 +2258,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var __vue_styles__ = {}
 	
 	/* styles */
-	__webpack_require__(86)
+	__webpack_require__(88)
 	
 	/* script */
 	__vue_exports__ = __webpack_require__(39)
+	
+	/* template */
+	var __vue_template__ = __webpack_require__(86)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -2313,6 +2276,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  __vue_options__ = __vue_options__.options
 	}
 	
+	__vue_options__.render = __vue_template__.render
+	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	
 	module.exports = __vue_exports__
 
@@ -2326,6 +2291,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/* script */
 	__vue_exports__ = __webpack_require__(40)
+	
+	/* template */
+	var __vue_template__ = __webpack_require__(85)
 	__vue_options__ = __vue_exports__ = __vue_exports__ || {}
 	if (
 	  typeof __vue_exports__.default === "object" ||
@@ -2337,12 +2305,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	  __vue_options__ = __vue_options__.options
 	}
 	
+	__vue_options__.render = __vue_template__.render
+	__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 	
 	module.exports = __vue_exports__
 
 
 /***/ },
 /* 85 */
+/***/ function(module, exports) {
+
+	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+	  return _c('div', [_c('input', {
+	    attrs: {
+	      "type": "file",
+	      "name": _vm.$parent.name,
+	      "id": _vm.$parent.id || _vm.$parent.name,
+	      "accept": _vm.$parent.accept,
+	      "multiple": _vm.$parent.multiple && _vm.$parent.mode === 'html5'
+	    },
+	    on: {
+	      "change": _vm.change
+	    }
+	  })])
+	},staticRenderFns: []}
+
+/***/ },
+/* 86 */
+/***/ function(module, exports) {
+
+	module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+	  return _c('label', {
+	    staticClass: "file-uploads",
+	    class: _vm.mode === 'html5' ? 'file-uploads-html5' : 'file-uploads-html4'
+	  }, [_c('span', [_vm._v(_vm._s(_vm.title))]), _vm._v(" "), _vm._t("default"), _vm._v(" "), _c('input-file')], 2)
+	},staticRenderFns: []}
+
+/***/ },
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -2564,7 +2564,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 86 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// style-loader: Adds some css to the DOM by adding a <style> tag
@@ -2573,14 +2573,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var content = __webpack_require__(81);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(85)(content, {});
+	var update = __webpack_require__(87)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
 		// When the styles change, update the <style> tags
 		if(!content.locals) {
-			module.hot.accept("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-4563ebb1!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue", function() {
-				var newContent = require("!!./../node_modules/css-loader/index.js!./../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-4563ebb1!./../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue");
+			module.hot.accept("!!../node_modules/css-loader/index.js!../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-696d21f4!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue", function() {
+				var newContent = require("!!../node_modules/css-loader/index.js!../node_modules/vue-loader/lib/style-rewriter.js?id=data-v-696d21f4!../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./FileUpload.vue");
 				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
 				update(newContent);
 			});
