@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <span class="file-uploads-input">
     <input
       type="file"
       :name="$parent.name"
@@ -8,8 +8,7 @@
       @change="change"
       :multiple="$parent.multiple && $parent.mode === 'html5'"
     />
-  </div>
-
+  </span>
 </template>
 <script>
 export default {

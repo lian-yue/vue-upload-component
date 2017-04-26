@@ -1,6 +1,6 @@
 <template>
   <label class="file-uploads" :class="mode === 'html5' ? 'file-uploads-html5' : 'file-uploads-html4'">
-      <span>{{title}}</span>
+      <span class="file-uploads-title" v-html="title"></span>
       <slot></slot>
       <input-file></input-file>
   </label>
@@ -125,6 +125,7 @@ export default {
 
   // 挂载后
   mounted() {
+    return
     var input = document.createElement('input');
     input.type = 'file';
     if (window.FormData && input.files)  {
@@ -398,7 +399,7 @@ export default {
 
       var inputFile = new Component({
         parent: this,
-        el: el,
+        el: el.parentNode,
       });
     },
 
