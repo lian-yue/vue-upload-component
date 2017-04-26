@@ -1,3 +1,11 @@
+<template>
+  <label class="file-uploads" :class="mode === 'html5' ? 'file-uploads-html5' : 'file-uploads-html4'">
+      <span>{{title}}</span>
+      <slot></slot>
+      <input-file></input-file>
+  </label>
+</template>
+
 <style>
 .file-uploads {
     overflow: hidden;
@@ -139,22 +147,6 @@ export default {
     this.destroy = true;
     this.files.splice(0, this.files.length);
   },
-
-  render (h) {
-    return (
-      <label class={{
-        'file-uploads': true,
-        'file-uploads-html5': this.mode == 'html5',
-        'file-uploads-html4': this.mode == 'html4'
-      }} >
-          <span>{this.title}</span>
-          <input-file></input-file>
-      </label>
-    )
-  },
-
-
-
 
   watch: {
     drop(value) {
