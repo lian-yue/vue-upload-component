@@ -782,7 +782,6 @@ module.exports =
 	  mounted: function mounted() {
 	    var _this = this;
 	
-	    return;
 	    var input = document.createElement('input');
 	    input.type = 'file';
 	    if (window.FormData && input.files) {

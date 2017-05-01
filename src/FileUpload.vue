@@ -125,7 +125,6 @@ export default {
 
   // 挂载后
   mounted() {
-    return
     var input = document.createElement('input');
     input.type = 'file';
     if (window.FormData && input.files)  {
