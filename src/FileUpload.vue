@@ -59,9 +59,6 @@ export default {
       type: String,
       default: 'file',
     },
-    drop: {
-      default: false,
-    },
     extensions: {
       default:  () => [],
     },
