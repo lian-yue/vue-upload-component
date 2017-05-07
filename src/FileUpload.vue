@@ -97,10 +97,6 @@ export default {
       type: Object,
       default: () => {},
     },
-    drop: {
-      type: Boolean,
-      default: false,
-    },
     files: {
       type: Array,
       default: () => [],
