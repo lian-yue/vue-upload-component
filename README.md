@@ -8,7 +8,7 @@
 ## Install
 
 ``` bash
-    npm install vue-upload-component@next --save
+    npm install vue-upload-component --save
 ```
 
 ### CommonJS
@@ -36,6 +36,24 @@
 
 ```
 
+
+### SSR (Server)
+```js
+import FileUpload from 'vue-upload-component/src'
+```
+
+#### webpack.config.js
+```js
+var nodeExternals = require('webpack-node-externals');
+{
+    //.....
+    externals: [
+        nodeExternals({whitelist:[/^vue-upload-component/]})
+    ]
+    //.....
+}
+
+```
 
 ## Examples
 

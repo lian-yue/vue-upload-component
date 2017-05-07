@@ -10,13 +10,12 @@ module.exports = {
     path: './dist',
     publicPath: '/dist/',
     filename: "[name].js",
+    // target: 'node',
   },
 
 
   resolve: {
     root: path.join(__dirname, 'node_modules'),
-    alias: {
-    },
     extensions: ['', '.js', '.vue', '.json'],
   },
 
@@ -52,7 +51,7 @@ module.exports = {
 
   babel: {
     presets: ['es2015', 'stage-0'],
-    plugins: ['transform-runtime', 'transform-vue-jsx'],
+    plugins: ['transform-runtime'],
   },
 
   devServer: {

@@ -1,3 +1,11 @@
+<template>
+  <label class="file-uploads" :class="mode === 'html5' ? 'file-uploads-html5' : 'file-uploads-html4'">
+      <span class="file-uploads-title" v-html="title"></span>
+      <slot></slot>
+      <input-file></input-file>
+  </label>
+</template>
+
 <style>
 .file-uploads {
     overflow: hidden;
@@ -89,10 +97,6 @@ export default {
       type: Object,
       default: () => {},
     },
-    drop: {
-      type: Boolean,
-      default: false,
-    },
     files: {
       type: Array,
       default: () => [],
@@ -139,22 +143,6 @@ export default {
     this.destroy = true;
     this.files.splice(0, this.files.length);
   },
-
-  render (h) {
-    return (
-      <label class={{
-        'file-uploads': true,
-        'file-uploads-html5': this.mode == 'html5',
-        'file-uploads-html4': this.mode == 'html4'
-      }} >
-          <span>{this.title}</span>
-          <input-file></input-file>
-      </label>
-    )
-  },
-
-
-
 
   watch: {
     drop(value) {
@@ -406,7 +394,7 @@ export default {
 
       var inputFile = new Component({
         parent: this,
-        el: el,
+        el: el.parentNode,
       });
     },
 
