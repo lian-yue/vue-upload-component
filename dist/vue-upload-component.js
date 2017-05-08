@@ -804,32 +804,32 @@ module.exports =
 	    files: function files(_files) {
 	      var diffCount = 0;
 	      var fileMaps = {};
-	
+
 	      for (var i = 0; i < _files.length; i++) {
 	        var file = _files[i];
-	
+
 	        if (!file.error && !file.success) {
 	          this.uploaded = false;
 	        }
-	
+	        if (this._files === undefined) { this._files = []; }
 	        if (!this._files[file.id]) {
 	          diffCount++;
 	          this._files[file.id] = file;
 	          this._uploadEvents('add', file);
 	        }
-	
+
 	        fileMaps[file.id] = true;
 	      }
-	
+
 	      for (var id in this._files) {
 	        if (fileMaps[id]) {
 	          continue;
 	        }
 	        diffCount++;
 	        var _file = this._files[id];
-	
+
 	        _file.removed = true;
-	
+
 	        var xhr = _file.xhr;
 	        if (xhr) {
 	          try {

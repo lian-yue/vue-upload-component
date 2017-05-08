@@ -161,6 +161,7 @@ export default {
         }
 
         // 新增的
+        if (this._files === undefined]) { this._files = [] }
         if (!this._files[file.id]) {
           diffCount++
           this._files[file.id] = file
