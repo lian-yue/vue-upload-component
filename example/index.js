@@ -1,25 +1,12 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router'
-
-import App from './App'
 
 import Home from './Home'
-import Multi from './Multi'
-import CrossRouter from './CrossRouter'
-import CrossRouterUpload from './CrossRouterUpload'
-import CrossRouterList from './CrossRouterList'
-import VuexComponent from './Vuex'
 
 import store from './store'
 
-Vue.use(VueRouter)
 
 Vue.config.silent = false;
 Vue.config.devtools = true;
-
-
-
-
 
 
 Vue.filter('formatSize', function(size) {
@@ -39,37 +26,7 @@ Vue.filter('formatSize', function(size) {
 
 
 
-const router = new VueRouter({
-  mode: 'history',
-  base: __dirname,
-  routes: [
-    {
-      path: '/',
-      component: Home
-    },
-    {
-      path: '/multi',
-      component: Multi
-    },
-    {
-      path: '/cross-router',
-      component: CrossRouter,
-      children: [
-        { path: '', component: CrossRouterUpload },
-        { path: 'list', component: CrossRouterList }
-      ]
-    },
-    {
-      path: '/vuex',
-      component: VuexComponent,
-    },
-  ]
-})
-
-
-
 new Vue({
-  router,
   store,
-  ...App
+  ...Home
 }).$mount('#app')

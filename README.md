@@ -16,7 +16,7 @@
     var FileUpload = require('vue-upload-component');
 
     new Vue({
-        template: '<file-upload post-action="/post.method" put-action="/put.method"></file-upload>',
+        template: '<file-upload post-action="/post.method" put-action="/put.method">Upload file</file-upload>',
         components: {
             FileUpload: FileUpload
         }
@@ -28,7 +28,7 @@
 ```js
     import FileUpload from 'vue-upload-component'
     new Vue({
-        template: '<file-upload post-action="/post.method" put-action="/put.method"></file-upload>',
+        template: '<file-upload post-action="/post.method" put-action="/put.method">Upload file</file-upload>',
         components: {
             FileUpload
         }
@@ -52,7 +52,6 @@ var nodeExternals = require('webpack-node-externals');
     ]
     //.....
 }
-
 ```
 
 ## Examples
@@ -61,12 +60,9 @@ https://lian-yue.github.io/vue-upload-component/
 
 
 https://github.com/lian-yue/vue-upload-component/tree/2.0/example/
-
 ``` html
-    <!-- Example file ./index.html -->
-    <!-- Example file ./src/example.js -->
     <div id="app">
-        <file-upload title="Add upload files"></file-upload>
+        <file-upload>Upload file</file-upload>
     </div>
 
     <script type="text/javascript">
@@ -102,8 +98,6 @@ npm run build
 ## Props
 ``` html
 <file-upload
-    title="Add upload files"
-
     name="post file name"
 
     drop="Boolean (true = $parent) or Element or Css Selector"
@@ -122,51 +116,28 @@ npm run build
 
     timeout="3600000"
 
-    events="Object"
-
     headers="Request headers object"
 
     data="Request data object"
 
-    files="Upload files"
-
     thread="Number  (Multi-file uploads at the same time)"
+
+    filter="Function(file) (Custom upload filters)"
+
+    value="Upload files"
+
+    @input="Function(files)"
+
+    @input-file="Function(newFile, oldFile)"
     >
+    Add Files
 </file-upload>
 ```
 
 
 
 
-### Props events
-``` js
-    events: {
-        add(file, component) {
-            console.log('add');
-            if (this.auto) {
-                component.active = true;
-            }
-            file.headers['X-Filename'] = encodeURIComponent(file.name)
-            file.data.filename = file.name
-
-            // file.putAction = 'xxx'
-            // file.postAction = 'xxx'
-        },
-        progress(file, component) {
-            console.log('progress ' + file.progress);
-        },
-        after(file, component) {
-            console.log('after');
-        },
-        before(file, component) {
-            console.log('before');
-        }
-    }
-```
-
-
-
-### Props files
+### Props value
 ``` js
     [
         {
@@ -219,7 +190,9 @@ npm run build
 
 ## methods
 ````
-    clear()  // Clear all files
-    remove(id or file Object)  // Remove a file   return   file object or  false
-    abort(id or file Object)  // Stop a file upload return   file object or  false
+    clear()
+    get(id or file Object)
+    add(window.File Object or object)
+    update(id or file Object, data)
+    remove(id or file Object)
 ```

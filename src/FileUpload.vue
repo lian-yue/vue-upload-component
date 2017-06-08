@@ -1,60 +1,43 @@
 <template>
-  <label class="file-uploads" :class="mode === 'html5' ? 'file-uploads-html5' : 'file-uploads-html4'">
-      <span class="file-uploads-title" v-html="title"></span>
-      <slot></slot>
-      <input-file></input-file>
+  <label class="file-uploads" :class="'file-uploads-' + mode">
+    <input-file></input-file>
+    <slot></slot>
   </label>
 </template>
-
 <style>
 .file-uploads {
-    overflow: hidden;
-    position: relative;
-    text-align: center;
-    display: inline-block;
+  overflow: hidden;
+  position: relative;
+  text-align: center;
+  display: inline-block;
 }
-.file-uploads span{
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
+.file-uploads.file-uploads-html4 input[type="file"]{
+  opacity: 0;
+  font-size: 20em;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
-.file-uploads input{
-    z-index: 1;
-    opacity: 0;
-    font-size: 20em;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-}
-.file-uploads.file-uploads-html5 input{
-    position: fixed;
-    width: 1px !important;
-    height: 1px !important;
-    top: -999em !important;
-    left:0 !important;
-    right:auto !important;
-    bottom:auto !important;
+.file-uploads.file-uploads-html5 input[type="file"] {
+  overflow: hidden;
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  top: -99em;
 }
 </style>
-
 <script>
-import InputFile from './InputFile.vue';
+import InputFile from './InputFile.vue'
 export default {
   components: {
     InputFile,
   },
-
   props: {
-    title: {
-      type: String,
-      default: 'Upload file',
-    },
     name: {
       type: String,
       default: 'file',
@@ -62,181 +45,217 @@ export default {
     drop: {
       default: false,
     },
+
     extensions: {
-      default:  () => [],
+      default: Array,
     },
+
     postAction: {
       type: String,
     },
+
     putAction: {
       type: String,
     },
+
     accept: {
-      type:String,
+      type: String,
     },
+
     multiple: {
       type: Boolean,
     },
+
     timeout: {
       type: Number,
-      default:0,
+      default: 0,
     },
+
     size: {
       type: Number,
-    },
-    events: {
-      type: Object,
-      default: () => {},
     },
 
     headers: {
       type: Object,
-      default: () => {},
+      default: Object,
     },
+
+    filter: {
+      type: Function,
+      default(file) {
+        return file
+      }
+    },
+
     data: {
       type: Object,
-      default: () => {},
+      default: Object,
     },
-    files: {
+
+    value: {
       type: Array,
-      default: () => [],
+      default: Array,
     },
+
     thread: {
       type: Number,
       default: 1,
     },
   },
 
-
   data() {
     return {
       mode: 'html5',
+      input: false,
       active: false,
-      uploading: 0,
-      uploaded: true,
-      destroy: false,
       dropActive: false,
+      destroy: false,
+      files: [],
     }
   },
 
+
   // 挂载后
   mounted() {
-    var input = document.createElement('input');
-    input.type = 'file';
+    var input = document.createElement('input')
+    input.type = 'file'
     if (window.FormData && input.files)  {
-      this.mode = 'html5';
+      this.mode = 'html5'
     } else {
-      this.mode = 'html4';
+      this.mode = 'html4'
     }
-    this._index = 0;
-    this._files = [];
-    this._dropActive = 0;
-    this._drop(this.drop)
+
+    this._maps = {}
+
+    this.$parent.$forceUpdate()
     this.$nextTick(() => {
-      this._drop(this.drop)
+      this.watchDrop(this.drop)
     })
   },
 
   // 销毁前
   beforeDestroy() {
-    this.active = false;
-    this.destroy = true;
-    this.files.splice(0, this.files.length);
+    this.destroy = true
+    this.active = false
   },
 
-  watch: {
-    drop(value) {
-      this._drop(value);
+  computed: {
+    uploading() {
+      var uploading = 0
+      for (var i = 0; i < this.files.length; i++) {
+        if (this.files[i].active) {
+          uploading++
+        }
+      }
+      return uploading
     },
-    files(files) {
-      var diffCount = 0
-      var fileMaps = {};
 
-
-      for (var i = 0; i < files.length; i++) {
-        let file = files[i];
-        // 是否 全部上传完成
+    uploaded() {
+      var file
+      for (var i = 0; i < this.files.length; i++) {
+        file = this.files[i]
         if (!file.error && !file.success) {
-          this.uploaded = false;
+          return false
         }
-
-        // 新增的
-        if (!this._files[file.id]) {
-          diffCount++
-          this._files[file.id] = file
-          this._uploadEvents('add', file);
-        }
-
-        // 储存 maps
-        fileMaps[file.id] = true
       }
+      return true
+    },
+  },
 
-      // 删除文件
-      for (var id in this._files) {
-        if (fileMaps[id]) {
-          continue;
-        }
-        diffCount++
-        let file = this._files[id];
 
-        // 已移除的记录
-        file.removed = true;
+  watch: {
+    active(active) {
+      this.watchActive(active)
+    },
 
-        // xhr abort
-        var xhr = file.xhr;
-        if (xhr) {
-          try {
-            xhr.abort();
-            xhr.timeout = 1;
-          } catch (e) {
-          }
-        }
-
-        // iframe abort
-        if (file.iframe) {
-          file.iframe.onabort({type:'abort'});
-        }
-        delete this._files[id];
-        this._uploadEvents('remove', file);
-      }
-      if (diffCount) {
-        this._index = 0;
+    dropActive() {
+      this.$parent.$forceUpdate()
+    },
+    value(value) {
+      if (this.files != value && !this.input) {
+        console.log('ww')
+        this.files = value
       }
     },
 
-    active(newValue, oldValue) {
-      if (newValue && !oldValue) {
-        for (var i = 0; i < this.thread; i++) {
-          this._fileUploads();
-          if (this.mode != 'html5') {
-            break
+    files(files, oldFiles) {
+      this._oldFiles = oldFiles
+      var idMaps = {}
+      for (var i = 0; i < files.length; i++) {
+        let file = files[i]
+        let old = this._maps[file.id]
+
+        idMaps[file.id] = true
+
+        if (!old || old != file) {
+          this.$emit('input-file', file, old)
+          this._maps[file.id] = file
+          if (file.active && (!old || !old.active)) {
+            this.upload(file).then(() => {
+              this.update(file, {active: false, success: true})
+            }).catch((e) => {
+              this.update(file, {active: false, success: false, error: e.code || e.error || e.message})
+            })
+          } else if (!file.active && !file.error && !file.success && old && old.active) {
+            this.update(file, {error: 'abort'})
           }
         }
       }
-    },
 
-    uploaded(uploaded) {
-      if (uploaded) {
-        this.active = false;
+      // 删除
+      for (var id in this._maps) {
+        if (idMaps[id]) {
+          continue
+        }
+        var old = this._maps[id]
+        delete this._maps[id]
+        this.$emit('input-file', undefined, old)
       }
+      this.input = true
+      this.$emit('input', files)
+      this.$nextTick(() => {
+        this.input = false
+      })
+      if (this.active) {
+        this.watchActive(true)
+      }
+    },
+    drop(value) {
+      this.watchDrop(value)
     },
   },
 
   methods: {
+
+    // 清空
     clear() {
       if (this.files.length) {
-        this.files.splice(0, this.files.length);
+        this.files = []
       }
+      return true
     },
 
-    select(file) {
+    // 选择
+    get(file) {
       if (typeof file == 'object') {
         var index = this.files.indexOf(file)
-        if (index == -1) {
+        if (index != -1) {
+          return file
+        }
+        if (!file.id) {
           return false
         }
-        return file
+        file = file.id
       }
+
+      if (this._maps[file]) {
+        return this._maps[file]
+      }
+
+      if (!file) {
+        return false
+      }
+
       var id = file
       for (var i = 0; i < this.files.length; i++) {
         file = this.files[i]
@@ -247,139 +266,109 @@ export default {
       return false
     },
 
-    remove(file) {
-      file = this.select(file)
-      if (file) {
-        this.files.splice(this.files.indexOf(file), 1)
+    // 添加
+    add(file, start) {
+      if (this.mode == 'html5' && file instanceof File) {
+        file = {
+          file,
+          size: file.size,
+          name: file.name,
+          type: file.type,
+        }
       }
-      return file
-    },
 
-    abort(file) {
-      file = this.select(file)
-      if (file) {
-        file.active = false
+      file = {
+        size: -1,                // 只读
+        name: 'Filename',        // 只读
+        type: '',                // 只读
+        progress: '0.00',        // 只读
+        speed: 0,                // 只读
+        active: false,           // 读写
+        error: '',               // 读写
+        success: false,          // 读写
+        putAction: this.putAction,   // 读写
+        postAction: this.postAction, // 读写
+        timeout: this.timeout,       // 读写
+
+        ...file,
+
+        response: {},                // 读写
+
+        xhr: false,                // 只读
+        iframe: false,             // 只读
       }
-      return file
-    },
+      file.data = {
+        ...this.data,
+        ...file.data ? file.data : {},
+      }
 
-    addFileUpload(file) {
-      this.uploaded = false;
-      var defaultFile = {
-        size: -1,
-        name: 'Filename',
-        progress: '0.00',
-        speed: 0,
-        active: false,
-        error: '',
-        success: false,
-        removed: false,
-        putAction: this.putAction,
-        postAction: this.postAction,
-        timeout: this.timeout,
-        data: Object.assign({}, this.data),
-        headers: Object.assign({}, this.headers),
-        response: {},
+      file.headers = {
+        ...this.headers,
+        ...file.headers ? file.headers : {},
+      }
 
-        xhr: false,
-        iframe: false,
-      };
-
-      file = Object.assign(defaultFile, file)
 
       if (!file.id) {
-        file.id = Math.random().toString(36).substr(2);
+        file.id = Math.random().toString(36).substr(2)
       }
-
       if (!this.multiple) {
-        this.clear();
+        this.clear()
       }
-      var index = this.files.push(file)
-    },
-
-    _uploadEvents(name, file) {
-      this.events && this.events[name] && this.events[name].call(this, file, this);
-    },
-
-    _drop(value) {
-
-      // 移除挂载
-      if (this.dropElement && this.mode === 'html5') {
-        try {
-          window.document.removeEventListener('dragenter', this._onDragenter, false);
-          window.document.removeEventListener('dragleave', this._onDragleave, false);
-          this.dropElement.removeEventListener('dragover', this._onDragover, false);
-          this.dropElement.removeEventListener('drop', this._onDrop, false);
-        } catch (e) {
-        }
-      }
-
-      if (!value) {
-        this.dropElement = false;
-        return;
-      }
-
-      if (typeof value == 'string') {
-        this.dropElement = document.querySelector(value) || this.$root.$el.querySelector(value);
-      } else if (typeof value == 'boolean') {
-        this.dropElement = this.$parent.$el;
+      var files = this.files.concat([])
+      if (start) {
+        files.unshift(file)
       } else {
-        this.dropElement = this.drop;
+        files.push(file)
       }
+      this.files = files
+      return file
+    },
 
-      if (this.dropElement && this.mode === 'html5') {
-        window.document.addEventListener('dragenter', this._onDragenter, false);
-        window.document.addEventListener('dragleave', this._onDragleave, false);
-        this.dropElement.addEventListener('dragover', this._onDragover, false);
-        this.dropElement.addEventListener('drop', this._onDrop, false);
+    // 移除
+    remove(file) {
+      file = this.get(file)
+      if (file) {
+        var files = this.files.concat([])
+        files.splice(files.indexOf(file), 1)
+        this.files = files
       }
+      return file
     },
 
-    _onDragenter(e) {
-      this._dropActive++;
-      this.dropActive = !!this._dropActive;
-      e.preventDefault();
-    },
-
-    _onDragleave(e) {
-      e.preventDefault();
-      this._dropActive--;
-      if (e.target.nodeName == 'HTML' || (e.screenX == 0 && e.screenY == 0)) {
-        this.dropActive = !!this._dropActive;
+    // 更新
+    update(file, data) {
+      file = this.get(file)
+      if (file) {
+        var newFile = {...file, ...data}
+        var files = this.files.concat([])
+        files.splice(files.indexOf(file), 1, newFile)
+        this.files = files
+        return newFile
       }
-    },
-    _onDragover(e) {
-      e.preventDefault();
+      return false
     },
 
-
-    _onDrop(e) {
-      this._dropActive = 0;
-      this.dropActive = false;
-      e.preventDefault();
-      if (e.dataTransfer.files.length) {
-        for (let i = 0; i < e.dataTransfer.files.length; i++) {
-          let file = e.dataTransfer.files[i];
-          this.addFileUpload({file:file, size:file.size, name: file.name});
-          if (!this.multiple) {
-            break;
-          }
-        }
-      }
-    },
-
-
-    _addInputFileElement(el) {
+    // 添加表单文件
+    addInputFile(el) {
       if (el.files) {
         for (let i = 0; i < el.files.length; i++) {
-          let file = el.files[i];
-          this.addFileUpload({size: file.size, name: file.name, file: file, el:el});
+          let file = el.files[i]
+          this.add({
+            size: file.size,
+            name: file.name,
+            type: file.type,
+            file,
+            el
+          })
         }
       } else {
-        this.addFileUpload({name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1'), el:el});
+        this.add({
+          name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1'),
+          el,
+        })
       }
 
-      var Component = this.$options.components.InputFile;
+      var Component = this.$options.components.InputFile
 
       // vue 2.0.0  = Component
       // vue 2.0.x  = Component._Ctor
@@ -394,277 +383,283 @@ export default {
 
       var inputFile = new Component({
         parent: this,
-        el: el.parentNode,
-      });
+        el,
+      })
     },
 
 
-    _fileUploads() {
-      if (this.uploading > 0) {
-        this.uploading--
-      }
-      if (!this.active) {
-        return;
-      }
-
-      for (; this._index < this.files.length; this._index++) {
-        var file = this.files[this._index];
-        if (file.active || file.success || file.error) {
-          continue;
-        }
 
 
-        if (this.size && this.size > 0 && file.size >= 0 && file.size > this.size) {
-          file.error = 'size';
-          continue;
-        }
-
-
-        if (this.extensions && (this.extensions.length || typeof this.extensions.length == 'undefined')) {
-          var extensions = this.extensions;
-          if (typeof extensions == 'object' && extensions instanceof RegExp) {
-
-          } else {
-            if (typeof extensions == 'string') {
-              extensions = extensions.split(',').map((value) => value.trim()).filter(value => value);
-            }
-            extensions = new RegExp('\\.('+ extensions.join('|').replace(/\./g, '\\.') +')$', 'i');
-          }
-
-          if (file.name.search(extensions) == -1) {
-            file.error = 'extension';
-            continue;
-          }
-        }
-
-        if (this.mode == 'html5') {
-          if (file.putAction) {
-            this._fileUploadPut(file);
-          } else if (file.postAction) {
-            this._fileUploadHtml5(file);
-          } else {
-            file.error = 'not_support';
-            continue;
-          }
-        } else {
-          if (file.postAction) {
-            this._fileUploadHtml4(file);
-          } else {
-            file.error = 'not_support';
-            continue;
-          }
-        }
-
-        this.uploading++
-        return;
+    // 上传
+    upload(file) {
+      if (!(file = this.get(file))) {
+        return Promise.reject(new Error('not_exists'))
       }
 
-      if (!this.uploading) {
-        this.active = false;
-        this.uploaded = true;
+      // 重置上传数据
+      if (file.error || file.success) {
+        file = this.update(file, {error: '', success: false})
+      }
+
+      // 后缀
+      var extensions = this.extensions
+      if (extensions && (extensions.length || typeof extensions.length == 'undefined')) {
+        if (typeof extensions != 'object' || !(extensions instanceof RegExp)) {
+          if (typeof extensions == 'string') {
+            extensions = extensions.split(',').map(value => value.trim()).filter(value => value)
+          }
+          extensions = new RegExp('\\.('+ extensions.join('|').replace(/\./g, '\\.') +')$', 'i')
+        }
+        if (file.name.search(extensions) == -1) {
+          return Promise.reject(new Error('extension'))
+        }
+      }
+
+
+      // 大小
+      if (this.size > 0 && file.size >= 0 && file.size > this.size) {
+        return Promise.reject(new Error('size'))
+      }
+
+
+      // 过滤器
+      file = this.filter(file) || this.get(file)
+
+      // 被过滤掉
+      if (!file || file.error || file.success) {
+        return Promise.reject(new Error(file ? file.error : 'not_exists'))
+      }
+
+      if (this.mode == 'html5' && file.putAction) {
+        return this.uploadPut(file)
+      } else if (this.mode == 'html5') {
+        return this.uploadHtml5(file)
+      } else {
+        return this.uploadHtml4(file)
       }
     },
 
+    uploadPut(file) {
+      var querys = []
+      var value
+      for (var key in file.data) {
+        value = file.data[key]
+        if (value !== null && value !== undefined) {
+          querys.push(encodeURIComponent(key)  + '=' + encodeURIComponent(value))
+        }
+      }
+      var queryString = querys.length ? (file.putAction.indexOf('?') == -1 ? '?' : '&') + querys.join('&')  : ''
+      var xhr = new XMLHttpRequest()
+      xhr.open('PUT', file.putAction + queryString)
+      return this.uploadXhr(xhr, file, file.file)
+    },
 
-    _fileUploadXhr(xhr, file, data) {
-      var _self = this;
-      var complete = false;
+    uploadHtml5(file) {
+      var form = new window.FormData()
+      var value
+      for (var key in file.data) {
+        value = file.data[key]
+        if (value && typeof value == 'object' && typeof value.toString != 'function') {
+          form.append(key, JSON.stringify(value))
+        } else if (value !== null && value !== undefined) {
+          form.append(key, value)
+        }
+      }
+      form.append(this.name, file.file)
+      var xhr = new XMLHttpRequest()
+      xhr.open('POST', file.postAction)
+      return this.uploadXhr(xhr, file, form)
+    },
 
-      var speedTime = 0;
-      var speedLoaded = 0;
+    uploadXhr(xhr, file, data) {
+      var self = this
+
+      var speedTime = 0
+      var speedLoaded = 0
+
       xhr.upload.onprogress = function(e) {
-
-        // 已 移除
-        if (file.removed) {
-          xhr.abort();
-          return;
+        // 还未开始上传 已删除  未激活
+        if (!e.lengthComputable || !(file = self.get(file))) {
+          return
         }
 
-        //  终止
-        if (!_self.active || !file.active) {
-          xhr.abort();
-          return;
+        // 进度 速度 每秒更新一次
+        var speedTime2 = Math.round(Date.now() / 1000)
+        if (speedTime2 == speedTime) {
+          return
         }
+        speedTime = speedTime2
 
-        // 进度
-        if (e.lengthComputable) {
-          file.progress = (e.loaded / e.total * 100).toFixed(2);
-          var speedTime2 = Math.round(Date.now() / 1000);
-          if (speedTime2 != speedTime) {
-            file.speed = e.loaded - speedLoaded;
-            speedLoaded = e.loaded;
-            speedTime = speedTime2;
-          }
-        }
-        _self._uploadEvents('progress', file);
+
+        file = self.update(file, {
+          progress: (e.loaded / e.total * 100).toFixed(2),
+          speed: e.loaded - speedLoaded,
+        })
+        speedLoaded = e.loaded
       }
 
-      var callback = function(e) {
-        switch (e.type) {
-          case 'timeout':
-            file.error = 'timeout';
-            break;
-          case 'abort':
-            file.error = 'abort';
-            break;
-          case 'error':
-            if (!xhr.status) {
-              file.error = 'network';
-            } else if(xhr.status >= 500) {
-              file.error = 'server';
-            } else if (xhr.status >= 400) {
-              file.error = 'denied';
-            }
-            break;
-          default:
-            if(xhr.status >= 500) {
-              file.error = 'server';
-            } else if (xhr.status >= 400) {
-              file.error = 'denied';
-            } else {
-              file.progress = '100.00';
-              file.success = true;
-            }
-        }
-        file.active = false;
-        if (xhr.responseText) {
-          var contentType = xhr.getResponseHeader('Content-Type');
-          if (contentType && contentType.indexOf('/json') != -1) {
-            file.response = JSON.parse(xhr.responseText);
-          } else {
-            file.response = xhr.responseText;
+      // 检查激活状态
+      var interval = setInterval(function() {
+        if (!(file = self.get(file)) || file.success || file.error) {
+          if (interval) {
+            clearInterval(interval)
+            interval = false
           }
+          if (!file || file.error) {
+            try {
+              xhr.abort()
+              xhr.timeout =1
+            } catch (e) {
+            }
+          }
+        }
+      }, 50);
+
+      return new Promise(function(resolve, reject) {
+        var complete
+        var fn = function(e) {
+          // 已经处理过了
+          if (complete) {
+            return
+          }
+          complete = true
+          if (interval) {
+            clearInterval(interval)
+            interval = false
+          }
+
+          // 不存在直接响应
+          if (!(file = self.get(file))) {
+            return reject(new Error('not_exists'))
+          }
+
+          // 有错误自动响应
+          if (file.error) {
+            return reject(new Error(file.error))
+          }
+
+          var data = {}
+
+          switch (e.type) {
+            case 'timeout':
+            case 'abort':
+              data.error = e.type
+              break
+            case 'error':
+              if (!xhr.status) {
+                data.error = 'network'
+              } else if(xhr.status >= 500) {
+                data.error = 'server'
+              } else if (xhr.status >= 400) {
+                data.error = 'denied'
+              }
+              break
+            default:
+              if(xhr.status >= 500) {
+                data.error = 'server'
+              } else if (xhr.status >= 400) {
+                data.error = 'denied'
+              } else {
+                data.progress = '100.00'
+              }
+          }
+
+          if (xhr.responseText) {
+            var contentType = xhr.getResponseHeader('Content-Type')
+            if (contentType && contentType.indexOf('/json') != -1) {
+              data.response = JSON.parse(xhr.responseText)
+            } else {
+              data.response = xhr.responseText
+            }
+          }
+
+          // 更新
+          file = self.update(file, data)
+
+          if (file.error) {
+            return reject(new Error(file.error))
+          }
+
+          // 响应
+          return resolve(file)
         }
 
-        if (!complete) {
-          complete = true;
-          if (!file.removed) {
-            _self._uploadEvents('after', file);
-          }
-          setTimeout(function() {
-            _self._fileUploads();
-          }, 50);
+        // 事件
+        xhr.onload = fn
+        xhr.onerror = fn
+        xhr.onabort = fn
+        xhr.ontimeout = fn
+
+        // 超时
+        if (file.timeout) {
+          xhr.timeout = file.timeout
+        }
+
+        // headers
+        for (let key in file.headers) {
+          xhr.setRequestHeader(key, file.headers[key])
+        }
+
+        // 更新 xhr
+        file = self.update(file, {xhr})
+
+        // 开始上传
+        xhr.send(data)
+      })
+    },
+
+
+
+
+    uploadHtml4(file) {
+      var self = this
+      var onKeydown = function(e) {
+        if (e.keyCode == 27) {
+          e.preventDefault()
         }
       };
 
-      // 事件
-      xhr.onload = callback;
-      xhr.onerror = callback;
-      xhr.onabort = callback;
-      xhr.ontimeout = callback;
-
-      // 超时
-      if (file.timeout) {
-        xhr.timeout = file.timeout;
-      }
+      var iframe = document.createElement('iframe')
+      iframe.id = 'upload-iframe-' + file.id
+      iframe.name = 'upload-iframe-' + file.id
+      iframe.src = 'about:blank'
+      iframe.setAttribute('style', 'width:1px;height:1px;top:-999em;position:absolute; margin-top:-999em;')
 
 
+      var form = document.createElement('form')
 
-      // headers
-      // xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-      for (let key in file.headers) {
-        xhr.setRequestHeader(key, file.headers[key]);
-      }
+      form.action = file.postAction
 
-
-      // 开始上传
-      xhr.send(data);
-      file.active = true;
-      file.xhr = xhr
-
-      // 定时执行检测
-      var interval = setInterval(function() {
-        if (!_self.active || !file.active || file.success || file.error) {
-          clearInterval(interval);
-          if (!file.success && !file.error) {
-            xhr.abort();
-          }
-        }
-      }, 100);
-
-      // 开始上传
-      this._uploadEvents('before', file);
-    },
+      form.name = 'upload-form-' + file.id
 
 
-    _fileUploadPut(file) {
-      var querys = Object.assign({}, file.data)
-      var queryArray = [];
-      for (let key in querys) {
-        if (querys[key] !== null && typeof querys[key] !== 'undefined') {
-          queryArray.push(encodeURIComponent(key)  + '=' + encodeURIComponent(querys[key]));
-        }
-      }
-      var queryString = queryArray.length ? (file.putAction.indexOf('?') == -1 ? '?' : '&') + queryArray.join('&')  : '';
-      var xhr = new XMLHttpRequest();
-      xhr.open('PUT', file.putAction + queryString);
-      this._fileUploadXhr(xhr, file, file.file);
-    },
+      form.setAttribute('method', 'POST')
+      form.setAttribute('target', 'upload-iframe-' + file.id)
+      form.setAttribute('enctype', 'multipart/form-data')
 
-    _fileUploadHtml5(file) {
-      var form = new window.FormData();
+      var value
+      var input
       for (var key in file.data) {
-        if (typeof file.data[key] != 'string') {
-          form.append(key, JSON.stringify(file.data[key]));
-        } else {
-          form.append(key, file.data[key]);
+        value = file.data[key]
+        if (value && typeof value == 'object' && typeof value.toString != 'function') {
+          value = JSON.stringify(value)
+        }
+        if (value !== null && value !== undefined) {
+          input = document.createElement('input')
+          input.type = 'hidden'
+          input.name =  key
+          form.appendChild(input)
         }
       }
-      form.append(this.name, file.file);
-      var xhr = new XMLHttpRequest();
-      xhr.open('POST', file.postAction);
-      this._fileUploadXhr(xhr, file, form);
-    },
+      form.appendChild(file.el)
 
-    _fileUploadHtml4(file) {
-      var _self = this;
-      var complete = false;
-
-      var keydown = function(e) {
-        if (e.keyCode == 27) {
-          e.preventDefault();
-        }
-      }
-      var iframe = document.createElement('iframe');
-      iframe.id = 'upload-iframe-' + file.id;
-      iframe.name = 'upload-iframe-' + file.id;
-      iframe.src = 'about:blank';
-      iframe.style = {
-        width: '1px',
-        height: '1px',
-        top: '-9999px',
-        left: '-9999px',
-        position: 'absolute',
-        marginTop: '-9999em',
-      }
-
-      var form = document.createElement('form');
-
-      form.action = file.postAction;
-
-      form.name = 'upload-form-' + file.id;
+      document.body.appendChild(iframe).appendChild(form)
 
 
-      form.setAttribute('method', 'POST');
-      form.setAttribute('target', 'upload-iframe-' + file.id);
-      form.setAttribute('enctype', 'multipart/form-data');
-
-      for (let key in file.data) {
-        let input = document.createElement('input');
-        input.type = 'hidden';
-        input.name =  key;
-        if (typeof file.data[key] != 'string') {
-          input.value = JSON.stringify(file.data[key]);
-        } else {
-          input.value = file[key];
-        }
-        form.appendChild(input);
-      }
-
-      form.appendChild(file.el);
 
 
-      var getDocumentData = function() {
+
+      var getResponseData = function() {
         var doc;
         try {
           if (iframe.contentWindow) {
@@ -686,81 +681,221 @@ export default {
       }
 
 
+      return new Promise(function(resolve, reject) {
+        setTimeout(function() {
+
+          // 不存在
+          if (!(file = self.update(file, {iframe}))) {
+            return reject(new Error('not_exists'))
+          }
+
+          // 定时检查
+          var interval = setInterval(function() {
+            if (!(file = self.get(file)) || file.success || file.error) {
+              if (interval) {
+                clearInterval(interval)
+                interval = false
+              }
+
+              if (!file || file.error) {
+                iframe.onabort({type:file ? 'abort' : 'not_exists'})
+              }
+            }
+          }, 50)
 
 
-      var callback = function(e) {
-        switch (e.type) {
-          case 'abort':
-            file.error = 'abort';
-            break;
-          case 'error':
-            var data = getDocumentData();
+          var complete
+          var fn = function(e) {
+            // 已经处理过了
+            if (complete) {
+              return
+            }
+            complete = true
+
+
+            if (interval) {
+              clearInterval(interval)
+              interval = false
+            }
+
+            // 关闭 esc 事件
+            document.body.removeEventListener('keydown', onKeydown)
+
+            // 移除
+            iframe.parentNode && iframe.parentNode.removeChild(iframe)
+
+            // 不存在直接响应
+            if (!(file = self.get(file))) {
+              return reject(new Error('not_exists'))
+            }
+
+            // 有错误自动响应
             if (file.error) {
-            } else if (data === null) {
-              file.error = 'network';
-            } else {
-              file.error = 'denied';
+              return reject(new Error(file.error))
             }
-            break;
-          default:
-            var data = getDocumentData();
+
+            var response = getResponseData()
+            var data = {}
+            switch (e.type) {
+              case 'abort':
+                data.error = 'abort'
+                break
+              case 'error':
+                if (file.error) {
+                  data.error = file.error
+                } else if (response === null) {
+                  data.error = 'network'
+                } else {
+                  data.error = 'denied'
+                }
+                break
+              default:
+                if (file.error) {
+                  data.error = file.error
+                } else if (data === null) {
+                  data.error = 'network'
+                } else {
+                  data.progress = '100.00'
+                }
+            }
+
+            if (response !== null) {
+              if (response && response.substr(0, 1) == '{' && response.substr(response.length - 1, 1) == '}') {
+                try {
+                  response = JSON.parse(response)
+                } catch (err) {
+                }
+              }
+              data.response = response
+            }
+
+            // 更新
+            file = self.update(file, data)
+
             if (file.error) {
-            } else if (data === null) {
-              file.error = 'network';
-            } else {
-              file.progress = '100.00';
-              file.success = true;
+              return reject(new Error(file.error))
             }
-        }
 
-        file.active = false;
-        if (typeof data != "undefined") {
-          if (data && data.substr(0, 1) == '{' && data.substr(data.length - 1, 1) == '}') {
-            try {
-              data = JSON.parse(data);
-            } catch (err) {
-            }
-          }
-          file.data = data;
-        }
-        if (!complete) {
-          complete = true;
-          document.body.removeEventListener('keydown', keydown);
-          document.body.removeEventListener('keydown', keydown);
-          iframe.parentNode && iframe.parentNode.removeChild(iframe);
-          if (!file.removed) {
-            _self._uploadEvents('after', file);
-          }
-          setTimeout(function() {
-            _self._fileUploads();
-          }, 50);
-        }
-      };
+            // 响应
+            return resolve(file)
+          };
 
 
 
-      setTimeout(function() {
-        document.body.appendChild(iframe).appendChild(form).submit();
-        iframe.onload = callback;
-        iframe.onerror = callback;
-        iframe.onabort = callback;
 
-        file.active = true;
-        file.iframe = iframe;
+          // 添加事件
+          iframe.onload = fn
+          iframe.onerror = fn
+          iframe.onabort = fn
 
-        document.body.addEventListener('keydown', keydown);
-        var interval = setInterval(function() {
-          if (!_self.active || !file.active || file.success || file.error) {
-            clearInterval(interval);
-            if (!file.success && !file.error) {
-              iframe.onabort({type:'abort'});
-            }
-          }
-        }, 50);
-        _self._uploadEvents('before', file);
-      }, 10);
+
+          // 禁止 esc 键
+          document.body.addEventListener('keydown', onKeydown)
+
+          // 提交
+          form.submit()
+
+
+        }, 10)
+      })
     },
 
+
+
+    watchActive(active) {
+      var file
+      var index = 0
+      var uploading = this.uploading
+      while (file = this.files[index]) {
+        index++
+        if (active && !this.destroy) {
+          if (uploading >= this.thread) {
+            break
+          }
+          if (!file.active && !file.error && !file.success) {
+            this.update(file, {active: true})
+            uploading++
+          }
+        } else {
+          uploading = 0
+          if (file.active) {
+            this.update(file, {active: false})
+          }
+        }
+      }
+      if (uploading == 0) {
+        this.active = false
+      }
+    },
+
+
+
+    watchDrop(el) {
+      if (this.mode != 'html5') {
+        return
+      }
+
+      // 移除挂载
+      if (this.dropElement) {
+        try {
+          window.document.removeEventListener('dragenter', this.onDragenter, false)
+          window.document.removeEventListener('dragleave', this.onDragleave, false)
+          this.dropElement.removeEventListener('dragover', this.onDragover, false)
+          this.dropElement.removeEventListener('drop', this.onDrop, false)
+        } catch (e) {
+        }
+      }
+
+      if (!el) {
+        el = false
+      } else if (typeof el == 'string') {
+        el = document.querySelector(el) || this.$root.$el.querySelector(el)
+      } else if (el === true) {
+        el = this.$parent.$el
+      }
+
+      this.dropElement = el
+
+      if (this.dropElement) {
+        window.document.addEventListener('dragenter', this.onDragenter, false)
+        window.document.addEventListener('dragleave', this.onDragleave, false)
+        this.dropElement.addEventListener('dragover', this.onDragover, false)
+        this.dropElement.addEventListener('drop', this.onDrop, false)
+      }
+    },
+
+
+    onDragenter(e) {
+      e.preventDefault()
+      if (!this.dropActive) {
+        this.dropActive = true
+      }
+    },
+
+    onDragleave(e) {
+      e.preventDefault()
+      if (e.target.nodeName == 'HTML' || (e.screenX == 0 && e.screenY == 0 && e.screenY == 0 && !e.fromElement && e.offsetX < 0)) {
+        this.dropActive = false
+      }
+    },
+
+    onDragover(e) {
+      e.preventDefault()
+    },
+
+    onDrop(e) {
+      e.preventDefault()
+      this.dropActive = false
+      if (e.dataTransfer.files.length) {
+        for (let i = 0; i < e.dataTransfer.files.length; i++) {
+          let file = e.dataTransfer.files[i]
+          this.add(file)
+          if (!this.multiple) {
+            break;
+          }
+        }
+      }
+    },
   }
 }
 </script>

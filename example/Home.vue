@@ -42,6 +42,7 @@ table th,table td {
           <tr>
             <th>Index</th>
             <th>ID</th>
+            <th>Image</th>
             <th>Name</th>
             <th>Size</th>
             <th>Progress</th>
@@ -50,6 +51,7 @@ table th,table td {
             <th>Error</th>
             <th>Success</th>
             <th>Abort</th>
+            <th>customError</th>
             <th>Delete</th>
           </tr>
         </thead>
@@ -57,6 +59,10 @@ table th,table td {
           <tr v-for="(file, index) in files">
               <td>{{index}}</td>
               <td>{{file.id}}</td>
+              <td v-if="file.type.substr(0, 6) == 'image/' && file.blob">
+                <img :src="file.blob" width="50" height="auto" />
+              </td>
+              <td v-else></td>
               <td>{{file.name}}</td>
               <td>{{file.size | formatSize}}</td>
               <td>{{file.progress}}</td>
@@ -64,7 +70,8 @@ table th,table td {
               <td>{{file.active}}</td>
               <td>{{file.error}}</td>
               <td>{{file.success}}</td>
-              <td><button type="button" @click.prevent="file.active = false">Abort</button></td>
+              <td><button type="button" @click.prevent="abort(file)">Abort</button></td>
+              <td><button type="button" @click.prevent="customError(file)">custom error</button></td>
               <td><button type="button" @click.prevent="remove(file)">x</button></td>
           </tr>
         </tbody>
@@ -76,8 +83,6 @@ table th,table td {
           <tr>
             <td>
               <file-upload
-                :title="title"
-                :events="events"
                 :name="name"
                 :post-action="postAction"
                 :put-action="putAction"
@@ -89,13 +94,15 @@ table th,table td {
                 :headers="headers"
                 :data="data"
                 :drop="drop"
-                :files="files"
+                v-model="files"
+                @input-file="inputFile"
                 ref="upload">
+                Add upload files
               </file-upload>
             </td>
             <td>
-              <button v-show="!upload.active" @click.prevent="upload.active = true" type="button">Start upload</button>
-              <button v-show="upload.active" @click.prevent="upload.active = false" type="button">Stop upload</button>
+              <button v-show="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true" type="button">Start upload</button>
+              <button v-show="$refs.upload && $refs.upload.active" @click.prevent="$refs.upload.active = false" type="button">Stop upload</button>
             </td>
             <td>
               <label>
@@ -138,22 +145,22 @@ table th,table td {
               Auto start: {{auto}}
             </td>
             <td>
-              Active: {{upload.active}}
+              Active: {{$refs.upload ? $refs.upload.active : false}}
             </td>
             <td>
-              Uploaded: {{upload.uploaded}}
+              Uploaded: {{$refs.upload ? $refs.upload.uploaded : true}}
             </td>
             <td>
-              Drop active: {{upload.dropActive}}
+              Drop active: {{$refs.upload ? $refs.upload.dropActive : false}}
             </td>
             <td>
-              <label for="file">Click</label>
+              <label :for="name">Click</label>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div v-show="upload.dropActive" class="drop-active">
+    <div v-show="$refs.upload && $refs.upload.dropActive" class="drop-active">
       Drop ing
     </div>
   </main>
@@ -162,7 +169,6 @@ table th,table td {
 
 <script>
 import FileUpload from '../src'
-
 export default {
   components: {
     FileUpload,
@@ -170,19 +176,16 @@ export default {
 
   data() {
      return {
-      accept: 'image/*',
-      accept: '',
-      size: 1024 * 1024 * 10,
-      multiple: true,
-      extensions: 'gif,jpg,png',
-      // extensions: ['gif','jpg','png'],
-      // extensions: /\.(gif|png|jpg)$/i,
       files: [],
-      upload: {},
-      title: 'Add upload files',
+      accept: 'image/png,image/gif,image/jpeg,image/webp',
+      size: 1024 * 1024 * 10,
+      extensions: 'gif,jpg,jpeg,png,webp',
+      // extensions: ['gif', 'jpg', 'jpeg','png', 'webp'],
+      // extensions: /\.(gif|jpe?g|png|webp)$/i,
+
+      multiple: true,
       drop: true,
-      auto: false,
-      thread: 1,
+      thread: 3,
       name: 'file',
 
       postAction: './post.php',
@@ -196,42 +199,69 @@ export default {
         "_csrf_token": "xxxxxx",
       },
 
-      events: {
-        add(file, component) {
-          console.log('add');
-          if (this.$parent.auto) {
-            component.active = true;
-          }
-          file.headers['X-Filename'] = encodeURIComponent(file.name)
-          file.data.finename = file.name
 
-          // file.putAction = 'xxx'
-          // file.postAction = 'xxx'
-        },
-        progress(file, component) {
-          console.log('progress ' + file.progress);
-        },
-        after(file, component) {
-          console.log('after');
-        },
-        before(file, component) {
-          console.log('before');
-        },
+      auto: false,
+    }
+  },
+
+  watch: {
+    auto(auto) {
+      if (auto && !this.$refs.upload.uploaded && !this.$refs.upload.active) {
+        this.$refs.upload.active = true
       }
     }
   },
 
-  mounted() {
-    this.upload = this.$refs.upload.$data
-  },
-
   methods: {
-    remove(file) {
-      var index = this.files.indexOf(file)
-      if (index != -1) {
-        this.files.splice(index, 1);
+    // Custom filter
+    filter(file) {
+      // min size
+      if (file.size < 100 * 1024) {
+        file = this.$refs.upload.update(file, {error: 'size'})
+      }
+      return file
+    },
+
+
+    // File Event
+    inputFile(newFile, oldFile) {
+      if (newFile && !oldFile) {
+        console.log('add', newFile)
+        var URL = window.URL || window.webkitURL
+        if (URL && URL.createObjectURL) {
+          this.$refs.upload.update(newFile, {blob: URL.createObjectURL(newFile.file)})
+        }
+      }
+
+      if (newFile && oldFile) {
+        console.log('update', newFile, oldFile)
+        if (newFile.progress != oldFile.progress) {
+          console.log('progress', newFile.progress)
+        }
+      }
+
+      if (!newFile && oldFile) {
+        console.log('remove', oldFile)
+      }
+
+      if (this.auto && !this.$refs.upload.uploaded && !this.$refs.upload.active) {
+        this.$refs.upload.active = true
       }
     },
+
+    abort(file) {
+      this.$refs.upload.update(file, {active: false})
+      // or
+      // this.$refs.upload.update(file, {error: 'abort'})
+    },
+
+    customError(file) {
+      this.$refs.upload.update(file, {error: 'custom'})
+    },
+    remove(file) {
+      this.$refs.upload.remove(file)
+    },
+
   },
 }
 

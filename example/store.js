@@ -10,37 +10,12 @@ const state = {
 }
 
 const mutations = {
-  addFile (state, file) {
-    state.files.push(file)
-  },
-  updateFile (state, {oldFile, newFile}) {
-    var index = state.files.indexOf(oldFile)
-    if (index == -1) {
-      return
-    }
-    state.files.splice(index, 1, newFile);
-  },
-  removeFile(state, file) {
-    var index = state.files.indexOf(file)
-    if (index != -1) {
-      state.files.splice(index, 1);
-    }
-  },
+  updateFiles(state, files) {
+    state.files = files
+  }
 }
-
-const actions = {
-
-}
-
-const getters = {
-
-}
-
-
 export default new Vuex.Store({
-  strict: process.env.NODE_ENV !== 'production',
+  strict: true,
   state,
-  getters,
-  actions,
   mutations
 })
