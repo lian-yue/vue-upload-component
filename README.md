@@ -16,7 +16,7 @@
     var FileUpload = require('vue-upload-component');
 
     new Vue({
-        template: '<file-upload post-action="/post.method" put-action="/put.method">Upload file</file-upload>',
+        template: '<file-upload v-model="files" post-action="/post.method" put-action="/put.method">Upload file</file-upload>',
         components: {
             FileUpload: FileUpload
         }
@@ -28,7 +28,7 @@
 ```js
     import FileUpload from 'vue-upload-component'
     new Vue({
-        template: '<file-upload post-action="/post.method" put-action="/put.method">Upload file</file-upload>',
+        template: '<file-upload v-model="files" post-action="/post.method" put-action="/put.method">Upload file</file-upload>',
         components: {
             FileUpload
         }
@@ -62,7 +62,7 @@ https://lian-yue.github.io/vue-upload-component/
 https://github.com/lian-yue/vue-upload-component/tree/2.0/example/
 ``` html
     <div id="app">
-        <file-upload>Upload file</file-upload>
+        <file-upload v-model="files" post-action="/post.method" put-action="/put.method">Upload file</file-upload>
     </div>
 
     <script type="text/javascript">
@@ -70,6 +70,11 @@ https://github.com/lian-yue/vue-upload-component/tree/2.0/example/
 
     new Vue({
         el:'#app',
+        data() {
+            return {
+                files: [],
+            }
+        },
         components: {
             FileUpload: FileUpload,
         },
@@ -125,6 +130,8 @@ npm run build
     filter="Function(file) (Custom upload filters)"
 
     value="Upload files"
+
+    v-model="files"
 
     @input="Function(files)"
 
