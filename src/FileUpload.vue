@@ -173,7 +173,6 @@ export default {
     },
     value(value) {
       if (this.files != value && !this.input) {
-        console.log('ww')
         this.files = value
       }
     },
@@ -387,7 +386,32 @@ export default {
       })
     },
 
-
+    // 添加 entry
+    addEntry(entry, path = '') {
+      if (entry.isFile) {
+        entry.file((file) => {
+          this.add({
+            size: file.size,
+            name: path + file.name,
+            type: file.type,
+            file,
+          })
+        });
+        return 1
+      } else if (entry.isDirectory) {
+        var count =  0
+        entry.createReader().readEntries((entrys) => {
+          for (var i = 0; i < entrys.length; i++) {
+            count += this.addEntry(entrys[i], path + entry.name + '/')
+            if (count && !this.multiple) {
+              break
+            }
+          }
+        })
+        return count
+      }
+      return 0
+    },
 
 
     // 上传
@@ -886,9 +910,25 @@ export default {
     onDrop(e) {
       e.preventDefault()
       this.dropActive = false
-      if (e.dataTransfer.files.length) {
-        for (let i = 0; i < e.dataTransfer.files.length; i++) {
-          let file = e.dataTransfer.files[i]
+      var dataTransfer = e.dataTransfer
+
+      if (dataTransfer.items && dataTransfer.items.length) {
+        for (let i = 0; i < dataTransfer.items.length; i++) {
+          let item = dataTransfer.items[i]
+          if (item.getAsEntry) {
+            this.addEntry(item.getAsEntry())
+          } else if (item.webkitGetAsEntry) {
+            this.addEntry(item.webkitGetAsEntry())
+          } else {
+            this.add(item.getAsFile())
+          }
+          if (!this.multiple) {
+            break;
+          }
+        }
+      } else if (dataTransfer.files.length) {
+        for (let i = 0; i < dataTransfer.files.length; i++) {
+          let file = dataTransfer.files[i]
           this.add(file)
           if (!this.multiple) {
             break;

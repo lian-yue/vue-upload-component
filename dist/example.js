@@ -8357,7 +8357,6 @@
 	    },
 	    value: function value(_value) {
 	      if (this.files != _value && !this.input) {
-	        console.log('ww');
 	        this.files = _value;
 	      }
 	    },
@@ -8547,6 +8546,35 @@
 	        parent: this,
 	        el: el
 	      });
+	    },
+	    addEntry: function addEntry(entry) {
+	      var _this3 = this;
+	
+	      var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+	
+	      if (entry.isFile) {
+	        entry.file(function (file) {
+	          _this3.add({
+	            size: file.size,
+	            name: path + file.name,
+	            type: file.type,
+	            file: file
+	          });
+	        });
+	        return 1;
+	      } else if (entry.isDirectory) {
+	        var count = 0;
+	        entry.createReader().readEntries(function (entrys) {
+	          for (var i = 0; i < entrys.length; i++) {
+	            count += _this3.addEntry(entrys[i], path + entry.name + '/');
+	            if (count && !_this3.multiple) {
+	              break;
+	            }
+	          }
+	        });
+	        return count;
+	      }
+	      return 0;
 	    },
 	    upload: function upload(file) {
 	      if (!(file = this.get(file))) {
@@ -8975,9 +9003,25 @@
 	    onDrop: function onDrop(e) {
 	      e.preventDefault();
 	      this.dropActive = false;
-	      if (e.dataTransfer.files.length) {
-	        for (var i = 0; i < e.dataTransfer.files.length; i++) {
-	          var _file2 = e.dataTransfer.files[i];
+	      var dataTransfer = e.dataTransfer;
+	
+	      if (dataTransfer.items && dataTransfer.items.length) {
+	        for (var i = 0; i < dataTransfer.items.length; i++) {
+	          var item = dataTransfer.items[i];
+	          if (item.getAsEntry) {
+	            this.addEntry(item.getAsEntry());
+	          } else if (item.webkitGetAsEntry) {
+	            this.addEntry(item.webkitGetAsEntry());
+	          } else {
+	            this.add(item.getAsFile());
+	          }
+	          if (!this.multiple) {
+	            break;
+	          }
+	        }
+	      } else if (dataTransfer.files.length) {
+	        for (var _i = 0; _i < dataTransfer.files.length; _i++) {
+	          var _file2 = dataTransfer.files[_i];
 	          this.add(_file2);
 	          if (!this.multiple) {
 	            break;
