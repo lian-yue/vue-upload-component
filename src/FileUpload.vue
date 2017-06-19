@@ -46,6 +46,10 @@ export default {
       default: false,
     },
 
+    dropDirectory: {
+      default: true,
+    },
+
     extensions: {
       default: Array,
     },
@@ -66,6 +70,10 @@ export default {
       type: Boolean,
     },
 
+    directory: {
+      type: Boolean,
+    },
+
     timeout: {
       type: Number,
       default: 0,
@@ -74,7 +82,6 @@ export default {
     size: {
       type: Number,
     },
-
     headers: {
       type: Object,
       default: Object,
@@ -271,7 +278,7 @@ export default {
         file = {
           file,
           size: file.size,
-          name: file.name,
+          name: file.webkitRelativePath || file.name,
           type: file.type,
         }
       }
@@ -354,7 +361,7 @@ export default {
           let file = el.files[i]
           this.add({
             size: file.size,
-            name: file.name,
+            name: file.webkitRelativePath || file.name,
             type: file.type,
             file,
             el
@@ -398,7 +405,7 @@ export default {
           })
         });
         return 1
-      } else if (entry.isDirectory) {
+      } else if (entry.isDirectory && this.dropDirectory) {
         var count =  0
         entry.createReader().readEntries((entrys) => {
           for (var i = 0; i < entrys.length; i++) {
@@ -923,7 +930,7 @@ export default {
             this.add(item.getAsFile())
           }
           if (!this.multiple) {
-            break;
+            break
           }
         }
       } else if (dataTransfer.files.length) {
@@ -931,7 +938,7 @@ export default {
           let file = dataTransfer.files[i]
           this.add(file)
           if (!this.multiple) {
-            break;
+            break
           }
         }
       }

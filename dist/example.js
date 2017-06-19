@@ -8119,7 +8119,9 @@
 	
 	
 	      multiple: true,
+	      directory: false,
 	      drop: true,
+	      dropDirectory: false,
 	      thread: 3,
 	      name: 'file',
 	
@@ -8148,6 +8150,15 @@
 	  },
 	
 	  methods: {
+	    addDirectory: function addDirectory() {
+	      var _this = this;
+	
+	      this.directory = true;
+	      this.$nextTick(function () {
+	        _this.$refs.upload.$el.querySelector('input').click();
+	        _this.directory = false;
+	      });
+	    },
 	    filter: function filter(file) {
 	      if (file.size < 100 * 1024) {
 	        file = this.$refs.upload.update(file, { error: 'size' });
@@ -8235,6 +8246,10 @@
 	      default: false
 	    },
 	
+	    dropDirectory: {
+	      default: true
+	    },
+	
 	    extensions: {
 	      default: Array
 	    },
@@ -8255,6 +8270,10 @@
 	      type: Boolean
 	    },
 	
+	    directory: {
+	      type: Boolean
+	    },
+	
 	    timeout: {
 	      type: Number,
 	      default: 0
@@ -8263,7 +8282,6 @@
 	    size: {
 	      type: Number
 	    },
-	
 	    headers: {
 	      type: Object,
 	      default: Object
@@ -8454,7 +8472,7 @@
 	        file = {
 	          file: file,
 	          size: file.size,
-	          name: file.name,
+	          name: file.webkitRelativePath || file.name,
 	          type: file.type
 	        };
 	      }
@@ -8521,7 +8539,7 @@
 	          var _file = el.files[i];
 	          this.add({
 	            size: _file.size,
-	            name: _file.name,
+	            name: _file.webkitRelativePath || _file.name,
 	            type: _file.type,
 	            file: _file,
 	            el: el
@@ -8562,7 +8580,7 @@
 	          });
 	        });
 	        return 1;
-	      } else if (entry.isDirectory) {
+	      } else if (entry.isDirectory && this.dropDirectory) {
 	        var count = 0;
 	        entry.createReader().readEntries(function (entrys) {
 	          for (var i = 0; i < entrys.length; i++) {
@@ -10426,6 +10444,7 @@
 	      "name": _vm.$parent.name,
 	      "id": _vm.$parent.id || _vm.$parent.name,
 	      "accept": _vm.$parent.accept,
+	      "webkitdirectory": _vm.$parent.directory && _vm.$parent.mode === 'html5',
 	      "multiple": _vm.$parent.multiple && _vm.$parent.mode === 'html5'
 	    },
 	    on: {
@@ -10496,11 +10515,13 @@
 	      "extensions": _vm.extensions,
 	      "accept": _vm.accept,
 	      "multiple": _vm.multiple,
+	      "directory": _vm.directory,
 	      "size": _vm.size || 0,
 	      "thread": _vm.thread < 1 ? 1 : (_vm.thread > 5 ? 5 : _vm.thread),
 	      "headers": _vm.headers,
 	      "data": _vm.data,
-	      "drop": _vm.drop
+	      "drop": _vm.drop,
+	      "dropDirectory": _vm.dropDirectory
 	    },
 	    on: {
 	      "input-file": _vm.inputFile
@@ -10513,6 +10534,13 @@
 	      expression: "files"
 	    }
 	  }, [_vm._v("\n              Add upload files\n            ")])], 1), _vm._v(" "), _c('td', [_c('button', {
+	    on: {
+	      "click": function($event) {
+	        $event.preventDefault();
+	        _vm.addDirectory($event)
+	      }
+	    }
+	  }, [_vm._v("Add upload directory")]), _vm._v(" "), _c('br'), _vm._v("Only support chrome\n          ")]), _vm._v(" "), _c('td', [_c('button', {
 	    directives: [{
 	      name: "show",
 	      rawName: "v-show",

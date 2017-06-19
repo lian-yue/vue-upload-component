@@ -918,6 +918,10 @@ module.exports =
 	      default: false
 	    },
 	
+	    dropDirectory: {
+	      default: true
+	    },
+	
 	    extensions: {
 	      default: Array
 	    },
@@ -938,6 +942,10 @@ module.exports =
 	      type: Boolean
 	    },
 	
+	    directory: {
+	      type: Boolean
+	    },
+	
 	    timeout: {
 	      type: Number,
 	      default: 0
@@ -946,7 +954,6 @@ module.exports =
 	    size: {
 	      type: Number
 	    },
-	
 	    headers: {
 	      type: Object,
 	      default: Object
@@ -1137,7 +1144,7 @@ module.exports =
 	        file = {
 	          file: file,
 	          size: file.size,
-	          name: file.name,
+	          name: file.webkitRelativePath || file.name,
 	          type: file.type
 	        };
 	      }
@@ -1204,7 +1211,7 @@ module.exports =
 	          var _file = el.files[i];
 	          this.add({
 	            size: _file.size,
-	            name: _file.name,
+	            name: _file.webkitRelativePath || _file.name,
 	            type: _file.type,
 	            file: _file,
 	            el: el
@@ -1245,7 +1252,7 @@ module.exports =
 	          });
 	        });
 	        return 1;
-	      } else if (entry.isDirectory) {
+	      } else if (entry.isDirectory && this.dropDirectory) {
 	        var count = 0;
 	        entry.createReader().readEntries(function (entrys) {
 	          for (var i = 0; i < entrys.length; i++) {
@@ -3149,6 +3156,7 @@ module.exports =
 	      "name": _vm.$parent.name,
 	      "id": _vm.$parent.id || _vm.$parent.name,
 	      "accept": _vm.$parent.accept,
+	      "webkitdirectory": _vm.$parent.directory && _vm.$parent.mode === 'html5',
 	      "multiple": _vm.$parent.multiple && _vm.$parent.mode === 'html5'
 	    },
 	    on: {

@@ -89,16 +89,22 @@ table th,table td {
                 :extensions="extensions"
                 :accept="accept"
                 :multiple="multiple"
+                :directory="directory"
                 :size="size || 0"
                 :thread="thread < 1 ? 1 : (thread > 5 ? 5 : thread)"
                 :headers="headers"
                 :data="data"
                 :drop="drop"
+                :dropDirectory="dropDirectory"
                 v-model="files"
                 @input-file="inputFile"
                 ref="upload">
                 Add upload files
               </file-upload>
+            </td>
+            <td>
+              <button @click.prevent="addDirectory">Add upload directory</button>
+              <br/>Only support chrome
             </td>
             <td>
               <button v-show="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true" type="button">Start upload</button>
@@ -184,7 +190,9 @@ export default {
       // extensions: /\.(gif|jpe?g|png|webp)$/i,
 
       multiple: true,
+      directory: false,
       drop: true,
+      dropDirectory: false,
       thread: 3,
       name: 'file',
 
@@ -213,6 +221,16 @@ export default {
   },
 
   methods: {
+
+    // add Directory
+    addDirectory() {
+      this.directory = true
+      this.$nextTick(() => {
+        this.$refs.upload.$el.querySelector('input').click()
+        this.directory = false
+      })
+    },
+
     // Custom filter
     filter(file) {
       // min size

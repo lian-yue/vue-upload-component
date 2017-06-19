@@ -107,6 +107,8 @@ npm run build
 
     drop="Boolean (true = $parent) or Element or Css Selector"
 
+    dropDirectory="true or false"
+
     extensions="Array or String or Regular"
 
     post-action="./post.method"
@@ -116,6 +118,8 @@ npm run build
     accept="accept"
 
     multiple="true or false"
+
+    directory="true or false"
 
     size="max Size"
 
