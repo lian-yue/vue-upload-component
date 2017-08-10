@@ -1,5 +1,14 @@
-exports["VueUploadComponent"] =
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["VueUploadComponent"] = factory();
+	else
+		root["VueUploadComponent"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -3444,5 +3453,7 @@ exports["VueUploadComponent"] =
 
 
 /***/ })
-/******/ ]);
+/******/ ])
+});
+;
 //# sourceMappingURL=vue-upload-component.js.map

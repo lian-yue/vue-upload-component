@@ -9,4 +9,4 @@ module.exports.entry = {
 }
 
 module.exports.output.library = 'VueUploadComponent';
-module.exports.output.libraryTarget = 'commonjs';
+module.exports.output.libraryTarget = 'umd';

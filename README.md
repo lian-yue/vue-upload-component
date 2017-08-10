@@ -17,10 +17,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
   <title>Vue-upload-component Test</title>
   <script src="https://unpkg.com/vue"></script>
-  <script src="https://unpkg.com/vue-upload-component@2.4.0-beta.4/dist/vue-upload-component.js"></script>
+  <script src="https://unpkg.com/vue-upload-component@2.4.0-beta.5/dist/vue-upload-component.js"></script>
 </head>
 <body>
   <div id="app">
