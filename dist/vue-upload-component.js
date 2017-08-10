@@ -1,4 +1,4 @@
-module.exports =
+exports["VueUploadComponent"] =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};

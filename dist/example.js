@@ -8121,7 +8121,7 @@
 	      multiple: true,
 	      directory: false,
 	      drop: true,
-	      dropDirectory: false,
+	      dropDirectory: true,
 	      thread: 3,
 	      name: 'file',
 	

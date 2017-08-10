@@ -11,12 +11,51 @@
     npm install vue-upload-component --save
 ```
 
+### HTML
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Vue-upload-component Test</title>
+  <script src="https://unpkg.com/vue"></script>
+  <script src="https://unpkg.com/vue-upload-component@2.4.0-beta.4/dist/vue-upload-component.js"></script>
+</head>
+<body>
+  <div id="app">
+    <file-upload v-model="files"
+                 post-action="/post.method"
+                 put-action="/put.method">Upload file
+    </file-upload>
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: function() {
+          return {
+              files: []
+          }
+      },
+      components: {
+          FileUpload: VueUploadComponent
+      }
+    });
+  </script>
+</body>
+</html>
+```
+
 ### CommonJS
 ```js
     var FileUpload = require('vue-upload-component');
-
     new Vue({
         template: '<file-upload v-model="files" post-action="/post.method" put-action="/put.method">Upload file</file-upload>',
+        data: function() {
+            return {
+                files: []
+            }
+        },
         components: {
             FileUpload: FileUpload
         }
@@ -29,6 +68,11 @@
     import FileUpload from 'vue-upload-component'
     new Vue({
         template: '<file-upload v-model="files" post-action="/post.method" put-action="/put.method">Upload file</file-upload>',
+        data() {
+            return {
+                files: []
+            }
+        },
         components: {
             FileUpload
         }
