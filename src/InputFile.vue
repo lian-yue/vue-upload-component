@@ -6,6 +6,7 @@
     :accept="$parent.accept"
     @change="change"
     :webkitdirectory="$parent.directory && $parent.mode === 'html5'"
+    :directory="$parent.directory && $parent.mode === 'html5'"
     :multiple="$parent.multiple && $parent.mode === 'html5'"
   />
 </template>

@@ -3166,6 +3166,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      "id": _vm.$parent.id || _vm.$parent.name,
 	      "accept": _vm.$parent.accept,
 	      "webkitdirectory": _vm.$parent.directory && _vm.$parent.mode === 'html5',
+	      "directory": _vm.$parent.directory && _vm.$parent.mode === 'html5',
 	      "multiple": _vm.$parent.multiple && _vm.$parent.mode === 'html5'
 	    },
 	    on: {

@@ -8156,7 +8156,14 @@
 	      this.directory = true;
 	      this.$nextTick(function () {
 	        _this.$refs.upload.$el.querySelector('input').click();
-	        _this.directory = false;
+	        _this.$refs.upload.$el.onclick = function (e) {
+	          e.preventDefault();
+	          _this.directory = false;
+	          _this.$refs.upload.$el.onclick = null;
+	          _this.$nextTick(function () {
+	            _this.$refs.upload.$el.querySelector('input').click();
+	          });
+	        };
 	      });
 	    },
 	    filter: function filter(file) {
@@ -10445,6 +10452,7 @@
 	      "id": _vm.$parent.id || _vm.$parent.name,
 	      "accept": _vm.$parent.accept,
 	      "webkitdirectory": _vm.$parent.directory && _vm.$parent.mode === 'html5',
+	      "directory": _vm.$parent.directory && _vm.$parent.mode === 'html5',
 	      "multiple": _vm.$parent.multiple && _vm.$parent.mode === 'html5'
 	    },
 	    on: {

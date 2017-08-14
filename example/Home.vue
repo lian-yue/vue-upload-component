@@ -227,7 +227,14 @@ export default {
       this.directory = true
       this.$nextTick(() => {
         this.$refs.upload.$el.querySelector('input').click()
-        this.directory = false
+        this.$refs.upload.$el.onclick = (e) => {
+          e.preventDefault()
+          this.directory = false
+          this.$refs.upload.$el.onclick = null
+          this.$nextTick(() => {
+            this.$refs.upload.$el.querySelector('input').click()
+          })
+        }
       })
     },
 
