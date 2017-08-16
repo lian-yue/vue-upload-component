@@ -8179,6 +8179,8 @@
 	        if (URL && URL.createObjectURL) {
 	          this.$refs.upload.update(newFile, { blob: URL.createObjectURL(newFile.file) });
 	        }
+	
+	        newFile.data.name = newFile.name;
 	      }
 	
 	      if (newFile && oldFile) {
@@ -10529,6 +10531,7 @@
 	      "headers": _vm.headers,
 	      "data": _vm.data,
 	      "drop": _vm.drop,
+	      "filter": _vm.filter,
 	      "dropDirectory": _vm.dropDirectory
 	    },
 	    on: {

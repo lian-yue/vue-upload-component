@@ -95,6 +95,7 @@ table th,table td {
                 :headers="headers"
                 :data="data"
                 :drop="drop"
+                :filter="filter"
                 :dropDirectory="dropDirectory"
                 v-model="files"
                 @input-file="inputFile"
@@ -256,6 +257,8 @@ export default {
         if (URL && URL.createObjectURL) {
           this.$refs.upload.update(newFile, {blob: URL.createObjectURL(newFile.file)})
         }
+        // post filename
+        newFile.data.name = newFile.name
       }
 
       if (newFile && oldFile) {
