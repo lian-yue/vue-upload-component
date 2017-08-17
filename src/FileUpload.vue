@@ -38,6 +38,9 @@ export default {
     InputFile,
   },
   props: {
+    inputId: {
+      type: String,
+    },
     name: {
       type: String,
       default: 'file',

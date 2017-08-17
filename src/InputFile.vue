@@ -2,7 +2,7 @@
   <input
     type="file"
     :name="$parent.name"
-    :id="$parent.id || $parent.name"
+    :id="$parent.inputId || $parent.name"
     :accept="$parent.accept"
     @change="change"
     :webkitdirectory="$parent.directory && $parent.mode === 'html5'"
