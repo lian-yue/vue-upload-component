@@ -138,7 +138,7 @@ export default {
     this._maps = {}
 
     this.$parent.$forceUpdate()
-    this.$nextTick(() => {
+    this.$nextTick(function() {
       this.watchDrop(this.drop)
     })
   },
@@ -187,8 +187,13 @@ export default {
       }
     },
 
-    files(files, oldFiles) {
-      this._oldFiles = oldFiles
+    files(files) {
+      this.input = true
+      this.$emit('input', files)
+      this.$nextTick(function() {
+        this.input = false
+      })
+
       var idMaps = {}
       for (var i = 0; i < files.length; i++) {
         let file = files[i]
@@ -200,10 +205,14 @@ export default {
           this.$emit('input-file', file, old)
           this._maps[file.id] = file
           if (file.active && (!old || !old.active)) {
-            this.upload(file).then(() => {
-              this.update(file, {active: false, success: true})
-            }).catch((e) => {
-              this.update(file, {active: false, success: false, error: e.code || e.error || e.message})
+            this.$nextTick(function() {
+              setTimeout(()=> {
+                this.upload(file).then(() => {
+                  this.update(file, {active: false, success: true})
+                }).catch((e) => {
+                  this.update(file, {active: false, success: false, error: e.code || e.error || e.message || e})
+                })
+              }, 64)
             })
           } else if (!file.active && !file.error && !file.success && old && old.active) {
             this.update(file, {error: 'abort'})
@@ -220,14 +229,8 @@ export default {
         delete this._maps[id]
         this.$emit('input-file', undefined, old)
       }
-      this.input = true
-      this.$emit('input', files)
-      this.$nextTick(() => {
-        this.input = false
-      })
-      if (this.active) {
-        this.watchActive(true)
-      }
+
+      this.active && this.watchActive(true)
     },
     drop(value) {
       this.watchDrop(value)
@@ -426,13 +429,19 @@ export default {
 
     // 上传
     upload(file) {
+      // 被删除
       if (!(file = this.get(file))) {
-        return Promise.reject(new Error('not_exists'))
+        return Promise.reject('not_exists')
       }
 
-      // 重置上传数据
-      if (file.error || file.success) {
-        file = this.update(file, {error: '', success: false})
+      // 有错误直接响应
+      if (file.error) {
+        return Promise.reject(file.error)
+      }
+
+      // 已完成直接响应
+      if (file.success) {
+        return Promise.resolve(file)
       }
 
       // 后缀
@@ -445,24 +454,33 @@ export default {
           extensions = new RegExp('\\.('+ extensions.join('|').replace(/\./g, '\\.') +')$', 'i')
         }
         if (file.name.search(extensions) == -1) {
-          return Promise.reject(new Error('extension'))
+          return Promise.reject('extension')
         }
       }
 
-
       // 大小
       if (this.size > 0 && file.size >= 0 && file.size > this.size) {
-        return Promise.reject(new Error('size'))
+        return Promise.reject('size')
       }
-
 
       // 过滤器
       file = this.filter(file) || this.get(file)
 
       // 被过滤掉
-      if (!file || file.error || file.success) {
-        return Promise.reject(new Error(file ? file.error : 'not_exists'))
+      if (!file) {
+        return Promise.reject('not_exists')
       }
+
+      // 错误相应
+      if (file.error) {
+        return Promise.reject(file.error)
+      }
+
+      // 直接相应
+      if (file.success) {
+        return Promise.resolve(file)
+      }
+
 
       if (this.mode == 'html5' && file.putAction) {
         return this.uploadPut(file)

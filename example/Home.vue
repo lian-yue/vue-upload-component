@@ -56,7 +56,7 @@ table th,table td {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(file, index) in files">
+          <tr v-for="(file, index) in files" :key="file.id">
               <td>{{index}}</td>
               <td>{{file.id}}</td>
               <td v-if="file.type.substr(0, 6) == 'image/' && file.blob">
@@ -94,7 +94,6 @@ table th,table td {
                 :headers="headers"
                 :data="data"
                 :drop="drop"
-                :filter="filter"
                 :dropDirectory="dropDirectory"
                 v-model="files"
                 @input-file="inputFile"
@@ -197,7 +196,9 @@ export default {
       name: 'file',
 
       postAction: './post.php',
+      // postAction: 'http://upload.qiniu.com/',
       putAction: './put.php',
+      // putAction: '',
 
       headers: {
         "X-Csrf-Token": "xxxx",
@@ -238,32 +239,19 @@ export default {
       })
     },
 
-    // Custom filter
-    filter(file) {
-      // beforeSend
-
-
-      // min size
-      if (file.size < 100 * 1024) {
-        file = this.$refs.upload.update(file, {error: 'size'})
-      }
-
-      return file
-    },
-
 
     // File Event
     inputFile(newFile, oldFile) {
 
 
       if (newFile && !oldFile) {
-        console.log('add', newFile)
+        // console.log('add', newFile)
 
 
         // 缩略图
         var URL = window.URL || window.webkitURL
-        if (URL && URL.createObjectURL) {
-          this.$refs.upload.update(newFile, {blob: URL.createObjectURL(newFile.file)})
+        if (URL && URL.createObjectURL && file.type.substr(0, 6) == 'image/') {
+          newFile = this.$refs.upload.update(newFile, {blob: URL.createObjectURL(newFile.file)})
         }
 
         // post filename
@@ -271,28 +259,37 @@ export default {
       }
 
       if (newFile && oldFile) {
-        console.log('update', newFile, oldFile)
+        // console.log('update', newFile, oldFile)
+
+        if (newFile.active && !oldFile.active) {
+          // this.beforeSend(newFile)
+
+          // min size
+          if (newFile.size < 100 * 1024) {
+            newFile = this.$refs.upload.update(newFile, {error: 'size'})
+          }
+        }
 
         if (newFile.progress != oldFile.progress) {
           // this.progress(newFile)
-          console.log('progress', newFile.progress)
+          // console.log('progress', newFile.progress)
         }
 
         if (newFile.error && !oldFile.error) {
           // this.error(newFile)
-          console.log('error', newFile.error, newFile.response)
+          // console.log('error', newFile.error, newFile.response)
         }
 
         if (newFile.success && !oldFile.success) {
           // this.success(newFile)
-          console.log('success', newFile.response)
+          // console.log('success', newFile.response)
         }
       }
 
 
       if (!newFile && oldFile) {
         // this.remove(oldFile)
-        console.log('remove', oldFile)
+        // console.log('remove', oldFile)
       }
 
 

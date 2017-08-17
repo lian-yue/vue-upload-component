@@ -8126,7 +8126,9 @@
 	      name: 'file',
 	
 	      postAction: './post.php',
+	
 	      putAction: './put.php',
+	
 	
 	      headers: {
 	        "X-Csrf-Token": "xxxx"
@@ -8166,33 +8168,33 @@
 	        };
 	      });
 	    },
-	    filter: function filter(file) {
-	      if (file.size < 100 * 1024) {
-	        file = this.$refs.upload.update(file, { error: 'size' });
-	      }
-	      return file;
-	    },
 	    inputFile: function inputFile(newFile, oldFile) {
+	
 	      if (newFile && !oldFile) {
-	        console.log('add', newFile);
 	        var URL = window.URL || window.webkitURL;
-	        if (URL && URL.createObjectURL) {
-	          this.$refs.upload.update(newFile, { blob: URL.createObjectURL(newFile.file) });
+	        if (URL && URL.createObjectURL && file.type.substr(0, 6) == 'image/') {
+	          newFile = this.$refs.upload.update(newFile, { blob: URL.createObjectURL(newFile.file) });
 	        }
 	
 	        newFile.data.name = newFile.name;
 	      }
 	
 	      if (newFile && oldFile) {
-	        console.log('update', newFile, oldFile);
-	        if (newFile.progress != oldFile.progress) {
-	          console.log('progress', newFile.progress);
+	
+	        if (newFile.active && !oldFile.active) {
+	          if (newFile.size < 100 * 1024) {
+	            newFile = this.$refs.upload.update(newFile, { error: 'size' });
+	          }
 	        }
+	
+	        if (newFile.progress != oldFile.progress) {}
+	
+	        if (newFile.error && !oldFile.error) {}
+	
+	        if (newFile.success && !oldFile.success) {}
 	      }
 	
-	      if (!newFile && oldFile) {
-	        console.log('remove', oldFile);
-	      }
+	      if (!newFile && oldFile) {}
 	
 	      if (this.auto && !this.$refs.upload.uploaded && !this.$refs.upload.active) {
 	        this.$refs.upload.active = true;
@@ -8247,6 +8249,9 @@
 	    InputFile: _InputFile2.default
 	  },
 	  props: {
+	    inputId: {
+	      type: String
+	    },
 	    name: {
 	      type: String,
 	      default: 'file'
@@ -8330,8 +8335,6 @@
 	    };
 	  },
 	  mounted: function mounted() {
-	    var _this = this;
-	
 	    var input = document.createElement('input');
 	    input.type = 'file';
 	    if (window.FormData && input.files) {
@@ -8344,7 +8347,7 @@
 	
 	    this.$parent.$forceUpdate();
 	    this.$nextTick(function () {
-	      _this.watchDrop(_this.drop);
+	      this.watchDrop(this.drop);
 	    });
 	  },
 	  beforeDestroy: function beforeDestroy() {
@@ -8387,29 +8390,40 @@
 	        this.files = _value;
 	      }
 	    },
-	    files: function files(_files, oldFiles) {
-	      var _this2 = this;
+	    files: function files(_files) {
+	      var _this = this;
 	
-	      this._oldFiles = oldFiles;
+	      this.input = true;
+	      this.$emit('input', _files);
+	      this.$nextTick(function () {
+	        this.input = false;
+	      });
+	
 	      var idMaps = {};
 	
 	      var _loop = function _loop() {
 	        var file = _files[i];
-	        var old = _this2._maps[file.id];
+	        var old = _this._maps[file.id];
 	
 	        idMaps[file.id] = true;
 	
 	        if (!old || old != file) {
-	          _this2.$emit('input-file', file, old);
-	          _this2._maps[file.id] = file;
+	          _this.$emit('input-file', file, old);
+	          _this._maps[file.id] = file;
 	          if (file.active && (!old || !old.active)) {
-	            _this2.upload(file).then(function () {
-	              _this2.update(file, { active: false, success: true });
-	            }).catch(function (e) {
-	              _this2.update(file, { active: false, success: false, error: e.code || e.error || e.message });
+	            _this.$nextTick(function () {
+	              var _this2 = this;
+	
+	              setTimeout(function () {
+	                _this2.upload(file).then(function () {
+	                  _this2.update(file, { active: false, success: true });
+	                }).catch(function (e) {
+	                  _this2.update(file, { active: false, success: false, error: e.code || e.error || e.message || e });
+	                });
+	              }, 64);
 	            });
 	          } else if (!file.active && !file.error && !file.success && old && old.active) {
-	            _this2.update(file, { error: 'abort' });
+	            _this.update(file, { error: 'abort' });
 	          }
 	        }
 	      };
@@ -8426,14 +8440,8 @@
 	        delete this._maps[id];
 	        this.$emit('input-file', undefined, old);
 	      }
-	      this.input = true;
-	      this.$emit('input', _files);
-	      this.$nextTick(function () {
-	        _this2.input = false;
-	      });
-	      if (this.active) {
-	        this.watchActive(true);
-	      }
+	
+	      this.active && this.watchActive(true);
 	    },
 	    drop: function drop(value) {
 	      this.watchDrop(value);
@@ -8605,11 +8613,15 @@
 	    },
 	    upload: function upload(file) {
 	      if (!(file = this.get(file))) {
-	        return _promise2.default.reject(new Error('not_exists'));
+	        return _promise2.default.reject('not_exists');
 	      }
 	
-	      if (file.error || file.success) {
-	        file = this.update(file, { error: '', success: false });
+	      if (file.error) {
+	        return _promise2.default.reject(file.error);
+	      }
+	
+	      if (file.success) {
+	        return _promise2.default.resolve(file);
 	      }
 	
 	      var extensions = this.extensions;
@@ -8625,18 +8637,26 @@
 	          extensions = new RegExp('\\.(' + extensions.join('|').replace(/\./g, '\\.') + ')$', 'i');
 	        }
 	        if (file.name.search(extensions) == -1) {
-	          return _promise2.default.reject(new Error('extension'));
+	          return _promise2.default.reject('extension');
 	        }
 	      }
 	
 	      if (this.size > 0 && file.size >= 0 && file.size > this.size) {
-	        return _promise2.default.reject(new Error('size'));
+	        return _promise2.default.reject('size');
 	      }
 	
 	      file = this.filter(file) || this.get(file);
 	
-	      if (!file || file.error || file.success) {
-	        return _promise2.default.reject(new Error(file ? file.error : 'not_exists'));
+	      if (!file) {
+	        return _promise2.default.reject('not_exists');
+	      }
+	
+	      if (file.error) {
+	        return _promise2.default.reject(file.error);
+	      }
+	
+	      if (file.success) {
+	        return _promise2.default.resolve(file);
 	      }
 	
 	      if (this.mode == 'html5' && file.putAction) {
@@ -10451,7 +10471,7 @@
 	    attrs: {
 	      "type": "file",
 	      "name": _vm.$parent.name,
-	      "id": _vm.$parent.id || _vm.$parent.name,
+	      "id": _vm.$parent.inputId || _vm.$parent.name,
 	      "accept": _vm.$parent.accept,
 	      "webkitdirectory": _vm.$parent.directory && _vm.$parent.mode === 'html5',
 	      "directory": _vm.$parent.directory && _vm.$parent.mode === 'html5',
@@ -10475,7 +10495,9 @@
 	      "id": "lists"
 	    }
 	  }, [_c('table', [_vm._m(0), _vm._v(" "), _c('tbody', _vm._l((_vm.files), function(file, index) {
-	    return _c('tr', [_c('td', [_vm._v(_vm._s(index))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(file.id))]), _vm._v(" "), (file.type.substr(0, 6) == 'image/' && file.blob) ? _c('td', [_c('img', {
+	    return _c('tr', {
+	      key: file.id
+	    }, [_c('td', [_vm._v(_vm._s(index))]), _vm._v(" "), _c('td', [_vm._v(_vm._s(file.id))]), _vm._v(" "), (file.type.substr(0, 6) == 'image/' && file.blob) ? _c('td', [_c('img', {
 	      attrs: {
 	        "src": file.blob,
 	        "width": "50",
@@ -10519,7 +10541,6 @@
 	  }, [_c('table', [_c('tbody', [_c('tr', [_c('td', [_c('file-upload', {
 	    ref: "upload",
 	    attrs: {
-	      "name": _vm.name,
 	      "post-action": _vm.postAction,
 	      "put-action": _vm.putAction,
 	      "extensions": _vm.extensions,
@@ -10531,7 +10552,6 @@
 	      "headers": _vm.headers,
 	      "data": _vm.data,
 	      "drop": _vm.drop,
-	      "filter": _vm.filter,
 	      "dropDirectory": _vm.dropDirectory
 	    },
 	    on: {

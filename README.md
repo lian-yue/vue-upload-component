@@ -174,10 +174,6 @@ npm run build
 
     thread="Number  (Multi-file uploads at the same time)"
 
-    filter="Function(file) (Custom upload filters)"
-
-    value="Upload files"
-
     v-model="files"
 
     @input="Function(files)"
