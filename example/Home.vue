@@ -83,7 +83,6 @@ table th,table td {
           <tr>
             <td>
               <file-upload
-                :name="name"
                 :post-action="postAction"
                 :put-action="putAction"
                 :extensions="extensions"
@@ -241,37 +240,63 @@ export default {
 
     // Custom filter
     filter(file) {
+      // beforeSend
+
+
       // min size
       if (file.size < 100 * 1024) {
         file = this.$refs.upload.update(file, {error: 'size'})
       }
+
       return file
     },
 
 
     // File Event
     inputFile(newFile, oldFile) {
+
+
       if (newFile && !oldFile) {
         console.log('add', newFile)
+
+
+        // 缩略图
         var URL = window.URL || window.webkitURL
         if (URL && URL.createObjectURL) {
           this.$refs.upload.update(newFile, {blob: URL.createObjectURL(newFile.file)})
         }
+
         // post filename
         newFile.data.name = newFile.name
       }
 
       if (newFile && oldFile) {
         console.log('update', newFile, oldFile)
+
         if (newFile.progress != oldFile.progress) {
+          // this.progress(newFile)
           console.log('progress', newFile.progress)
+        }
+
+        if (newFile.error && !oldFile.error) {
+          // this.error(newFile)
+          console.log('error', newFile.error, newFile.response)
+        }
+
+        if (newFile.success && !oldFile.success) {
+          // this.success(newFile)
+          console.log('success', newFile.response)
         }
       }
 
+
       if (!newFile && oldFile) {
+        // this.remove(oldFile)
         console.log('remove', oldFile)
       }
 
+
+      // 自动开始
       if (this.auto && !this.$refs.upload.uploaded && !this.$refs.upload.active) {
         this.$refs.upload.active = true
       }
