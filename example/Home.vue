@@ -250,7 +250,7 @@ export default {
 
         // 缩略图
         var URL = window.URL || window.webkitURL
-        if (URL && URL.createObjectURL && file.type.substr(0, 6) == 'image/') {
+        if (URL && URL.createObjectURL) {
           newFile = this.$refs.upload.update(newFile, {blob: URL.createObjectURL(newFile.file)})
         }
 
