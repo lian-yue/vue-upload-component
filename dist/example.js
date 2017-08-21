@@ -8182,7 +8182,7 @@
 	      if (newFile && oldFile) {
 	
 	        if (newFile.active && !oldFile.active) {
-	          if (newFile.size < 100 * 1024) {
+	          if (newFile.size >= 0 && newFile.size < 100 * 1024) {
 	            newFile = this.$refs.upload.update(newFile, { error: 'size' });
 	          }
 	        }
@@ -8913,8 +8913,6 @@
 	
 	            document.body.removeEventListener('keydown', onKeydown);
 	
-	            iframe.parentNode && iframe.parentNode.removeChild(iframe);
-	
 	            if (!(file = self.get(file))) {
 	              return reject(new Error('not_exists'));
 	            }
@@ -8974,6 +8972,12 @@
 	
 	          form.submit();
 	        }, 10);
+	      }).then(function (res) {
+	        iframe.parentNode && iframe.parentNode.removeChild(iframe);
+	        return res;
+	      }).catch(function (res) {
+	        iframe.parentNode && iframe.parentNode.removeChild(iframe);
+	        return res;
 	      });
 	    },
 	    watchActive: function watchActive(active) {
@@ -8983,7 +8987,7 @@
 	      while (file = this.files[index]) {
 	        index++;
 	        if (active && !this.destroy) {
-	          if (uploading >= this.thread) {
+	          if (uploading >= this.thread || uploading && this.mode == 'html4') {
 	            break;
 	          }
 	          if (!file.active && !file.error && !file.success) {

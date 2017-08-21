@@ -1583,8 +1583,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	            document.body.removeEventListener('keydown', onKeydown);
 	
-	            iframe.parentNode && iframe.parentNode.removeChild(iframe);
-	
 	            if (!(file = self.get(file))) {
 	              return reject(new Error('not_exists'));
 	            }
@@ -1644,6 +1642,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	          form.submit();
 	        }, 10);
+	      }).then(function (res) {
+	        iframe.parentNode && iframe.parentNode.removeChild(iframe);
+	        return res;
+	      }).catch(function (res) {
+	        iframe.parentNode && iframe.parentNode.removeChild(iframe);
+	        return res;
 	      });
 	    },
 	    watchActive: function watchActive(active) {
@@ -1653,7 +1657,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      while (file = this.files[index]) {
 	        index++;
 	        if (active && !this.destroy) {
-	          if (uploading >= this.thread) {
+	          if (uploading >= this.thread || uploading && this.mode == 'html4') {
 	            break;
 	          }
 	          if (!file.active && !file.error && !file.success) {

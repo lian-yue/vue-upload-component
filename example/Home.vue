@@ -265,7 +265,7 @@ export default {
           // this.beforeSend(newFile)
 
           // min size
-          if (newFile.size < 100 * 1024) {
+          if (newFile.size >= 0 && newFile.size < 100 * 1024) {
             newFile = this.$refs.upload.update(newFile, {error: 'size'})
           }
         }

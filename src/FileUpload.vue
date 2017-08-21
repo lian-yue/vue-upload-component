@@ -773,9 +773,6 @@ export default {
             // 关闭 esc 事件
             document.body.removeEventListener('keydown', onKeydown)
 
-            // 移除
-            iframe.parentNode && iframe.parentNode.removeChild(iframe)
-
             // 不存在直接响应
             if (!(file = self.get(file))) {
               return reject(new Error('not_exists'))
@@ -849,6 +846,12 @@ export default {
 
 
         }, 10)
+      }).then(function(res) {
+        iframe.parentNode && iframe.parentNode.removeChild(iframe)
+        return res
+      }).catch(function(res) {
+        iframe.parentNode && iframe.parentNode.removeChild(iframe)
+        return res
       })
     },
 
@@ -861,7 +864,7 @@ export default {
       while (file = this.files[index]) {
         index++
         if (active && !this.destroy) {
-          if (uploading >= this.thread) {
+          if (uploading >= this.thread || (uploading && this.mode == 'html4')) {
             break
           }
           if (!file.active && !file.error && !file.success) {
