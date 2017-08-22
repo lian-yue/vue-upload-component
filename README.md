@@ -19,7 +19,7 @@
   <meta charset="utf-8">
   <title>Vue-upload-component Test</title>
   <script src="https://unpkg.com/vue"></script>
-  <script src="https://unpkg.com/vue-upload-component@2.4.0-beta.5/dist/vue-upload-component.js"></script>
+  <script src="https://unpkg.com/vue-upload-component"></script>
 </head>
 <body>
   <div id="app">
