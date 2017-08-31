@@ -150,7 +150,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `this.name`
 
-* **描述：**
+* **描述：**  
   input标签的 `id` 属性
 
 * **用法：**
@@ -169,7 +169,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `file`
 
-* **描述：**
+* **描述：**  
   input标签的 `name` 属性
 
 * **用法：**
@@ -188,7 +188,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `undefined`
 
-* **描述：**
+* **描述：**  
   `POST` 请求的上传URL
 
 * **用法：**
@@ -205,10 +205,10 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `undefined`
 
-* **描述：**
-  `PUT` 请求的上传URL
-  `put-action` 不为空请优先 `PUT` 请求
-  需要`HTML5`支持
+* **描述：**  
+  `PUT` 请求的上传URL  
+  `put-action` 不为空请优先 `PUT` 请求  
+  需要`HTML5`支持  
 
 * **用法：**
   ```html
@@ -226,9 +226,9 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `{}`
 
-* **描述：**
-  自定义 `HTTP Header`
-  需要`HTML5`支持
+* **描述：**  
+  自定义 `HTTP Header`  
+  需要`HTML5`支持  
 
 * **用法：**
   ```html
@@ -244,9 +244,9 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `{}`
 
-* **描述：**
-  `POST 请求`: 附加请求的 body
-  `PUT 请求`: 附加请求的 query
+* **描述：**  
+  `POST 请求`: 附加请求的 body  
+  `PUT 请求`: 附加请求的 query  
 
 * **用法：**
   ```html
@@ -261,7 +261,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `[]`
 
-* **描述：**
+* **描述：**  
   文件列表
   **为了防止不可预知的错误，不可直接修改 `files`，请使用 `add`, `update`, `remove` 方法修改**
 
@@ -282,9 +282,9 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `undefined`
 
-* **描述：**
-  表单的`accept`属性, MIME type
-  需要`HTML5`支持
+* **描述：**  
+  表单的`accept`属性, MIME type  
+  需要`HTML5`支持  
 
 * **用法：**
   ```html
@@ -300,10 +300,10 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `false`
 
-* **描述：**
-  文件表单的 `multiple` 属性
-  是否允许选择多个文件
-  如果是 `false` files 里面最多只有一个文件 多的会自动删除
+* **描述：**  
+  文件表单的 `multiple` 属性  
+  是否允许选择多个文件  
+  如果是 `false` `files` 里面最多只有一个文件 多的会自动删除  
 
 * **用法：**
   ```html
@@ -317,10 +317,10 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `false`
 
-* **描述：**
-  文件表单的 `directory` 属性
-  是否是上传文件夹
-  [查看支持的浏览器](http://caniuse.com/#feat=input-file-directory)
+* **描述：**  
+  文件表单的 `directory` 属性  
+  是否是上传文件夹  
+  [查看支持的浏览器](http://caniuse.com/#feat=input-file-directory)  
 
 * **用法：**
   ```html
@@ -336,7 +336,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `undefined`
 
-* **描述：**
+* **描述：**  
   允许上传的文件后缀
 
 * **用法：**
@@ -354,7 +354,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `0`
 
-* **描述：**
+* **描述：**  
   允许上传的最大字节
 
 * **用法：**
@@ -370,7 +370,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `0`
 
-* **描述：**
+* **描述：**  
   上传超时时间毫秒
 
 * **用法：**
@@ -386,9 +386,9 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `1`
 
-* **描述：**
-  同时并发上传的文件数量 线程数
-  需要`HTML5`支持
+* **描述：**  
+  同时并发上传的文件数量 线程数  
+  需要`HTML5`支持  
 
 * **用法：**
   ```html
@@ -404,9 +404,9 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `false`
 
-* **描述：**
-  拖拽上传
-  如果设置成 `true` 则读取父组件作为容器
+* **描述：**  
+  拖拽上传  
+  如果设置成 `true` 则读取父组件作为容器  
   需要`HTML5`支持
 
 * **用法：**
@@ -425,8 +425,8 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `true`
 
-* **描述：**
-  是否开启拖拽目录
+* **描述：**  
+  是否开启拖拽目录  
   如果设置成 `false` 则过滤掉目录
 
 * **用法：**
@@ -445,8 +445,8 @@ const nodeExternals = require('webpack-node-externals');
 * **参数：**
   * `files: Array<Object>`
 
-* **描述：**
-  文件被改变触发的方法
+* **描述：**  
+  文件被改变触发的方法  
   默认用于`v-model`绑定
 
 * **用法：**
@@ -477,10 +477,11 @@ const nodeExternals = require('webpack-node-externals');
   * `oldFile: Object | undefined`  `只读`
   * `prevent: Function`
 
-* **描述：**
-  添加，更新，移除 前过滤器
-  事件内不可使用 `update`, `add`, `remove`, `clear` 方法
+* **描述：**  
+  添加，更新，移除 前过滤器  
+  事件内不可使用 `update`, `add`, `remove`, `clear` 方法  
   事件内可修改 `newFile` 对象
+  `prevent()` 用于阻止修改
 
 * **用法：**
   ```html
@@ -545,10 +546,10 @@ const nodeExternals = require('webpack-node-externals');
   * `newFile: Object | undefined` `读写`
   * `oldFile: Object | undefined` `只读`
 
-* **描述：**
-  添加，更新，移除 后
-  事件内可使用 `update`, `add`, `remove`, `clear` 方法
-  事件内不可修改 `newFile` 对象
+* **描述：**  
+  添加，更新，移除 后  
+  事件内可使用 `update`, `add`, `remove`, `clear` 方法  
+  事件内不可修改 `newFile` 对象  
   事件内不可修改 `oldFile` 对象
 
 * **用法：**
@@ -630,7 +631,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **返回值：** `Object | Boolean` 存在返回文件对象否则返回`false`
 
-* **描述：**
+* **描述：**  
   使用`id`获得某个文件对象
 
 
@@ -641,7 +642,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **返回值：** `Object | Array<Object> | Boolean`      传入的是数组返回数组否则对象或`false`
 
-* **描述：**
+* **描述：**  
   添加一个或多个文件
 
 * **用法：**
@@ -681,7 +682,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **返回值：**  `Object | Boolean`  成功返回`newFile` 失败返回 `false`
 
-* **描述：**
+* **描述：**  
   更新某个文件对象
 
 * **用法：**
@@ -718,7 +719,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **返回值：**  `Object | Boolean`  成功返回 `oldFile` 失败返回 `false`
 
-* **描述：**
+* **描述：**  
   移除某个文件对象
 
 * **用法：**
@@ -766,7 +767,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `{html5: true, directory: false, drag: false}`
 
-* **描述：**
+* **描述：**  
   用于判断浏览器支持的特性
 
 * **用法：**
@@ -788,7 +789,7 @@ const nodeExternals = require('webpack-node-externals');
 
   * **默认值：** `false`
 
-  * **描述：**
+  * **描述：**  
     激活或停止上传
 
   * **用法：**
@@ -809,7 +810,7 @@ const nodeExternals = require('webpack-node-externals');
 
   * **默认值：** `false`
 
-  * **描述：**
+  * **描述：**  
     是否正在拖拽
 
   * **用法：**
@@ -832,7 +833,7 @@ const nodeExternals = require('webpack-node-externals');
 
   * **默认值：** `true`
 
-  * **描述：**
+  * **描述：**  
     是否全部已上传
 
   * **用法：**
@@ -864,7 +865,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `Math.random().toString(36).substr(2)`
 
-* **描述：**
+* **描述：**  
   文件id
 
 
@@ -877,7 +878,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `-1`
 
-* **描述：**
+* **描述：**  
   文件大小
 
   需要`HTML5`支持
@@ -891,11 +892,11 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `empty`
 
-* **描述：**
+* **描述：**  
   文件名
 
-  格式：
-  `directory/filename.gif`
+  格式：  
+  `directory/filename.gif`  
   `filename.gif`
 
 
@@ -907,13 +908,13 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** ` `
 
-* **描述：**
+* **描述：**  
   MIME类型
 
-  格式：
-  `image/gif`
-  `image/png`
-  `text/html`
+  格式：  
+  `image/gif`  
+  `image/png`  
+  `text/html`  
 
   需要`HTML5`支持
 
@@ -926,10 +927,10 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `false`
 
-* **描述：**
+* **描述：**  
   激活或终止上传
 
-  `true` = 上传
+  `true` = 上传  
   `false` = 停止
 
 
@@ -944,10 +945,10 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** ` `
 
-* **描述：**
+* **描述：**  
   上传失败错误代码
 
-  内置
+  内置  
   `size`, `extension`, `timeout`, `abort`, `network`, `server`, `denied`
 
 
@@ -960,7 +961,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `false`
 
-* **描述：**
+* **描述：**  
   是否上传成功
 
 
@@ -972,7 +973,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `this.putAction`
 
-* **描述：**
+* **描述：**  
   自定义当前文件 `PUT` 地址
 
 
@@ -984,7 +985,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `this.postAction`
 
-* **描述：**
+* **描述：**  
   自定义当前文件 `POST` 地址
 
 
@@ -998,7 +999,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `this.headers`
 
-* **描述：**
+* **描述：**  
   自定义当前文件 `HTTP` Header
 
 
@@ -1010,7 +1011,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `this.data`
 
-* **描述：**
+* **描述：**  
   自定义当前文件 `body` 或 `query` 附加内容
 
 
@@ -1022,7 +1023,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `0`
 
-* **描述：**
+* **描述：**  
   自定义当前单个文件的上传超时时间
 
 
@@ -1035,7 +1036,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `{}`
 
-* **描述：**
+* **描述：**  
   响应的数据
 
 
@@ -1048,7 +1049,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `0.00`
 
-* **描述：**
+* **描述：**  
   上传进度
 
 
@@ -1061,7 +1062,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `0`
 
-* **描述：**
+* **描述：**  
   每秒的上传速度
 
 
@@ -1074,7 +1075,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `undefined`
 
-* **描述：**
+* **描述：**  
   `HTML5` 上传 `XMLHttpRequest` 对象
 
 
@@ -1087,5 +1088,5 @@ const nodeExternals = require('webpack-node-externals');
 
 * **默认值：** `undefined`
 
-* **描述：**
+* **描述：**  
   `HTML4` 上传 `iframe` 元素

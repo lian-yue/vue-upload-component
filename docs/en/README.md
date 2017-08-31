@@ -152,7 +152,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `this.name`
 
-* **Description:**
+* **Description:**  
   The `id` attribute of the input tag
 
 * **Usage:**
@@ -171,7 +171,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `file`
 
-* **Description:**
+* **Description:**  
   The `name` attribute of the input tag
 
 * **Usage:**
@@ -190,7 +190,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `undefined`
 
-* **Description:**
+* **Description:**  
   `POST` Request upload URL
 
 * **Usage:**
@@ -207,9 +207,9 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `undefined`
 
-* **Description:**
-  `PUT` Request upload URL
-  `put-action` is not empty Please give priority to` PUT` request
+* **Description:**  
+  `PUT` Request upload URL  
+  `put-action` is not empty Please give priority to` PUT` request  
   Required `html5` support
 
 * **Usage:**
@@ -226,8 +226,8 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `{}`
 
-* **Description:**
-  Attach `header` data
+* **Description:**  
+  Attach `header` data  
   Required `html5` support
 
 * **Usage:**
@@ -244,8 +244,8 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `{}`
 
-* **Description:**
-  `POST request`:  Append request `body`
+* **Description:**  
+  `POST request`:  Append request `body`  
   `PUT request`:  Append request `query`
 
 * **Usage:**
@@ -262,8 +262,8 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `[]`
 
-* **Description:**
-  File List
+* **Description:**  
+  File List  
   **In order to prevent unpredictable errors, can not directly modify the `files`, please use` add`, `update`,` remove` method to modify**
 
 * **[File object](#file)**
@@ -283,9 +283,9 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `undefined`
 
-* **Description:**
-  The `accept` attribute of the input tag, MIME type
-  Required `html5` support
+* **Description:**  
+  The `accept` attribute of the input tag, MIME type  
+  Required `html5` support  
 
 * **Usage:**
   ```html
@@ -302,9 +302,9 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `false`
 
-* **Description:**
-  The `multiple` attribute of the input tag
-  Whether to allow multiple files to be selected
+* **Description:**  
+  The `multiple` attribute of the input tag  
+  Whether to allow multiple files to be selected  
   If it is `false` file inside only one file will be automatically deleted
 
 * **Usage:**
@@ -319,10 +319,10 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `false`
 
-* **Description:**
-  The `directory` attribute of the input tag
-  Whether it is a upload folder
-  [View supported browsers](http://caniuse.com/#feat=input-file-directory)
+* **Description:**  
+  The `directory` attribute of the input tag  
+  Whether it is a upload folder  
+  [View supported browsers](http://caniuse.com/#feat=input-file-directory)  
 
 * **Usage:**
   ```html
@@ -338,8 +338,8 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `undefined`
 
-* **Description:**
-  Allow upload file extensions
+* **Description:**  
+  Allow upload file extensions  
 
 * **Usage:**
   ```html
@@ -356,7 +356,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `0`
 
-* **Description:**
+* **Description:**  
   Allow the maximum byte to upload
 
 * **Usage:**
@@ -372,7 +372,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `0`
 
-* **Description:**
+* **Description:**  
   Upload timeout time in milliseconds
 
 * **Usage:**
@@ -388,8 +388,8 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `1`
 
-* **Description:**
-  Also upload the number of files at the same time (number of threads)
+* **Description:**  
+  Also upload the number of files at the same time (number of threads)  
   Required `html5` support
 
 * **Usage:**
@@ -406,9 +406,9 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `false`
 
-* **Description:**
-  Drag and drop upload
-  If set to `true`, read the parent component as a container
+* **Description:**  
+  Drag and drop upload  
+  If set to `true`, read the parent component as a container  
   Required `html5` support
 
 * **Usage:**
@@ -425,8 +425,8 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `true`
 
-* **Description:**
-  Whether to open the drag directory
+* **Description:**  
+  Whether to open the drag directory  
   If set to `false` filter out the directory
 
 * **Usage:**
@@ -445,8 +445,8 @@ const nodeExternals = require('webpack-node-externals');
 * **Arguments:**
   * `files: Array<Object>`
 
-* **Description:**
-  The files is changed to trigger the method
+* **Description:**  
+  The files is changed to trigger the method  
   Default for `v-model` binding
 
 * **Usage:**
@@ -477,10 +477,10 @@ const nodeExternals = require('webpack-node-externals');
   * `oldFile: Object | undefined`  `Read only`
   * `prevent: Function`
 
-* **Description:**
-  Add, update, remove pre-filter
-  You can not use `update`,` add`, `remove`,` clear` methods in the event
-  The `newFile` object can be modified within the event
+* **Description:**  
+  Add, update, remove pre-filter  
+  You can not use `update`,` add`, `remove`,` clear` methods in the event  
+  The `newFile` object can be modified within the event  
   `prevent()` can prevent modification
 
 * **Usage:**
@@ -545,10 +545,10 @@ const nodeExternals = require('webpack-node-externals');
   * `newFile: Object | undefined` `Read only`
   * `oldFile: Object | undefined` `Read only`
 
-* **Description:**
-  Add, update, remove after
-  You can use `update`,` add`, `remove`,` clear` methods in the event
-  You can not modify the `newFile` object in the event
+* **Description:**  
+  Add, update, remove after  
+  You can use `update`,` add`, `remove`,` clear` methods in the event  
+  You can not modify the `newFile` object in the event  
   You can not modify the `oldFile` object in the event
 
 * **Usage:**
@@ -630,7 +630,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Result：** `Object | Boolean` There is a return file object that otherwise returns `false`
 
-* **Description:**
+* **Description:**  
   Use `id` to get a file object
 
 
@@ -641,7 +641,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Result：** `Object | Array<Object> | Boolean`     The incoming array is returned to the array otherwise the object or `false`
 
-* **Description:**
+* **Description:**  
   Add one or more files
 
 * **Usage:**
@@ -681,7 +681,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Result：**  `Object | Boolean`  Successfully returned `newFile` failed to return` false`
 
-* **Description:**
+* **Description:**  
   Update a file object
 
 * **Usage:**
@@ -718,7 +718,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Result：**  `Object | Boolean`  Successfully returned `oldFile` failed to return` false`
 
-* **Description:**
+* **Description:**  
   Remove a file object
 
 * **Usage:**
@@ -750,7 +750,7 @@ const nodeExternals = require('webpack-node-externals');
 ### clear
 * **Result：**  `Boolean`  Always return `true`
 
-* **Description:**
+* **Description:**  
   Empty the file list
 
 
@@ -766,7 +766,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `{html5: true, directory: false, drag: false}`
 
-* **Description:**
+* **Description:**  
   Used to determine the browser support features
 
 
@@ -789,7 +789,7 @@ const nodeExternals = require('webpack-node-externals');
 
   * **Default:** `false`
 
-  * **Description:**
+  * **Description:**  
     Activation or abort upload
 
   * **Usage:**
@@ -810,7 +810,7 @@ const nodeExternals = require('webpack-node-externals');
 
   * **Default:** `false`
 
-  * **Description:**
+  * **Description:**  
     Is dragging
 
   * **Usage:**
@@ -832,7 +832,7 @@ const nodeExternals = require('webpack-node-externals');
 
   * **Default:** `true`
 
-  * **Description:**
+  * **Description:**  
     All uploaded
 
   * **Usage:**
@@ -865,7 +865,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `Math.random().toString(36).substr(2)`
 
-* **Description:**
+* **Description:**  
   File ID
 
 
@@ -878,7 +878,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `-1`
 
-* **Description:**
+* **Description:**  
   File size
 
   Required `html5` support
@@ -892,12 +892,12 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** ` `
 
-* **Description:**
-  Filename
+* **Description:**  
+  Filename  
 
-  Format:
-  `directory/filename.gif`
-  `filename.gif`
+  Format:  
+  `directory/filename.gif`  
+  `filename.gif`  
 
 
 
@@ -908,12 +908,12 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `empty`
 
-* **Description:**
+* **Description:**  
   MIME type
 
-  Format:
-  `image/gif`
-  `image/png`
+  Format:  
+  `image/gif`  
+  `image/png`  
   `text/html`
 
   Required `html5` support
@@ -927,11 +927,11 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `false`
 
-* **Description:**
+* **Description:**  
   Activation or abort upload
 
-  `true` = Upload
-  `false` = Abort
+  `true` = Upload  
+  `false` = Abort  
 
 
 
@@ -945,10 +945,10 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** ` `
 
-* **Description:**
+* **Description:**  
   Upload failed error code
 
-  Built-in
+  Built-in  
   `size`, `extension`, `timeout`, `abort`, `network`, `server`, `denied`
 
 
@@ -961,7 +961,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `false`
 
-* **Description:**
+* **Description:**  
   Whether the upload was successful
 
 
@@ -973,7 +973,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `this.putAction`
 
-* **Description:**
+* **Description:**  
   Customize the current file `PUT` URL
 
 
@@ -985,7 +985,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `this.postAction`
 
-* **Description:**
+* **Description:**  
   Customize the current file `POST` URL
 
 
@@ -999,7 +999,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `this.headers`
 
-* **Description:**
+* **Description:**  
   Customize the current file `HTTP` Header
 
 
@@ -1011,7 +1011,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `this.data`
 
-* **Description:**
+* **Description:**  
   Customize the current file `body` or` query` to attach content
 
 
@@ -1023,7 +1023,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `0`
 
-* **Description:**
+* **Description:**  
   Customize the upload timeout for a current single file
 
 
@@ -1036,7 +1036,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `{}`
 
-* **Description:**
+* **Description:**  
   Response data
 
 
@@ -1049,7 +1049,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `0.00`
 
-* **Description:**
+* **Description:**  
   Upload progress
 
 
@@ -1062,7 +1062,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `0`
 
-* **Description:**
+* **Description:**  
   Per second upload speed
 
 
@@ -1075,7 +1075,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `undefined`
 
-* **Description:**
+* **Description:**  
   `HTML5` upload` XMLHttpRequest` object
 
 
@@ -1088,5 +1088,5 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Default:** `undefined`
 
-* **Description:**
+* **Description:**  
   `HTML4` upload` iframe` element
