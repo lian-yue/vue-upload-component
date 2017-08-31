@@ -19,6 +19,11 @@ module.exports = {
     extensions: ['', '.js', '.vue', '.json'],
   },
 
+  externals: {
+    vue: 'Vue',
+    vuex: 'Vuex',
+  },
+
   module: {
     loaders: [
       {
@@ -55,6 +60,7 @@ module.exports = {
   },
 
   devServer: {
+    // host: '172.16.23.1',
     historyApiFallback: true,
     noInfo: true
   },

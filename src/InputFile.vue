@@ -5,9 +5,10 @@
     :id="$parent.inputId || $parent.name"
     :accept="$parent.accept"
     @change="change"
-    :webkitdirectory="$parent.directory && $parent.mode === 'html5'"
-    :directory="$parent.directory && $parent.mode === 'html5'"
-    :multiple="$parent.multiple && $parent.mode === 'html5'"
+    :webkitdirectory="$parent.directory && $parent.features.directory"
+    :directory="$parent.directory && $parent.features.directory"
+    :allowdir="$parent.directory && $parent.features.directory"
+    :multiple="$parent.multiple && $parent.features.html5"
   />
 </template>
 <script>

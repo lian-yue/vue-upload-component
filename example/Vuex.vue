@@ -5,7 +5,6 @@
     put-action="/put"
     :value="files"
     @input="input"
-    @input-file="inputFile"
     ref="upload">
     Add upload files
   </file-upload>

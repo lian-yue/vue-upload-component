@@ -96,6 +96,7 @@ table th,table td {
                 :drop="drop"
                 :dropDirectory="dropDirectory"
                 v-model="files"
+                @input-filter="inputFilter"
                 @input-file="inputFile"
                 ref="upload">
                 Add upload files
@@ -103,7 +104,8 @@ table th,table td {
             </td>
             <td>
               <button @click.prevent="addDirectory">Add upload directory</button>
-              <br/>Only support chrome
+              <br/>
+              <span v-show="$refs.upload && !$refs.upload.features.directory">Your browser does not support</span>
             </td>
             <td>
               <button v-show="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true" type="button">Start upload</button>
@@ -168,6 +170,9 @@ table th,table td {
     <div v-show="$refs.upload && $refs.upload.dropActive" class="drop-active">
       Drop ing
     </div>
+    <br/>
+    <br/>
+    <button type="button" @click.prevent="files = []">Test overwrite files</button>
   </main>
 </template>
 
@@ -188,6 +193,7 @@ export default {
       // extensions: ['gif', 'jpg', 'jpeg','png', 'webp'],
       // extensions: /\.(gif|jpe?g|png|webp)$/i,
 
+
       multiple: true,
       directory: false,
       drop: true,
@@ -196,9 +202,7 @@ export default {
       name: 'file',
 
       postAction: './post.php',
-      // postAction: 'http://upload.qiniu.com/',
       putAction: './put.php',
-      // putAction: '',
 
       headers: {
         "X-Csrf-Token": "xxxx",
@@ -210,6 +214,14 @@ export default {
 
 
       auto: false,
+
+
+      // headers: {},
+      // putAction: '',
+      // postAction: 'http://upload.qiniu.com/',
+      // accept: 'image/png,image/gif,image/jpeg,image/webp',
+      // extensions: '',
+      // size: 0,
     }
   },
 
@@ -225,6 +237,11 @@ export default {
 
     // add Directory
     addDirectory() {
+      if (!this.$refs.upload.features.directory) {
+        return
+      }
+      this.$refs.upload.$el.onclick = null
+
       this.directory = true
       this.$nextTick(() => {
         this.$refs.upload.$el.querySelector('input').click()
@@ -240,24 +257,31 @@ export default {
     },
 
 
-    // File Event
-    inputFile(newFile, oldFile) {
-
-
+    //  event Filter
+    inputFilter(newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
-        // console.log('add', newFile)
-
-
-        // 缩略图
-        var URL = window.URL || window.webkitURL
-        if (URL && URL.createObjectURL) {
-          newFile = this.$refs.upload.update(newFile, {blob: URL.createObjectURL(newFile.file)})
+        // 过滤系疼文件 or 隐藏文件
+        if (/(\/|^)(Thumbs\.db|desktop\.ini|\..+)$/.test(newFile.name)) {
+          return prevent()
         }
 
-        // post filename
-        newFile.data.name = newFile.name
-      }
+        // 过滤 php html js 文件
+        if (/\.(php5?|html?|jsx?)$/i.test(newFile.name)) {
+          return prevent()
+        }
 
+        // 创建 blob 字段
+        newFile.blob = ''
+        var URL = window.URL || window.webkitURL
+        if (URL && URL.createObjectURL) {
+          newFile.blob = URL.createObjectURL(newFile.file)
+        }
+      }
+    },
+
+
+    // add, update, remove File Event
+    inputFile(newFile, oldFile) {
       if (newFile && oldFile) {
         // console.log('update', newFile, oldFile)
 
@@ -266,7 +290,7 @@ export default {
 
           // min size
           if (newFile.size >= 0 && newFile.size < 100 * 1024) {
-            newFile = this.$refs.upload.update(newFile, {error: 'size'})
+            // newFile = this.$refs.upload.update(newFile, {error: 'size'})
           }
         }
 
@@ -294,7 +318,7 @@ export default {
 
 
       // 自动开始
-      if (this.auto && !this.$refs.upload.uploaded && !this.$refs.upload.active) {
+      if (newFile && !oldFile && this.auto && !this.$refs.upload.active) {
         this.$refs.upload.active = true
       }
     },
