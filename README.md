@@ -3,7 +3,7 @@
 > Vue.js file upload component
   - [x] Multi-file upload
   - [x] Upload directory
-  - [x] Drag and drop
+  - [x] Drag upload
   - [x] Drag the directory
   - [x] Upload multiple files at the same time
   - [x] html4 (IE 9)
