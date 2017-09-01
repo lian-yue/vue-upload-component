@@ -167,6 +167,7 @@ table th,table td {
         </tbody>
       </table>
     </div>
+    <h1>Allow to drag and drop</h1>
     <div v-show="$refs.upload && $refs.upload.dropActive" class="drop-active">
       Drop ing
     </div>

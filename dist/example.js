@@ -4197,7 +4197,7 @@
 	    attrs: {
 	      "for": _vm.name
 	    }
-	  }, [_vm._v("Click")])])])])])]), _vm._v(" "), _c('div', {
+	  }, [_vm._v("Click")])])])])])]), _vm._v(" "), _c('h1', [_vm._v("Allow to drag and drop")]), _vm._v(" "), _c('div', {
 	    directives: [{
 	      name: "show",
 	      rawName: "v-show",

@@ -1,6 +1,11 @@
 # vue-upload-component
 
+>
+
 > Vue.js file upload component
+> The component is just a button
+
+
   - [x] Multi-file upload
   - [x] Upload directory
   - [x] Drag upload
@@ -11,8 +16,9 @@
   - [x] Customize the filter
   - [x] thumbnails
 
-
 > Vue.js 文件上传组建
+> 组件只是一个按钮
+
   - [x] 上传多文件
   - [x] 上传目录
   - [x] 拖拽
