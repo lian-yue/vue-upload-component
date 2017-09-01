@@ -94,7 +94,7 @@ table th,table td {
                 :headers="headers"
                 :data="data"
                 :drop="drop"
-                :dropDirectory="dropDirectory"
+                :drop-directory="dropDirectory"
                 v-model="files"
                 @input-filter="inputFilter"
                 @input-file="inputFile"
