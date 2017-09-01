@@ -264,7 +264,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Description:**  
   File List  
-  **In order to prevent unpredictable errors, can not directly modify the `files`, please use` add`, `update`,` remove` method to modify**
+  **In order to prevent unpredictable errors, can not directly modify the `files`, please use [`add`](#add), [`update`](#update), [`remove`](#remove) method to modify**
 
 * **[File object](#file)**
 
@@ -322,7 +322,8 @@ const nodeExternals = require('webpack-node-externals');
 * **Description:**  
   The `directory` attribute of the input tag  
   Whether it is a upload folder  
-  [View supported browsers](http://caniuse.com/#feat=input-file-directory)  
+
+* **[View supported browsers](http://caniuse.com/#feat=input-file-directory)**
 
 * **Usage:**
   ```html
@@ -410,6 +411,8 @@ const nodeExternals = require('webpack-node-externals');
   Drag and drop upload  
   If set to `true`, read the parent component as a container  
   Required `html5` support
+
+* **[View supported browsers](http://caniuse.com/#feat=dragndrop)**
 
 * **Usage:**
   ```html
@@ -553,7 +556,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **Usage:**
   ```html
-  <file-upload ref="upload" :value="files" @input-file="inputFile"></file-upload>
+  <file-upload ref="upload" v-model="files" @input-file="inputFile"></file-upload>
   ```
   ```js
   {
@@ -575,6 +578,16 @@ const nodeExternals = require('webpack-node-externals');
 
         if (newFile && oldFile) {
           // Update file
+
+          // Start upload
+          if (newFile.active !== oldFile.active) {
+            console.log('Start upload', newFile.active, newFile)
+
+            // min size
+            if (newFile.size >= 0 && newFile.size < 100 * 1024) {
+              newFile = this.$refs.upload.update(newFile, {error: 'size'})
+            }
+          }
 
           // Upload progress
           if (newFile.progress !== oldFile.progress) {
@@ -855,7 +868,7 @@ const nodeExternals = require('webpack-node-externals');
 
 ## File
 
-> **File object in the `input-filter` event outside the use of `$ refs.upload.update (file, data Object)`**
+> **File object in the `input-filter` event outside the use of [`update`] (#update) method**
 
 
 ### id

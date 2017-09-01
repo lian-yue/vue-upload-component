@@ -263,7 +263,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **描述：**  
   文件列表
-  **为了防止不可预知的错误，不可直接修改 `files`，请使用 `add`, `update`, `remove` 方法修改**
+  **为了防止不可预知的错误，不可直接修改 `files`，请使用 [`add`](#add), [`update`](#update), [`remove`](#remove) 方法修改**
 
 * **[文件对象信息](#file)**
 
@@ -320,7 +320,8 @@ const nodeExternals = require('webpack-node-externals');
 * **描述：**  
   文件表单的 `directory` 属性  
   是否是上传文件夹  
-  [查看支持的浏览器](http://caniuse.com/#feat=input-file-directory)  
+
+* **[查看支持的浏览器](http://caniuse.com/#feat=input-file-directory) **
 
 * **用法：**
   ```html
@@ -408,6 +409,9 @@ const nodeExternals = require('webpack-node-externals');
   拖拽上传  
   如果设置成 `true` 则读取父组件作为容器  
   需要`HTML5`支持
+
+* **[查看支持的浏览器](http://caniuse.com/#feat=dragndrop)**
+
 
 * **用法：**
   ```html
@@ -554,7 +558,7 @@ const nodeExternals = require('webpack-node-externals');
 
 * **用法：**
   ```html
-  <file-upload ref="upload" :value="files" @input-file="inputFile"></file-upload>
+  <file-upload ref="upload" v-model="files" @input-file="inputFile"></file-upload>
   ```
   ```js
   {
@@ -576,6 +580,16 @@ const nodeExternals = require('webpack-node-externals');
 
         if (newFile && oldFile) {
           // 更新文件
+
+          // 开始上传
+          if (newFile.active !== oldFile.active) {
+            console.log('Start upload', newFile.active, newFile)
+
+            // 限定最小字节
+            if (newFile.size >= 0 && newFile.size < 100 * 1024) {
+              newFile = this.$refs.upload.update(newFile, {error: 'size'})
+            }
+          }
 
           // 上传进度
           if (newFile.progress !== oldFile.progress) {
@@ -856,7 +870,7 @@ const nodeExternals = require('webpack-node-externals');
 
 ## File
 
-> **文件对象在`input-filter`事件外修改请使用 `$refs.upload.update(file, data Object)`**
+> **文件对象在`input-filter`事件外修改请使用 [`update`](#update) 方法**
 
 ### id
 * **类型：** `String | Number`
