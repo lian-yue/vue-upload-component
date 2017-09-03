@@ -1398,20 +1398,19 @@
 	      if (!this.$refs.upload.features.directory) {
 	        return;
 	      }
-	      this.$refs.upload.$el.onclick = null;
 	
+	      var input = this.$refs.upload.$el.querySelector('input');
+	      input.directory = true;
+	      input.webkitdirectory = true;
 	      this.directory = true;
-	      this.$nextTick(function () {
-	        _this.$refs.upload.$el.querySelector('input').click();
-	        _this.$refs.upload.$el.onclick = function (e) {
-	          e.preventDefault();
-	          _this.directory = false;
-	          _this.$refs.upload.$el.onclick = null;
-	          _this.$nextTick(function () {
-	            _this.$refs.upload.$el.querySelector('input').click();
-	          });
-	        };
-	      });
+	
+	      input.onclick = null;
+	      input.click();
+	      input.onclick = function (e) {
+	        _this.directory = false;
+	        input.directory = false;
+	        input.webkitdirectory = false;
+	      };
 	    },
 	    inputFilter: function inputFilter(newFile, oldFile, prevent) {
 	      if (newFile && !oldFile) {
@@ -3950,7 +3949,7 @@
 	      "headers": _vm.headers,
 	      "data": _vm.data,
 	      "drop": _vm.drop,
-	      "dropDirectory": _vm.dropDirectory
+	      "drop-directory": _vm.dropDirectory
 	    },
 	    on: {
 	      "input-filter": _vm.inputFilter,

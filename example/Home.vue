@@ -241,20 +241,19 @@ export default {
       if (!this.$refs.upload.features.directory) {
         return
       }
-      this.$refs.upload.$el.onclick = null
 
+      let input = this.$refs.upload.$el.querySelector('input')
+      input.directory = true
+      input.webkitdirectory = true
       this.directory = true
-      this.$nextTick(() => {
-        this.$refs.upload.$el.querySelector('input').click()
-        this.$refs.upload.$el.onclick = (e) => {
-          e.preventDefault()
-          this.directory = false
-          this.$refs.upload.$el.onclick = null
-          this.$nextTick(() => {
-            this.$refs.upload.$el.querySelector('input').click()
-          })
-        }
-      })
+
+      input.onclick = null
+      input.click()
+      input.onclick = (e) => {
+        this.directory = false
+        input.directory = false
+        input.webkitdirectory = false
+      }
     },
 
 
