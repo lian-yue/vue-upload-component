@@ -413,6 +413,116 @@ export default {
       return isArray ? addFiles : addFiles[0]
     },
 
+
+
+    // 添加表单文件
+    addInputFile(el) {
+      let files = []
+      if (el.files) {
+        for (let i = 0; i < el.files.length; i++) {
+          let file = el.files[i]
+          files.push({
+            size: file.size,
+            name: file.webkitRelativePath || file.relativePath || file.name,
+            type: file.type,
+            file,
+            el
+          })
+        }
+      } else {
+        files.push({
+          name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1'),
+          el,
+        })
+      }
+      return this.add(files)
+    },
+
+
+    // 添加 DataTransfer
+    addDataTransfer(dataTransfer) {
+      let files = []
+      if (dataTransfer.items && dataTransfer.items.length) {
+        let items = []
+        for (let i = 0; i < dataTransfer.items.length; i++) {
+          let item = dataTransfer.items[i]
+          if (item.getAsEntry) {
+            item = item.getAsEntry()
+          } else if (item.webkitGetAsEntry) {
+            item = item.webkitGetAsEntry()
+          } else {
+            item = item.getAsFile()
+          }
+          if (item) {
+            items.push(item)
+          }
+        }
+
+        return new Promise(function(resolve, reject) {
+          let forEach = (i) => {
+            let item = items[i]
+            // 结束 或者已有文件了
+            if (!item || (!this.multiple && files.length)) {
+              return resolve(this.add(files))
+            }
+            this.getEntry(item).then(function(results) {
+              files.push(...results)
+              forEach(i + 1)
+            })
+          }
+          forEach(0)
+        });
+      }
+
+      if (dataTransfer.files.length) {
+        for (let i = 0; i < dataTransfer.files.length; i++) {
+          files.push(dataTransfer.files[i])
+          if (!this.multiple) {
+            break
+          }
+        }
+        return Promise.resolve(this.add(files))
+      }
+
+      return Promise.resolve([])
+    },
+
+
+    // 获得 entry
+    getEntry(entry, path = '') {
+      return new Promise((resolve, reject) => {
+        if (entry.isFile) {
+          entry.file(function(file) {
+            resolve([
+              {
+                size: file.size,
+                name: path + file.name,
+                type: file.type,
+                file,
+              }
+            ])
+          })
+        } else if (entry.isDirectory && this.dropDirectory) {
+          entry.createReader().readEntries((entries) => {
+            let files = []
+            let forEach = (i) => {
+              if (!entries[i] || (files.length && !this.multiple)) {
+                return resolve(files)
+              }
+              this.getEntry(entries[i], path + entry.name + '/').then((results) => {
+                files.push(...results)
+                forEach(i + 1)
+              })
+            }
+            forEach(0)
+          })
+        } else {
+          resolve([])
+        }
+      })
+    },
+
+
     // 移除
     remove(file) {
       file = this.get(file)
@@ -1015,84 +1125,6 @@ export default {
     },
 
 
-
-    // 添加表单文件
-    addInputFile(el) {
-      let files = []
-      if (el.files) {
-        for (let i = 0; i < el.files.length; i++) {
-          let file = el.files[i]
-          files.push({
-            size: file.size,
-            name: file.webkitRelativePath || file.relativePath || file.name,
-            type: file.type,
-            file,
-            el
-          })
-        }
-      } else {
-        files.push({
-          name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1'),
-          el,
-        })
-      }
-
-      this.add(files)
-
-      var Component = this.$options.components.InputFile
-
-      // vue 2.0.0  = Component
-      // vue 2.0.x  = Component._Ctor
-      // vue 2.1.x = Component._Ctor[0]
-      if (!Component._Ctor) {
-
-      } else if (typeof Component._Ctor === 'function') {  ///... 蠢死我 没加 typeof
-        Component = Component._Ctor
-      } else {
-        Component = Component._Ctor[0]
-      }
-
-      var inputFile = new Component({
-        parent: this,
-        el,
-      })
-    },
-
-    // 获得 entry
-    getEntry(entry, path = '') {
-      return new Promise((resolve, reject) => {
-        if (entry.isFile) {
-          entry.file(function(file) {
-            resolve([
-              {
-                size: file.size,
-                name: path + file.name,
-                type: file.type,
-                file,
-              }
-            ])
-          })
-        } else if (entry.isDirectory && this.dropDirectory) {
-          entry.createReader().readEntries((entries) => {
-            let files = []
-            let forEach = (i) => {
-              if (!entries[i] || (files.length && !this.multiple)) {
-                return resolve(files)
-              }
-              this.getEntry(entries[i], path + entry.name + '/').then((results) => {
-                files.push(...results)
-                forEach(i + 1)
-              })
-            }
-            forEach(0)
-          })
-        } else {
-          resolve([])
-        }
-      })
-    },
-
-
     onDragenter(e) {
       e.preventDefault()
       if (!this.dropActive) {
@@ -1114,44 +1146,7 @@ export default {
     onDrop(e) {
       e.preventDefault()
       this.dropActive = false
-      let dataTransfer = e.dataTransfer
-      let files = []
-
-      if (dataTransfer.items && dataTransfer.items.length) {
-        let items = []
-        for (let i = 0; i < dataTransfer.items.length; i++) {
-          let item = dataTransfer.items[i]
-          if (item.getAsEntry) {
-            item = item.getAsEntry()
-          } else if (item.webkitGetAsEntry) {
-            item = item.webkitGetAsEntry()
-          } else {
-            item = item.getAsFile()
-          }
-          items.push(item)
-        }
-
-        let forEach = (i) => {
-          let item = items[i]
-          // 结束 或者已有文件了
-          if (!item || (!this.multiple && files.length)) {
-            return this.add(files)
-          }
-          this.getEntry(item).then(function(results) {
-            files.push(...results)
-            forEach(i + 1)
-          })
-        }
-        forEach(0)
-      } else if (dataTransfer.files.length) {
-        for (let i = 0; i < dataTransfer.files.length; i++) {
-          files.push(dataTransfer.files[i])
-          if (!this.multiple) {
-            break
-          }
-        }
-        this.add(files)
-      }
+      this.addDataTransfer(e.dataTransfer)
     },
   }
 }

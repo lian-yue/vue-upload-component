@@ -17,6 +17,10 @@ export default {
     change(e) {
       this.$destroy()
       this.$parent.addInputFile(e.target)
+      new this.constructor({
+        parent: this.$parent,
+        el: this.$el,
+      })
     }
   }
 }

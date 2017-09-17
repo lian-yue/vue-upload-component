@@ -1471,13 +1471,13 @@
 	  value: true
 	});
 	
-	var _toConsumableArray2 = __webpack_require__(69);
-	
-	var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
-	
 	var _stringify = __webpack_require__(64);
 	
 	var _stringify2 = _interopRequireDefault(_stringify);
+	
+	var _toConsumableArray2 = __webpack_require__(69);
+	
+	var _toConsumableArray3 = _interopRequireDefault(_toConsumableArray2);
 	
 	var _promise = __webpack_require__(66);
 	
@@ -1794,6 +1794,109 @@
 	
 	      return isArray ? addFiles : addFiles[0];
 	    },
+	    addInputFile: function addInputFile(el) {
+	      var files = [];
+	      if (el.files) {
+	        for (var i = 0; i < el.files.length; i++) {
+	          var file = el.files[i];
+	          files.push({
+	            size: file.size,
+	            name: file.webkitRelativePath || file.relativePath || file.name,
+	            type: file.type,
+	            file: file,
+	            el: el
+	          });
+	        }
+	      } else {
+	        files.push({
+	          name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1'),
+	          el: el
+	        });
+	      }
+	      return this.add(files);
+	    },
+	    addDataTransfer: function addDataTransfer(dataTransfer) {
+	      var files = [];
+	      if (dataTransfer.items && dataTransfer.items.length) {
+	        var items = [];
+	        for (var i = 0; i < dataTransfer.items.length; i++) {
+	          var item = dataTransfer.items[i];
+	          if (item.getAsEntry) {
+	            item = item.getAsEntry();
+	          } else if (item.webkitGetAsEntry) {
+	            item = item.webkitGetAsEntry();
+	          } else {
+	            item = item.getAsFile();
+	          }
+	          if (item) {
+	            items.push(item);
+	          }
+	        }
+	
+	        return new _promise2.default(function (resolve, reject) {
+	          var _this = this;
+	
+	          var forEach = function forEach(i) {
+	            var item = items[i];
+	
+	            if (!item || !_this.multiple && files.length) {
+	              return resolve(_this.add(files));
+	            }
+	            _this.getEntry(item).then(function (results) {
+	              files.push.apply(files, (0, _toConsumableArray3.default)(results));
+	              forEach(i + 1);
+	            });
+	          };
+	          forEach(0);
+	        });
+	      }
+	
+	      if (dataTransfer.files.length) {
+	        for (var _i3 = 0; _i3 < dataTransfer.files.length; _i3++) {
+	          files.push(dataTransfer.files[_i3]);
+	          if (!this.multiple) {
+	            break;
+	          }
+	        }
+	        return _promise2.default.resolve(this.add(files));
+	      }
+	
+	      return _promise2.default.resolve([]);
+	    },
+	    getEntry: function getEntry(entry) {
+	      var _this2 = this;
+	
+	      var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+	
+	      return new _promise2.default(function (resolve, reject) {
+	        if (entry.isFile) {
+	          entry.file(function (file) {
+	            resolve([{
+	              size: file.size,
+	              name: path + file.name,
+	              type: file.type,
+	              file: file
+	            }]);
+	          });
+	        } else if (entry.isDirectory && _this2.dropDirectory) {
+	          entry.createReader().readEntries(function (entries) {
+	            var files = [];
+	            var forEach = function forEach(i) {
+	              if (!entries[i] || files.length && !_this2.multiple) {
+	                return resolve(files);
+	              }
+	              _this2.getEntry(entries[i], path + entry.name + '/').then(function (results) {
+	                files.push.apply(files, (0, _toConsumableArray3.default)(results));
+	                forEach(i + 1);
+	              });
+	            };
+	            forEach(0);
+	          });
+	        } else {
+	          resolve([]);
+	        }
+	      });
+	    },
 	    remove: function remove(file) {
 	      file = this.get(file);
 	      if (file) {
@@ -1860,16 +1963,16 @@
 	        this.uploading++;
 	
 	        this.$nextTick(function () {
-	          var _this = this;
+	          var _this3 = this;
 	
 	          setTimeout(function () {
-	            _this.upload(newFile).then(function () {
-	              newFile = _this.get(newFile);
+	            _this3.upload(newFile).then(function () {
+	              newFile = _this3.get(newFile);
 	              if (newFile) {
-	                _this.update(newFile, { active: false, success: !newFile.error });
+	                _this3.update(newFile, { active: false, success: !newFile.error });
 	              }
 	            }).catch(function (e) {
-	              _this.update(newFile, { active: false, success: false, error: e.code || e.error || e.message || e });
+	              _this3.update(newFile, { active: false, success: false, error: e.code || e.error || e.message || e });
 	            });
 	          }, parseInt(Math.random() * 50 + 50));
 	        });
@@ -1957,13 +2060,13 @@
 	      return this.uploadXhr(xhr, file, form);
 	    },
 	    uploadXhr: function uploadXhr(xhr, file, data) {
-	      var _this2 = this;
+	      var _this4 = this;
 	
 	      var speedTime = 0;
 	      var speedLoaded = 0;
 	
 	      xhr.upload.onprogress = function (e) {
-	        if (!e.lengthComputable || !(file = _this2.get(file)) || !file.active) {
+	        if (!e.lengthComputable || !(file = _this4.get(file)) || !file.active) {
 	          return;
 	        }
 	
@@ -1973,7 +2076,7 @@
 	        }
 	        speedTime = speedTime2;
 	
-	        file = _this2.update(file, {
+	        file = _this4.update(file, {
 	          progress: (e.loaded / e.total * 100).toFixed(2),
 	          speed: e.loaded - speedLoaded
 	        });
@@ -1981,7 +2084,7 @@
 	      };
 	
 	      var interval = setInterval(function () {
-	        file = _this2.get(file);
+	        file = _this4.get(file);
 	        if (file && !file.success && !file.error && file.active) {
 	          return;
 	        }
@@ -2009,7 +2112,7 @@
 	            interval = false;
 	          }
 	
-	          file = _this2.get(file);
+	          file = _this4.get(file);
 	
 	          if (!file) {
 	            return reject('not_exists');
@@ -2062,7 +2165,7 @@
 	            }
 	          }
 	
-	          file = _this2.update(file, data);
+	          file = _this4.update(file, data);
 	
 	          if (file.error) {
 	            return reject(file.error);
@@ -2084,13 +2187,13 @@
 	          xhr.setRequestHeader(key, file.headers[key]);
 	        }
 	
-	        file = _this2.update(file, { xhr: xhr });
+	        file = _this4.update(file, { xhr: xhr });
 	
 	        xhr.send(data);
 	      });
 	    },
 	    uploadHtml4: function uploadHtml4(file) {
-	      var _this3 = this;
+	      var _this5 = this;
 	
 	      var onKeydown = function onKeydown(e) {
 	        if (e.keyCode == 27) {
@@ -2154,12 +2257,12 @@
 	
 	      return new _promise2.default(function (resolve, reject) {
 	        setTimeout(function () {
-	          if (!(file = _this3.update(file, { iframe: iframe }))) {
+	          if (!(file = _this5.update(file, { iframe: iframe }))) {
 	            return reject('not_exists');
 	          }
 	
 	          var interval = setInterval(function () {
-	            file = _this3.get(file);
+	            file = _this5.get(file);
 	            if (file && !file.success && !file.error && file.active) {
 	              return;
 	            }
@@ -2187,7 +2290,7 @@
 	
 	            document.body.removeEventListener('keydown', onKeydown);
 	
-	            file = _this3.get(file);
+	            file = _this5.get(file);
 	
 	            if (!file) {
 	              return reject('not_exists');
@@ -2239,7 +2342,7 @@
 	              data.response = response;
 	            }
 	
-	            file = _this3.update(file, data);
+	            file = _this5.update(file, data);
 	
 	            if (file.error) {
 	              return reject(file.error);
@@ -2317,75 +2420,6 @@
 	        this.dropElement.addEventListener('drop', this.onDrop, false);
 	      }
 	    },
-	    addInputFile: function addInputFile(el) {
-	      var files = [];
-	      if (el.files) {
-	        for (var i = 0; i < el.files.length; i++) {
-	          var file = el.files[i];
-	          files.push({
-	            size: file.size,
-	            name: file.webkitRelativePath || file.relativePath || file.name,
-	            type: file.type,
-	            file: file,
-	            el: el
-	          });
-	        }
-	      } else {
-	        files.push({
-	          name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1'),
-	          el: el
-	        });
-	      }
-	
-	      this.add(files);
-	
-	      var Component = this.$options.components.InputFile;
-	
-	      if (!Component._Ctor) {} else if (typeof Component._Ctor === 'function') {
-	        Component = Component._Ctor;
-	      } else {
-	        Component = Component._Ctor[0];
-	      }
-	
-	      var inputFile = new Component({
-	        parent: this,
-	        el: el
-	      });
-	    },
-	    getEntry: function getEntry(entry) {
-	      var _this4 = this;
-	
-	      var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-	
-	      return new _promise2.default(function (resolve, reject) {
-	        if (entry.isFile) {
-	          entry.file(function (file) {
-	            resolve([{
-	              size: file.size,
-	              name: path + file.name,
-	              type: file.type,
-	              file: file
-	            }]);
-	          });
-	        } else if (entry.isDirectory && _this4.dropDirectory) {
-	          entry.createReader().readEntries(function (entries) {
-	            var files = [];
-	            var forEach = function forEach(i) {
-	              if (!entries[i] || files.length && !_this4.multiple) {
-	                return resolve(files);
-	              }
-	              _this4.getEntry(entries[i], path + entry.name + '/').then(function (results) {
-	                files.push.apply(files, (0, _toConsumableArray3.default)(results));
-	                forEach(i + 1);
-	              });
-	            };
-	            forEach(0);
-	          });
-	        } else {
-	          resolve([]);
-	        }
-	      });
-	    },
 	    onDragenter: function onDragenter(e) {
 	      e.preventDefault();
 	      if (!this.dropActive) {
@@ -2402,48 +2436,9 @@
 	      e.preventDefault();
 	    },
 	    onDrop: function onDrop(e) {
-	      var _this5 = this;
-	
 	      e.preventDefault();
 	      this.dropActive = false;
-	      var dataTransfer = e.dataTransfer;
-	      var files = [];
-	
-	      if (dataTransfer.items && dataTransfer.items.length) {
-	        var items = [];
-	        for (var i = 0; i < dataTransfer.items.length; i++) {
-	          var item = dataTransfer.items[i];
-	          if (item.getAsEntry) {
-	            item = item.getAsEntry();
-	          } else if (item.webkitGetAsEntry) {
-	            item = item.webkitGetAsEntry();
-	          } else {
-	            item = item.getAsFile();
-	          }
-	          items.push(item);
-	        }
-	
-	        var forEach = function forEach(i) {
-	          var item = items[i];
-	
-	          if (!item || !_this5.multiple && files.length) {
-	            return _this5.add(files);
-	          }
-	          _this5.getEntry(item).then(function (results) {
-	            files.push.apply(files, (0, _toConsumableArray3.default)(results));
-	            forEach(i + 1);
-	          });
-	        };
-	        forEach(0);
-	      } else if (dataTransfer.files.length) {
-	        for (var _i3 = 0; _i3 < dataTransfer.files.length; _i3++) {
-	          files.push(dataTransfer.files[_i3]);
-	          if (!this.multiple) {
-	            break;
-	          }
-	        }
-	        this.add(files);
-	      }
+	      this.addDataTransfer(e.dataTransfer);
 	    }
 	  }
 	};
@@ -2462,6 +2457,10 @@
 	    change: function change(e) {
 	      this.$destroy();
 	      this.$parent.addInputFile(e.target);
+	      new this.constructor({
+	        parent: this.$parent,
+	        el: this.$el
+	      });
 	    }
 	  }
 	};

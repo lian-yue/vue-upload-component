@@ -687,6 +687,28 @@ const nodeExternals = require('webpack-node-externals');
   }
   ```
 
+###  addInputFile
+* **参数：**
+  * `files: HTMLInputElement`     文件元素
+
+* **返回值：** `Array`   返回已添加的文件列表
+
+* **描述：**  
+  把`<input type="file">`选择的文件添加进上传列表  
+  要求版本 >= `2.5.1`
+
+
+
+###  addDataTransfer
+* **参数：**
+  * `dataTransfer: DataTransfer`  拖拽或者粘贴的数据
+
+* **返回值：** `Promise<Array>`   返回已添加的文件列表
+
+* **描述：**  
+  把拖拽或者粘贴的数据的文件添加进上传列表  
+  要求版本 >= `2.5.1`
+
 
 
 ### update
