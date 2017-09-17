@@ -1306,6 +1306,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return this.add(files);
 	    },
 	    addDataTransfer: function addDataTransfer(dataTransfer) {
+	      var _this = this;
+	
 	      var files = [];
 	      if (dataTransfer.items && dataTransfer.items.length) {
 	        var items = [];
@@ -1324,8 +1326,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	
 	        return new _promise2.default(function (resolve, reject) {
-	          var _this = this;
-	
 	          var forEach = function forEach(i) {
 	            var item = items[i];
 	

@@ -458,7 +458,7 @@ export default {
           }
         }
 
-        return new Promise(function(resolve, reject) {
+        return new Promise((resolve, reject) => {
           let forEach = (i) => {
             let item = items[i]
             // 结束 或者已有文件了
