@@ -131,7 +131,7 @@ const nodeExternals = require('webpack-node-externals');
 {
   //.....
   externals: [
-    nodeExternals({whitelist:[/^vue-upload-component/]})
+    nodeExternals({whitelist:[/^vue-upload-component\/src/]})
   ]
   //.....
 }
