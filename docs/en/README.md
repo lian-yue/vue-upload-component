@@ -686,6 +686,30 @@ const nodeExternals = require('webpack-node-externals');
   ```
 
 
+###  addInputFile
+* **Arguments:**
+  * `files: HTMLInputElement`     File element
+
+* **Result：** `Array`   Added list of files
+
+* **Description:**  
+  Add the file selected by `<input type = "file">` to the upload list
+  Requires version >= `2.5.1`
+
+
+
+###  addDataTransfer
+* **Arguments:**
+  * `dataTransfer: DataTransfer`  Drag or paste data
+
+* **Result：** `Promise<Array>`   Added list of files
+
+* **Description:**  
+  Add files that are dragged or pasted into the upload list  
+  Requires version >= `2.5.1`
+
+
+
 
 ### update
 * **Arguments:**

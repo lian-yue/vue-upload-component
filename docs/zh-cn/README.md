@@ -135,6 +135,13 @@ const nodeExternals = require('webpack-node-externals');
 }
 ```
 
+https://github.com/liady/webpack-node-externals
+
+* [**官方 `vue-hackernews` 演示**](https://github.com/lian-yue/vue-hackernews-2.0/)  
+
+* [**查看改动**](https://github.com/lian-yue/vue-hackernews-2.0/commit/bd6c58a30cc6b8ba6c0148e737b3ce9336b99cf8)
+
+
 
 
 ***
