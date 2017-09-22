@@ -1,3 +1,5 @@
+
+
 ## 安装
 
 ### npm 方式安装
@@ -23,16 +25,16 @@ Vue.component('file-upload', VueUploadComponent)
 
 ## 使用
 
-### 例子
+### 演示
 
 https://lian-yue.github.io/vue-upload-component/
 
-### 例子源代码
+### 演示源代码
 
 https://github.com/lian-yue/vue-upload-component/tree/2.0/example
 
 
-### html
+### HTML 演示
 ```html
 <!DOCTYPE html>
 <html>
@@ -99,7 +101,7 @@ new Vue({
     inputFilter: function(newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
         // 过滤 非 图片文件
-        if (!/\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.file)) {
+        if (!/\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {
           return prevent()
         }
       }
@@ -123,7 +125,7 @@ new Vue({
 import FileUpload from 'vue-upload-component/src'
 ```
 
-### webpack.config.js
+#### webpack.config.js
 ```js
 const nodeExternals = require('webpack-node-externals');
 {
@@ -134,7 +136,6 @@ const nodeExternals = require('webpack-node-externals');
   //.....
 }
 ```
-
 https://github.com/liady/webpack-node-externals
 
 * [**官方 `vue-hackernews` 演示**](https://github.com/lian-yue/vue-hackernews-2.0/)  
@@ -152,17 +153,17 @@ https://github.com/liady/webpack-node-externals
 
 
 
-### inputId
+### input-id
 * **类型：** `String`
 
 * **默认值：** `this.name`
 
 * **描述：**  
-  input标签的 `id` 属性
+  input 标签的 `id` 属性
 
 * **用法：**
   ```html
-  <file-upload inputId="file2"></file-upload>
+  <file-upload input-id="file2"></file-upload>
   <!--输出-->
   <input id="file2" />
   ```
@@ -517,7 +518,7 @@ https://github.com/liady/webpack-node-externals
 
           // 过滤非图片文件
           // 不会添加到 files 去
-          if (!/\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.file)) {
+          if (!/\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {
             return prevent()
             return
           }

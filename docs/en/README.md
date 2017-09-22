@@ -101,7 +101,7 @@ new Vue({
     inputFilter: function(newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
         // Filter non-image file
-        if (!/\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.file)) {
+        if (!/\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {
           return prevent()
         }
       }
@@ -515,7 +515,7 @@ https://github.com/liady/webpack-node-externals
 
           // Filter non-image file
           // Will not be added to files
-          if (!/\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.file)) {
+          if (!/\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {
             return prevent()
           }
 
