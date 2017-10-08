@@ -1,1 +1,1 @@
-module.exports = require('./FileUpload.vue');
+module.exports = require('./FileUpload.vue')

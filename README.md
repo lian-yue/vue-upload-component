@@ -1,6 +1,6 @@
 # vue-upload-component
+[![npm](https://img.shields.io/npm/dm/vue-upload-component.svg?style=flat-square)](https://www.npmjs.com/package/vue-upload-component) [![npm](https://img.shields.io/npm/v/vue-upload-component.svg?style=flat-square)](https://www.npmjs.com/package/vue-upload-component) [![license](https://img.shields.io/github/license/lian-yue/vue-upload-component.svg?style=flat-square)](https://www.npmjs.com/package/vue-upload-component)
 
->
 
 > Vue.js file upload component
 > The component is just a button
@@ -16,6 +16,29 @@
   - [x] Customize the filter
   - [x] thumbnails
 
+
+
+# Example
+
+https://lian-yue.github.io/vue-upload-component/
+
+# Installation
+
+``` bash
+npm install vue-upload-component --save
+```
+
+# Documentation
+
+https://lian-yue.github.io/vue-upload-component/#/documents
+
+
+
+---
+
+
+
+
 > Vue.js 文件上传组建
 > 组件只是一个按钮
 
@@ -29,13 +52,18 @@
   - [x] 自定义过滤器
   - [x] 缩略图
 
-# 演示 (Example)
+# 演示
 
-https://lian-yue.github.io/vue-upload-component/
+https://lian-yue.github.io/vue-upload-component/#/zh-cn/
 
 
-# 文档 (Documents)
 
-**[中文文档](https://github.com/lian-yue/vue-upload-component/tree/2.0/docs/zh-cn/README.md)**  
+## 安装
 
-**[English document](https://github.com/lian-yue/vue-upload-component/tree/2.0/docs/en/README.md)**
+``` bash
+npm install vue-upload-component --save
+```
+
+# 文档
+
+https://lian-yue.github.io/vue-upload-component/#/zh-cn/documents

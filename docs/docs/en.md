@@ -1,18 +1,29 @@
+
 > **The document uses Google Translate**
 
-## Install
+## Getting Started
 
-### npm install
+### NPM
 
 ``` bash
 npm install vue-upload-component --save
 ```
+
 ``` js
 const VueUploadComponent = require('vue-upload-component')
 Vue.component('file-upload', VueUploadComponent)
 ```
 
-### html install
+### Curated
+
+**No data**
+
+
+### Script
+
+
+unpkg
+
 ``` html
 <script src="https://unpkg.com/vue"></script>
 <script src="https://unpkg.com/vue-upload-component"></script>
@@ -21,20 +32,21 @@ Vue.component('file-upload', VueUploadComponent)
 </script>
 ```
 
+jsDelivr
+
+``` html
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-upload-component"></script>
+<script>
+Vue.component('file-upload', VueUploadComponent)
+</script>
+```
 
 
-## Usage
-
-### Example
-
-https://lian-yue.github.io/vue-upload-component/
-
-### Example source code
-
-https://github.com/lian-yue/vue-upload-component/tree/2.0/example
+### Simple example
 
 
-### html
+
 ```html
 <!DOCTYPE html>
 <html>
@@ -65,7 +77,7 @@ https://github.com/lian-yue/vue-upload-component/tree/2.0/example
 <script>
 new Vue({
   el: '#app',
-  data: function() {
+  data: function () {
     return {
       files: []
     }
@@ -80,13 +92,12 @@ new Vue({
      * @param  Object|undefined   oldFile   Read only
      * @return undefined
      */
-    inputFile: function(newFile, oldFile) {
+    inputFile: function (newFile, oldFile) {
       if (newFile && oldFile && !newFile.active && oldFile.active) {
         // Get response data
         console.log('response', newFile.response)
         if (newFile.xhr) {
           //  Get the response status code
-          //  Required html5 support
           console.log('status', newFile.xhr.status)
         }
       }
@@ -98,7 +109,7 @@ new Vue({
      * @param  Function           prevent   Prevent changing
      * @return undefined
      */
-    inputFilter: function(newFile, oldFile, prevent) {
+    inputFilter: function (newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
         // Filter non-image file
         if (!/\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {
@@ -120,12 +131,77 @@ new Vue({
 </html>
 ```
 
+
+
 ### SSR (Server isomorphism)
+
+
+```html
+<template>
+  <file-upload v-model="files" post-action="/">Upload file</file-upload>
+</template>
+<style>
+/*
+import '~vue-upload-component/dist/vue-upload-component.part.css'
+
+
+or
+
+
+ */
+.file-uploads {
+  overflow: hidden;
+  position: relative;
+  text-align: center;
+  display: inline-block;
+}
+.file-uploads.file-uploads-html4 input[type="file"] {
+  opacity: 0;
+  font-size: 20em;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.file-uploads.file-uploads-html5 input[type="file"] {
+  overflow: hidden;
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  z-index: -1;
+  opacity: 0;
+}
+</style>
+<script>
+import FileUpload from 'vue-upload-component/dist/vue-upload-component.part.js'
+export default {
+  components: {
+    FileUpload,
+  },
+  data() {
+    return {
+      files: []
+    }
+  },
+}
+</script>
+```
+
+
+** OR **
+
+
 ```js
 import FileUpload from 'vue-upload-component/src'
 ```
 
-### webpack.config.js
+
+webpack.config.js
+
 ```js
 const nodeExternals = require('webpack-node-externals');
 {
@@ -137,33 +213,29 @@ const nodeExternals = require('webpack-node-externals');
 }
 ```
 
+* [https://github.com/liady/webpack-node-externals](https://github.com/liady/webpack-node-externals)  
 
-https://github.com/liady/webpack-node-externals
-
-* [**Official `vue-hackernews` demo**](https://github.com/lian-yue/vue-hackernews-2.0/)  
+* [**`vue-hackernews` demo**](https://github.com/lian-yue/vue-hackernews-2.0/)  
 
 * [**View changes**](https://github.com/lian-yue/vue-hackernews-2.0/commit/bd6c58a30cc6b8ba6c0148e737b3ce9336b99cf8)
 
 
-***
 
 
-
-## Props
-
+## Options / Props
 
 
-### inputId
+### input-id
+
+The `id` attribute of the input tag
+
 * **Type:** `String`
 
 * **Default:** `this.name`
 
-* **Description:**  
-  The `id` attribute of the input tag
-
 * **Usage:**
   ```html
-  <file-upload inputId="file2"></file-upload>
+  <file-upload input-id="file2"></file-upload>
   <!--Output-->
   <input id="file2" />
   ```
@@ -173,17 +245,17 @@ https://github.com/liady/webpack-node-externals
 
 
 ### name
+
+The `name` attribute of the input tag
+
 * **Type:** `String`
 
 * **Default:** `file`
 
-* **Description:**  
-  The `name` attribute of the input tag
-
 * **Usage:**
   ```html
   <file-upload name="file"></file-upload>
-  <!--输出-->
+  <!--Output-->
   <input name="file" />
   ```
 
@@ -192,12 +264,12 @@ https://github.com/liady/webpack-node-externals
 
 
 ### post-action
+
+`POST` Request upload URL
+
 * **Type:** `String`
 
 * **Default:** `undefined`
-
-* **Description:**  
-  `POST` Request upload URL
 
 * **Usage:**
   ```html
@@ -209,14 +281,18 @@ https://github.com/liady/webpack-node-externals
 
 
 ### put-action
+
+`PUT` Request upload URL
+
 * **Type:** `String`
 
 * **Default:** `undefined`
 
-* **Description:**  
-  `PUT` Request upload URL  
+* **Browser:** `> IE9`
+
+* **Details:**  
+
   `put-action` is not empty Please give priority to` PUT` request  
-  Required `html5` support
 
 * **Usage:**
   ```html
@@ -228,13 +304,14 @@ https://github.com/liady/webpack-node-externals
 
 
 ### headers
+
+Attach `header` data
+
 * **Type:** `Object`
 
 * **Default:** `{}`
 
-* **Description:**  
-  Attach `header` data  
-  Required `html5` support
+* **Browser:** `> IE9`
 
 * **Usage:**
   ```html
@@ -246,37 +323,39 @@ https://github.com/liady/webpack-node-externals
 
 
 ### data
+
+`POST request`:  Append request `body`  
+`PUT request`:  Append request `query`
+
 * **Type:** `Object`
 
 * **Default:** `{}`
 
-* **Description:**  
-  `POST request`:  Append request `body`  
-  `PUT request`:  Append request `query`
-
 * **Usage:**
   ```html
-  <file-upload :data="{'access_token': 'access_token'}"></file-upload>
+  <file-upload :data="{access_token: 'access_token'}"></file-upload>
   ```
 
 
 
 
-
 ### value, v-model
-* **Type:** `Array<Object>`
+
+File List
+
+* **Type:** `Array<File | Object>`
 
 * **Default:** `[]`
 
-* **Description:**  
-  File List  
-  **In order to prevent unpredictable errors, can not directly modify the `files`, please use [`add`](#add), [`update`](#update), [`remove`](#remove) method to modify**
+* **Details:**  
 
-* **[File object](#file)**
+  View **[`File`](#file)** details  
+  > In order to prevent unpredictable errors, can not directly modify the `files`, please use [`add`](#instance-methods-add), [`update`](#instance-methods-update), [`remove`](#instance-methods-remove) method to modify
 
 * **Usage:**
   ```html
   <file-upload :value="files" @input="updatetValue"></file-upload>
+  <!--or-->
   <file-upload v-model="files"></file-upload>
   ```
 
@@ -285,17 +364,19 @@ https://github.com/liady/webpack-node-externals
 
 
 ### accept
+
+The `accept` attribute of the input tag, MIME type  
+
 * **Type:** `String`
 
 * **Default:** `undefined`
 
-* **Description:**  
-  The `accept` attribute of the input tag, MIME type  
-  Required `html5` support  
+* **Browser:** `> IE9`
 
 * **Usage:**
   ```html
   <file-upload accept="image/png,image/gif,image/jpeg,image/webp"></file-upload>
+  <!--or-->
   <file-upload accept="image/*"></file-upload>
   ```
 
@@ -304,13 +385,16 @@ https://github.com/liady/webpack-node-externals
 
 
 ### multiple
+
+The `multiple` attribute of the input tag  
+Whether to allow multiple files to be selected  
+
 * **Type:** `Boolean`
 
 * **Default:** `false`
 
-* **Description:**  
-  The `multiple` attribute of the input tag  
-  Whether to allow multiple files to be selected  
+* **Details:**  
+
   If it is `false` file inside only one file will be automatically deleted
 
 * **Usage:**
@@ -321,15 +405,15 @@ https://github.com/liady/webpack-node-externals
 
 
 ### directory
+
+The `directory` attribute of the input tag  
+Whether it is a upload folder  
+
 * **Type:** `Boolean`
 
 * **Default:** `false`
 
-* **Description:**  
-  The `directory` attribute of the input tag  
-  Whether it is a upload folder  
-
-* **[View supported browsers](http://caniuse.com/#feat=input-file-directory)**
+* **Browser:** [http://caniuse.com/#feat=input-file-directory](http://caniuse.com/#feat=input-file-directory)
 
 * **Usage:**
   ```html
@@ -341,17 +425,19 @@ https://github.com/liady/webpack-node-externals
 
 
 ### extensions
+
+Allow upload file extensions  
+
 * **Type:** `Array | String | RegExp`
 
 * **Default:** `undefined`
 
-* **Description:**  
-  Allow upload file extensions  
-
 * **Usage:**
   ```html
   <file-upload extensions="jpg,gif,png,webp"></file-upload>
+  <!--or-->
   <file-upload :extensions="['jpg', 'gif', 'png', 'webp']"></file-upload>
+  <!--or-->
   <file-upload :extensions="/\.(gif|jpe?g|png|webp)$/i"></file-upload>
   ```
 
@@ -359,12 +445,18 @@ https://github.com/liady/webpack-node-externals
 
 
 ### size
+
+Allow the maximum byte to upload
+
 * **Type:** `Number`
 
 * **Default:** `0`
 
-* **Description:**  
-  Allow the maximum byte to upload
+* **Browser:** `> IE9`
+
+* **Details:**
+
+  `0` is equal to not limit
 
 * **Usage:**
   ```html
@@ -375,12 +467,14 @@ https://github.com/liady/webpack-node-externals
 
 
 ### timeout
+
+Upload timeout time in milliseconds
+
 * **Type:** `Number`
 
 * **Default:** `0`
 
-* **Description:**  
-  Upload timeout time in milliseconds
+* **Browser:** `> IE9`
 
 * **Usage:**
   ```html
@@ -391,13 +485,14 @@ https://github.com/liady/webpack-node-externals
 
 
 ### thread
+
+Also upload the number of files at the same time (number of threads)  
+
 * **Type:** `Number`
 
 * **Default:** `1`
 
-* **Description:**  
-  Also upload the number of files at the same time (number of threads)  
-  Required `html5` support
+* **Browser:** `> IE9`
 
 * **Usage:**
   ```html
@@ -409,16 +504,18 @@ https://github.com/liady/webpack-node-externals
 
 
 ### drop
+
+Drag and drop upload
+
 * **Type:** `Boolean | Element | CSS selector`
 
 * **Default:** `false`
 
-* **Description:**  
-  Drag and drop upload  
-  If set to `true`, read the parent component as a container  
-  Required `html5` support
+* **Browser:** [http://caniuse.com/#feat=dragndrop](http://caniuse.com/#feat=dragndrop)
 
-* **[View supported browsers](http://caniuse.com/#feat=dragndrop)**
+* **Details:**
+
+  If set to `true`, read the parent component as a container  
 
 * **Usage:**
   ```html
@@ -430,12 +527,15 @@ https://github.com/liady/webpack-node-externals
 
 
 ### drop-directory
+
+Whether to open the drag directory
+
 * **Type:** `Boolean`
 
 * **Default:** `true`
 
-* **Description:**  
-  Whether to open the drag directory  
+* **Details:**
+
   If set to `false` filter out the directory
 
 * **Usage:**
@@ -444,27 +544,28 @@ https://github.com/liady/webpack-node-externals
   ```
 
 
-***
 
 
+## Options / Events
 
-## Events
+The files is changed to trigger the method
+Default for `v-model` binding
 
 ### @input
 * **Arguments:**
-  * `files: Array<Object>`
 
-* **Description:**  
-  The files is changed to trigger the method  
-  Default for `v-model` binding
+  * `files: Array<File | Object>`
+
 
 * **Usage:**
   ```html
-  <file-upload :value="files" @input="updatetValue"></file-upload>
-  <file-upload v-model="files"></file-upload>
-  ```
-  ```js
-  {
+  <template>
+    <file-upload :value="files" @input="updatetValue"></file-upload>
+    <!--or-->
+    <file-upload v-model="files"></file-upload>
+  </template>
+  <script>
+  export default {
     data() {
       return {
         files: []
@@ -476,33 +577,44 @@ https://github.com/liady/webpack-node-externals
       }
     }
   }
+  </script>
   ```
 
 
 
 ### @input-filter
+
+Add, update, remove pre-filter  
+
 * **Arguments:**
-  * `newFile: Object | undefined`  `Read and write`
-  * `oldFile: Object | undefined`  `Read only`
-  * `prevent: Function`
 
-* **Description:**  
-  Add, update, remove pre-filter  
-  You can not use `update`,` add`, `remove`,` clear` methods in the event  
-  The `newFile` object can be modified within the event  
-  `prevent()` can prevent modification
+  * `newFile: File | Object | undefined`  `Read and write`
+  * `oldFile: File | Object | undefined`  `Read only`
+  * `prevent: Function`   Call this function to prevent modification
 
-* **Usage:**
+
+* **Details:**
+
+  If the `newFile` value is `undefined` 'is deleted
+  If the `oldFile` value is `undefined` 'is added
+  If `newFile`, `oldFile` is exist, it is updated
+
+
+  > You can not use `update`,` add`, `remove`,` clear` methods in the event  
+  >The `newFile` object can be modified within the event  
+
+* **Usage:**  
   ```html
-  <ul>
-    <li v-for="file in files">
-      <img :src="file.blob" width="50" height="50" />
-    </li>
-  </ul>
-  <file-upload :value="files" @input-filter="inputFilter"></file-upload>
-  ```
-  ```js
-  {
+  <template>
+    <ul>
+      <li v-for="file in files">
+        <img :src="file.blob" width="50" height="50" />
+      </li>
+    </ul>
+    <file-upload :value="files" @input-filter="inputFilter"></file-upload>
+  </template>
+  <script>
+  export default {
     data() {
       return {
         files: []
@@ -519,8 +631,7 @@ https://github.com/liady/webpack-node-externals
             return prevent()
           }
 
-
-          // Create the `blob` field for thumbnail preview
+          // Create the 'blob' field for thumbnail preview
           newFile.blob = ''
           let URL = window.URL || window.webkitURL
           if (URL && URL.createObjectURL) {
@@ -547,25 +658,37 @@ https://github.com/liady/webpack-node-externals
       }
     }
   }
+  </script>
   ```
 
 ### @input-file
-* **Arguments:**
-  * `newFile: Object | undefined` `Read only`
-  * `oldFile: Object | undefined` `Read only`
 
-* **Description:**  
-  Add, update, remove after  
-  You can use `update`,` add`, `remove`,` clear` methods in the event  
-  You can not modify the `newFile` object in the event  
-  You can not modify the `oldFile` object in the event
+Add, update, remove after
+
+* **Arguments:**
+
+  * `newFile: File | Object | undefined` `Read only`
+  * `oldFile: File | Object | undefined` `Read only`
+
+
+* **Details:**
+
+  If the `newFile` value is `undefined` 'is deleted
+  If the `oldFile` value is `undefined` 'is added
+  If `newFile`, `oldFile` is exist, it is updated
+
+
+  >You can use `update`,` add`, `remove`,` clear` methods in the event  
+  >You can not modify the `newFile` object in the event  
+  >You can not modify the `oldFile` object in the event
 
 * **Usage:**
   ```html
-  <file-upload ref="upload" v-model="files" @input-file="inputFile"></file-upload>
-  ```
-  ```js
-  {
+  <template>
+    <file-upload ref="upload" v-model="files" @input-file="inputFile"></file-upload>
+  </template>
+  <script>
+  export default {
     data() {
       return {
         files: []
@@ -616,8 +739,8 @@ https://github.com/liady/webpack-node-externals
 
           // Automatically delete files on the server
           if (oldFile.success && oldFile.response.id) {
-            // $.ajax({  
-            //   type: 'DELETE',  
+            // $.ajax({
+            //   type: 'DELETE',
             //   url: '/file/delete?id=' + oldFile.response.id,
             // });
           }
@@ -625,193 +748,22 @@ https://github.com/liady/webpack-node-externals
       }
     }
   }
+  </script>
   ```
 
 
 
-
-
-
-***
-
-
-
-
-
-
-
-## Methods
-
-
-### get
-* **Arguments:**
-  * `id: Object | String`      File object | file id
-
-* **Result：** `Object | Boolean` There is a return file object that otherwise returns `false`
-
-* **Description:**  
-  Use `id` to get a file object
-
-
-### add
-* **Arguments:**
-  * `files: Object | Array<Object> | window.File`     File object | file array (multiple) | window.File object
-  * `start: Boolean`                                  Whether it is inserted from the start position
-
-* **Result：** `Object | Array<Object> | Boolean`     The incoming array is returned to the array otherwise the object or `false`
-
-* **Description:**  
-  Add one or more files
-
-* **Usage:**
-  ```html
-  <ul>
-    <li v-for="file in files">
-      <span>{{file.name}}</span>
-    </li>
-  </ul>
-  <file-upload v-model="files"></file-upload>
-  <button type="button" @click.prevent="addText">Add a file</button>
-  ```
-  ```js
-  {
-    data() {
-      return {
-        files: []
-      }
-    },
-    methods: {
-      addText() {
-        let file = new File(['foo'], 'foo.txt', {
-          type: "text/plain",
-        })
-        this.$refs.upload.add(file)
-      }
-    }
-  }
-  ```
-
-
-###  addInputFile
-* **Arguments:**
-  * `files: HTMLInputElement`     File element
-
-* **Result：** `Array`   Added list of files
-
-* **Description:**  
-  Add the file selected by `<input type = "file">` to the upload list
-  Requires version >= `2.5.1`
-
-
-
-###  addDataTransfer
-* **Arguments:**
-  * `dataTransfer: DataTransfer`  Drag or paste data
-
-* **Result：** `Promise<Array>`   Added list of files
-
-* **Description:**  
-  Add files that are dragged or pasted into the upload list  
-  Requires version >= `2.5.1`
-
-
-
-
-### update
-* **Arguments:**
-  * `id: Object | String`        File object | file id
-  * `data: Object`               Updated data object
-
-* **Result：**  `Object | Boolean`  Successfully returned `newFile` failed to return` false`
-
-* **Description:**  
-  Update a file object
-
-* **Usage:**
-  ```html
-  <ul>
-    <li v-for="file in files">
-      <span>{{file.name}}</span>
-      <button v-show="file.active" type="button" @click.prevent="abort(file)">Abort</button>
-    </li>
-  </ul>
-  <file-upload v-model="files"></file-upload>
-  ```
-  ```js
-  {
-    data() {
-      return {
-        files: []
-      }
-    },
-    methods: {
-      abort(file) {
-        this.$refs.upload.update(file, {active: false})
-
-        // or
-        // this.$refs.upload.update(file, {error: 'abort'})
-      }
-    }
-  }
-  ```
-
-### remove
-* **Arguments:**
-  * `id: Object | String`       File object | file id
-
-* **Result：**  `Object | Boolean`  Successfully returned `oldFile` failed to return` false`
-
-* **Description:**  
-  Remove a file object
-
-* **Usage:**
-  ```html
-  <ul>
-    <li v-for="file in files">
-      <span>{{file.name}}</span>
-      <button type="button" @click.prevent="remove(file)">Remove</button>
-    </li>
-  </ul>
-  <file-upload v-model="files"></file-upload>
-  ```
-  ```js
-  {
-    data() {
-      return {
-        files: []
-      }
-    },
-    methods: {
-      remove(file) {
-        this.$refs.upload.remove(file)
-      }
-    }
-  }
-  ```
-
-
-### clear
-* **Result：**  `Boolean`  Always return `true`
-
-* **Description:**  
-  Empty the file list
-
-
-***
-
-## Component Data data
-
+## Instance / Data
 
 ### features
+
+Used to determine the browser support features
+
 * **Type:** `Object`
 
 * **Read only:** `true`
 
-* **Default:** `{html5: true, directory: false, drag: false}`
-
-* **Description:**  
-  Used to determine the browser support features
-
+* **Default:** `{ html5: true, directory: false, drag: false }`
 
 * **Usage:**
   ```html
@@ -826,152 +778,354 @@ https://github.com/liady/webpack-node-externals
 
 
 ### active
-  * **Type:** `Boolean`
 
-  * **Read only:** `false`
+Activation or abort upload
 
-  * **Default:** `false`
-
-  * **Description:**  
-    Activation or abort upload
-
-  * **Usage:**
-    ```html
-    <app>
-      <file-upload ref="upload"></file-upload>
-      <span v-if="!$refs.upload || !$refs.upload.active" @click="$refs.upload.active = true">Start upload</span>
-      <span v-else @click="$refs.upload.active = false">Stop upload</span>
-    </app>
-    ```
-
-
-
-### dropActive
-  * **Type:** `Boolean`
-
-  * **Read only:** `true`
-
-  * **Default:** `false`
-
-  * **Description:**  
-    Is dragging
-
-  * **Usage:**
-    ```html
-    <app>
-      <file-upload ref="upload" :drop="true"></file-upload>
-      <span v-show="$refs.upload && $refs.upload.dropActive">Drag and drop here for upload<span>
-    </app>
-    ```
-
-
-
-
-
-### uploaded
-  * **Type:** `Boolean`
-
-  * **Read only:** `true`
-
-  * **Default:** `true`
-
-  * **Description:**  
-    All uploaded
-
-  * **Usage:**
-    ```html
-    <app>
-      <file-upload ref="upload"></file-upload>
-      <span v-show="$refs.upload && $refs.upload.uploaded">All files have been uploaded<span>
-    </app>
-    ```
-
-
-
-
-
-
-***
-
-
-
-
-## File
-
-> **File object in the `input-filter` event outside the use of [`update`] (#update) method**
-
-
-### id
-* **Type:** `String | Number`
-
-* **Read only:** `true`
-
-* **Default:** `Math.random().toString(36).substr(2)`
-
-* **Description:**  
-  File ID
-
-
-
-
-### size
-* **Type:** `Number`
-
-* **Read only:** `false`
-
-* **Default:** `-1`
-
-* **Description:**  
-  File size
-
-  Required `html5` support
-
-
-
-### name
-* **Type:** `String`
-
-* **Read only:** `false`
-
-* **Default:** ` `
-
-* **Description:**  
-  Filename  
-
-  Format:  
-  `directory/filename.gif`  
-  `filename.gif`  
-
-
-
-### type
-* **Type:** `String`
-
-* **Read only:** `false`
-
-* **Default:** `empty`
-
-* **Description:**  
-  MIME type
-
-  Format:  
-  `image/gif`  
-  `image/png`  
-  `text/html`
-
-  Required `html5` support
-
-
-
-### active
 * **Type:** `Boolean`
 
 * **Read only:** `false`
 
 * **Default:** `false`
 
-* **Description:**  
-  Activation or abort upload
+* **Usage:**
+  ```html
+  <app>
+    <file-upload ref="upload"></file-upload>
+    <span v-if="!$refs.upload || !$refs.upload.active" @click="$refs.upload.active = true">Start upload</span>
+    <span v-else @click="$refs.upload.active = false">Stop upload</span>
+  </app>
+  ```
+
+
+
+### dropActive
+
+Is dragging
+
+* **Type:** `Boolean`
+
+* **Read only:** `true`
+
+* **Default:** `false`
+
+* **Usage:**
+  ```html
+  <app>
+    <file-upload ref="upload" :drop="true"></file-upload>
+    <span v-show="$refs.upload && $refs.upload.dropActive">Drag and drop here for upload<span>
+  </app>
+  ```
+
+
+
+
+
+### uploaded
+
+All uploaded
+
+* **Type:** `Boolean`
+
+* **Read only:** `true`
+
+* **Default:** `true`
+
+* **Usage:**
+  ```html
+  <app>
+    <file-upload ref="upload"></file-upload>
+    <span v-show="$refs.upload && $refs.upload.uploaded">All files have been uploaded<span>
+  </app>
+  ```
+
+
+
+
+
+## Instance / Methods
+
+
+
+### get()
+
+Use `id` to get a file object
+
+* **Arguments:**
+
+  * `id: File | Object | String`
+
+
+* **Result:** `File | Object | Boolean` There is a return file, object that otherwise returns `false`
+
+
+
+### add()
+
+Add one or more files
+
+* **Arguments:**
+
+  * `files: Array<File | window.File | Object> | File | window.File | Object`     If it is an array of responses will be an array
+  * `start: Boolean`                                  Whether it is inserted from the start position
+
+
+* **Result:** `Object | Array<File | Object> | Boolean`     The incoming array is returned to the array otherwise the object or `false`
+
+* **Usage:**
+  ```html
+  <template>
+    <ul>
+      <li v-for="file in files">
+        <span>{{file.name}}</span>
+      </li>
+    </ul>
+    <file-upload v-model="files"></file-upload>
+    <button type="button" @click.prevent="addText">Add a file</button>
+  </template>
+  <script>
+  export default {
+    data() {
+      return {
+        files: []
+      }
+    },
+    methods: {
+      addText() {
+        let file = new window.File(['foo'], 'foo.txt', {
+          type: "text/plain",
+        })
+        this.$refs.upload.add(file)
+      }
+    }
+  }
+  </script>
+  ```
+
+
+###  addInputFile()
+
+Add the file selected by `<input type = "file">` to the upload list
+
+* **Arguments:**
+
+  * `el: HTMLInputElement`     File element
+
+
+* **Result:** `Array<File>`  Added list of files
+
+* **Version:** : `>=2.5.1`
+
+
+
+###  addDataTransfer()
+
+Add files that are dragged or pasted into the upload list  
+
+* **Arguments:**
+
+  * `dataTransfer: DataTransfer`  Drag or paste data
+
+
+* **Result:** `Promise<Array<File>>`   Added list of files
+
+
+* **Version:** : `>=2.5.1`
+
+
+
+### update()
+
+Update a file object
+
+* **Arguments:**
+
+  * `id: File | Object | String`
+  * `data: Object`                    Updated data object
+
+
+* **Result:**  `Object | Boolean`  Successfully returned `newFile` failed to return` false`
+
+
+* **Usage:**
+  ```html
+  <template>
+    <ul>
+      <li v-for="file in files">
+        <span>{{file.name}}</span>
+        <button v-show="file.active" type="button" @click.prevent="abort(file)">Abort</button>
+      </li>
+    </ul>
+    <file-upload v-model="files"></file-upload>
+  </template>
+  <script>
+  export default {
+    data() {
+      return {
+        files: []
+      }
+    },
+    methods: {
+      abort(file) {
+        this.$refs.upload.update(file, {active: false})
+        // or
+        // this.$refs.upload.update(file, {error: 'abort'})
+      }
+    }
+  }
+  </script>
+  ```
+
+### remove()
+
+Remove a file object
+
+* **Arguments:**
+
+  * `id: File | Object | String`
+
+
+* **Result:**  `Object | Boolean`  Successfully returned `oldFile` failed to return` false`
+
+* **Usage:**
+  ```html
+  <template>
+    <ul>
+      <li v-for="file in files">
+        <span>{{file.name}}</span>
+        <button type="button" @click.prevent="remove(file)">Remove</button>
+      </li>
+    </ul>
+    <file-upload v-model="files"></file-upload>
+  </template>
+  <script>
+  export default {
+    data() {
+      return {
+        files: []
+      }
+    },
+    methods: {
+      remove(file) {
+        this.$refs.upload.remove(file)
+      }
+    }
+  }
+  </script>
+  ```
+
+
+### clear()
+
+Empty the file list
+
+* **Result:**  `Boolean`  Always return `true`
+
+
+
+## Instance / File
+
+
+
+> **File object in the `@input-filter` event outside the use of [`update`](#instance-methods-update) method**
+
+
+
+
+### fileObject
+
+* **Type:** `Boolean`
+
+* **Read only:** `true`
+
+* **Required:** `true`
+
+* **Default:** `true`
+
+* **Version:** : `>=2.6.0`
+
+* **Details:**
+
+  If the attribute does not exist, the object will not be processed internally  
+  If the attribute does not exist, it is not `File` but `Object`
+
+
+
+
+### id
+
+File ID
+
+* **Type:** `String | Number`
+
+* **Read only:** `false`
+
+* **Default:** `Math.random().toString(36).substr(2)`
+
+* **Details:**
+
+  >`id` can not be repeated  
+  >Upload can not modify `id`
+
+
+### size
+
+File size
+
+* **Type:** `Number`
+
+* **Read only:** `false`
+
+* **Default:** `-1`
+
+* **Browser:** `> IE9`
+
+
+### name
+
+Filename  
+
+* **Type:** `String`
+
+* **Read only:** `false`
+
+* **Default:** ` `
+
+* **Details:**
+
+  Format:  `directory/filename.gif`  `filename.gif`  
+
+
+
+### type
+
+MIME type
+
+* **Type:** `String`
+
+* **Read only:** `false`
+
+* **Default:** ` `
+
+* **Browser:** `> IE9`
+
+* **Details:**
+
+  Format:  `image/gif`   `image/png`  `text/html`
+
+
+
+
+### active
+
+Activation or abort upload
+
+* **Type:** `Boolean`
+
+* **Read only:** `false`
+
+* **Default:** `false`
+
+* **Details:**
 
   `true` = Upload  
   `false` = Abort  
@@ -982,14 +1136,16 @@ https://github.com/liady/webpack-node-externals
 
 
 ### error
+
+Upload failed error code
+
 * **Type:** `String`
 
 * **Read only:** `false`
 
 * **Default:** ` `
 
-* **Description:**  
-  Upload failed error code
+* **Details:**
 
   Built-in  
   `size`, `extension`, `timeout`, `abort`, `network`, `server`, `denied`
@@ -998,138 +1154,139 @@ https://github.com/liady/webpack-node-externals
 
 
 ### success
+
+Whether the upload was successful
+
 * **Type:** `Boolean`
 
 * **Read only:** `false`
 
 * **Default:** `false`
 
-* **Description:**  
-  Whether the upload was successful
-
-
 
 ### putAction
+
+Customize the current file `PUT` URL
+
 * **Type:** `String`
 
 * **Read only:** `false`
 
 * **Default:** `this.putAction`
 
-* **Description:**  
-  Customize the current file `PUT` URL
-
 
 
 ### postAction
+
+Customize the current file `POST` URL
+
 * **Type:** `String`
 
 * **Read only:** `false`
 
 * **Default:** `this.postAction`
 
-* **Description:**  
-  Customize the current file `POST` URL
-
-
 
 
 
 ### headers
+
+Customize the current file `HTTP` Header
+
 * **Type:** `Object`
 
 * **Read only:** `false`
 
 * **Default:** `this.headers`
 
-* **Description:**  
-  Customize the current file `HTTP` Header
-
-
 
 ### data
+
+Customize the current file `body` or` query` to attach content
+
 * **Type:** `Object`
 
 * **Read only:** `false`
 
 * **Default:** `this.data`
 
-* **Description:**  
-  Customize the current file `body` or` query` to attach content
-
-
 
 ### timeout
+
+Customize the upload timeout for a current single file
+
 * **Type:** `Number`
 
 * **Read only:** `false`
 
-* **Default:** `0`
-
-* **Description:**  
-  Customize the upload timeout for a current single file
-
-
+* **Default:** `this.timeout`
 
 
 ### response
+
+Response data
+
 * **Type:** `Object | String`
 
 * **Read only:** `false`
 
 * **Default:** `{}`
 
-* **Description:**  
-  Response data
-
 
 
 
 ### progress
+
+Upload progress
+
 * **Type:** `String`
 
 * **Read only:** `true`
 
 * **Default:** `0.00`
 
-* **Description:**  
-  Upload progress
-
+* **Browser:** `> IE9`
 
 
 
 ### speed
+
+Per second upload speed
+
 * **Type:** `Number`
 
 * **Read only:** `true`
 
 * **Default:** `0`
 
-* **Description:**  
-  Per second upload speed
+* **Browser:** `> IE9`
 
 
 
 
 ### xhr
+
+`HTML5` upload` XMLHttpRequest` object
+
 * **Type:** `XMLHttpRequest`
 
 * **Read only:** `true`
 
 * **Default:** `undefined`
 
-* **Description:**  
-  `HTML5` upload` XMLHttpRequest` object
+* **Browser:** `> IE9`
 
 
 
 
 ### iframe
+
+`HTML4` upload` iframe` element
+
 * **Type:** `Element`
 
 * **Read only:** `true`
 
 * **Default:** `undefined`
 
-* **Description:**  
-  `HTML4` upload` iframe` element
+* **Browser:** `= IE9`

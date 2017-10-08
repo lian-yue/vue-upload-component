@@ -7,7 +7,6 @@
     @change="change"
     :webkitdirectory="$parent.directory && $parent.features.directory"
     :directory="$parent.directory && $parent.features.directory"
-    :allowdir="$parent.directory && $parent.features.directory"
     :multiple="$parent.multiple && $parent.features.html5"
   />
 </template>
@@ -17,6 +16,7 @@ export default {
     change(e) {
       this.$destroy()
       this.$parent.addInputFile(e.target)
+      // eslint-disable-next-line
       new this.constructor({
         parent: this.$parent,
         el: this.$el,

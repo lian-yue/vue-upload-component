@@ -1,82 +1,195 @@
-var path = require('path')
-var webpack = require('webpack')
+const path              = require('path')
+const merge             = require('webpack-merge')
+const webpack           = require('webpack')
 
-module.exports = {
+const packageInfo       = require('./package')
+
+process.env.NODE_ENV = process.env.NODE_ENV || 'production'
+
+const isDev = process.env.NODE_ENV === 'development'
+
+
+function baseConfig() {
+  let config = {
+    output: {
+      path: path.join(__dirname, 'dist'),
+      publicPath: '/dist',
+      filename: '[name].js',
+      chunkFilename: '[chunkhash:8].[name].chunk.js',
+    },
+
+    resolve: {
+      modules: [
+        path.join(__dirname, 'node_modules'),
+      ],
+
+      alias: {
+        'vue-upload-component': path.join(__dirname, 'src'),
+      },
+
+      extensions: [
+        '.js',
+        '.jsx',
+        '.json',
+        '.vue',
+        '.md',
+      ],
+    },
+
+
+    externals: {
+      vue: 'Vue',
+      vuex: 'Vuex',
+      'vue-router': 'VueRouter',
+      'vue-i18n': 'VueI18n',
+      'marked': 'marked',
+      'highlight.js': 'hljs',
+      'cropperjs': 'Cropper',
+    },
+
+
+    module: {
+      rules: [
+        {
+          test: /\.jsx?$/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                presets: [
+                  [
+                    'env',
+                    {
+                      modules: false
+                    }
+                  ],
+                  'stage-0',
+                ],
+                plugins: [
+                  [
+                    'transform-runtime',
+                    {
+                      helpers: false,
+                      polyfill: false,
+                      regenerator: true,
+                      moduleName: 'babel-runtime'
+                    }
+                  ]
+                ],
+
+                cacheDirectory: isDev
+              },
+            },
+            {
+              loader: 'eslint-loader',
+            },
+          ],
+        },
+        {
+          test: /\.(md|txt)$/,
+          use: [
+            {
+              loader: 'raw-loader',
+            },
+          ]
+        },
+        {
+          test: /\.vue$/,
+          use: [
+            {
+              loader: 'vue-loader',
+              options: {
+                preserveWhitespace: false,
+                loaders: {
+                  js: [
+                    {
+                      loader: 'babel-loader',
+                      options: {
+                        presets: [
+                          [
+                            'env',
+                            {
+                              modules: false
+                            }
+                          ],
+                          'stage-0'
+                        ],
+                        cacheDirectory: isDev
+                      }
+                    },
+                  ],
+                }
+              },
+            },
+            {
+              loader: 'eslint-loader',
+            },
+          ]
+        }
+      ]
+    },
+
+    plugins: [
+      new webpack.BannerPlugin(`Name: ${packageInfo.name}\nVersion: ${packageInfo.version}\nAuthor: ${packageInfo.author}`),
+    ],
+    devtool: isDev ? 'eval-source-map' : 'source-map'
+  }
+
+  if (isDev) {
+    config.plugins.push(new webpack.HotModuleReplacementPlugin())
+  }
+  return config
+}
+
+
+
+module.exports = merge(baseConfig(), {
   entry: {
-    example: ['./example'],
+    index: [
+      path.join(__dirname, 'docs/index.js'),
+    ],
   },
 
   output: {
-    path: './dist',
-    publicPath: '/dist/',
-    filename: "[name].js",
-    // target: 'node',
-  },
-
-
-  resolve: {
-    root: path.join(__dirname, 'node_modules'),
-    extensions: ['', '.js', '.vue', '.json'],
-  },
-
-  externals: {
-    vue: 'Vue',
-    vuex: 'Vuex',
-  },
-
-  module: {
-    loaders: [
-      {
-        test: /\.vue$/,
-        loader: 'vue'
-      },
-      {
-        test: /\.js$/,
-        loader: 'babel',
-        exclude: /node_modules/
-      },
-      {
-        test: /\.json$/,
-        loader: 'json'
-      },
-      {
-        test: /\.html$/,
-        loader: 'vue-html'
-      },
-      {
-        test: /\.(png|jpg|gif|svg)$/,
-        loader: 'url',
-        query: {
-          limit: 10000,
-          name: '[name].[ext]?[hash]'
-        }
-      }
-    ]
-  },
-
-  babel: {
-    presets: ['es2015', 'stage-0'],
-    plugins: ['transform-runtime'],
+    path: path.join(__dirname, 'docs/dist'),
   },
 
   devServer: {
-    // host: '172.16.23.1',
-    historyApiFallback: true,
-    noInfo: true
-  },
-  devtool: 'eval-source-map'
-}
-
-if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = 'source-map'
-  // http://vuejs.github.io/vue-loader/workflow/production.html
-  module.exports.plugins = (module.exports.plugins || []).concat([
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: '"production"'
+    before(app) {
+      let id = 1000000
+      let put = function (req, res) {
+        setTimeout(function () {
+          let rand = Math.random()
+          if (rand <= 0.1) {
+            res.status(500)
+            res.json({ error: 'server', success: false })
+          } else if (rand <= 0.25) {
+            res.status(403)
+            res.json({ error: 'failure', success: false })
+          } else {
+            res.json({ name: 'filename.ext', id: id++, success: true })
+          }
+        }, 200 + parseInt(Math.random() * 4000, 10))
       }
-    }),
-
-    new webpack.optimize.OccurenceOrderPlugin()
-  ])
-}
+      let del = function (req, res) {
+        res.json({ success: true })
+      }
+      app.post('/upload/post', put)
+      app.put('/upload/put', put)
+      app.post('/upload/delete', del)
+      app.delete('/upload/delete', del)
+    },
+    hot: true,
+    contentBase: path.join(__dirname, 'docs'),
+    clientLogLevel: 'error',
+    noInfo: true,
+    publicPath: '/dist',
+    inline: true,
+    historyApiFallback: true,
+    overlay: {
+      warnings: true,
+      errors: true
+    },
+    // host: '172.16.23.1'
+  },
+})
