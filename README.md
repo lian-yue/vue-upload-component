@@ -1,5 +1,5 @@
 # vue-upload-component
-[![npm](https://img.shields.io/npm/dm/vue-upload-component.svg?style=flat-square)](https://www.npmjs.com/package/vue-upload-component) [![npm](https://img.shields.io/npm/v/vue-upload-component.svg?style=flat-square)](https://www.npmjs.com/package/vue-upload-component) [![license](https://img.shields.io/github/license/lian-yue/vue-upload-component.svg?style=flat-square)](https://www.npmjs.com/package/vue-upload-component)
+[![npm](https://img.shields.io/npm/dm/vue-upload-component.svg?style=flat-square)](https://www.npmjs.com/package/vue-upload-component)  [![npm](https://img.shields.io/npm/v/vue-upload-component.svg?style=flat-square)](https://www.npmjs.com/package/vue-upload-component)  [![license](https://img.shields.io/github/license/lian-yue/vue-upload-component.svg?style=flat-square)](https://www.npmjs.com/package/vue-upload-component)  [![gzip](http://img.badgesize.io/lian-yue/vue-upload-component/master/dist/vue-upload-component.min.js.svg?compression=gzip&style=flat-square)](https://github.com/lian-yue/vue-upload-component)
 
 
 > Vue.js file upload component
