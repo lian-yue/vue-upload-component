@@ -279,7 +279,7 @@
   </div>
 
   <div class="pt-5">
-    Source code: <a href="https://github.com/lian-yue/vue-upload-component/tree/2.0/docs/views/examples/Full.vue">https://github.com/lian-yue/vue-upload-component/tree/2.0/docs/views/examples/Full.vue</a>
+    Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Full.vue">https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Full.vue</a>
   </div>
 
 </div>
