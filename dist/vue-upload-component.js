@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.6.0-beta.1
+ * Version: 2.6.0-beta.2
  * Author: LianYue
  */
 (function (global, factory) {

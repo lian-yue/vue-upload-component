@@ -114,6 +114,17 @@ function baseConfig() {
                           ],
                           'stage-0'
                         ],
+                        plugins: [
+                          [
+                            'transform-runtime',
+                            {
+                              helpers: false,
+                              polyfill: false,
+                              regenerator: true,
+                              moduleName: 'babel-runtime'
+                            }
+                          ]
+                        ],
                         cacheDirectory: isDev
                       }
                     },
