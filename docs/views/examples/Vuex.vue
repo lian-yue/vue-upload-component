@@ -38,8 +38,7 @@
       </div>
     </div>
     <div class="pt-5">
-      Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Vuex.vue">https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Vuex.vue</a><br/>
-      <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/store.js">https://github.com/lian-yue/vue-upload-component/blob/master/docs/store.js</a>
+      Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Vuex.vue">/docs/views/examples/Vuex.vue</a>, <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/store.js">/docs/store.js</a>
     </div>
   </div>
 </template>

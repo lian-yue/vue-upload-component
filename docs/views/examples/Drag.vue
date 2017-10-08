@@ -49,7 +49,7 @@
     </div>
 
     <div class="pt-5">
-      Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Drag.vue">https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Drag.vue</a>
+      Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Drag.vue">/docs/views/examples/Drag.vue</a>
     </div>
   </div>
 </template>

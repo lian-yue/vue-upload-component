@@ -39,7 +39,7 @@
       </div>
     </div>
     <div class="pt-5">
-      Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Simple.vue">https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Simple.vue</a>
+      Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Simple.vue">/docs/views/examples/Simple.vue</a>
     </div>
   </div>
 </template>

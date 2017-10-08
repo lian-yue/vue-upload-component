@@ -70,7 +70,7 @@
       </div>
     </div>
     <div class="pt-5">
-      Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Multiple.vue">https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Multiple.vue</a>
+      Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Multiple.vue">/docs/views/examples/Multiple.vue</a>
     </div>
   </div>
 </template>

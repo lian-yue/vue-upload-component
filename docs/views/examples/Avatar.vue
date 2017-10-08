@@ -37,7 +37,7 @@
       </div>
     </div>
     <div class="pt-5">
-      Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Avatar.vue">https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Avatar.vue</a>
+      Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Avatar.vue">/docs/views/examples/Avatar.vue</a>
     </div>
   </div>
 </template>
