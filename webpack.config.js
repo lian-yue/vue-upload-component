@@ -178,7 +178,7 @@ module.exports = merge(baseConfig(), {
             res.status(403)
             res.json({ error: 'failure', success: false })
           } else {
-            res.json({ name: 'filename.ext', id: id++, success: true })
+            res.json({ url: 'https://vuejs.org/images/logo.png?id=' + id, name: 'filename.ext', id: id++, success: true })
           }
         }, 200 + parseInt(Math.random() * 4000, 10))
       }

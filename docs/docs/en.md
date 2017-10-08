@@ -1241,7 +1241,7 @@ Upload progress
 
 * **Type:** `String`
 
-* **Read only:** `true`
+* **Read only:** `false`
 
 * **Default:** `0.00`
 

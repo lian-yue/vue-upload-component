@@ -4,7 +4,7 @@
     <i class="fa fa-cog" aria-hidden="true"></i>
     Options
   </button>
-  <h1 id="document-title" class="document-title">Full Example</h1>
+  <h1 id="example-title" class="example-title">Full Example</h1>
 
   <div v-show="$refs.upload && $refs.upload.dropActive" class="drop-active">
 		<h3>Drop files to upload</h3>
@@ -82,7 +82,8 @@
         Drop active: {{$refs.upload ? $refs.upload.dropActive : false}}
       </div>
       <div class="btn-group">
-        <file-upload class="btn btn-primary dropdown-toggle"
+        <file-upload
+          class="btn btn-primary dropdown-toggle"
           :post-action="postAction"
           :put-action="putAction"
           :extensions="extensions"

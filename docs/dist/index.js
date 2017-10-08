@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.6.0-beta.2
+ * Version: 2.6.0-beta.3
  * Author: LianYue
  */
 /******/ (function(modules) { // webpackBootstrap
@@ -65,7 +65,7 @@
 /******/ 	__webpack_require__.p = "/dist";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 7);
+/******/ 	return __webpack_require__(__webpack_require__.s = 11);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -264,7 +264,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
   ) }
 }
 
-var listToStyles = __webpack_require__(23)
+var listToStyles = __webpack_require__(26)
 
 /*
 type StyleObject = {
@@ -467,19 +467,31 @@ function applyToTag (styleElement, obj) {
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(39);
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports) {
 
 module.exports = marked;
 
 /***/ }),
-/* 4 */
+/* 5 */
+/***/ (function(module, exports) {
+
+module.exports = Vuex;
+
+/***/ }),
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_i18n__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_i18n__ = __webpack_require__(18);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_i18n___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue_i18n__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__en__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__zh_cn__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__en__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__zh_cn__ = __webpack_require__(20);
 // import Vue from 'vue'
 
 
@@ -496,40 +508,52 @@ module.exports = marked;
 }));
 
 /***/ }),
-/* 5 */
-/***/ (function(module, exports) {
-
-module.exports = "\n> **The document uses Google Translate**\n\n## Getting Started\n\n### NPM\n\n``` bash\nnpm install vue-upload-component --save\n```\n\n``` js\nconst VueUploadComponent = require('vue-upload-component')\nVue.component('file-upload', VueUploadComponent)\n```\n\n### Curated\n\n**No data**\n\n\n### Script\n\n\nunpkg\n\n``` html\n<script src=\"https://unpkg.com/vue\"></script>\n<script src=\"https://unpkg.com/vue-upload-component\"></script>\n<script>\nVue.component('file-upload', VueUploadComponent)\n</script>\n```\n\njsDelivr\n\n``` html\n<script src=\"https://cdn.jsdelivr.net/npm/vue/dist/vue.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/vue-upload-component\"></script>\n<script>\nVue.component('file-upload', VueUploadComponent)\n</script>\n```\n\n\n### Simple example\n\n\n\n```html\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <title>Vue-upload-component Test</title>\n  <script src=\"https://unpkg.com/vue\"></script>\n  <script src=\"https://unpkg.com/vue-upload-component\"></script>\n</head>\n<body>\n<div id=\"app\">\n  <ul>\n    <li v-for=\"file in files\">{{file.name}} - Error: {{file.error}}, Success: {{file.success}}</li>\n  </ul>\n  <file-upload\n    ref=\"upload\"\n    v-model=\"files\"\n    post-action=\"/post.method\"\n    put-action=\"/put.method\"\n    @input-file=\"inputFile\"\n    @input-filter=\"inputFilter\"\n  >\n  Upload file\n  </file-upload>\n  <button v-show=\"!$refs.upload || !$refs.upload.active\" @click.prevent=\"$refs.upload.active = true\" type=\"button\">Start upload</button>\n  <button v-show=\"$refs.upload && $refs.upload.active\" @click.prevent=\"$refs.upload.active = false\" type=\"button\">Stop upload</button>\n</div>\n<script>\nnew Vue({\n  el: '#app',\n  data: function () {\n    return {\n      files: []\n    }\n  },\n  components: {\n    FileUpload: VueUploadComponent\n  },\n  methods: {\n    /**\n     * Has changed\n     * @param  Object|undefined   newFile   Read only\n     * @param  Object|undefined   oldFile   Read only\n     * @return undefined\n     */\n    inputFile: function (newFile, oldFile) {\n      if (newFile && oldFile && !newFile.active && oldFile.active) {\n        // Get response data\n        console.log('response', newFile.response)\n        if (newFile.xhr) {\n          //  Get the response status code\n          console.log('status', newFile.xhr.status)\n        }\n      }\n    },\n    /**\n     * Pretreatment\n     * @param  Object|undefined   newFile   Read and write\n     * @param  Object|undefined   oldFile   Read only\n     * @param  Function           prevent   Prevent changing\n     * @return undefined\n     */\n    inputFilter: function (newFile, oldFile, prevent) {\n      if (newFile && !oldFile) {\n        // Filter non-image file\n        if (!/\\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {\n          return prevent()\n        }\n      }\n\n      // Create a blob field\n      newFile.blob = ''\n      let URL = window.URL || window.webkitURL\n      if (URL && URL.createObjectURL) {\n        newFile.blob = URL.createObjectURL(newFile.file)\n      }\n    }\n  }\n});\n</script>\n</body>\n</html>\n```\n\n\n\n### SSR (Server isomorphism)\n\n\n```html\n<template>\n  <file-upload v-model=\"files\" post-action=\"/\">Upload file</file-upload>\n</template>\n<style>\n/*\nimport '~vue-upload-component/dist/vue-upload-component.part.css'\n\n\nor\n\n\n */\n.file-uploads {\n  overflow: hidden;\n  position: relative;\n  text-align: center;\n  display: inline-block;\n}\n.file-uploads.file-uploads-html4 input[type=\"file\"] {\n  opacity: 0;\n  font-size: 20em;\n  z-index: 1;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n}\n.file-uploads.file-uploads-html5 input[type=\"file\"] {\n  overflow: hidden;\n  position: fixed;\n  width: 1px;\n  height: 1px;\n  z-index: -1;\n  opacity: 0;\n}\n</style>\n<script>\nimport FileUpload from 'vue-upload-component/dist/vue-upload-component.part.js'\nexport default {\n  components: {\n    FileUpload,\n  },\n  data() {\n    return {\n      files: []\n    }\n  },\n}\n</script>\n```\n\n\n** OR **\n\n\n```js\nimport FileUpload from 'vue-upload-component/src'\n```\n\n\nwebpack.config.js\n\n```js\nconst nodeExternals = require('webpack-node-externals');\n{\n  //.....\n  externals: [\n    nodeExternals({whitelist:[/^vue-upload-component\\/src/]})\n  ]\n  //.....\n}\n```\n\n* [https://github.com/liady/webpack-node-externals](https://github.com/liady/webpack-node-externals)  \n\n* [**`vue-hackernews` demo**](https://github.com/lian-yue/vue-hackernews-2.0/)  \n\n* [**View changes**](https://github.com/lian-yue/vue-hackernews-2.0/commit/bd6c58a30cc6b8ba6c0148e737b3ce9336b99cf8)\n\n\n\n\n## Options / Props\n\n\n### input-id\n\nThe `id` attribute of the input tag\n\n* **Type:** `String`\n\n* **Default:** `this.name`\n\n* **Usage:**\n  ```html\n  <file-upload input-id=\"file2\"></file-upload>\n  <!--Output-->\n  <input id=\"file2\" />\n  ```\n\n\n\n\n\n### name\n\nThe `name` attribute of the input tag\n\n* **Type:** `String`\n\n* **Default:** `file`\n\n* **Usage:**\n  ```html\n  <file-upload name=\"file\"></file-upload>\n  <!--Output-->\n  <input name=\"file\" />\n  ```\n\n\n\n\n\n### post-action\n\n`POST` Request upload URL\n\n* **Type:** `String`\n\n* **Default:** `undefined`\n\n* **Usage:**\n  ```html\n  <file-upload put-action=\"/upload/put.php\"></file-upload>\n  ```\n\n\n\n\n\n### put-action\n\n`PUT` Request upload URL\n\n* **Type:** `String`\n\n* **Default:** `undefined`\n\n* **Browser:** `> IE9`\n\n* **Details:**  \n\n  `put-action` is not empty Please give priority to` PUT` request  \n\n* **Usage:**\n  ```html\n  <file-upload put-action=\"/upload/put.php\"></file-upload>\n  ```\n\n\n\n\n\n### headers\n\nAttach `header` data\n\n* **Type:** `Object`\n\n* **Default:** `{}`\n\n* **Browser:** `> IE9`\n\n* **Usage:**\n  ```html\n  <file-upload :headers=\"{'X-Token-CSRF': 'code'}\"></file-upload>\n  ```\n\n\n\n\n\n### data\n\n`POST request`:  Append request `body`  \n`PUT request`:  Append request `query`\n\n* **Type:** `Object`\n\n* **Default:** `{}`\n\n* **Usage:**\n  ```html\n  <file-upload :data=\"{access_token: 'access_token'}\"></file-upload>\n  ```\n\n\n\n\n### value, v-model\n\nFile List\n\n* **Type:** `Array<File | Object>`\n\n* **Default:** `[]`\n\n* **Details:**  \n\n  View **[`File`](#file)** details  \n  > In order to prevent unpredictable errors, can not directly modify the `files`, please use [`add`](#instance-methods-add), [`update`](#instance-methods-update), [`remove`](#instance-methods-remove) method to modify\n\n* **Usage:**\n  ```html\n  <file-upload :value=\"files\" @input=\"updatetValue\"></file-upload>\n  <!--or-->\n  <file-upload v-model=\"files\"></file-upload>\n  ```\n\n\n\n\n\n### accept\n\nThe `accept` attribute of the input tag, MIME type  \n\n* **Type:** `String`\n\n* **Default:** `undefined`\n\n* **Browser:** `> IE9`\n\n* **Usage:**\n  ```html\n  <file-upload accept=\"image/png,image/gif,image/jpeg,image/webp\"></file-upload>\n  <!--or-->\n  <file-upload accept=\"image/*\"></file-upload>\n  ```\n\n\n\n\n\n### multiple\n\nThe `multiple` attribute of the input tag  \nWhether to allow multiple files to be selected  \n\n* **Type:** `Boolean`\n\n* **Default:** `false`\n\n* **Details:**  \n\n  If it is `false` file inside only one file will be automatically deleted\n\n* **Usage:**\n  ```html\n  <file-upload :multiple=\"true\"></file-upload>\n  ```\n\n\n\n### directory\n\nThe `directory` attribute of the input tag  \nWhether it is a upload folder  \n\n* **Type:** `Boolean`\n\n* **Default:** `false`\n\n* **Browser:** [http://caniuse.com/#feat=input-file-directory](http://caniuse.com/#feat=input-file-directory)\n\n* **Usage:**\n  ```html\n  <file-upload :directory=\"true\" :multiple=\"true\"></file-upload>\n  ```\n\n\n\n\n\n### extensions\n\nAllow upload file extensions  \n\n* **Type:** `Array | String | RegExp`\n\n* **Default:** `undefined`\n\n* **Usage:**\n  ```html\n  <file-upload extensions=\"jpg,gif,png,webp\"></file-upload>\n  <!--or-->\n  <file-upload :extensions=\"['jpg', 'gif', 'png', 'webp']\"></file-upload>\n  <!--or-->\n  <file-upload :extensions=\"/\\.(gif|jpe?g|png|webp)$/i\"></file-upload>\n  ```\n\n\n\n\n### size\n\nAllow the maximum byte to upload\n\n* **Type:** `Number`\n\n* **Default:** `0`\n\n* **Browser:** `> IE9`\n\n* **Details:**\n\n  `0` is equal to not limit\n\n* **Usage:**\n  ```html\n  <file-upload :size=\"1024 * 1024\"></file-upload>\n  ```\n\n\n\n\n### timeout\n\nUpload timeout time in milliseconds\n\n* **Type:** `Number`\n\n* **Default:** `0`\n\n* **Browser:** `> IE9`\n\n* **Usage:**\n  ```html\n  <file-upload :timeout=\"600 * 1000\"></file-upload>\n  ```\n\n\n\n\n### thread\n\nAlso upload the number of files at the same time (number of threads)  \n\n* **Type:** `Number`\n\n* **Default:** `1`\n\n* **Browser:** `> IE9`\n\n* **Usage:**\n  ```html\n  <file-upload :thread=\"3\"></file-upload>\n  ```\n\n\n\n\n\n### drop\n\nDrag and drop upload\n\n* **Type:** `Boolean | Element | CSS selector`\n\n* **Default:** `false`\n\n* **Browser:** [http://caniuse.com/#feat=dragndrop](http://caniuse.com/#feat=dragndrop)\n\n* **Details:**\n\n  If set to `true`, read the parent component as a container  \n\n* **Usage:**\n  ```html\n  <file-upload :drop=\"true\"></file-upload>\n  ```\n\n\n\n\n\n### drop-directory\n\nWhether to open the drag directory\n\n* **Type:** `Boolean`\n\n* **Default:** `true`\n\n* **Details:**\n\n  If set to `false` filter out the directory\n\n* **Usage:**\n  ```html\n  <file-upload :drop-directory=\"false\"></file-upload>\n  ```\n\n\n\n\n## Options / Events\n\nThe files is changed to trigger the method\nDefault for `v-model` binding\n\n### @input\n* **Arguments:**\n\n  * `files: Array<File | Object>`\n\n\n* **Usage:**\n  ```html\n  <template>\n    <file-upload :value=\"files\" @input=\"updatetValue\"></file-upload>\n    <!--or-->\n    <file-upload v-model=\"files\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      updatetValue(value) {\n        this.files = value\n      }\n    }\n  }\n  </script>\n  ```\n\n\n\n### @input-filter\n\nAdd, update, remove pre-filter  \n\n* **Arguments:**\n\n  * `newFile: File | Object | undefined`  `Read and write`\n  * `oldFile: File | Object | undefined`  `Read only`\n  * `prevent: Function`   Call this function to prevent modification\n\n\n* **Details:**\n\n  If the `newFile` value is `undefined` 'is deleted\n  If the `oldFile` value is `undefined` 'is added\n  If `newFile`, `oldFile` is exist, it is updated\n\n\n  > You can not use `update`,` add`, `remove`,` clear` methods in the event  \n  >The `newFile` object can be modified within the event  \n\n* **Usage:**  \n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <img :src=\"file.blob\" width=\"50\" height=\"50\" />\n      </li>\n    </ul>\n    <file-upload :value=\"files\" @input-filter=\"inputFilter\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      inputFilter(newFile, oldFile, prevent) {\n        if (newFile && !oldFile) {\n          // Add file\n\n          // Filter non-image file\n          // Will not be added to files\n          if (!/\\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {\n            return prevent()\n          }\n\n          // Create the 'blob' field for thumbnail preview\n          newFile.blob = ''\n          let URL = window.URL || window.webkitURL\n          if (URL && URL.createObjectURL) {\n            newFile.blob = URL.createObjectURL(newFile.file)\n          }\n        }\n\n        if (newFile && oldFile) {\n          // Update file\n\n          // Increase the version number\n          if (!newFile.version) {\n            newFile.version = 0\n          }\n          newFile.version++\n        }\n\n        if (!newFile && oldFile) {\n          // Remove file\n\n          // Refused to remove the file\n          // return prevent()\n        }\n      }\n    }\n  }\n  </script>\n  ```\n\n### @input-file\n\nAdd, update, remove after\n\n* **Arguments:**\n\n  * `newFile: File | Object | undefined` `Read only`\n  * `oldFile: File | Object | undefined` `Read only`\n\n\n* **Details:**\n\n  If the `newFile` value is `undefined` 'is deleted\n  If the `oldFile` value is `undefined` 'is added\n  If `newFile`, `oldFile` is exist, it is updated\n\n\n  >You can use `update`,` add`, `remove`,` clear` methods in the event  \n  >You can not modify the `newFile` object in the event  \n  >You can not modify the `oldFile` object in the event\n\n* **Usage:**\n  ```html\n  <template>\n    <file-upload ref=\"upload\" v-model=\"files\" @input-file=\"inputFile\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      inputFile(newFile, oldFile) {\n        if (newFile && !oldFile) {\n          // Add file\n\n          // Automatic upload\n          if (!this.$refs.upload.active) {\n            this.$refs.upload.active = true\n          }\n        }\n\n        if (newFile && oldFile) {\n          // Update file\n\n          // Start upload\n          if (newFile.active !== oldFile.active) {\n            console.log('Start upload', newFile.active, newFile)\n\n            // min size\n            if (newFile.size >= 0 && newFile.size < 100 * 1024) {\n              newFile = this.$refs.upload.update(newFile, {error: 'size'})\n            }\n          }\n\n          // Upload progress\n          if (newFile.progress !== oldFile.progress) {\n            console.log('progress', newFile.progress, newFile)\n          }\n\n          // Upload error\n          if (newFile.error !== oldFile.error) {\n            console.log('error', newFile.error, newFile)\n          }\n\n          // Uploaded successfully\n          if (newFile.success !== oldFile.success) {\n            console.log('success', newFile.success, newFile)\n          }\n        }\n\n        if (!newFile && oldFile) {\n          // Remove file\n\n          // Automatically delete files on the server\n          if (oldFile.success && oldFile.response.id) {\n            // $.ajax({\n            //   type: 'DELETE',\n            //   url: '/file/delete?id=' + oldFile.response.id,\n            // });\n          }\n        }\n      }\n    }\n  }\n  </script>\n  ```\n\n\n\n## Instance / Data\n\n### features\n\nUsed to determine the browser support features\n\n* **Type:** `Object`\n\n* **Read only:** `true`\n\n* **Default:** `{ html5: true, directory: false, drag: false }`\n\n* **Usage:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\"></file-upload>\n    <span v-show=\"$refs.upload && $refs.upload.features.drag\">Support drag and drop upload</span>\n    <span v-show=\"$refs.upload && $refs.upload.features.directory\">Support folder upload</span>\n    <span v-show=\"$refs.upload && $refs.upload.features.html5\">Support for HTML5</span>\n  </app>\n  ```\n\n\n\n### active\n\nActivation or abort upload\n\n* **Type:** `Boolean`\n\n* **Read only:** `false`\n\n* **Default:** `false`\n\n* **Usage:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\"></file-upload>\n    <span v-if=\"!$refs.upload || !$refs.upload.active\" @click=\"$refs.upload.active = true\">Start upload</span>\n    <span v-else @click=\"$refs.upload.active = false\">Stop upload</span>\n  </app>\n  ```\n\n\n\n### dropActive\n\nIs dragging\n\n* **Type:** `Boolean`\n\n* **Read only:** `true`\n\n* **Default:** `false`\n\n* **Usage:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\" :drop=\"true\"></file-upload>\n    <span v-show=\"$refs.upload && $refs.upload.dropActive\">Drag and drop here for upload<span>\n  </app>\n  ```\n\n\n\n\n\n### uploaded\n\nAll uploaded\n\n* **Type:** `Boolean`\n\n* **Read only:** `true`\n\n* **Default:** `true`\n\n* **Usage:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\"></file-upload>\n    <span v-show=\"$refs.upload && $refs.upload.uploaded\">All files have been uploaded<span>\n  </app>\n  ```\n\n\n\n\n\n## Instance / Methods\n\n\n\n### get()\n\nUse `id` to get a file object\n\n* **Arguments:**\n\n  * `id: File | Object | String`\n\n\n* **Result:** `File | Object | Boolean` There is a return file, object that otherwise returns `false`\n\n\n\n### add()\n\nAdd one or more files\n\n* **Arguments:**\n\n  * `files: Array<File | window.File | Object> | File | window.File | Object`     If it is an array of responses will be an array\n  * `start: Boolean`                                  Whether it is inserted from the start position\n\n\n* **Result:** `Object | Array<File | Object> | Boolean`     The incoming array is returned to the array otherwise the object or `false`\n\n* **Usage:**\n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <span>{{file.name}}</span>\n      </li>\n    </ul>\n    <file-upload v-model=\"files\"></file-upload>\n    <button type=\"button\" @click.prevent=\"addText\">Add a file</button>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      addText() {\n        let file = new window.File(['foo'], 'foo.txt', {\n          type: \"text/plain\",\n        })\n        this.$refs.upload.add(file)\n      }\n    }\n  }\n  </script>\n  ```\n\n\n###  addInputFile()\n\nAdd the file selected by `<input type = \"file\">` to the upload list\n\n* **Arguments:**\n\n  * `el: HTMLInputElement`     File element\n\n\n* **Result:** `Array<File>`  Added list of files\n\n* **Version:** : `>=2.5.1`\n\n\n\n###  addDataTransfer()\n\nAdd files that are dragged or pasted into the upload list  \n\n* **Arguments:**\n\n  * `dataTransfer: DataTransfer`  Drag or paste data\n\n\n* **Result:** `Promise<Array<File>>`   Added list of files\n\n\n* **Version:** : `>=2.5.1`\n\n\n\n### update()\n\nUpdate a file object\n\n* **Arguments:**\n\n  * `id: File | Object | String`\n  * `data: Object`                    Updated data object\n\n\n* **Result:**  `Object | Boolean`  Successfully returned `newFile` failed to return` false`\n\n\n* **Usage:**\n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <span>{{file.name}}</span>\n        <button v-show=\"file.active\" type=\"button\" @click.prevent=\"abort(file)\">Abort</button>\n      </li>\n    </ul>\n    <file-upload v-model=\"files\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      abort(file) {\n        this.$refs.upload.update(file, {active: false})\n        // or\n        // this.$refs.upload.update(file, {error: 'abort'})\n      }\n    }\n  }\n  </script>\n  ```\n\n### remove()\n\nRemove a file object\n\n* **Arguments:**\n\n  * `id: File | Object | String`\n\n\n* **Result:**  `Object | Boolean`  Successfully returned `oldFile` failed to return` false`\n\n* **Usage:**\n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <span>{{file.name}}</span>\n        <button type=\"button\" @click.prevent=\"remove(file)\">Remove</button>\n      </li>\n    </ul>\n    <file-upload v-model=\"files\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      remove(file) {\n        this.$refs.upload.remove(file)\n      }\n    }\n  }\n  </script>\n  ```\n\n\n### clear()\n\nEmpty the file list\n\n* **Result:**  `Boolean`  Always return `true`\n\n\n\n## Instance / File\n\n\n\n> **File object in the `@input-filter` event outside the use of [`update`](#instance-methods-update) method**\n\n\n\n\n### fileObject\n\n* **Type:** `Boolean`\n\n* **Read only:** `true`\n\n* **Required:** `true`\n\n* **Default:** `true`\n\n* **Version:** : `>=2.6.0`\n\n* **Details:**\n\n  If the attribute does not exist, the object will not be processed internally  \n  If the attribute does not exist, it is not `File` but `Object`\n\n\n\n\n### id\n\nFile ID\n\n* **Type:** `String | Number`\n\n* **Read only:** `false`\n\n* **Default:** `Math.random().toString(36).substr(2)`\n\n* **Details:**\n\n  >`id` can not be repeated  \n  >Upload can not modify `id`\n\n\n### size\n\nFile size\n\n* **Type:** `Number`\n\n* **Read only:** `false`\n\n* **Default:** `-1`\n\n* **Browser:** `> IE9`\n\n\n### name\n\nFilename  \n\n* **Type:** `String`\n\n* **Read only:** `false`\n\n* **Default:** ` `\n\n* **Details:**\n\n  Format:  `directory/filename.gif`  `filename.gif`  \n\n\n\n### type\n\nMIME type\n\n* **Type:** `String`\n\n* **Read only:** `false`\n\n* **Default:** ` `\n\n* **Browser:** `> IE9`\n\n* **Details:**\n\n  Format:  `image/gif`   `image/png`  `text/html`\n\n\n\n\n### active\n\nActivation or abort upload\n\n* **Type:** `Boolean`\n\n* **Read only:** `false`\n\n* **Default:** `false`\n\n* **Details:**\n\n  `true` = Upload  \n  `false` = Abort  \n\n\n\n\n\n\n### error\n\nUpload failed error code\n\n* **Type:** `String`\n\n* **Read only:** `false`\n\n* **Default:** ` `\n\n* **Details:**\n\n  Built-in  \n  `size`, `extension`, `timeout`, `abort`, `network`, `server`, `denied`\n\n\n\n\n### success\n\nWhether the upload was successful\n\n* **Type:** `Boolean`\n\n* **Read only:** `false`\n\n* **Default:** `false`\n\n\n### putAction\n\nCustomize the current file `PUT` URL\n\n* **Type:** `String`\n\n* **Read only:** `false`\n\n* **Default:** `this.putAction`\n\n\n\n### postAction\n\nCustomize the current file `POST` URL\n\n* **Type:** `String`\n\n* **Read only:** `false`\n\n* **Default:** `this.postAction`\n\n\n\n\n### headers\n\nCustomize the current file `HTTP` Header\n\n* **Type:** `Object`\n\n* **Read only:** `false`\n\n* **Default:** `this.headers`\n\n\n### data\n\nCustomize the current file `body` or` query` to attach content\n\n* **Type:** `Object`\n\n* **Read only:** `false`\n\n* **Default:** `this.data`\n\n\n### timeout\n\nCustomize the upload timeout for a current single file\n\n* **Type:** `Number`\n\n* **Read only:** `false`\n\n* **Default:** `this.timeout`\n\n\n### response\n\nResponse data\n\n* **Type:** `Object | String`\n\n* **Read only:** `false`\n\n* **Default:** `{}`\n\n\n\n\n### progress\n\nUpload progress\n\n* **Type:** `String`\n\n* **Read only:** `true`\n\n* **Default:** `0.00`\n\n* **Browser:** `> IE9`\n\n\n\n### speed\n\nPer second upload speed\n\n* **Type:** `Number`\n\n* **Read only:** `true`\n\n* **Default:** `0`\n\n* **Browser:** `> IE9`\n\n\n\n\n### xhr\n\n`HTML5` upload` XMLHttpRequest` object\n\n* **Type:** `XMLHttpRequest`\n\n* **Read only:** `true`\n\n* **Default:** `undefined`\n\n* **Browser:** `> IE9`\n\n\n\n\n### iframe\n\n`HTML4` upload` iframe` element\n\n* **Type:** `Element`\n\n* **Read only:** `true`\n\n* **Default:** `undefined`\n\n* **Browser:** `= IE9`\n"
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports) {
-
-module.exports = "## 入门开始\n\n### NPM\n\n``` bash\nnpm install vue-upload-component --save\n```\n\n``` js\nconst VueUploadComponent = require('vue-upload-component')\nVue.component('file-upload', VueUploadComponent)\n```\n\n### Curated\n\n**No data**\n\n\n### 直接使用\n\n\nunpkg\n\n``` html\n<script src=\"https://unpkg.com/vue\"></script>\n<script src=\"https://unpkg.com/vue-upload-component\"></script>\n<script>\nVue.component('file-upload', VueUploadComponent)\n</script>\n```\n\njsDelivr\n\n``` html\n<script src=\"https://cdn.jsdelivr.net/npm/vue/dist/vue.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/vue-upload-component\"></script>\n<script>\nVue.component('file-upload', VueUploadComponent)\n</script>\n```\n\n\n### 简单的例子\n\n\n\n```html\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <title>Vue-upload-component Test</title>\n  <script src=\"https://unpkg.com/vue\"></script>\n  <script src=\"https://unpkg.com/vue-upload-component\"></script>\n</head>\n<body>\n<div id=\"app\">\n  <ul>\n    <li v-for=\"file in files\">{{file.name}} - Error: {{file.error}}, Success: {{file.success}}</li>\n  </ul>\n  <file-upload\n    ref=\"upload\"\n    v-model=\"files\"\n    post-action=\"/post.method\"\n    put-action=\"/put.method\"\n    @input-file=\"inputFile\"\n    @input-filter=\"inputFilter\"\n  >\n  上传文件\n  </file-upload>\n  <button v-show=\"!$refs.upload || !$refs.upload.active\" @click.prevent=\"$refs.upload.active = true\" type=\"button\">开始上传</button>\n  <button v-show=\"$refs.upload && $refs.upload.active\" @click.prevent=\"$refs.upload.active = false\" type=\"button\">停止上传</button>\n</div>\n<script>\nnew Vue({\n  el: '#app',\n  data: function () {\n    return {\n      files: []\n    }\n  },\n  components: {\n    FileUpload: VueUploadComponent\n  },\n  methods: {\n    /**\n     * Has changed\n     * @param  Object|undefined   newFile   只读\n     * @param  Object|undefined   oldFile   只读\n     * @return undefined\n     */\n    inputFile: function (newFile, oldFile) {\n      if (newFile && oldFile && !newFile.active && oldFile.active) {\n        // 获得相应数据\n        console.log('response', newFile.response)\n        if (newFile.xhr) {\n          //  获得响应状态码\n          console.log('status', newFile.xhr.status)\n        }\n      }\n    },\n    /**\n     * Pretreatment\n     * @param  Object|undefined   newFile   读写\n     * @param  Object|undefined   oldFile   只读\n     * @param  Function           prevent   阻止回调\n     * @return undefined\n     */\n    inputFilter: function (newFile, oldFile, prevent) {\n      if (newFile && !oldFile) {\n        // 过滤不是图片后缀的文件\n        if (!/\\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {\n          return prevent()\n        }\n      }\n\n      // 创建 blob 字段 用于图片预览\n      newFile.blob = ''\n      let URL = window.URL || window.webkitURL\n      if (URL && URL.createObjectURL) {\n        newFile.blob = URL.createObjectURL(newFile.file)\n      }\n    }\n  }\n});\n</script>\n</body>\n</html>\n```\n\n\n\n### SSR (服务器同构)\n\n\n```html\n<template>\n  <file-upload v-model=\"files\" post-action=\"/\">Upload file</file-upload>\n</template>\n<style>\n/*\nimport '~vue-upload-component/dist/vue-upload-component.part.css'\n\n\n或\n\n\n */\n.file-uploads {\n  overflow: hidden;\n  position: relative;\n  text-align: center;\n  display: inline-block;\n}\n.file-uploads.file-uploads-html4 input[type=\"file\"] {\n  opacity: 0;\n  font-size: 20em;\n  z-index: 1;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n}\n.file-uploads.file-uploads-html5 input[type=\"file\"] {\n  overflow: hidden;\n  position: fixed;\n  width: 1px;\n  height: 1px;\n  z-index: -1;\n  opacity: 0;\n}\n</style>\n<script>\nimport FileUpload from 'vue-upload-component/dist/vue-upload-component.part.js'\nexport default {\n  components: {\n    FileUpload,\n  },\n  data() {\n    return {\n      files: []\n    }\n  },\n}\n</script>\n```\n\n\n** 或者 **\n\n\n```js\nimport FileUpload from 'vue-upload-component/src'\n```\n\nwebpack.config.js\n\n```js\nconst nodeExternals = require('webpack-node-externals');\n{\n  //...\n  externals: [\n    nodeExternals({whitelist:[/^vue-upload-component\\/src/]})\n  ]\n  //...\n}\n```\n\n* [https://github.com/liady/webpack-node-externals](https://github.com/liady/webpack-node-externals)  \n\n* [**`vue-hackernews` 演示**](https://github.com/lian-yue/vue-hackernews-2.0/)  \n\n* [**浏览修改文件**](https://github.com/lian-yue/vue-hackernews-2.0/commit/bd6c58a30cc6b8ba6c0148e737b3ce9336b99cf8)\n\n\n\n\n## 选项 / 属性\n\n\n### input-id\n\ninput 标签的 `id` 属性\n\n* **类型:** `String`\n\n* **默认值:** `this.name`\n\n* **示例:**\n  ```html\n  <file-upload input-id=\"file2\"></file-upload>\n  <!--输出-->\n  <input id=\"file2\" />\n  ```\n\n\n\n\n\n### name\n\ninput标签的 `name` 属性\n\n* **类型:** `String`\n\n* **默认值:** `file`\n\n* **示例:**\n  ```html\n  <file-upload name=\"file\"></file-upload>\n  <!--输出-->\n  <input name=\"file\" />\n  ```\n\n\n\n\n\n### post-action\n\n`POST` 请求的上传URL\n\n* **类型:** `String`\n\n* **默认值:** `undefined`\n\n* **示例:**\n  ```html\n  <file-upload put-action=\"/upload/put.php\"></file-upload>\n  ```\n\n\n\n\n\n### put-action\n\n`PUT` 请求的上传URL\n\n* **类型:** `String`\n\n* **默认值:** `undefined`\n\n* **浏览器:** `> IE9`\n\n* **详细:**  \n\n  `put-action` 不为空请优先 `PUT` 请求  \n\n* **示例:**\n  ```html\n  <file-upload put-action=\"/upload/put.php\"></file-upload>\n  ```\n\n\n\n\n\n### headers\n\n自定义上传请求 `header` 数据\n\n* **类型:** `Object`\n\n* **默认值:** `{}`\n\n* **浏览器:** `> IE9`\n\n* **示例:**\n  ```html\n  <file-upload :headers=\"{'X-Token-CSRF': 'code'}\"></file-upload>\n  ```\n\n\n\n\n\n### data\n\n`POST 请求`: 附加请求的 body  \n`PUT 请求`: 附加请求的 query  \n\n* **类型:** `Object`\n\n* **默认值:** `{}`\n\n* **示例:**\n  ```html\n  <file-upload :data=\"{access_token: 'access_token'}\"></file-upload>\n  ```\n\n\n\n\n### value, v-model\n\n文件列表\n\n* **类型:** `Array<File | Object>`\n\n* **默认值:** `[]`\n\n* **详细:**  \n\n  浏览 **[`File`](#file)** 详细信息  \n  > 为了防止不可预知的错误，不可直接修改 `files`，请使用 [`add`](#实例-方法-add), [`update`](#实例-方法-update), [`remove`](#实例-方法-remove) 方法修改\n\n* **示例:**\n  ```html\n  <file-upload :value=\"files\" @input=\"updatetValue\"></file-upload>\n  <!--或-->\n  <file-upload v-model=\"files\"></file-upload>\n  ```\n\n\n\n\n\n### accept\n\n表单的`accept`属性, MIME type  \n\n* **类型:** `String`\n\n* **默认值:** `undefined`\n\n* **浏览器:** `> IE9`\n\n* **示例:**\n  ```html\n  <file-upload accept=\"image/png,image/gif,image/jpeg,image/webp\"></file-upload>\n  <!--或-->\n  <file-upload accept=\"image/*\"></file-upload>\n  ```\n\n\n\n\n\n### multiple\n\n文件表单的 `multiple` 属性  \n是否允许选择多个文件  \n\n* **类型:** `Boolean`\n\n* **默认值:** `false`\n\n* **详细:**  \n\n  如果是 `false` `files` 里面最多只有一个文件 多的会自动删除  \n\n* **示例:**\n  ```html\n  <file-upload :multiple=\"true\"></file-upload>\n  ```\n\n\n\n### directory\n\n文件表单的 `directory` 属性  \n是否是上传文件夹  \n\n* **类型:** `Boolean`\n\n* **默认值:** `false`\n\n* **浏览器:** [http://caniuse.com/#feat=input-file-directory](http://caniuse.com/#feat=input-file-directory)\n\n* **示例:**\n  ```html\n  <file-upload :directory=\"true\" :multiple=\"true\"></file-upload>\n  ```\n\n\n\n\n\n### extensions\n\n允许上传的文件后缀\n\n* **类型:** `Array | String | RegExp`\n\n* **默认值:** `undefined`\n\n* **示例:**\n  ```html\n  <file-upload extensions=\"jpg,gif,png,webp\"></file-upload>\n  <!--或-->\n  <file-upload :extensions=\"['jpg', 'gif', 'png', 'webp']\"></file-upload>\n  <!--或-->\n  <file-upload :extensions=\"/\\.(gif|jpe?g|png|webp)$/i\"></file-upload>\n  ```\n\n\n\n\n### size\n\n允许上传的最大字节\n\n* **类型:** `Number`\n\n* **默认值:** `0`\n\n* **浏览器:** `> IE9`\n\n* **详细:**\n\n  `0` 等于不限制\n\n* **示例:**\n  ```html\n  <file-upload :size=\"1024 * 1024\"></file-upload>\n  ```\n\n\n\n\n### timeout\n\n上传超时时间毫秒\n\n* **类型:** `Number`\n\n* **默认值:** `0`\n\n* **浏览器:** `> IE9`\n\n* **示例:**\n  ```html\n  <file-upload :timeout=\"600 * 1000\"></file-upload>\n  ```\n\n\n\n\n### thread\n\n同时并发上传的文件数量 线程数  \n\n* **类型:** `Number`\n\n* **默认值:** `1`\n\n* **浏览器:** `> IE9`\n\n* **示例:**\n  ```html\n  <file-upload :thread=\"3\"></file-upload>\n  ```\n\n\n\n\n\n### drop\n\n拖拽上传  \n\n* **类型:** `Boolean | Element | CSS selector`\n\n* **默认值:** `false`\n\n* **浏览器:** [http://caniuse.com/#feat=dragndrop](http://caniuse.com/#feat=dragndrop)\n\n* **详细:**\n\n  如果设置成 `true` 则读取父组件作为容器  \n\n* **示例:**\n  ```html\n  <file-upload :drop=\"true\"></file-upload>\n  ```\n\n\n\n\n\n### drop-directory\n\n是否开启拖拽目录  \n\n* **类型:** `Boolean`\n\n* **默认值:** `true`\n\n* **详细:**\n\n  如果设置成 `false` 则过滤掉目录\n\n* **示例:**\n  ```html\n  <file-upload :drop-directory=\"false\"></file-upload>\n  ```\n\n\n\n\n## 选项 / 事件\n\n文件被改变触发的方法  \n默认用于`v-model`绑定\n\n### @input\n* **参数:**\n\n  * `files: Array<File | Object>`\n\n\n* **示例:**\n  ```html\n  <template>\n    <file-upload :value=\"files\" @input=\"updatetValue\"></file-upload>\n    <!--或者-->\n    <file-upload v-model=\"files\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      updatetValue(value) {\n        this.files = value\n      }\n    }\n  }\n  </script>\n  ```\n\n\n\n### @input-filter\n\nAdd, update, remove pre-filter  \n\n* **参数:**\n\n  * `newFile: File | Object | undefined`  `读写`\n  * `oldFile: File | Object | undefined`  `只读`\n  * `prevent: Function`   调用该方法 阻止修改\n\n\n* **详细:**\n\n  如果 `newFile` 值为 `undefined` 则是删除  \n  如果 `oldFile` 值为 `undefined` 则是添加  \n  如果 `newFile`, `oldFile` 都存在则是更新\n\n  > 事件内不可使用 `update`, `add`, `remove`, `clear` 方法  \n  事件内可修改 `newFile` 对象\n\n* **示例:**  \n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <img :src=\"file.blob\" width=\"50\" height=\"50\" />\n      </li>\n    </ul>\n    <file-upload :value=\"files\" @input-filter=\"inputFilter\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      inputFilter(newFile, oldFile, prevent) {\n        if (newFile && !oldFile) {\n          // 添加文件\n\n          // 过滤非图片文件\n          // 不会添加到 files 去\n          if (!/\\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {\n            return prevent()\n          }\n\n          // 创建 `blob` 字段 用于缩略图预览\n          newFile.blob = ''\n          let URL = window.URL || window.webkitURL\n          if (URL && URL.createObjectURL) {\n            newFile.blob = URL.createObjectURL(newFile.file)\n          }\n        }\n\n        if (newFile && oldFile) {\n          // 更新文件\n\n          // 增加版本号\n          if (!newFile.version) {\n            newFile.version = 0\n          }\n          newFile.version++\n        }\n\n        if (!newFile && oldFile) {\n          // 移除文件\n\n          // 拒绝删除文件\n          // return prevent()\n        }\n      }\n    }\n  }\n  </script>\n  ```\n\n### @input-file\n\n添加，更新，移除 后\n\n* **参数:**\n\n  * `newFile: File | Object | undefined` `只读`\n  * `oldFile: File | Object | undefined` `只读`\n\n\n* **详细:**\n\n  如果 `newFile` 值为 `undefined` 则是删除  \n  如果 `oldFile` 值为 `undefined` 则是添加  \n  如果 `newFile`, `oldFile` 都存在则是更新\n\n  >事件内可使用 `update`, `add`, `remove`, `clear` 方法  \n  >事件内不可修改 `newFile` 对象  \n  >事件内不可修改 `oldFile` 对象\n\n* **示例:**\n  ```html\n  <template>\n    <file-upload ref=\"upload\" v-model=\"files\" @input-file=\"inputFile\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      inputFile(newFile, oldFile) {\n        if (newFile && !oldFile) {\n          // 添加文件\n\n          // 自动上传\n          if (!this.$refs.upload.active) {\n            this.$refs.upload.active = true\n          }\n        }\n\n        if (newFile && oldFile) {\n          // 更新文件\n\n          // 开始上传\n          if (newFile.active !== oldFile.active) {\n            console.log('Start upload', newFile.active, newFile)\n\n            // 限定最小字节\n            if (newFile.size >= 0 && newFile.size < 100 * 1024) {\n              newFile = this.$refs.upload.update(newFile, {error: 'size'})\n            }\n          }\n\n          // 上传进度\n          if (newFile.progress !== oldFile.progress) {\n            console.log('progress', newFile.progress, newFile)\n          }\n\n          // 上传错误\n          if (newFile.error !== oldFile.error) {\n            console.log('error', newFile.error, newFile)\n          }\n\n          // 上传成功\n          if (newFile.success !== oldFile.success) {\n            console.log('success', newFile.success, newFile)\n          }\n        }\n\n        if (!newFile && oldFile) {\n          // 删除文件\n\n          // 自动删除 服务器上的文件\n          if (oldFile.success && oldFile.response.id) {\n            // $.ajax({\n            //   type: 'DELETE',\n            //   url: '/file/delete?id=' + oldFile.response.id,\n            // });\n          }\n        }\n      }\n    }\n  }\n  </script>\n  ```\n\n\n\n## 实例 / 数据\n\n### features\n\n用于判断浏览器支持的特性\n\n* **类型:** `Object`\n\n* **只读:** `true`\n\n* **默认值:** `{ html5: true, directory: false, drag: false }`\n\n* **示例:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\"></file-upload>\n    <span v-show=\"$refs.upload && $refs.upload.features.drag\">支持拖拽上传</span>\n    <span v-show=\"$refs.upload && $refs.upload.features.directory\">支持文件夹上传</span>\n    <span v-show=\"$refs.upload && $refs.upload.features.html5\">支持HTML5</span>\n  </app>\n  ```\n\n\n\n### active\n\n激活或停止上传\n\n* **类型:** `Boolean`\n\n* **只读:** `false`\n\n* **默认值:** `false`\n\n* **示例:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\"></file-upload>\n    <span v-if=\"!$refs.upload || !$refs.upload.active\" @click=\"$refs.upload.active = true\">开始上传</span>\n    <span v-else @click=\"$refs.upload.active = false\">停止上传</span>\n  </app>\n  ```\n\n\n\n### dropActive\n\n是否正在拖拽\n\n* **类型:** `Boolean`\n\n* **只读:** `true`\n\n* **默认值:** `false`\n\n* **示例:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\" :drop=\"true\"></file-upload>\n    <span v-show=\"$refs.upload && $refs.upload.dropActive\">拖拽到这里上传<span>\n  </app>\n  ```\n\n\n\n\n\n### uploaded\n\n是否全部已上传\n\n* **类型:** `Boolean`\n\n* **只读:** `true`\n\n* **默认值:** `true`\n\n* **示例:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\"></file-upload>\n    <span v-show=\"$refs.upload && $refs.upload.uploaded\">全部文件已上传完毕<span>\n  </app>\n  ```\n\n\n\n\n\n## 实例 / 方法\n\n\n\n### get()\n\n使用`id`获得某个对象\n\n* **参数:**\n\n  * `id: File | Object | String`\n\n\n* **结果:** `File | Object | Boolean` 存在返回文件对象否则返回 `false`\n\n\n\n### add()\n\n添加一个或多个文件\n\n* **参数:**\n\n  * `files: Array<File | window.File | Object> | File | window.File | Object`     如果它是一个数组的响应将是一个数组\n  * `start: Boolean`                                  是否从开始位置插入\n\n\n* **结果:** `Object | Array<File | Object> | Boolean`     传入的是数组返回数组否则对象或`false`\n\n* **示例:**\n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <span>{{file.name}}</span>\n      </li>\n    </ul>\n    <file-upload v-model=\"files\"></file-upload>\n    <button type=\"button\" @click.prevent=\"addText\">添加文件</button>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      addText() {\n        let file = new window.File(['foo'], 'foo.txt', {\n          type: \"text/plain\",\n        })\n        this.$refs.upload.add(file)\n      }\n    }\n  }\n  </script>\n  ```\n\n\n###  addInputFile()\n\n把`<input type=\"file\">`选择的文件添加进上传列表  \n\n* **参数:**\n\n  * `el: HTMLInputElement`     文件元素\n\n\n* **结果:** `Array<File>`  返回已添加的文件列表\n\n* **版本:** : `>=2.5.1`\n\n\n\n###  addDataTransfer()\n\n把拖拽或者粘贴的数据的文件添加进上传列表  \n\n* **参数:**\n\n  * `dataTransfer: DataTransfer`  拖拽或者粘贴的数据\n\n\n* **结果:** `Promise<Array<File>>`   返回已添加的文件列表\n\n\n* **版本:** : `>=2.5.1`\n\n\n\n### update()\n\n更新某个对象\n\n* **参数:**\n\n  * `id: File | Object | String`\n  * `data: Object`                    更新的数据对象\n\n\n* **结果:**  `Object | Boolean`  成功返回 `newFile` 失败返回 `false`\n\n\n* **示例:**\n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <span>{{file.name}}</span>\n        <button v-show=\"file.active\" type=\"button\" @click.prevent=\"abort(file)\">停止</button>\n      </li>\n    </ul>\n    <file-upload v-model=\"files\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      abort(file) {\n        this.$refs.upload.update(file, {active: false})\n        // 或\n        // this.$refs.upload.update(file, {error: 'abort'})\n      }\n    }\n  }\n  </script>\n  ```\n\n### remove()\n\n移除某个文件对象\n\n* **参数:**\n\n  * `id: File | Object | String`\n\n\n* **结果:**  `Object | Boolean`  成功返回 `oldFile` 失败返回 `false`\n\n* **示例:**\n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <span>{{file.name}}</span>\n        <button type=\"button\" @click.prevent=\"remove(file)\">移除</button>\n      </li>\n    </ul>\n    <file-upload v-model=\"files\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      remove(file) {\n        this.$refs.upload.remove(file)\n      }\n    }\n  }\n  </script>\n  ```\n\n\n### clear()\n\n清空文件列表\n\n* **结果:**  `Boolean`  总是返回 `true`\n\n\n\n## 实例 / File\n\n\n> **文件对象在`input-filter`事件外修改请使用 [`update`](#实例-方法-update) 方法**\n\n\n### fileObject\n\n* **类型:** `Boolean`\n\n* **只读:** `true`\n\n* **Required:** `true`\n\n* **默认值:** `true`\n\n* **版本:** : `>=2.6.0`\n\n* **详细:**\n\n  如果属性不存在，则不会在内部处理该对象  \n  如果属性不存在，它不是 `File` 而是 `Object`\n\n\n\n### id\n\n文件id\n\n* **类型:** `String | Number`\n\n* **只读:** `false`\n\n* **默认值:** `Math.random().toString(36).substr(2)`\n\n* **详细:**\n\n  >`id` can not be repeated  \n  >Upload can not modify `id`\n\n\n### size\n\n文件大小\n\n* **类型:** `Number`\n\n* **只读:** `false`\n\n* **默认值:** `-1`\n\n* **浏览器:** `> IE9`\n\n\n### name\n\n文件名  \n\n* **类型:** `String`\n\n* **只读:** `false`\n\n* **默认值:** ` `\n\n* **详细:**\n\n  格式:  `directory/filename.gif`  `filename.gif`  \n\n\n\n### type\n\nMIME类型\n\n* **类型:** `String`\n\n* **只读:** `false`\n\n* **默认值:** ` `\n\n* **浏览器:** `> IE9`\n\n* **详细:**\n\n  格式:  `image/gif`   `image/png`  `text/html`\n\n\n\n\n### active\n\n激活或终止上传\n\n* **类型:** `Boolean`\n\n* **只读:** `false`\n\n* **默认值:** `false`\n\n* **详细:**\n\n  `true` = 上传  \n  `false` = 停止  \n\n\n\n\n\n\n### error\n\n上传失败错误代码\n\n* **类型:** `String`\n\n* **只读:** `false`\n\n* **默认值:** ` `\n\n* **详细:**\n\n  内置\n  `size`, `extension`, `timeout`, `abort`, `network`, `server`, `denied`\n\n\n\n\n### success\n\n是否上传成功\n\n* **类型:** `Boolean`\n\n* **只读:** `false`\n\n* **默认值:** `false`\n\n\n### putAction\n\n自定义当前文件 `PUT` 地址\n\n* **类型:** `String`\n\n* **只读:** `false`\n\n* **默认值:** `this.putAction`\n\n\n\n### postAction\n\n自定义当前文件 `POST` 地址\n\n* **类型:** `String`\n\n* **只读:** `false`\n\n* **默认值:** `this.postAction`\n\n\n\n\n### headers\n\n自定义当前文件 `HTTP` Header\n\n* **类型:** `Object`\n\n* **只读:** `false`\n\n* **默认值:** `this.headers`\n\n\n### data\n\n自定义当前文件 `body` 或 `query` 附加内容\n\n* **类型:** `Object`\n\n* **只读:** `false`\n\n* **默认值:** `this.data`\n\n\n### timeout\n\n自定义当前单个文件的上传超时时间\n\n* **类型:** `Number`\n\n* **只读:** `false`\n\n* **默认值:** `this.timeout`\n\n\n### response\n\n响应的数据\n\n* **类型:** `Object | String`\n\n* **只读:** `false`\n\n* **默认值:** `{}`\n\n\n\n\n### progress\n\n上传进度\n\n* **类型:** `String`\n\n* **只读:** `true`\n\n* **默认值:** `0.00`\n\n* **浏览器:** `> IE9`\n\n\n\n### speed\n\n每秒的上传速度\n\n* **类型:** `Number`\n\n* **只读:** `true`\n\n* **默认值:** `0`\n\n* **浏览器:** `> IE9`\n\n\n\n\n### xhr\n\n`HTML5` 上传 `XMLHttpRequest` 对象\n\n* **类型:** `XMLHttpRequest`\n\n* **只读:** `true`\n\n* **默认值:** `undefined`\n\n* **浏览器:** `> IE9`\n\n\n\n\n### iframe\n\n`HTML4` 上传 `iframe` 元素\n\n* **类型:** `Element`\n\n* **只读:** `true`\n\n* **默认值:** `undefined`\n\n* **浏览器:** `= IE9`\n"
-
-/***/ }),
 /* 7 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-module.exports = __webpack_require__(8);
-
+module.exports = "\n> **The document uses Google Translate**\n\n## Getting Started\n\n### NPM\n\n``` bash\nnpm install vue-upload-component --save\n```\n\n``` js\nconst VueUploadComponent = require('vue-upload-component')\nVue.component('file-upload', VueUploadComponent)\n```\n\n### Curated\n\n**No data**\n\n\n### Script\n\n\nunpkg\n\n``` html\n<script src=\"https://unpkg.com/vue\"></script>\n<script src=\"https://unpkg.com/vue-upload-component\"></script>\n<script>\nVue.component('file-upload', VueUploadComponent)\n</script>\n```\n\njsDelivr\n\n``` html\n<script src=\"https://cdn.jsdelivr.net/npm/vue/dist/vue.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/vue-upload-component\"></script>\n<script>\nVue.component('file-upload', VueUploadComponent)\n</script>\n```\n\n\n### Simple example\n\n\n\n```html\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <title>Vue-upload-component Test</title>\n  <script src=\"https://unpkg.com/vue\"></script>\n  <script src=\"https://unpkg.com/vue-upload-component\"></script>\n</head>\n<body>\n<div id=\"app\">\n  <ul>\n    <li v-for=\"file in files\">{{file.name}} - Error: {{file.error}}, Success: {{file.success}}</li>\n  </ul>\n  <file-upload\n    ref=\"upload\"\n    v-model=\"files\"\n    post-action=\"/post.method\"\n    put-action=\"/put.method\"\n    @input-file=\"inputFile\"\n    @input-filter=\"inputFilter\"\n  >\n  Upload file\n  </file-upload>\n  <button v-show=\"!$refs.upload || !$refs.upload.active\" @click.prevent=\"$refs.upload.active = true\" type=\"button\">Start upload</button>\n  <button v-show=\"$refs.upload && $refs.upload.active\" @click.prevent=\"$refs.upload.active = false\" type=\"button\">Stop upload</button>\n</div>\n<script>\nnew Vue({\n  el: '#app',\n  data: function () {\n    return {\n      files: []\n    }\n  },\n  components: {\n    FileUpload: VueUploadComponent\n  },\n  methods: {\n    /**\n     * Has changed\n     * @param  Object|undefined   newFile   Read only\n     * @param  Object|undefined   oldFile   Read only\n     * @return undefined\n     */\n    inputFile: function (newFile, oldFile) {\n      if (newFile && oldFile && !newFile.active && oldFile.active) {\n        // Get response data\n        console.log('response', newFile.response)\n        if (newFile.xhr) {\n          //  Get the response status code\n          console.log('status', newFile.xhr.status)\n        }\n      }\n    },\n    /**\n     * Pretreatment\n     * @param  Object|undefined   newFile   Read and write\n     * @param  Object|undefined   oldFile   Read only\n     * @param  Function           prevent   Prevent changing\n     * @return undefined\n     */\n    inputFilter: function (newFile, oldFile, prevent) {\n      if (newFile && !oldFile) {\n        // Filter non-image file\n        if (!/\\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {\n          return prevent()\n        }\n      }\n\n      // Create a blob field\n      newFile.blob = ''\n      let URL = window.URL || window.webkitURL\n      if (URL && URL.createObjectURL) {\n        newFile.blob = URL.createObjectURL(newFile.file)\n      }\n    }\n  }\n});\n</script>\n</body>\n</html>\n```\n\n\n\n### SSR (Server isomorphism)\n\n\n```html\n<template>\n  <file-upload v-model=\"files\" post-action=\"/\">Upload file</file-upload>\n</template>\n<style>\n/*\nimport '~vue-upload-component/dist/vue-upload-component.part.css'\n\n\nor\n\n\n */\n.file-uploads {\n  overflow: hidden;\n  position: relative;\n  text-align: center;\n  display: inline-block;\n}\n.file-uploads.file-uploads-html4 input[type=\"file\"] {\n  opacity: 0;\n  font-size: 20em;\n  z-index: 1;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n}\n.file-uploads.file-uploads-html5 input[type=\"file\"] {\n  overflow: hidden;\n  position: fixed;\n  width: 1px;\n  height: 1px;\n  z-index: -1;\n  opacity: 0;\n}\n</style>\n<script>\nimport FileUpload from 'vue-upload-component/dist/vue-upload-component.part.js'\nexport default {\n  components: {\n    FileUpload,\n  },\n  data() {\n    return {\n      files: []\n    }\n  },\n}\n</script>\n```\n\n\n** OR **\n\n\n```js\nimport FileUpload from 'vue-upload-component/src'\n```\n\n\nwebpack.config.js\n\n```js\nconst nodeExternals = require('webpack-node-externals');\n{\n  //.....\n  externals: [\n    nodeExternals({whitelist:[/^vue-upload-component\\/src/]})\n  ]\n  //.....\n}\n```\n\n* [https://github.com/liady/webpack-node-externals](https://github.com/liady/webpack-node-externals)  \n\n* [**`vue-hackernews` demo**](https://github.com/lian-yue/vue-hackernews-2.0/)  \n\n* [**View changes**](https://github.com/lian-yue/vue-hackernews-2.0/commit/bd6c58a30cc6b8ba6c0148e737b3ce9336b99cf8)\n\n\n\n\n## Options / Props\n\n\n### input-id\n\nThe `id` attribute of the input tag\n\n* **Type:** `String`\n\n* **Default:** `this.name`\n\n* **Usage:**\n  ```html\n  <file-upload input-id=\"file2\"></file-upload>\n  <!--Output-->\n  <input id=\"file2\" />\n  ```\n\n\n\n\n\n### name\n\nThe `name` attribute of the input tag\n\n* **Type:** `String`\n\n* **Default:** `file`\n\n* **Usage:**\n  ```html\n  <file-upload name=\"file\"></file-upload>\n  <!--Output-->\n  <input name=\"file\" />\n  ```\n\n\n\n\n\n### post-action\n\n`POST` Request upload URL\n\n* **Type:** `String`\n\n* **Default:** `undefined`\n\n* **Usage:**\n  ```html\n  <file-upload put-action=\"/upload/put.php\"></file-upload>\n  ```\n\n\n\n\n\n### put-action\n\n`PUT` Request upload URL\n\n* **Type:** `String`\n\n* **Default:** `undefined`\n\n* **Browser:** `> IE9`\n\n* **Details:**  \n\n  `put-action` is not empty Please give priority to` PUT` request  \n\n* **Usage:**\n  ```html\n  <file-upload put-action=\"/upload/put.php\"></file-upload>\n  ```\n\n\n\n\n\n### headers\n\nAttach `header` data\n\n* **Type:** `Object`\n\n* **Default:** `{}`\n\n* **Browser:** `> IE9`\n\n* **Usage:**\n  ```html\n  <file-upload :headers=\"{'X-Token-CSRF': 'code'}\"></file-upload>\n  ```\n\n\n\n\n\n### data\n\n`POST request`:  Append request `body`  \n`PUT request`:  Append request `query`\n\n* **Type:** `Object`\n\n* **Default:** `{}`\n\n* **Usage:**\n  ```html\n  <file-upload :data=\"{access_token: 'access_token'}\"></file-upload>\n  ```\n\n\n\n\n### value, v-model\n\nFile List\n\n* **Type:** `Array<File | Object>`\n\n* **Default:** `[]`\n\n* **Details:**  \n\n  View **[`File`](#file)** details  \n  > In order to prevent unpredictable errors, can not directly modify the `files`, please use [`add`](#instance-methods-add), [`update`](#instance-methods-update), [`remove`](#instance-methods-remove) method to modify\n\n* **Usage:**\n  ```html\n  <file-upload :value=\"files\" @input=\"updatetValue\"></file-upload>\n  <!--or-->\n  <file-upload v-model=\"files\"></file-upload>\n  ```\n\n\n\n\n\n### accept\n\nThe `accept` attribute of the input tag, MIME type  \n\n* **Type:** `String`\n\n* **Default:** `undefined`\n\n* **Browser:** `> IE9`\n\n* **Usage:**\n  ```html\n  <file-upload accept=\"image/png,image/gif,image/jpeg,image/webp\"></file-upload>\n  <!--or-->\n  <file-upload accept=\"image/*\"></file-upload>\n  ```\n\n\n\n\n\n### multiple\n\nThe `multiple` attribute of the input tag  \nWhether to allow multiple files to be selected  \n\n* **Type:** `Boolean`\n\n* **Default:** `false`\n\n* **Details:**  \n\n  If it is `false` file inside only one file will be automatically deleted\n\n* **Usage:**\n  ```html\n  <file-upload :multiple=\"true\"></file-upload>\n  ```\n\n\n\n### directory\n\nThe `directory` attribute of the input tag  \nWhether it is a upload folder  \n\n* **Type:** `Boolean`\n\n* **Default:** `false`\n\n* **Browser:** [http://caniuse.com/#feat=input-file-directory](http://caniuse.com/#feat=input-file-directory)\n\n* **Usage:**\n  ```html\n  <file-upload :directory=\"true\" :multiple=\"true\"></file-upload>\n  ```\n\n\n\n\n\n### extensions\n\nAllow upload file extensions  \n\n* **Type:** `Array | String | RegExp`\n\n* **Default:** `undefined`\n\n* **Usage:**\n  ```html\n  <file-upload extensions=\"jpg,gif,png,webp\"></file-upload>\n  <!--or-->\n  <file-upload :extensions=\"['jpg', 'gif', 'png', 'webp']\"></file-upload>\n  <!--or-->\n  <file-upload :extensions=\"/\\.(gif|jpe?g|png|webp)$/i\"></file-upload>\n  ```\n\n\n\n\n### size\n\nAllow the maximum byte to upload\n\n* **Type:** `Number`\n\n* **Default:** `0`\n\n* **Browser:** `> IE9`\n\n* **Details:**\n\n  `0` is equal to not limit\n\n* **Usage:**\n  ```html\n  <file-upload :size=\"1024 * 1024\"></file-upload>\n  ```\n\n\n\n\n### timeout\n\nUpload timeout time in milliseconds\n\n* **Type:** `Number`\n\n* **Default:** `0`\n\n* **Browser:** `> IE9`\n\n* **Usage:**\n  ```html\n  <file-upload :timeout=\"600 * 1000\"></file-upload>\n  ```\n\n\n\n\n### thread\n\nAlso upload the number of files at the same time (number of threads)  \n\n* **Type:** `Number`\n\n* **Default:** `1`\n\n* **Browser:** `> IE9`\n\n* **Usage:**\n  ```html\n  <file-upload :thread=\"3\"></file-upload>\n  ```\n\n\n\n\n\n### drop\n\nDrag and drop upload\n\n* **Type:** `Boolean | Element | CSS selector`\n\n* **Default:** `false`\n\n* **Browser:** [http://caniuse.com/#feat=dragndrop](http://caniuse.com/#feat=dragndrop)\n\n* **Details:**\n\n  If set to `true`, read the parent component as a container  \n\n* **Usage:**\n  ```html\n  <file-upload :drop=\"true\"></file-upload>\n  ```\n\n\n\n\n\n### drop-directory\n\nWhether to open the drag directory\n\n* **Type:** `Boolean`\n\n* **Default:** `true`\n\n* **Details:**\n\n  If set to `false` filter out the directory\n\n* **Usage:**\n  ```html\n  <file-upload :drop-directory=\"false\"></file-upload>\n  ```\n\n\n\n\n## Options / Events\n\nThe files is changed to trigger the method\nDefault for `v-model` binding\n\n### @input\n* **Arguments:**\n\n  * `files: Array<File | Object>`\n\n\n* **Usage:**\n  ```html\n  <template>\n    <file-upload :value=\"files\" @input=\"updatetValue\"></file-upload>\n    <!--or-->\n    <file-upload v-model=\"files\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      updatetValue(value) {\n        this.files = value\n      }\n    }\n  }\n  </script>\n  ```\n\n\n\n### @input-filter\n\nAdd, update, remove pre-filter  \n\n* **Arguments:**\n\n  * `newFile: File | Object | undefined`  `Read and write`\n  * `oldFile: File | Object | undefined`  `Read only`\n  * `prevent: Function`   Call this function to prevent modification\n\n\n* **Details:**\n\n  If the `newFile` value is `undefined` 'is deleted\n  If the `oldFile` value is `undefined` 'is added\n  If `newFile`, `oldFile` is exist, it is updated\n\n\n  > You can not use `update`,` add`, `remove`,` clear` methods in the event  \n  >The `newFile` object can be modified within the event  \n\n* **Usage:**  \n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <img :src=\"file.blob\" width=\"50\" height=\"50\" />\n      </li>\n    </ul>\n    <file-upload :value=\"files\" @input-filter=\"inputFilter\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      inputFilter(newFile, oldFile, prevent) {\n        if (newFile && !oldFile) {\n          // Add file\n\n          // Filter non-image file\n          // Will not be added to files\n          if (!/\\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {\n            return prevent()\n          }\n\n          // Create the 'blob' field for thumbnail preview\n          newFile.blob = ''\n          let URL = window.URL || window.webkitURL\n          if (URL && URL.createObjectURL) {\n            newFile.blob = URL.createObjectURL(newFile.file)\n          }\n        }\n\n        if (newFile && oldFile) {\n          // Update file\n\n          // Increase the version number\n          if (!newFile.version) {\n            newFile.version = 0\n          }\n          newFile.version++\n        }\n\n        if (!newFile && oldFile) {\n          // Remove file\n\n          // Refused to remove the file\n          // return prevent()\n        }\n      }\n    }\n  }\n  </script>\n  ```\n\n### @input-file\n\nAdd, update, remove after\n\n* **Arguments:**\n\n  * `newFile: File | Object | undefined` `Read only`\n  * `oldFile: File | Object | undefined` `Read only`\n\n\n* **Details:**\n\n  If the `newFile` value is `undefined` 'is deleted\n  If the `oldFile` value is `undefined` 'is added\n  If `newFile`, `oldFile` is exist, it is updated\n\n\n  >You can use `update`,` add`, `remove`,` clear` methods in the event  \n  >You can not modify the `newFile` object in the event  \n  >You can not modify the `oldFile` object in the event\n\n* **Usage:**\n  ```html\n  <template>\n    <file-upload ref=\"upload\" v-model=\"files\" @input-file=\"inputFile\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      inputFile(newFile, oldFile) {\n        if (newFile && !oldFile) {\n          // Add file\n\n          // Automatic upload\n          if (!this.$refs.upload.active) {\n            this.$refs.upload.active = true\n          }\n        }\n\n        if (newFile && oldFile) {\n          // Update file\n\n          // Start upload\n          if (newFile.active !== oldFile.active) {\n            console.log('Start upload', newFile.active, newFile)\n\n            // min size\n            if (newFile.size >= 0 && newFile.size < 100 * 1024) {\n              newFile = this.$refs.upload.update(newFile, {error: 'size'})\n            }\n          }\n\n          // Upload progress\n          if (newFile.progress !== oldFile.progress) {\n            console.log('progress', newFile.progress, newFile)\n          }\n\n          // Upload error\n          if (newFile.error !== oldFile.error) {\n            console.log('error', newFile.error, newFile)\n          }\n\n          // Uploaded successfully\n          if (newFile.success !== oldFile.success) {\n            console.log('success', newFile.success, newFile)\n          }\n        }\n\n        if (!newFile && oldFile) {\n          // Remove file\n\n          // Automatically delete files on the server\n          if (oldFile.success && oldFile.response.id) {\n            // $.ajax({\n            //   type: 'DELETE',\n            //   url: '/file/delete?id=' + oldFile.response.id,\n            // });\n          }\n        }\n      }\n    }\n  }\n  </script>\n  ```\n\n\n\n## Instance / Data\n\n### features\n\nUsed to determine the browser support features\n\n* **Type:** `Object`\n\n* **Read only:** `true`\n\n* **Default:** `{ html5: true, directory: false, drag: false }`\n\n* **Usage:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\"></file-upload>\n    <span v-show=\"$refs.upload && $refs.upload.features.drag\">Support drag and drop upload</span>\n    <span v-show=\"$refs.upload && $refs.upload.features.directory\">Support folder upload</span>\n    <span v-show=\"$refs.upload && $refs.upload.features.html5\">Support for HTML5</span>\n  </app>\n  ```\n\n\n\n### active\n\nActivation or abort upload\n\n* **Type:** `Boolean`\n\n* **Read only:** `false`\n\n* **Default:** `false`\n\n* **Usage:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\"></file-upload>\n    <span v-if=\"!$refs.upload || !$refs.upload.active\" @click=\"$refs.upload.active = true\">Start upload</span>\n    <span v-else @click=\"$refs.upload.active = false\">Stop upload</span>\n  </app>\n  ```\n\n\n\n### dropActive\n\nIs dragging\n\n* **Type:** `Boolean`\n\n* **Read only:** `true`\n\n* **Default:** `false`\n\n* **Usage:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\" :drop=\"true\"></file-upload>\n    <span v-show=\"$refs.upload && $refs.upload.dropActive\">Drag and drop here for upload<span>\n  </app>\n  ```\n\n\n\n\n\n### uploaded\n\nAll uploaded\n\n* **Type:** `Boolean`\n\n* **Read only:** `true`\n\n* **Default:** `true`\n\n* **Usage:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\"></file-upload>\n    <span v-show=\"$refs.upload && $refs.upload.uploaded\">All files have been uploaded<span>\n  </app>\n  ```\n\n\n\n\n\n## Instance / Methods\n\n\n\n### get()\n\nUse `id` to get a file object\n\n* **Arguments:**\n\n  * `id: File | Object | String`\n\n\n* **Result:** `File | Object | Boolean` There is a return file, object that otherwise returns `false`\n\n\n\n### add()\n\nAdd one or more files\n\n* **Arguments:**\n\n  * `files: Array<File | window.File | Object> | File | window.File | Object`     If it is an array of responses will be an array\n  * `start: Boolean`                                  Whether it is inserted from the start position\n\n\n* **Result:** `Object | Array<File | Object> | Boolean`     The incoming array is returned to the array otherwise the object or `false`\n\n* **Usage:**\n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <span>{{file.name}}</span>\n      </li>\n    </ul>\n    <file-upload v-model=\"files\"></file-upload>\n    <button type=\"button\" @click.prevent=\"addText\">Add a file</button>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      addText() {\n        let file = new window.File(['foo'], 'foo.txt', {\n          type: \"text/plain\",\n        })\n        this.$refs.upload.add(file)\n      }\n    }\n  }\n  </script>\n  ```\n\n\n###  addInputFile()\n\nAdd the file selected by `<input type = \"file\">` to the upload list\n\n* **Arguments:**\n\n  * `el: HTMLInputElement`     File element\n\n\n* **Result:** `Array<File>`  Added list of files\n\n* **Version:** : `>=2.5.1`\n\n\n\n###  addDataTransfer()\n\nAdd files that are dragged or pasted into the upload list  \n\n* **Arguments:**\n\n  * `dataTransfer: DataTransfer`  Drag or paste data\n\n\n* **Result:** `Promise<Array<File>>`   Added list of files\n\n\n* **Version:** : `>=2.5.1`\n\n\n\n### update()\n\nUpdate a file object\n\n* **Arguments:**\n\n  * `id: File | Object | String`\n  * `data: Object`                    Updated data object\n\n\n* **Result:**  `Object | Boolean`  Successfully returned `newFile` failed to return` false`\n\n\n* **Usage:**\n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <span>{{file.name}}</span>\n        <button v-show=\"file.active\" type=\"button\" @click.prevent=\"abort(file)\">Abort</button>\n      </li>\n    </ul>\n    <file-upload v-model=\"files\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      abort(file) {\n        this.$refs.upload.update(file, {active: false})\n        // or\n        // this.$refs.upload.update(file, {error: 'abort'})\n      }\n    }\n  }\n  </script>\n  ```\n\n### remove()\n\nRemove a file object\n\n* **Arguments:**\n\n  * `id: File | Object | String`\n\n\n* **Result:**  `Object | Boolean`  Successfully returned `oldFile` failed to return` false`\n\n* **Usage:**\n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <span>{{file.name}}</span>\n        <button type=\"button\" @click.prevent=\"remove(file)\">Remove</button>\n      </li>\n    </ul>\n    <file-upload v-model=\"files\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      remove(file) {\n        this.$refs.upload.remove(file)\n      }\n    }\n  }\n  </script>\n  ```\n\n\n### clear()\n\nEmpty the file list\n\n* **Result:**  `Boolean`  Always return `true`\n\n\n\n## Instance / File\n\n\n\n> **File object in the `@input-filter` event outside the use of [`update`](#instance-methods-update) method**\n\n\n\n\n### fileObject\n\n* **Type:** `Boolean`\n\n* **Read only:** `true`\n\n* **Required:** `true`\n\n* **Default:** `true`\n\n* **Version:** : `>=2.6.0`\n\n* **Details:**\n\n  If the attribute does not exist, the object will not be processed internally  \n  If the attribute does not exist, it is not `File` but `Object`\n\n\n\n\n### id\n\nFile ID\n\n* **Type:** `String | Number`\n\n* **Read only:** `false`\n\n* **Default:** `Math.random().toString(36).substr(2)`\n\n* **Details:**\n\n  >`id` can not be repeated  \n  >Upload can not modify `id`\n\n\n### size\n\nFile size\n\n* **Type:** `Number`\n\n* **Read only:** `false`\n\n* **Default:** `-1`\n\n* **Browser:** `> IE9`\n\n\n### name\n\nFilename  \n\n* **Type:** `String`\n\n* **Read only:** `false`\n\n* **Default:** ` `\n\n* **Details:**\n\n  Format:  `directory/filename.gif`  `filename.gif`  \n\n\n\n### type\n\nMIME type\n\n* **Type:** `String`\n\n* **Read only:** `false`\n\n* **Default:** ` `\n\n* **Browser:** `> IE9`\n\n* **Details:**\n\n  Format:  `image/gif`   `image/png`  `text/html`\n\n\n\n\n### active\n\nActivation or abort upload\n\n* **Type:** `Boolean`\n\n* **Read only:** `false`\n\n* **Default:** `false`\n\n* **Details:**\n\n  `true` = Upload  \n  `false` = Abort  \n\n\n\n\n\n\n### error\n\nUpload failed error code\n\n* **Type:** `String`\n\n* **Read only:** `false`\n\n* **Default:** ` `\n\n* **Details:**\n\n  Built-in  \n  `size`, `extension`, `timeout`, `abort`, `network`, `server`, `denied`\n\n\n\n\n### success\n\nWhether the upload was successful\n\n* **Type:** `Boolean`\n\n* **Read only:** `false`\n\n* **Default:** `false`\n\n\n### putAction\n\nCustomize the current file `PUT` URL\n\n* **Type:** `String`\n\n* **Read only:** `false`\n\n* **Default:** `this.putAction`\n\n\n\n### postAction\n\nCustomize the current file `POST` URL\n\n* **Type:** `String`\n\n* **Read only:** `false`\n\n* **Default:** `this.postAction`\n\n\n\n\n### headers\n\nCustomize the current file `HTTP` Header\n\n* **Type:** `Object`\n\n* **Read only:** `false`\n\n* **Default:** `this.headers`\n\n\n### data\n\nCustomize the current file `body` or` query` to attach content\n\n* **Type:** `Object`\n\n* **Read only:** `false`\n\n* **Default:** `this.data`\n\n\n### timeout\n\nCustomize the upload timeout for a current single file\n\n* **Type:** `Number`\n\n* **Read only:** `false`\n\n* **Default:** `this.timeout`\n\n\n### response\n\nResponse data\n\n* **Type:** `Object | String`\n\n* **Read only:** `false`\n\n* **Default:** `{}`\n\n\n\n\n### progress\n\nUpload progress\n\n* **Type:** `String`\n\n* **Read only:** `false`\n\n* **Default:** `0.00`\n\n* **Browser:** `> IE9`\n\n\n\n### speed\n\nPer second upload speed\n\n* **Type:** `Number`\n\n* **Read only:** `true`\n\n* **Default:** `0`\n\n* **Browser:** `> IE9`\n\n\n\n\n### xhr\n\n`HTML5` upload` XMLHttpRequest` object\n\n* **Type:** `XMLHttpRequest`\n\n* **Read only:** `true`\n\n* **Default:** `undefined`\n\n* **Browser:** `> IE9`\n\n\n\n\n### iframe\n\n`HTML4` upload` iframe` element\n\n* **Type:** `Element`\n\n* **Read only:** `true`\n\n* **Default:** `undefined`\n\n* **Browser:** `= IE9`\n"
 
 /***/ }),
 /* 8 */
+/***/ (function(module, exports) {
+
+module.exports = "## 入门开始\n\n### NPM\n\n``` bash\nnpm install vue-upload-component --save\n```\n\n``` js\nconst VueUploadComponent = require('vue-upload-component')\nVue.component('file-upload', VueUploadComponent)\n```\n\n### Curated\n\n**No data**\n\n\n### 直接使用\n\n\nunpkg\n\n``` html\n<script src=\"https://unpkg.com/vue\"></script>\n<script src=\"https://unpkg.com/vue-upload-component\"></script>\n<script>\nVue.component('file-upload', VueUploadComponent)\n</script>\n```\n\njsDelivr\n\n``` html\n<script src=\"https://cdn.jsdelivr.net/npm/vue/dist/vue.js\"></script>\n<script src=\"https://cdn.jsdelivr.net/npm/vue-upload-component\"></script>\n<script>\nVue.component('file-upload', VueUploadComponent)\n</script>\n```\n\n\n### 简单的例子\n\n\n\n```html\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <title>Vue-upload-component Test</title>\n  <script src=\"https://unpkg.com/vue\"></script>\n  <script src=\"https://unpkg.com/vue-upload-component\"></script>\n</head>\n<body>\n<div id=\"app\">\n  <ul>\n    <li v-for=\"file in files\">{{file.name}} - Error: {{file.error}}, Success: {{file.success}}</li>\n  </ul>\n  <file-upload\n    ref=\"upload\"\n    v-model=\"files\"\n    post-action=\"/post.method\"\n    put-action=\"/put.method\"\n    @input-file=\"inputFile\"\n    @input-filter=\"inputFilter\"\n  >\n  上传文件\n  </file-upload>\n  <button v-show=\"!$refs.upload || !$refs.upload.active\" @click.prevent=\"$refs.upload.active = true\" type=\"button\">开始上传</button>\n  <button v-show=\"$refs.upload && $refs.upload.active\" @click.prevent=\"$refs.upload.active = false\" type=\"button\">停止上传</button>\n</div>\n<script>\nnew Vue({\n  el: '#app',\n  data: function () {\n    return {\n      files: []\n    }\n  },\n  components: {\n    FileUpload: VueUploadComponent\n  },\n  methods: {\n    /**\n     * Has changed\n     * @param  Object|undefined   newFile   只读\n     * @param  Object|undefined   oldFile   只读\n     * @return undefined\n     */\n    inputFile: function (newFile, oldFile) {\n      if (newFile && oldFile && !newFile.active && oldFile.active) {\n        // 获得相应数据\n        console.log('response', newFile.response)\n        if (newFile.xhr) {\n          //  获得响应状态码\n          console.log('status', newFile.xhr.status)\n        }\n      }\n    },\n    /**\n     * Pretreatment\n     * @param  Object|undefined   newFile   读写\n     * @param  Object|undefined   oldFile   只读\n     * @param  Function           prevent   阻止回调\n     * @return undefined\n     */\n    inputFilter: function (newFile, oldFile, prevent) {\n      if (newFile && !oldFile) {\n        // 过滤不是图片后缀的文件\n        if (!/\\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {\n          return prevent()\n        }\n      }\n\n      // 创建 blob 字段 用于图片预览\n      newFile.blob = ''\n      let URL = window.URL || window.webkitURL\n      if (URL && URL.createObjectURL) {\n        newFile.blob = URL.createObjectURL(newFile.file)\n      }\n    }\n  }\n});\n</script>\n</body>\n</html>\n```\n\n\n\n### SSR (服务器同构)\n\n\n```html\n<template>\n  <file-upload v-model=\"files\" post-action=\"/\">Upload file</file-upload>\n</template>\n<style>\n/*\nimport '~vue-upload-component/dist/vue-upload-component.part.css'\n\n\n或\n\n\n */\n.file-uploads {\n  overflow: hidden;\n  position: relative;\n  text-align: center;\n  display: inline-block;\n}\n.file-uploads.file-uploads-html4 input[type=\"file\"] {\n  opacity: 0;\n  font-size: 20em;\n  z-index: 1;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n}\n.file-uploads.file-uploads-html5 input[type=\"file\"] {\n  overflow: hidden;\n  position: fixed;\n  width: 1px;\n  height: 1px;\n  z-index: -1;\n  opacity: 0;\n}\n</style>\n<script>\nimport FileUpload from 'vue-upload-component/dist/vue-upload-component.part.js'\nexport default {\n  components: {\n    FileUpload,\n  },\n  data() {\n    return {\n      files: []\n    }\n  },\n}\n</script>\n```\n\n\n** 或者 **\n\n\n```js\nimport FileUpload from 'vue-upload-component/src'\n```\n\nwebpack.config.js\n\n```js\nconst nodeExternals = require('webpack-node-externals');\n{\n  //...\n  externals: [\n    nodeExternals({whitelist:[/^vue-upload-component\\/src/]})\n  ]\n  //...\n}\n```\n\n* [https://github.com/liady/webpack-node-externals](https://github.com/liady/webpack-node-externals)  \n\n* [**`vue-hackernews` 演示**](https://github.com/lian-yue/vue-hackernews-2.0/)  \n\n* [**浏览修改文件**](https://github.com/lian-yue/vue-hackernews-2.0/commit/bd6c58a30cc6b8ba6c0148e737b3ce9336b99cf8)\n\n\n\n\n## 选项 / 属性\n\n\n### input-id\n\ninput 标签的 `id` 属性\n\n* **类型:** `String`\n\n* **默认值:** `this.name`\n\n* **示例:**\n  ```html\n  <file-upload input-id=\"file2\"></file-upload>\n  <!--输出-->\n  <input id=\"file2\" />\n  ```\n\n\n\n\n\n### name\n\ninput标签的 `name` 属性\n\n* **类型:** `String`\n\n* **默认值:** `file`\n\n* **示例:**\n  ```html\n  <file-upload name=\"file\"></file-upload>\n  <!--输出-->\n  <input name=\"file\" />\n  ```\n\n\n\n\n\n### post-action\n\n`POST` 请求的上传URL\n\n* **类型:** `String`\n\n* **默认值:** `undefined`\n\n* **示例:**\n  ```html\n  <file-upload put-action=\"/upload/put.php\"></file-upload>\n  ```\n\n\n\n\n\n### put-action\n\n`PUT` 请求的上传URL\n\n* **类型:** `String`\n\n* **默认值:** `undefined`\n\n* **浏览器:** `> IE9`\n\n* **详细:**  \n\n  `put-action` 不为空请优先 `PUT` 请求  \n\n* **示例:**\n  ```html\n  <file-upload put-action=\"/upload/put.php\"></file-upload>\n  ```\n\n\n\n\n\n### headers\n\n自定义上传请求 `header` 数据\n\n* **类型:** `Object`\n\n* **默认值:** `{}`\n\n* **浏览器:** `> IE9`\n\n* **示例:**\n  ```html\n  <file-upload :headers=\"{'X-Token-CSRF': 'code'}\"></file-upload>\n  ```\n\n\n\n\n\n### data\n\n`POST 请求`: 附加请求的 body  \n`PUT 请求`: 附加请求的 query  \n\n* **类型:** `Object`\n\n* **默认值:** `{}`\n\n* **示例:**\n  ```html\n  <file-upload :data=\"{access_token: 'access_token'}\"></file-upload>\n  ```\n\n\n\n\n### value, v-model\n\n文件列表\n\n* **类型:** `Array<File | Object>`\n\n* **默认值:** `[]`\n\n* **详细:**  \n\n  浏览 **[`File`](#file)** 详细信息  \n  > 为了防止不可预知的错误，不可直接修改 `files`，请使用 [`add`](#实例-方法-add), [`update`](#实例-方法-update), [`remove`](#实例-方法-remove) 方法修改\n\n* **示例:**\n  ```html\n  <file-upload :value=\"files\" @input=\"updatetValue\"></file-upload>\n  <!--或-->\n  <file-upload v-model=\"files\"></file-upload>\n  ```\n\n\n\n\n\n### accept\n\n表单的`accept`属性, MIME type  \n\n* **类型:** `String`\n\n* **默认值:** `undefined`\n\n* **浏览器:** `> IE9`\n\n* **示例:**\n  ```html\n  <file-upload accept=\"image/png,image/gif,image/jpeg,image/webp\"></file-upload>\n  <!--或-->\n  <file-upload accept=\"image/*\"></file-upload>\n  ```\n\n\n\n\n\n### multiple\n\n文件表单的 `multiple` 属性  \n是否允许选择多个文件  \n\n* **类型:** `Boolean`\n\n* **默认值:** `false`\n\n* **详细:**  \n\n  如果是 `false` `files` 里面最多只有一个文件 多的会自动删除  \n\n* **示例:**\n  ```html\n  <file-upload :multiple=\"true\"></file-upload>\n  ```\n\n\n\n### directory\n\n文件表单的 `directory` 属性  \n是否是上传文件夹  \n\n* **类型:** `Boolean`\n\n* **默认值:** `false`\n\n* **浏览器:** [http://caniuse.com/#feat=input-file-directory](http://caniuse.com/#feat=input-file-directory)\n\n* **示例:**\n  ```html\n  <file-upload :directory=\"true\" :multiple=\"true\"></file-upload>\n  ```\n\n\n\n\n\n### extensions\n\n允许上传的文件后缀\n\n* **类型:** `Array | String | RegExp`\n\n* **默认值:** `undefined`\n\n* **示例:**\n  ```html\n  <file-upload extensions=\"jpg,gif,png,webp\"></file-upload>\n  <!--或-->\n  <file-upload :extensions=\"['jpg', 'gif', 'png', 'webp']\"></file-upload>\n  <!--或-->\n  <file-upload :extensions=\"/\\.(gif|jpe?g|png|webp)$/i\"></file-upload>\n  ```\n\n\n\n\n### size\n\n允许上传的最大字节\n\n* **类型:** `Number`\n\n* **默认值:** `0`\n\n* **浏览器:** `> IE9`\n\n* **详细:**\n\n  `0` 等于不限制\n\n* **示例:**\n  ```html\n  <file-upload :size=\"1024 * 1024\"></file-upload>\n  ```\n\n\n\n\n### timeout\n\n上传超时时间毫秒\n\n* **类型:** `Number`\n\n* **默认值:** `0`\n\n* **浏览器:** `> IE9`\n\n* **示例:**\n  ```html\n  <file-upload :timeout=\"600 * 1000\"></file-upload>\n  ```\n\n\n\n\n### thread\n\n同时并发上传的文件数量 线程数  \n\n* **类型:** `Number`\n\n* **默认值:** `1`\n\n* **浏览器:** `> IE9`\n\n* **示例:**\n  ```html\n  <file-upload :thread=\"3\"></file-upload>\n  ```\n\n\n\n\n\n### drop\n\n拖拽上传  \n\n* **类型:** `Boolean | Element | CSS selector`\n\n* **默认值:** `false`\n\n* **浏览器:** [http://caniuse.com/#feat=dragndrop](http://caniuse.com/#feat=dragndrop)\n\n* **详细:**\n\n  如果设置成 `true` 则读取父组件作为容器  \n\n* **示例:**\n  ```html\n  <file-upload :drop=\"true\"></file-upload>\n  ```\n\n\n\n\n\n### drop-directory\n\n是否开启拖拽目录  \n\n* **类型:** `Boolean`\n\n* **默认值:** `true`\n\n* **详细:**\n\n  如果设置成 `false` 则过滤掉目录\n\n* **示例:**\n  ```html\n  <file-upload :drop-directory=\"false\"></file-upload>\n  ```\n\n\n\n\n## 选项 / 事件\n\n文件被改变触发的方法  \n默认用于`v-model`绑定\n\n### @input\n* **参数:**\n\n  * `files: Array<File | Object>`\n\n\n* **示例:**\n  ```html\n  <template>\n    <file-upload :value=\"files\" @input=\"updatetValue\"></file-upload>\n    <!--或者-->\n    <file-upload v-model=\"files\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      updatetValue(value) {\n        this.files = value\n      }\n    }\n  }\n  </script>\n  ```\n\n\n\n### @input-filter\n\nAdd, update, remove pre-filter  \n\n* **参数:**\n\n  * `newFile: File | Object | undefined`  `读写`\n  * `oldFile: File | Object | undefined`  `只读`\n  * `prevent: Function`   调用该方法 阻止修改\n\n\n* **详细:**\n\n  如果 `newFile` 值为 `undefined` 则是删除  \n  如果 `oldFile` 值为 `undefined` 则是添加  \n  如果 `newFile`, `oldFile` 都存在则是更新\n\n  > 事件内不可使用 `update`, `add`, `remove`, `clear` 方法  \n  事件内可修改 `newFile` 对象\n\n* **示例:**  \n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <img :src=\"file.blob\" width=\"50\" height=\"50\" />\n      </li>\n    </ul>\n    <file-upload :value=\"files\" @input-filter=\"inputFilter\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      inputFilter(newFile, oldFile, prevent) {\n        if (newFile && !oldFile) {\n          // 添加文件\n\n          // 过滤非图片文件\n          // 不会添加到 files 去\n          if (!/\\.(jpeg|jpe|jpg|gif|png|webp)$/i.test(newFile.name)) {\n            return prevent()\n          }\n\n          // 创建 `blob` 字段 用于缩略图预览\n          newFile.blob = ''\n          let URL = window.URL || window.webkitURL\n          if (URL && URL.createObjectURL) {\n            newFile.blob = URL.createObjectURL(newFile.file)\n          }\n        }\n\n        if (newFile && oldFile) {\n          // 更新文件\n\n          // 增加版本号\n          if (!newFile.version) {\n            newFile.version = 0\n          }\n          newFile.version++\n        }\n\n        if (!newFile && oldFile) {\n          // 移除文件\n\n          // 拒绝删除文件\n          // return prevent()\n        }\n      }\n    }\n  }\n  </script>\n  ```\n\n### @input-file\n\n添加，更新，移除 后\n\n* **参数:**\n\n  * `newFile: File | Object | undefined` `只读`\n  * `oldFile: File | Object | undefined` `只读`\n\n\n* **详细:**\n\n  如果 `newFile` 值为 `undefined` 则是删除  \n  如果 `oldFile` 值为 `undefined` 则是添加  \n  如果 `newFile`, `oldFile` 都存在则是更新\n\n  >事件内可使用 `update`, `add`, `remove`, `clear` 方法  \n  >事件内不可修改 `newFile` 对象  \n  >事件内不可修改 `oldFile` 对象\n\n* **示例:**\n  ```html\n  <template>\n    <file-upload ref=\"upload\" v-model=\"files\" @input-file=\"inputFile\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      inputFile(newFile, oldFile) {\n        if (newFile && !oldFile) {\n          // 添加文件\n\n          // 自动上传\n          if (!this.$refs.upload.active) {\n            this.$refs.upload.active = true\n          }\n        }\n\n        if (newFile && oldFile) {\n          // 更新文件\n\n          // 开始上传\n          if (newFile.active !== oldFile.active) {\n            console.log('Start upload', newFile.active, newFile)\n\n            // 限定最小字节\n            if (newFile.size >= 0 && newFile.size < 100 * 1024) {\n              newFile = this.$refs.upload.update(newFile, {error: 'size'})\n            }\n          }\n\n          // 上传进度\n          if (newFile.progress !== oldFile.progress) {\n            console.log('progress', newFile.progress, newFile)\n          }\n\n          // 上传错误\n          if (newFile.error !== oldFile.error) {\n            console.log('error', newFile.error, newFile)\n          }\n\n          // 上传成功\n          if (newFile.success !== oldFile.success) {\n            console.log('success', newFile.success, newFile)\n          }\n        }\n\n        if (!newFile && oldFile) {\n          // 删除文件\n\n          // 自动删除 服务器上的文件\n          if (oldFile.success && oldFile.response.id) {\n            // $.ajax({\n            //   type: 'DELETE',\n            //   url: '/file/delete?id=' + oldFile.response.id,\n            // });\n          }\n        }\n      }\n    }\n  }\n  </script>\n  ```\n\n\n\n## 实例 / 数据\n\n### features\n\n用于判断浏览器支持的特性\n\n* **类型:** `Object`\n\n* **只读:** `true`\n\n* **默认值:** `{ html5: true, directory: false, drag: false }`\n\n* **示例:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\"></file-upload>\n    <span v-show=\"$refs.upload && $refs.upload.features.drag\">支持拖拽上传</span>\n    <span v-show=\"$refs.upload && $refs.upload.features.directory\">支持文件夹上传</span>\n    <span v-show=\"$refs.upload && $refs.upload.features.html5\">支持HTML5</span>\n  </app>\n  ```\n\n\n\n### active\n\n激活或停止上传\n\n* **类型:** `Boolean`\n\n* **只读:** `false`\n\n* **默认值:** `false`\n\n* **示例:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\"></file-upload>\n    <span v-if=\"!$refs.upload || !$refs.upload.active\" @click=\"$refs.upload.active = true\">开始上传</span>\n    <span v-else @click=\"$refs.upload.active = false\">停止上传</span>\n  </app>\n  ```\n\n\n\n### dropActive\n\n是否正在拖拽\n\n* **类型:** `Boolean`\n\n* **只读:** `true`\n\n* **默认值:** `false`\n\n* **示例:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\" :drop=\"true\"></file-upload>\n    <span v-show=\"$refs.upload && $refs.upload.dropActive\">拖拽到这里上传<span>\n  </app>\n  ```\n\n\n\n\n\n### uploaded\n\n是否全部已上传\n\n* **类型:** `Boolean`\n\n* **只读:** `true`\n\n* **默认值:** `true`\n\n* **示例:**\n  ```html\n  <app>\n    <file-upload ref=\"upload\"></file-upload>\n    <span v-show=\"$refs.upload && $refs.upload.uploaded\">全部文件已上传完毕<span>\n  </app>\n  ```\n\n\n\n\n\n## 实例 / 方法\n\n\n\n### get()\n\n使用`id`获得某个对象\n\n* **参数:**\n\n  * `id: File | Object | String`\n\n\n* **结果:** `File | Object | Boolean` 存在返回文件对象否则返回 `false`\n\n\n\n### add()\n\n添加一个或多个文件\n\n* **参数:**\n\n  * `files: Array<File | window.File | Object> | File | window.File | Object`     如果它是一个数组的响应将是一个数组\n  * `start: Boolean`                                  是否从开始位置插入\n\n\n* **结果:** `Object | Array<File | Object> | Boolean`     传入的是数组返回数组否则对象或`false`\n\n* **示例:**\n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <span>{{file.name}}</span>\n      </li>\n    </ul>\n    <file-upload v-model=\"files\"></file-upload>\n    <button type=\"button\" @click.prevent=\"addText\">添加文件</button>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      addText() {\n        let file = new window.File(['foo'], 'foo.txt', {\n          type: \"text/plain\",\n        })\n        this.$refs.upload.add(file)\n      }\n    }\n  }\n  </script>\n  ```\n\n\n###  addInputFile()\n\n把`<input type=\"file\">`选择的文件添加进上传列表  \n\n* **参数:**\n\n  * `el: HTMLInputElement`     文件元素\n\n\n* **结果:** `Array<File>`  返回已添加的文件列表\n\n* **版本:** : `>=2.5.1`\n\n\n\n###  addDataTransfer()\n\n把拖拽或者粘贴的数据的文件添加进上传列表  \n\n* **参数:**\n\n  * `dataTransfer: DataTransfer`  拖拽或者粘贴的数据\n\n\n* **结果:** `Promise<Array<File>>`   返回已添加的文件列表\n\n\n* **版本:** : `>=2.5.1`\n\n\n\n### update()\n\n更新某个对象\n\n* **参数:**\n\n  * `id: File | Object | String`\n  * `data: Object`                    更新的数据对象\n\n\n* **结果:**  `Object | Boolean`  成功返回 `newFile` 失败返回 `false`\n\n\n* **示例:**\n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <span>{{file.name}}</span>\n        <button v-show=\"file.active\" type=\"button\" @click.prevent=\"abort(file)\">停止</button>\n      </li>\n    </ul>\n    <file-upload v-model=\"files\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      abort(file) {\n        this.$refs.upload.update(file, {active: false})\n        // 或\n        // this.$refs.upload.update(file, {error: 'abort'})\n      }\n    }\n  }\n  </script>\n  ```\n\n### remove()\n\n移除某个文件对象\n\n* **参数:**\n\n  * `id: File | Object | String`\n\n\n* **结果:**  `Object | Boolean`  成功返回 `oldFile` 失败返回 `false`\n\n* **示例:**\n  ```html\n  <template>\n    <ul>\n      <li v-for=\"file in files\">\n        <span>{{file.name}}</span>\n        <button type=\"button\" @click.prevent=\"remove(file)\">移除</button>\n      </li>\n    </ul>\n    <file-upload v-model=\"files\"></file-upload>\n  </template>\n  <script>\n  export default {\n    data() {\n      return {\n        files: []\n      }\n    },\n    methods: {\n      remove(file) {\n        this.$refs.upload.remove(file)\n      }\n    }\n  }\n  </script>\n  ```\n\n\n### clear()\n\n清空文件列表\n\n* **结果:**  `Boolean`  总是返回 `true`\n\n\n\n## 实例 / File\n\n\n> **文件对象在`input-filter`事件外修改请使用 [`update`](#实例-方法-update) 方法**\n\n\n### fileObject\n\n* **类型:** `Boolean`\n\n* **只读:** `true`\n\n* **Required:** `true`\n\n* **默认值:** `true`\n\n* **版本:** : `>=2.6.0`\n\n* **详细:**\n\n  如果属性不存在，则不会在内部处理该对象  \n  如果属性不存在，它不是 `File` 而是 `Object`\n\n\n\n### id\n\n文件id\n\n* **类型:** `String | Number`\n\n* **只读:** `false`\n\n* **默认值:** `Math.random().toString(36).substr(2)`\n\n* **详细:**\n\n  >`id` can not be repeated  \n  >Upload can not modify `id`\n\n\n### size\n\n文件大小\n\n* **类型:** `Number`\n\n* **只读:** `false`\n\n* **默认值:** `-1`\n\n* **浏览器:** `> IE9`\n\n\n### name\n\n文件名  \n\n* **类型:** `String`\n\n* **只读:** `false`\n\n* **默认值:** ` `\n\n* **详细:**\n\n  格式:  `directory/filename.gif`  `filename.gif`  \n\n\n\n### type\n\nMIME类型\n\n* **类型:** `String`\n\n* **只读:** `false`\n\n* **默认值:** ` `\n\n* **浏览器:** `> IE9`\n\n* **详细:**\n\n  格式:  `image/gif`   `image/png`  `text/html`\n\n\n\n\n### active\n\n激活或终止上传\n\n* **类型:** `Boolean`\n\n* **只读:** `false`\n\n* **默认值:** `false`\n\n* **详细:**\n\n  `true` = 上传  \n  `false` = 停止  \n\n\n\n\n\n\n### error\n\n上传失败错误代码\n\n* **类型:** `String`\n\n* **只读:** `false`\n\n* **默认值:** ` `\n\n* **详细:**\n\n  内置\n  `size`, `extension`, `timeout`, `abort`, `network`, `server`, `denied`\n\n\n\n\n### success\n\n是否上传成功\n\n* **类型:** `Boolean`\n\n* **只读:** `false`\n\n* **默认值:** `false`\n\n\n### putAction\n\n自定义当前文件 `PUT` 地址\n\n* **类型:** `String`\n\n* **只读:** `false`\n\n* **默认值:** `this.putAction`\n\n\n\n### postAction\n\n自定义当前文件 `POST` 地址\n\n* **类型:** `String`\n\n* **只读:** `false`\n\n* **默认值:** `this.postAction`\n\n\n\n\n### headers\n\n自定义当前文件 `HTTP` Header\n\n* **类型:** `Object`\n\n* **只读:** `false`\n\n* **默认值:** `this.headers`\n\n\n### data\n\n自定义当前文件 `body` 或 `query` 附加内容\n\n* **类型:** `Object`\n\n* **只读:** `false`\n\n* **默认值:** `this.data`\n\n\n### timeout\n\n自定义当前单个文件的上传超时时间\n\n* **类型:** `Number`\n\n* **只读:** `false`\n\n* **默认值:** `this.timeout`\n\n\n### response\n\n响应的数据\n\n* **类型:** `Object | String`\n\n* **只读:** `false`\n\n* **默认值:** `{}`\n\n\n\n\n### progress\n\n上传进度\n\n* **类型:** `String`\n\n* **只读:** `false`\n\n* **默认值:** `0.00`\n\n* **浏览器:** `> IE9`\n\n\n\n### speed\n\n每秒的上传速度\n\n* **类型:** `Number`\n\n* **只读:** `true`\n\n* **默认值:** `0`\n\n* **浏览器:** `> IE9`\n\n\n\n\n### xhr\n\n`HTML5` 上传 `XMLHttpRequest` 对象\n\n* **类型:** `XMLHttpRequest`\n\n* **只读:** `true`\n\n* **默认值:** `undefined`\n\n* **浏览器:** `> IE9`\n\n\n\n\n### iframe\n\n`HTML4` 上传 `iframe` 元素\n\n* **类型:** `Element`\n\n* **只读:** `true`\n\n* **默认值:** `undefined`\n\n* **浏览器:** `= IE9`\n"
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(36);
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports) {
+
+module.exports = Cropper;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(12);
+
+
+/***/ }),
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_marked__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_marked__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_marked___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_marked__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_highlight_js__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_highlight_js__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_highlight_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_highlight_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__store__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__router__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__i18n__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__views_App__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__store__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__router__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__i18n__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__views_App__ = __webpack_require__(73);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -672,23 +696,23 @@ new __WEBPACK_IMPORTED_MODULE_0_vue___default.a(_extends({
 }, __WEBPACK_IMPORTED_MODULE_6__views_App__["a" /* default */])).$mount('#app');
 
 /***/ }),
-/* 9 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = Vue;
 
 /***/ }),
-/* 10 */
+/* 14 */
 /***/ (function(module, exports) {
 
 module.exports = hljs;
 
 /***/ }),
-/* 11 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vuex__);
 // import Vue from 'vue'
 
@@ -712,28 +736,22 @@ var mutations = {
 }));
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-module.exports = Vuex;
-
-/***/ }),
-/* 13 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_router__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_router__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_router___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue_router__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__i18n__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__views_Router__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__views_Document__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__views_Example__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__views_examples_Full__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__i18n__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__views_Router__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__views_Document__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__views_Example__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__views_examples_Full__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__views_examples_Simple__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__views_examples_Avatar__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__views_examples_Drag__ = __webpack_require__(56);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__views_examples_Multiple__ = __webpack_require__(60);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__views_examples_Vuex__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__views_examples_Avatar__ = __webpack_require__(53);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__views_examples_Drag__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__views_examples_Multiple__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__views_examples_Vuex__ = __webpack_require__(68);
 // import Vue from 'vue'
 
 
@@ -802,19 +820,19 @@ var router = new __WEBPACK_IMPORTED_MODULE_0_vue_router___default.a({
 /* harmony default export */ __webpack_exports__["a"] = (router);
 
 /***/ }),
-/* 14 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = VueRouter;
 
 /***/ }),
-/* 15 */
+/* 18 */
 /***/ (function(module, exports) {
 
 module.exports = VueI18n;
 
 /***/ }),
-/* 16 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -840,17 +858,17 @@ module.exports = VueI18n;
   },
 
   example: {
-    full: 'Full',
+    full: 'Full Example',
     simple: 'Simple',
-    avatar: 'Avatar',
-    drag: 'Drag',
-    multiple: 'Multiple',
+    avatar: 'Upload avatar',
+    drag: 'Drag and drop',
+    multiple: 'Multiple instances',
     vuex: 'Vuex'
   }
 });
 
 /***/ }),
-/* 17 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -878,19 +896,19 @@ module.exports = VueI18n;
   example: {
     full: '完整例子',
     simple: '简单例子',
-    avatar: '头像例子',
-    drag: '拖拽例子',
-    multiple: '多实例',
+    avatar: '上传头像',
+    drag: '拖拽上传',
+    multiple: '多个实例',
     vuex: 'Vuex'
   }
 });
 
 /***/ }),
-/* 18 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_0546df56_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Router_vue__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_0546df56_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Router_vue__ = __webpack_require__(22);
 var normalizeComponent = __webpack_require__(0)
 /* script */
 var __vue_script__ = null
@@ -914,7 +932,7 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 19 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -924,14 +942,14 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 20 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Document_vue__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_102fa427_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Document_vue__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Document_vue__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_102fa427_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Document_vue__ = __webpack_require__(29);
 function injectStyle (ssrContext) {
-  __webpack_require__(21)
+  __webpack_require__(24)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
@@ -956,20 +974,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 21 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(22);
+var content = __webpack_require__(25);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("27a8f968", content, true);
 
 /***/ }),
-/* 22 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -983,7 +1001,7 @@ exports.push([module.i, ".document-title{margin-bottom:2rem;padding-bottom:1rem;
 
 
 /***/ }),
-/* 23 */
+/* 26 */
 /***/ (function(module, exports) {
 
 /**
@@ -1015,11 +1033,11 @@ module.exports = function listToStyles(parentId, list) {
 };
 
 /***/ }),
-/* 24 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_marked__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_marked__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_marked___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_marked__);
 //
 //
@@ -1080,7 +1098,7 @@ module.exports = function listToStyles(parentId, list) {
 /* harmony default export */ __webpack_exports__["a"] = ({
   computed: {
     document: function document() {
-      return __webpack_require__(25)("./" + this.$i18n.locale);
+      return __webpack_require__(28)("./" + this.$i18n.locale);
     },
     navs: function navs() {
       var tokens = __WEBPACK_IMPORTED_MODULE_0_marked___default.a.lexer(this.document);
@@ -1140,14 +1158,14 @@ module.exports = function listToStyles(parentId, list) {
 });
 
 /***/ }),
-/* 25 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./en": 5,
-	"./en.md": 5,
-	"./zh-cn": 6,
-	"./zh-cn.md": 6
+	"./en": 7,
+	"./en.md": 7,
+	"./zh-cn": 8,
+	"./zh-cn.md": 8
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -1163,10 +1181,10 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 25;
+webpackContext.id = 28;
 
 /***/ }),
-/* 26 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1176,11 +1194,11 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 27 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_f18b6ae4_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Example_vue__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_f18b6ae4_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Example_vue__ = __webpack_require__(31);
 var normalizeComponent = __webpack_require__(0)
 /* script */
 var __vue_script__ = null
@@ -1204,7 +1222,7 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 28 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1214,14 +1232,14 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 29 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Full_vue__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Full_vue__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_60fc9379_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Full_vue__ = __webpack_require__(47);
 function injectStyle (ssrContext) {
-  __webpack_require__(30)
+  __webpack_require__(33)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
@@ -1246,20 +1264,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 30 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(31);
+var content = __webpack_require__(34);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("3e9ccf96", content, true);
 
 /***/ }),
-/* 31 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -1273,15 +1291,15 @@ exports.push([module.i, ".example-full .btn-group .dropdown-menu{display:block;v
 
 
 /***/ }),
-/* 32 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cropperjs__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cropperjs__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cropperjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_cropperjs__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_upload_component__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_upload_component__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_upload_component___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_vue_upload_component__);
 
 
@@ -1289,6 +1307,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
+//
 //
 //
 //
@@ -1925,13 +1944,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 });
 
 /***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(34);
-
-/***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // This method of obtaining a reference to the global object needs to be
@@ -1950,7 +1963,7 @@ var oldRuntime = hadRuntime && g.regeneratorRuntime;
 // Force reevalutation of runtime.js.
 g.regeneratorRuntime = undefined;
 
-module.exports = __webpack_require__(35);
+module.exports = __webpack_require__(37);
 
 if (hadRuntime) {
   // Restore the original runtime.
@@ -1965,7 +1978,7 @@ if (hadRuntime) {
 }
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -2670,10 +2683,10 @@ if (hadRuntime) {
 function () {
   return this;
 }() || Function("return this")());
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(36)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(38)(module)))
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports) {
 
 module.exports = function (module) {
@@ -2698,18 +2711,6 @@ module.exports = function (module) {
 	}
 	return module;
 };
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports) {
-
-module.exports = Cropper;
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(39);
 
 /***/ }),
 /* 39 */
@@ -4027,7 +4028,7 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-full"},[_c('button',{staticClass:"btn btn-danger float-right btn-is-option",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.isOption = !_vm.isOption}}},[_c('i',{staticClass:"fa fa-cog",attrs:{"aria-hidden":"true"}}),_vm._v("\n    Options\n  ")]),_c('h1',{staticClass:"document-title",attrs:{"id":"document-title"}},[_vm._v("Full Example")]),_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.$refs.upload && _vm.$refs.upload.dropActive),expression:"$refs.upload && $refs.upload.dropActive"}],staticClass:"drop-active"},[_c('h3',[_vm._v("Drop files to upload")])]),_c('div',{directives:[{name:"show",rawName:"v-show",value:(!_vm.isOption),expression:"!isOption"}],staticClass:"upload"},[_c('table',{staticClass:"table table-hover"},[_vm._m(0),_c('tbody',[(!_vm.files.length)?_c('tr',[_c('td',{attrs:{"colspan":"7"}},[_c('div',{staticClass:"text-center p-5"},[_vm._m(1),_c('label',{staticClass:"btn btn-lg btn-primary",attrs:{"for":_vm.name}},[_vm._v("Select Files")])])])]):_vm._e(),_vm._l((_vm.files),function(file,index){return _c('tr',{key:file.id},[_c('td',[_vm._v(_vm._s(index))]),_c('td',[(file.thumb)?_c('img',{attrs:{"src":file.thumb,"width":"40","height":"auto"}}):_c('span',[_vm._v("No Image")])]),_c('td',[_c('div',{staticClass:"filename"},[_vm._v("\n              "+_vm._s(file.name)+"\n            ")]),(file.active || file.progress !== '0.00')?_c('div',{staticClass:"progress"},[_c('div',{class:{'progress-bar': true, 'progress-bar-striped': true, 'bg-danger': file.error, 'progress-bar-animated': file.active},style:({width: file.progress + '%'}),attrs:{"role":"progressbar"}},[_vm._v(_vm._s(file.progress)+"%")])]):_vm._e()]),_c('td',[_vm._v(_vm._s(_vm._f("formatSize")(file.size)))]),_c('td',[_vm._v(_vm._s(_vm._f("formatSize")(file.speed)))]),(file.error)?_c('td',[_vm._v(_vm._s(file.error))]):(file.success)?_c('td',[_vm._v("success")]):(file.active)?_c('td',[_vm._v("active")]):_c('td'),_c('td',[_c('div',{staticClass:"btn-group"},[_c('button',{staticClass:"btn btn-secondary btn-sm dropdown-toggle",attrs:{"type":"button"}},[_vm._v("\n                Action\n              ")]),_c('div',{staticClass:"dropdown-menu"},[_c('a',{class:{'dropdown-item': true, disabled: file.active || file.success},attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();file.active || file.success ? false :  _vm.onEditFileShow(file)}}},[_vm._v("Edit")]),_c('a',{class:{'dropdown-item': true, disabled: !file.active},attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();file.active ? _vm.$refs.upload.update(file, {error: 'cancel'}) : false}}},[_vm._v("Cancel")]),(file.active)?_c('a',{staticClass:"dropdown-item",attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.update(file, {active: false})}}},[_vm._v("Abort")]):(file.error && _vm.$refs.upload.features.html5)?_c('a',{staticClass:"dropdown-item",attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.update(file, {active: true, error: '', progress: '0.00'})}}},[_vm._v("Retry upload")]):_c('a',{class:{'dropdown-item': true, disabled: file.success},attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();file.success ? false : _vm.$refs.upload.update(file, {active: true})}}},[_vm._v("Upload")]),_c('div',{staticClass:"dropdown-divider"}),_c('a',{staticClass:"dropdown-item",attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.remove(file)}}},[_vm._v("Remove")])])])])])})],2)]),_c('div',{staticClass:"example-foorer"},[_c('div',{staticClass:"footer-status float-right"},[_vm._v("\n        Drop: "+_vm._s(_vm.$refs.upload ? _vm.$refs.upload.drop : false)+",\n        Active: "+_vm._s(_vm.$refs.upload ? _vm.$refs.upload.active : false)+",\n        Uploaded: "+_vm._s(_vm.$refs.upload ? _vm.$refs.upload.uploaded : true)+",\n        Drop active: "+_vm._s(_vm.$refs.upload ? _vm.$refs.upload.dropActive : false)+"\n      ")]),_c('div',{staticClass:"btn-group"},[_c('file-upload',{ref:"upload",staticClass:"btn btn-primary dropdown-toggle",attrs:{"post-action":_vm.postAction,"put-action":_vm.putAction,"extensions":_vm.extensions,"accept":_vm.accept,"multiple":_vm.multiple,"directory":_vm.directory,"size":_vm.size || 0,"thread":_vm.thread < 1 ? 1 : (_vm.thread > 5 ? 5 : _vm.thread),"headers":_vm.headers,"data":_vm.data,"drop":_vm.drop,"drop-directory":_vm.dropDirectory},on:{"input-filter":_vm.inputFilter,"input-file":_vm.inputFile},model:{value:(_vm.files),callback:function ($$v) {_vm.files=$$v},expression:"files"}},[_c('i',{staticClass:"fa fa-plus"}),_vm._v("\n          Select\n        ")]),_c('div',{staticClass:"dropdown-menu"},[_c('label',{staticClass:"dropdown-item",attrs:{"for":_vm.name}},[_vm._v("Add files")]),_c('a',{staticClass:"dropdown-item",attrs:{"href":"#"},on:{"click":_vm.onAddFolader}},[_vm._v("Add folder")]),_c('a',{staticClass:"dropdown-item",attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();_vm.addData.show = true}}},[_vm._v("Add data")])])],1),(!_vm.$refs.upload || !_vm.$refs.upload.active)?_c('button',{staticClass:"btn btn-success",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = true}}},[_c('i',{staticClass:"fa fa-arrow-up",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Start Upload\n      ")]):_c('button',{staticClass:"btn btn-danger",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = false}}},[_c('i',{staticClass:"fa fa-stop",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Stop Upload\n      ")])])]),_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.isOption),expression:"isOption"}],staticClass:"option"},[_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"accept"}},[_vm._v("Accept:")]),_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.accept),expression:"accept"}],staticClass:"form-control",attrs:{"type":"text","id":"accept"},domProps:{"value":(_vm.accept)},on:{"input":function($event){if($event.target.composing){ return; }_vm.accept=$event.target.value}}}),_c('small',{staticClass:"form-text text-muted"},[_vm._v("Allow upload mime type")])]),_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"extensions"}},[_vm._v("Extensions:")]),_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.extensions),expression:"extensions"}],staticClass:"form-control",attrs:{"type":"text","id":"extensions"},domProps:{"value":(_vm.extensions)},on:{"input":function($event){if($event.target.composing){ return; }_vm.extensions=$event.target.value}}}),_c('small',{staticClass:"form-text text-muted"},[_vm._v("Allow upload file extension")])]),_c('div',{staticClass:"form-group"},[_c('label',[_vm._v("PUT Upload:")]),_c('div',{staticClass:"form-check"},[_c('label',{staticClass:"form-check-label"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.putAction),expression:"putAction"}],staticClass:"form-check-input",attrs:{"type":"radio","name":"put-action","id":"put-action","value":""},domProps:{"checked":_vm._q(_vm.putAction,"")},on:{"__c":function($event){_vm.putAction=""}}}),_vm._v(" Off\n        ")])]),_c('div',{staticClass:"form-check"},[_c('label',{staticClass:"form-check-label"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.putAction),expression:"putAction"}],staticClass:"form-check-input",attrs:{"type":"radio","name":"put-action","id":"put-action","value":"/upload/put"},domProps:{"checked":_vm._q(_vm.putAction,"/upload/put")},on:{"__c":function($event){_vm.putAction="/upload/put"}}}),_vm._v(" On\n        ")])]),_c('small',{staticClass:"form-text text-muted"},[_vm._v("After the shutdown, use the POST method to upload")])]),_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"thread"}},[_vm._v("Thread:")]),_c('input',{directives:[{name:"model",rawName:"v-model.number",value:(_vm.thread),expression:"thread",modifiers:{"number":true}}],staticClass:"form-control",attrs:{"type":"number","max":"5","min":"1","id":"thread"},domProps:{"value":(_vm.thread)},on:{"input":function($event){if($event.target.composing){ return; }_vm.thread=_vm._n($event.target.value)},"blur":function($event){_vm.$forceUpdate()}}}),_c('small',{staticClass:"form-text text-muted"},[_vm._v("Also upload the number of files at the same time (number of threads)")])]),_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"size"}},[_vm._v("Max size:")]),_c('input',{directives:[{name:"model",rawName:"v-model.number",value:(_vm.size),expression:"size",modifiers:{"number":true}}],staticClass:"form-control",attrs:{"type":"number","min":"0","id":"size"},domProps:{"value":(_vm.size)},on:{"input":function($event){if($event.target.composing){ return; }_vm.size=_vm._n($event.target.value)},"blur":function($event){_vm.$forceUpdate()}}})]),_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"minSize"}},[_vm._v("Min size:")]),_c('input',{directives:[{name:"model",rawName:"v-model.number",value:(_vm.minSize),expression:"minSize",modifiers:{"number":true}}],staticClass:"form-control",attrs:{"type":"number","min":"0","id":"minSize"},domProps:{"value":(_vm.minSize)},on:{"input":function($event){if($event.target.composing){ return; }_vm.minSize=_vm._n($event.target.value)},"blur":function($event){_vm.$forceUpdate()}}})]),_c('div',{staticClass:"form-group"},[_c('div',{staticClass:"form-check"},[_c('label',{staticClass:"form-check-label"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.drop),expression:"drop"}],staticClass:"form-check-input",attrs:{"type":"checkbox","id":"drop"},domProps:{"checked":Array.isArray(_vm.drop)?_vm._i(_vm.drop,null)>-1:(_vm.drop)},on:{"__c":function($event){var $$a=_vm.drop,$$el=$event.target,$$c=$$el.checked?(true):(false);if(Array.isArray($$a)){var $$v=null,$$i=_vm._i($$a,$$v);if($$el.checked){$$i<0&&(_vm.drop=$$a.concat([$$v]))}else{$$i>-1&&(_vm.drop=$$a.slice(0,$$i).concat($$a.slice($$i+1)))}}else{_vm.drop=$$c}}}}),_vm._v(" Drop\n        ")])]),_c('small',{staticClass:"form-text text-muted"},[_vm._v("Drag and drop upload")])]),_c('div',{staticClass:"form-group"},[_c('div',{staticClass:"form-check"},[_c('label',{staticClass:"form-check-label"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.dropDirectory),expression:"dropDirectory"}],staticClass:"form-check-input",attrs:{"type":"checkbox","id":"drop-directory"},domProps:{"checked":Array.isArray(_vm.dropDirectory)?_vm._i(_vm.dropDirectory,null)>-1:(_vm.dropDirectory)},on:{"__c":function($event){var $$a=_vm.dropDirectory,$$el=$event.target,$$c=$$el.checked?(true):(false);if(Array.isArray($$a)){var $$v=null,$$i=_vm._i($$a,$$v);if($$el.checked){$$i<0&&(_vm.dropDirectory=$$a.concat([$$v]))}else{$$i>-1&&(_vm.dropDirectory=$$a.slice(0,$$i).concat($$a.slice($$i+1)))}}else{_vm.dropDirectory=$$c}}}}),_vm._v(" Drop directory\n        ")])]),_c('small',{staticClass:"form-text text-muted"},[_vm._v("Not checked, filter the dragged folder")])]),_c('div',{staticClass:"form-group"},[_c('div',{staticClass:"form-check"},[_c('label',{staticClass:"form-check-label"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.uploadAuto),expression:"uploadAuto"}],staticClass:"form-check-input",attrs:{"type":"checkbox","id":"upload-auto"},domProps:{"checked":Array.isArray(_vm.uploadAuto)?_vm._i(_vm.uploadAuto,null)>-1:(_vm.uploadAuto)},on:{"__c":function($event){var $$a=_vm.uploadAuto,$$el=$event.target,$$c=$$el.checked?(true):(false);if(Array.isArray($$a)){var $$v=null,$$i=_vm._i($$a,$$v);if($$el.checked){$$i<0&&(_vm.uploadAuto=$$a.concat([$$v]))}else{$$i>-1&&(_vm.uploadAuto=$$a.slice(0,$$i).concat($$a.slice($$i+1)))}}else{_vm.uploadAuto=$$c}}}}),_vm._v(" Auto start\n        ")])]),_c('small',{staticClass:"form-text text-muted"},[_vm._v("Automatically activate upload")])]),_c('div',{staticClass:"form-group"},[_c('button',{staticClass:"btn btn-primary btn-lg btn-block",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.isOption = !_vm.isOption}}},[_vm._v("Confirm")])])]),_c('div',{class:{'modal-backdrop': true, 'fade': true, show: _vm.addData.show}}),_c('div',{class:{modal: true, fade: true, show: _vm.addData.show},attrs:{"id":"modal-add-data","tabindex":"-1","role":"dialog"}},[_c('div',{staticClass:"modal-dialog",attrs:{"role":"document"}},[_c('div',{staticClass:"modal-content"},[_c('div',{staticClass:"modal-header"},[_c('h5',{staticClass:"modal-title"},[_vm._v("Add data")]),_c('button',{staticClass:"close",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.addData.show = false}}},[_c('span',[_vm._v("×")])])]),_c('form',{on:{"submit":function($event){$event.preventDefault();_vm.onAddData($event)}}},[_c('div',{staticClass:"modal-body"},[_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"name"}},[_vm._v("Name:")]),_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.addData.name),expression:"addData.name"}],staticClass:"form-control",attrs:{"type":"text","required":"","id":"name","placeholder":"Please enter a file name"},domProps:{"value":(_vm.addData.name)},on:{"input":function($event){if($event.target.composing){ return; }_vm.addData.name=$event.target.value}}}),_vm._m(2)]),_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"type"}},[_vm._v("Type:")]),_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.addData.type),expression:"addData.type"}],staticClass:"form-control",attrs:{"type":"text","required":"","id":"type","placeholder":"Please enter the MIME type"},domProps:{"value":(_vm.addData.type)},on:{"input":function($event){if($event.target.composing){ return; }_vm.addData.type=$event.target.value}}}),_vm._m(3)]),_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"content"}},[_vm._v("Content:")]),_c('textarea',{directives:[{name:"model",rawName:"v-model",value:(_vm.addData.content),expression:"addData.content"}],staticClass:"form-control",attrs:{"required":"","id":"content","rows":"3","placeholder":"Please enter the file contents"},domProps:{"value":(_vm.addData.content)},on:{"input":function($event){if($event.target.composing){ return; }_vm.addData.content=$event.target.value}}})])]),_c('div',{staticClass:"modal-footer"},[_c('button',{staticClass:"btn btn-secondary",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.addData.show = false}}},[_vm._v("Close")]),_c('button',{staticClass:"btn btn-primary",attrs:{"type":"submit"}},[_vm._v("Save")])])])])])]),_c('div',{class:{'modal-backdrop': true, 'fade': true, show: _vm.editFile.show}}),_c('div',{class:{modal: true, fade: true, show: _vm.editFile.show},attrs:{"id":"modal-edit-file","tabindex":"-1","role":"dialog"}},[_c('div',{staticClass:"modal-dialog modal-lg",attrs:{"role":"document"}},[_c('div',{staticClass:"modal-content"},[_c('div',{staticClass:"modal-header"},[_c('h5',{staticClass:"modal-title"},[_vm._v("Edit file")]),_c('button',{staticClass:"close",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.editFile.show = false}}},[_c('span',[_vm._v("×")])])]),_c('form',{on:{"submit":function($event){$event.preventDefault();_vm.onEditorFile($event)}}},[_c('div',{staticClass:"modal-body"},[_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"name"}},[_vm._v("Name:")]),_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.editFile.name),expression:"editFile.name"}],staticClass:"form-control",attrs:{"type":"text","required":"","id":"name","placeholder":"Please enter a file name"},domProps:{"value":(_vm.editFile.name)},on:{"input":function($event){if($event.target.composing){ return; }_vm.editFile.name=$event.target.value}}})]),(_vm.editFile.show && _vm.editFile.blob && _vm.editFile.type && _vm.editFile.type.substr(0, 6) === 'image/')?_c('div',{staticClass:"form-group"},[_c('label',[_vm._v("Image: ")]),_c('div',{staticClass:"edit-image"},[_c('img',{ref:"editImage",attrs:{"src":_vm.editFile.blob}})]),_c('div',{staticClass:"edit-image-tool"},[_c('div',{staticClass:"btn-group",attrs:{"role":"group"}},[_c('button',{staticClass:"btn btn-primary",attrs:{"type":"button","title":"cropper.rotate(-90)"},on:{"click":function($event){_vm.editFile.cropper.rotate(-90)}}},[_c('i',{staticClass:"fa fa-undo",attrs:{"aria-hidden":"true"}})]),_c('button',{staticClass:"btn btn-primary",attrs:{"type":"button","title":"cropper.rotate(90)"},on:{"click":function($event){_vm.editFile.cropper.rotate(90)}}},[_c('i',{staticClass:"fa fa-repeat",attrs:{"aria-hidden":"true"}})])]),_c('div',{staticClass:"btn-group",attrs:{"role":"group"}},[_c('button',{staticClass:"btn btn-primary",attrs:{"type":"button","title":"cropper.crop()"},on:{"click":function($event){_vm.editFile.cropper.crop()}}},[_c('i',{staticClass:"fa fa-check",attrs:{"aria-hidden":"true"}})]),_c('button',{staticClass:"btn btn-primary",attrs:{"type":"button","title":"cropper.clear()"},on:{"click":function($event){_vm.editFile.cropper.clear()}}},[_c('i',{staticClass:"fa fa-remove",attrs:{"aria-hidden":"true"}})])])])]):_vm._e()]),_c('div',{staticClass:"modal-footer"},[_c('button',{staticClass:"btn btn-secondary",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.editFile.show = false}}},[_vm._v("Close")]),_c('button',{staticClass:"btn btn-primary",attrs:{"type":"submit"}},[_vm._v("Save")])])])])])]),_vm._m(4)])}
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-full"},[_c('button',{staticClass:"btn btn-danger float-right btn-is-option",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.isOption = !_vm.isOption}}},[_c('i',{staticClass:"fa fa-cog",attrs:{"aria-hidden":"true"}}),_vm._v("\n    Options\n  ")]),_c('h1',{staticClass:"example-title",attrs:{"id":"example-title"}},[_vm._v("Full Example")]),_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.$refs.upload && _vm.$refs.upload.dropActive),expression:"$refs.upload && $refs.upload.dropActive"}],staticClass:"drop-active"},[_c('h3',[_vm._v("Drop files to upload")])]),_c('div',{directives:[{name:"show",rawName:"v-show",value:(!_vm.isOption),expression:"!isOption"}],staticClass:"upload"},[_c('table',{staticClass:"table table-hover"},[_vm._m(0),_c('tbody',[(!_vm.files.length)?_c('tr',[_c('td',{attrs:{"colspan":"7"}},[_c('div',{staticClass:"text-center p-5"},[_vm._m(1),_c('label',{staticClass:"btn btn-lg btn-primary",attrs:{"for":_vm.name}},[_vm._v("Select Files")])])])]):_vm._e(),_vm._l((_vm.files),function(file,index){return _c('tr',{key:file.id},[_c('td',[_vm._v(_vm._s(index))]),_c('td',[(file.thumb)?_c('img',{attrs:{"src":file.thumb,"width":"40","height":"auto"}}):_c('span',[_vm._v("No Image")])]),_c('td',[_c('div',{staticClass:"filename"},[_vm._v("\n              "+_vm._s(file.name)+"\n            ")]),(file.active || file.progress !== '0.00')?_c('div',{staticClass:"progress"},[_c('div',{class:{'progress-bar': true, 'progress-bar-striped': true, 'bg-danger': file.error, 'progress-bar-animated': file.active},style:({width: file.progress + '%'}),attrs:{"role":"progressbar"}},[_vm._v(_vm._s(file.progress)+"%")])]):_vm._e()]),_c('td',[_vm._v(_vm._s(_vm._f("formatSize")(file.size)))]),_c('td',[_vm._v(_vm._s(_vm._f("formatSize")(file.speed)))]),(file.error)?_c('td',[_vm._v(_vm._s(file.error))]):(file.success)?_c('td',[_vm._v("success")]):(file.active)?_c('td',[_vm._v("active")]):_c('td'),_c('td',[_c('div',{staticClass:"btn-group"},[_c('button',{staticClass:"btn btn-secondary btn-sm dropdown-toggle",attrs:{"type":"button"}},[_vm._v("\n                Action\n              ")]),_c('div',{staticClass:"dropdown-menu"},[_c('a',{class:{'dropdown-item': true, disabled: file.active || file.success},attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();file.active || file.success ? false :  _vm.onEditFileShow(file)}}},[_vm._v("Edit")]),_c('a',{class:{'dropdown-item': true, disabled: !file.active},attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();file.active ? _vm.$refs.upload.update(file, {error: 'cancel'}) : false}}},[_vm._v("Cancel")]),(file.active)?_c('a',{staticClass:"dropdown-item",attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.update(file, {active: false})}}},[_vm._v("Abort")]):(file.error && _vm.$refs.upload.features.html5)?_c('a',{staticClass:"dropdown-item",attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.update(file, {active: true, error: '', progress: '0.00'})}}},[_vm._v("Retry upload")]):_c('a',{class:{'dropdown-item': true, disabled: file.success},attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();file.success ? false : _vm.$refs.upload.update(file, {active: true})}}},[_vm._v("Upload")]),_c('div',{staticClass:"dropdown-divider"}),_c('a',{staticClass:"dropdown-item",attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.remove(file)}}},[_vm._v("Remove")])])])])])})],2)]),_c('div',{staticClass:"example-foorer"},[_c('div',{staticClass:"footer-status float-right"},[_vm._v("\n        Drop: "+_vm._s(_vm.$refs.upload ? _vm.$refs.upload.drop : false)+",\n        Active: "+_vm._s(_vm.$refs.upload ? _vm.$refs.upload.active : false)+",\n        Uploaded: "+_vm._s(_vm.$refs.upload ? _vm.$refs.upload.uploaded : true)+",\n        Drop active: "+_vm._s(_vm.$refs.upload ? _vm.$refs.upload.dropActive : false)+"\n      ")]),_c('div',{staticClass:"btn-group"},[_c('file-upload',{ref:"upload",staticClass:"btn btn-primary dropdown-toggle",attrs:{"post-action":_vm.postAction,"put-action":_vm.putAction,"extensions":_vm.extensions,"accept":_vm.accept,"multiple":_vm.multiple,"directory":_vm.directory,"size":_vm.size || 0,"thread":_vm.thread < 1 ? 1 : (_vm.thread > 5 ? 5 : _vm.thread),"headers":_vm.headers,"data":_vm.data,"drop":_vm.drop,"drop-directory":_vm.dropDirectory},on:{"input-filter":_vm.inputFilter,"input-file":_vm.inputFile},model:{value:(_vm.files),callback:function ($$v) {_vm.files=$$v},expression:"files"}},[_c('i',{staticClass:"fa fa-plus"}),_vm._v("\n          Select\n        ")]),_c('div',{staticClass:"dropdown-menu"},[_c('label',{staticClass:"dropdown-item",attrs:{"for":_vm.name}},[_vm._v("Add files")]),_c('a',{staticClass:"dropdown-item",attrs:{"href":"#"},on:{"click":_vm.onAddFolader}},[_vm._v("Add folder")]),_c('a',{staticClass:"dropdown-item",attrs:{"href":"#"},on:{"click":function($event){$event.preventDefault();_vm.addData.show = true}}},[_vm._v("Add data")])])],1),(!_vm.$refs.upload || !_vm.$refs.upload.active)?_c('button',{staticClass:"btn btn-success",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = true}}},[_c('i',{staticClass:"fa fa-arrow-up",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Start Upload\n      ")]):_c('button',{staticClass:"btn btn-danger",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = false}}},[_c('i',{staticClass:"fa fa-stop",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Stop Upload\n      ")])])]),_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.isOption),expression:"isOption"}],staticClass:"option"},[_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"accept"}},[_vm._v("Accept:")]),_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.accept),expression:"accept"}],staticClass:"form-control",attrs:{"type":"text","id":"accept"},domProps:{"value":(_vm.accept)},on:{"input":function($event){if($event.target.composing){ return; }_vm.accept=$event.target.value}}}),_c('small',{staticClass:"form-text text-muted"},[_vm._v("Allow upload mime type")])]),_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"extensions"}},[_vm._v("Extensions:")]),_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.extensions),expression:"extensions"}],staticClass:"form-control",attrs:{"type":"text","id":"extensions"},domProps:{"value":(_vm.extensions)},on:{"input":function($event){if($event.target.composing){ return; }_vm.extensions=$event.target.value}}}),_c('small',{staticClass:"form-text text-muted"},[_vm._v("Allow upload file extension")])]),_c('div',{staticClass:"form-group"},[_c('label',[_vm._v("PUT Upload:")]),_c('div',{staticClass:"form-check"},[_c('label',{staticClass:"form-check-label"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.putAction),expression:"putAction"}],staticClass:"form-check-input",attrs:{"type":"radio","name":"put-action","id":"put-action","value":""},domProps:{"checked":_vm._q(_vm.putAction,"")},on:{"__c":function($event){_vm.putAction=""}}}),_vm._v(" Off\n        ")])]),_c('div',{staticClass:"form-check"},[_c('label',{staticClass:"form-check-label"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.putAction),expression:"putAction"}],staticClass:"form-check-input",attrs:{"type":"radio","name":"put-action","id":"put-action","value":"/upload/put"},domProps:{"checked":_vm._q(_vm.putAction,"/upload/put")},on:{"__c":function($event){_vm.putAction="/upload/put"}}}),_vm._v(" On\n        ")])]),_c('small',{staticClass:"form-text text-muted"},[_vm._v("After the shutdown, use the POST method to upload")])]),_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"thread"}},[_vm._v("Thread:")]),_c('input',{directives:[{name:"model",rawName:"v-model.number",value:(_vm.thread),expression:"thread",modifiers:{"number":true}}],staticClass:"form-control",attrs:{"type":"number","max":"5","min":"1","id":"thread"},domProps:{"value":(_vm.thread)},on:{"input":function($event){if($event.target.composing){ return; }_vm.thread=_vm._n($event.target.value)},"blur":function($event){_vm.$forceUpdate()}}}),_c('small',{staticClass:"form-text text-muted"},[_vm._v("Also upload the number of files at the same time (number of threads)")])]),_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"size"}},[_vm._v("Max size:")]),_c('input',{directives:[{name:"model",rawName:"v-model.number",value:(_vm.size),expression:"size",modifiers:{"number":true}}],staticClass:"form-control",attrs:{"type":"number","min":"0","id":"size"},domProps:{"value":(_vm.size)},on:{"input":function($event){if($event.target.composing){ return; }_vm.size=_vm._n($event.target.value)},"blur":function($event){_vm.$forceUpdate()}}})]),_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"minSize"}},[_vm._v("Min size:")]),_c('input',{directives:[{name:"model",rawName:"v-model.number",value:(_vm.minSize),expression:"minSize",modifiers:{"number":true}}],staticClass:"form-control",attrs:{"type":"number","min":"0","id":"minSize"},domProps:{"value":(_vm.minSize)},on:{"input":function($event){if($event.target.composing){ return; }_vm.minSize=_vm._n($event.target.value)},"blur":function($event){_vm.$forceUpdate()}}})]),_c('div',{staticClass:"form-group"},[_c('div',{staticClass:"form-check"},[_c('label',{staticClass:"form-check-label"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.drop),expression:"drop"}],staticClass:"form-check-input",attrs:{"type":"checkbox","id":"drop"},domProps:{"checked":Array.isArray(_vm.drop)?_vm._i(_vm.drop,null)>-1:(_vm.drop)},on:{"__c":function($event){var $$a=_vm.drop,$$el=$event.target,$$c=$$el.checked?(true):(false);if(Array.isArray($$a)){var $$v=null,$$i=_vm._i($$a,$$v);if($$el.checked){$$i<0&&(_vm.drop=$$a.concat([$$v]))}else{$$i>-1&&(_vm.drop=$$a.slice(0,$$i).concat($$a.slice($$i+1)))}}else{_vm.drop=$$c}}}}),_vm._v(" Drop\n        ")])]),_c('small',{staticClass:"form-text text-muted"},[_vm._v("Drag and drop upload")])]),_c('div',{staticClass:"form-group"},[_c('div',{staticClass:"form-check"},[_c('label',{staticClass:"form-check-label"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.dropDirectory),expression:"dropDirectory"}],staticClass:"form-check-input",attrs:{"type":"checkbox","id":"drop-directory"},domProps:{"checked":Array.isArray(_vm.dropDirectory)?_vm._i(_vm.dropDirectory,null)>-1:(_vm.dropDirectory)},on:{"__c":function($event){var $$a=_vm.dropDirectory,$$el=$event.target,$$c=$$el.checked?(true):(false);if(Array.isArray($$a)){var $$v=null,$$i=_vm._i($$a,$$v);if($$el.checked){$$i<0&&(_vm.dropDirectory=$$a.concat([$$v]))}else{$$i>-1&&(_vm.dropDirectory=$$a.slice(0,$$i).concat($$a.slice($$i+1)))}}else{_vm.dropDirectory=$$c}}}}),_vm._v(" Drop directory\n        ")])]),_c('small',{staticClass:"form-text text-muted"},[_vm._v("Not checked, filter the dragged folder")])]),_c('div',{staticClass:"form-group"},[_c('div',{staticClass:"form-check"},[_c('label',{staticClass:"form-check-label"},[_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.uploadAuto),expression:"uploadAuto"}],staticClass:"form-check-input",attrs:{"type":"checkbox","id":"upload-auto"},domProps:{"checked":Array.isArray(_vm.uploadAuto)?_vm._i(_vm.uploadAuto,null)>-1:(_vm.uploadAuto)},on:{"__c":function($event){var $$a=_vm.uploadAuto,$$el=$event.target,$$c=$$el.checked?(true):(false);if(Array.isArray($$a)){var $$v=null,$$i=_vm._i($$a,$$v);if($$el.checked){$$i<0&&(_vm.uploadAuto=$$a.concat([$$v]))}else{$$i>-1&&(_vm.uploadAuto=$$a.slice(0,$$i).concat($$a.slice($$i+1)))}}else{_vm.uploadAuto=$$c}}}}),_vm._v(" Auto start\n        ")])]),_c('small',{staticClass:"form-text text-muted"},[_vm._v("Automatically activate upload")])]),_c('div',{staticClass:"form-group"},[_c('button',{staticClass:"btn btn-primary btn-lg btn-block",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.isOption = !_vm.isOption}}},[_vm._v("Confirm")])])]),_c('div',{class:{'modal-backdrop': true, 'fade': true, show: _vm.addData.show}}),_c('div',{class:{modal: true, fade: true, show: _vm.addData.show},attrs:{"id":"modal-add-data","tabindex":"-1","role":"dialog"}},[_c('div',{staticClass:"modal-dialog",attrs:{"role":"document"}},[_c('div',{staticClass:"modal-content"},[_c('div',{staticClass:"modal-header"},[_c('h5',{staticClass:"modal-title"},[_vm._v("Add data")]),_c('button',{staticClass:"close",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.addData.show = false}}},[_c('span',[_vm._v("×")])])]),_c('form',{on:{"submit":function($event){$event.preventDefault();_vm.onAddData($event)}}},[_c('div',{staticClass:"modal-body"},[_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"name"}},[_vm._v("Name:")]),_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.addData.name),expression:"addData.name"}],staticClass:"form-control",attrs:{"type":"text","required":"","id":"name","placeholder":"Please enter a file name"},domProps:{"value":(_vm.addData.name)},on:{"input":function($event){if($event.target.composing){ return; }_vm.addData.name=$event.target.value}}}),_vm._m(2)]),_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"type"}},[_vm._v("Type:")]),_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.addData.type),expression:"addData.type"}],staticClass:"form-control",attrs:{"type":"text","required":"","id":"type","placeholder":"Please enter the MIME type"},domProps:{"value":(_vm.addData.type)},on:{"input":function($event){if($event.target.composing){ return; }_vm.addData.type=$event.target.value}}}),_vm._m(3)]),_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"content"}},[_vm._v("Content:")]),_c('textarea',{directives:[{name:"model",rawName:"v-model",value:(_vm.addData.content),expression:"addData.content"}],staticClass:"form-control",attrs:{"required":"","id":"content","rows":"3","placeholder":"Please enter the file contents"},domProps:{"value":(_vm.addData.content)},on:{"input":function($event){if($event.target.composing){ return; }_vm.addData.content=$event.target.value}}})])]),_c('div',{staticClass:"modal-footer"},[_c('button',{staticClass:"btn btn-secondary",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.addData.show = false}}},[_vm._v("Close")]),_c('button',{staticClass:"btn btn-primary",attrs:{"type":"submit"}},[_vm._v("Save")])])])])])]),_c('div',{class:{'modal-backdrop': true, 'fade': true, show: _vm.editFile.show}}),_c('div',{class:{modal: true, fade: true, show: _vm.editFile.show},attrs:{"id":"modal-edit-file","tabindex":"-1","role":"dialog"}},[_c('div',{staticClass:"modal-dialog modal-lg",attrs:{"role":"document"}},[_c('div',{staticClass:"modal-content"},[_c('div',{staticClass:"modal-header"},[_c('h5',{staticClass:"modal-title"},[_vm._v("Edit file")]),_c('button',{staticClass:"close",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.editFile.show = false}}},[_c('span',[_vm._v("×")])])]),_c('form',{on:{"submit":function($event){$event.preventDefault();_vm.onEditorFile($event)}}},[_c('div',{staticClass:"modal-body"},[_c('div',{staticClass:"form-group"},[_c('label',{attrs:{"for":"name"}},[_vm._v("Name:")]),_c('input',{directives:[{name:"model",rawName:"v-model",value:(_vm.editFile.name),expression:"editFile.name"}],staticClass:"form-control",attrs:{"type":"text","required":"","id":"name","placeholder":"Please enter a file name"},domProps:{"value":(_vm.editFile.name)},on:{"input":function($event){if($event.target.composing){ return; }_vm.editFile.name=$event.target.value}}})]),(_vm.editFile.show && _vm.editFile.blob && _vm.editFile.type && _vm.editFile.type.substr(0, 6) === 'image/')?_c('div',{staticClass:"form-group"},[_c('label',[_vm._v("Image: ")]),_c('div',{staticClass:"edit-image"},[_c('img',{ref:"editImage",attrs:{"src":_vm.editFile.blob}})]),_c('div',{staticClass:"edit-image-tool"},[_c('div',{staticClass:"btn-group",attrs:{"role":"group"}},[_c('button',{staticClass:"btn btn-primary",attrs:{"type":"button","title":"cropper.rotate(-90)"},on:{"click":function($event){_vm.editFile.cropper.rotate(-90)}}},[_c('i',{staticClass:"fa fa-undo",attrs:{"aria-hidden":"true"}})]),_c('button',{staticClass:"btn btn-primary",attrs:{"type":"button","title":"cropper.rotate(90)"},on:{"click":function($event){_vm.editFile.cropper.rotate(90)}}},[_c('i',{staticClass:"fa fa-repeat",attrs:{"aria-hidden":"true"}})])]),_c('div',{staticClass:"btn-group",attrs:{"role":"group"}},[_c('button',{staticClass:"btn btn-primary",attrs:{"type":"button","title":"cropper.crop()"},on:{"click":function($event){_vm.editFile.cropper.crop()}}},[_c('i',{staticClass:"fa fa-check",attrs:{"aria-hidden":"true"}})]),_c('button',{staticClass:"btn btn-primary",attrs:{"type":"button","title":"cropper.clear()"},on:{"click":function($event){_vm.editFile.cropper.clear()}}},[_c('i',{staticClass:"fa fa-remove",attrs:{"aria-hidden":"true"}})])])])]):_vm._e()]),_c('div',{staticClass:"modal-footer"},[_c('button',{staticClass:"btn btn-secondary",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.editFile.show = false}}},[_vm._v("Close")]),_c('button',{staticClass:"btn btn-primary",attrs:{"type":"submit"}},[_vm._v("Save")])])])])])]),_vm._m(4)])}
 var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('thead',[_c('tr',[_c('th',[_vm._v("#")]),_c('th',[_vm._v("Thumb")]),_c('th',[_vm._v("Name")]),_c('th',[_vm._v("Size")]),_c('th',[_vm._v("Speed")]),_c('th',[_vm._v("Status")]),_c('th',[_vm._v("Action")])])])},function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('h4',[_vm._v("Drop files anywhere to upload"),_c('br'),_vm._v("or")])},function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('small',{staticClass:"form-text text-muted"},[_vm._v("Such as "),_c('code',[_vm._v("filename.txt")])])},function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('small',{staticClass:"form-text text-muted"},[_vm._v("Such as "),_c('code',[_vm._v("text/plain")])])},function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"pt-5"},[_vm._v("\n    Source code: "),_c('a',{attrs:{"href":"https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Full.vue"}},[_vm._v("https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Full.vue")])])}]
 var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
@@ -4037,13 +4038,14 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_2ce22c9c_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Simple_vue__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Simple_vue__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_2ce22c9c_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Simple_vue__ = __webpack_require__(52);
 function injectStyle (ssrContext) {
   __webpack_require__(49)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = null
+
 /* template */
 
 /* styles */
@@ -4053,8 +4055,8 @@ var __vue_scopeId__ = null
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __vue_script__,
-  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_2ce22c9c_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Simple_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Simple_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_2ce22c9c_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Simple_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
@@ -4085,7 +4087,7 @@ exports = module.exports = __webpack_require__(1)(undefined);
 
 
 // module
-exports.push([module.i, "", ""]);
+exports.push([module.i, ".example-simple label.btn{margin-bottom:0;margin-right:1rem}", ""]);
 
 // exports
 
@@ -4095,23 +4097,134 @@ exports.push([module.i, "", ""]);
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-simple"},[_vm._v("\n  No content\n")])}
-var staticRenderFns = []
-var esExports = { render: render, staticRenderFns: staticRenderFns }
-/* harmony default export */ __webpack_exports__["a"] = (esExports);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_upload_component__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_upload_component___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue_upload_component__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  components: {
+    FileUpload: __WEBPACK_IMPORTED_MODULE_0_vue_upload_component___default.a
+  },
+
+  data: function data() {
+    return {
+      files: []
+    };
+  },
+
+
+  methods: {
+    inputFilter: function inputFilter(newFile, oldFile, prevent) {
+      if (newFile && !oldFile) {
+        // Before adding a file
+        // 添加文件前
+
+        // Filter system files or hide files
+        // 过滤系统文件 和隐藏文件
+        if (/(\/|^)(Thumbs\.db|desktop\.ini|\..+)$/.test(newFile.name)) {
+          return prevent();
+        }
+
+        // Filter php html js file
+        // 过滤 php html js 文件
+        if (/\.(php5?|html?|jsx?)$/i.test(newFile.name)) {
+          return prevent();
+        }
+      }
+    },
+    inputFile: function inputFile(newFile, oldFile) {
+      if (newFile && !oldFile) {
+        // add
+        console.log('add', newFile);
+      }
+      if (newFile && oldFile) {
+        // update
+        console.log('update', newFile);
+      }
+
+      if (!newFile && oldFile) {
+        // remove
+        console.log('remove', oldFile);
+      }
+    }
+  }
+});
 
 /***/ }),
 /* 52 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_6a2e90c3_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Avatar_vue__ = __webpack_require__(55);
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-simple"},[_c('h1',{staticClass:"example-title",attrs:{"id":"example-title"}},[_vm._v("Simple Example")]),_c('div',{staticClass:"upload"},[_c('ul',_vm._l((_vm.files),function(file,index){return _c('li',{key:file.id},[_c('span',[_vm._v(_vm._s(file.name))]),_vm._v(" -\n        "),_c('span',[_vm._v(_vm._s(_vm._f("formatSize")(file.size)))]),_vm._v(" -\n        "),(file.error)?_c('span',[_vm._v(_vm._s(file.error))]):(file.success)?_c('span',[_vm._v("success")]):(file.active)?_c('span',[_vm._v("active")]):(file.active)?_c('span',[_vm._v("active")]):_c('span')])})),_c('div',{staticClass:"example-btn"},[_c('file-upload',{ref:"upload",staticClass:"btn btn-primary",attrs:{"post-action":"/upload/post","extensions":"gif,jpg,jpeg,png,webp","accept":"image/png,image/gif,image/jpeg,image/webp","multiple":true,"size":1024 * 1024 * 10},on:{"input-filter":_vm.inputFilter,"input-file":_vm.inputFile},model:{value:(_vm.files),callback:function ($$v) {_vm.files=$$v},expression:"files"}},[_c('i',{staticClass:"fa fa-plus"}),_vm._v("\n        Select files\n      ")]),(!_vm.$refs.upload || !_vm.$refs.upload.active)?_c('button',{staticClass:"btn btn-success",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = true}}},[_c('i',{staticClass:"fa fa-arrow-up",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Start Upload\n      ")]):_c('button',{staticClass:"btn btn-danger",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = false}}},[_c('i',{staticClass:"fa fa-stop",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Stop Upload\n      ")])],1)]),_vm._m(0)])}
+var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"pt-5"},[_vm._v("\n    Source code: "),_c('a',{attrs:{"href":"https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Simple.vue"}},[_vm._v("https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Simple.vue")])])}]
+var esExports = { render: render, staticRenderFns: staticRenderFns }
+/* harmony default export */ __webpack_exports__["a"] = (esExports);
+
+/***/ }),
+/* 53 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Avatar_vue__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_6a2e90c3_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Avatar_vue__ = __webpack_require__(57);
 function injectStyle (ssrContext) {
-  __webpack_require__(53)
+  __webpack_require__(54)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = null
+
 /* template */
 
 /* styles */
@@ -4121,8 +4234,8 @@ var __vue_scopeId__ = null
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __vue_script__,
-  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_6a2e90c3_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Avatar_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Avatar_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_6a2e90c3_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Avatar_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
@@ -4132,20 +4245,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(54);
+var content = __webpack_require__(55);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("dadd018e", content, true);
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -4153,33 +4266,253 @@ exports = module.exports = __webpack_require__(1)(undefined);
 
 
 // module
-exports.push([module.i, "", ""]);
+exports.push([module.i, ".example-avatar .avatar-upload .rounded-circle{width:200px;height:200px}.example-avatar .text-center .btn{margin:0 .5rem}.example-avatar .avatar-edit-image{max-width:100%}.example-avatar .drop-active{top:0;bottom:0;right:0;left:0;position:fixed;z-index:9999;opacity:.6;text-align:center;background:#000}.example-avatar .drop-active h3{margin:-.5em 0 0;position:absolute;top:50%;left:0;right:0;-webkit-transform:translateY(-50%);-ms-transform:translateY(-50%);transform:translateY(-50%);font-size:40px;color:#fff;padding:0}", ""]);
 
 // exports
 
-
-/***/ }),
-/* 55 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-avatar"},[_vm._v("\n  No content\n")])}
-var staticRenderFns = []
-var esExports = { render: render, staticRenderFns: staticRenderFns }
-/* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
 /* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_410878c4_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Drag_vue__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cropperjs__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cropperjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_cropperjs__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_upload_component__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_upload_component___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_vue_upload_component__);
+
+
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  components: {
+    FileUpload: __WEBPACK_IMPORTED_MODULE_2_vue_upload_component___default.a
+  },
+
+  data: function data() {
+    return {
+      files: [],
+      edit: false,
+      cropper: false
+    };
+  },
+
+
+  watch: {
+    edit: function edit(value) {
+      if (value) {
+        this.$nextTick(function () {
+          if (!this.$refs.editImage) {
+            return;
+          }
+          var cropper = new __WEBPACK_IMPORTED_MODULE_1_cropperjs___default.a(this.$refs.editImage, {
+            aspectRatio: 1 / 1,
+            viewMode: 1,
+            minContainerHeight: 300
+          });
+          this.cropper = cropper;
+        });
+      } else {
+        if (this.cropper) {
+          this.cropper.destroy();
+          this.cropper = false;
+        }
+      }
+    }
+  },
+
+  methods: {
+    editSave: function editSave() {
+      var _this = this;
+
+      return _asyncToGenerator( /*#__PURE__*/__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.mark(function _callee() {
+        var blob, file;
+        return __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _this.edit = false;
+                _context.next = 3;
+                return new Promise(function (resolve, reject) {
+                  _this.cropper.getCroppedCanvas().toBlob(function (value) {
+                    resolve(value);
+                  });
+                });
+
+              case 3:
+                blob = _context.sent;
+                file = new File([blob], _this.files[0].name, { type: blob.type });
+
+                _this.$refs.upload.update(_this.files[0].id, {
+                  file: file,
+                  type: file.type,
+                  size: file.size,
+                  active: true
+                });
+
+              case 6:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, _this);
+      }))();
+    },
+    alert: function (_alert) {
+      function alert(_x) {
+        return _alert.apply(this, arguments);
+      }
+
+      alert.toString = function () {
+        return _alert.toString();
+      };
+
+      return alert;
+    }(function (message) {
+      alert(message);
+    }),
+    inputFile: function inputFile(newFile, oldFile, prevent) {
+      if (newFile && !oldFile) {
+        this.$nextTick(function () {
+          this.edit = true;
+        });
+      }
+      if (!newFile && oldFile) {
+        this.edit = false;
+      }
+    },
+    inputFilter: function inputFilter(newFile, oldFile, prevent) {
+      if (newFile && !oldFile) {
+        if (!/\.(gif|jpg|jpeg|png|webp)$/i.test(newFile.name)) {
+          this.alert('Your choice is not a picture');
+          return prevent();
+        }
+      }
+
+      if (newFile && (!oldFile || newFile.file !== oldFile.file)) {
+        newFile.url = '';
+        var URL = window.URL || window.webkitURL;
+        if (URL && URL.createObjectURL) {
+          newFile.url = URL.createObjectURL(newFile.file);
+        }
+      }
+    }
+  }
+});
+
+/***/ }),
+/* 57 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-avatar"},[_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.$refs.upload && _vm.$refs.upload.dropActive),expression:"$refs.upload && $refs.upload.dropActive"}],staticClass:"drop-active"},[_c('h3',[_vm._v("Drop files to upload")])]),_c('div',{directives:[{name:"show",rawName:"v-show",value:(!_vm.edit),expression:"!edit"}],staticClass:"avatar-upload"},[_c('div',{staticClass:"text-center p-2"},[_c('label',{attrs:{"for":"avatar"}},[_c('img',{staticClass:"rounded-circle",attrs:{"src":_vm.files.length ? _vm.files[0].url : 'https://www.gravatar.com/avatar/default?s=200&r=pg&d=mm'}}),_vm._m(0)])]),_c('div',{staticClass:"text-center p-2"},[_c('file-upload',{ref:"upload",staticClass:"btn btn-primary",attrs:{"extensions":"gif,jpg,jpeg,png,webp","accept":"image/png,image/gif,image/jpeg,image/webp","name":"avatar","post-action":"/upload/post","drop":!_vm.edit},on:{"input-filter":_vm.inputFilter,"input-file":_vm.inputFile},model:{value:(_vm.files),callback:function ($$v) {_vm.files=$$v},expression:"files"}},[_vm._v("\n        Upload avatar\n      ")])],1)]),_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.files.length && _vm.edit),expression:"files.length && edit"}],staticClass:"avatar-edit"},[(_vm.files.length)?_c('div',{staticClass:"avatar-edit-image"},[_c('img',{ref:"editImage",attrs:{"src":_vm.files[0].url}})]):_vm._e(),_c('div',{staticClass:"text-center p-4"},[_c('button',{staticClass:"btn btn-secondary",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.clear($event)}}},[_vm._v("Cancel")]),_c('button',{staticClass:"btn btn-primary",attrs:{"type":"submit"},on:{"click":function($event){$event.preventDefault();_vm.editSave($event)}}},[_vm._v("Save")])])]),_vm._m(1)])}
+var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('h4',{staticClass:"pt-2"},[_vm._v("or"),_c('br'),_vm._v("Drop files anywhere to upload")])},function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"pt-5"},[_vm._v("\n    Source code: "),_c('a',{attrs:{"href":"https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Avatar.vue"}},[_vm._v("https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Avatar.vue")])])}]
+var esExports = { render: render, staticRenderFns: staticRenderFns }
+/* harmony default export */ __webpack_exports__["a"] = (esExports);
+
+/***/ }),
+/* 58 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Drag_vue__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_410878c4_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Drag_vue__ = __webpack_require__(62);
 function injectStyle (ssrContext) {
-  __webpack_require__(57)
+  __webpack_require__(59)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = null
+
 /* template */
 
 /* styles */
@@ -4189,8 +4522,8 @@ var __vue_scopeId__ = null
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __vue_script__,
-  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_410878c4_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Drag_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Drag_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_410878c4_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Drag_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
@@ -4200,20 +4533,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 57 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(58);
+var content = __webpack_require__(60);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("1705c8e8", content, true);
 
 /***/ }),
-/* 58 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -4221,101 +4554,144 @@ exports = module.exports = __webpack_require__(1)(undefined);
 
 
 // module
-exports.push([module.i, "", ""]);
+exports.push([module.i, ".example-drag label.btn{margin-bottom:0;margin-right:1rem}.example-drag .drop-active{top:0;bottom:0;right:0;left:0;position:fixed;z-index:9999;opacity:.6;text-align:center;background:#000}.example-drag .drop-active h3{margin:-.5em 0 0;position:absolute;top:50%;left:0;right:0;-webkit-transform:translateY(-50%);-ms-transform:translateY(-50%);transform:translateY(-50%);font-size:40px;color:#fff;padding:0}", ""]);
 
 // exports
-
-
-/***/ }),
-/* 59 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-drag"},[_vm._v("\n  No content\n")])}
-var staticRenderFns = []
-var esExports = { render: render, staticRenderFns: staticRenderFns }
-/* harmony default export */ __webpack_exports__["a"] = (esExports);
-
-/***/ }),
-/* 60 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_1d5e357a_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Multiple_vue__ = __webpack_require__(63);
-function injectStyle (ssrContext) {
-  __webpack_require__(61)
-}
-var normalizeComponent = __webpack_require__(0)
-/* script */
-var __vue_script__ = null
-/* template */
-
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = null
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_1d5e357a_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Multiple_vue__["a" /* default */],
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-
-/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
 
 
 /***/ }),
 /* 61 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-// style-loader: Adds some css to the DOM by adding a <style> tag
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_upload_component__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_upload_component___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue_upload_component__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
-// load the styles
-var content = __webpack_require__(62);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(2)("578cf3f8", content, true);
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  components: {
+    FileUpload: __WEBPACK_IMPORTED_MODULE_0_vue_upload_component___default.a
+  },
+
+  data: function data() {
+    return {
+      files: []
+    };
+  }
+});
 
 /***/ }),
 /* 62 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(1)(undefined);
-// imports
-
-
-// module
-exports.push([module.i, "", ""]);
-
-// exports
-
+"use strict";
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-drag"},[_c('div',{staticClass:"upload"},[(_vm.files.length)?_c('ul',_vm._l((_vm.files),function(file,index){return _c('li',{key:file.id},[_c('span',[_vm._v(_vm._s(file.name))]),_vm._v(" -\n        "),_c('span',[_vm._v(_vm._s(_vm._f("formatSize")(file.size)))]),_vm._v(" -\n        "),(file.error)?_c('span',[_vm._v(_vm._s(file.error))]):(file.success)?_c('span',[_vm._v("success")]):(file.active)?_c('span',[_vm._v("active")]):(file.active)?_c('span',[_vm._v("active")]):_c('span')])})):_c('ul',[_vm._m(0)]),_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.$refs.upload && _vm.$refs.upload.dropActive),expression:"$refs.upload && $refs.upload.dropActive"}],staticClass:"drop-active"},[_c('h3',[_vm._v("Drop files to upload")])]),_c('div',{staticClass:"example-btn"},[_c('file-upload',{ref:"upload",staticClass:"btn btn-primary",attrs:{"post-action":"/upload/post","multiple":true,"drop":true,"drop-directory":true},model:{value:(_vm.files),callback:function ($$v) {_vm.files=$$v},expression:"files"}},[_c('i',{staticClass:"fa fa-plus"}),_vm._v("\n        Select files\n      ")]),(!_vm.$refs.upload || !_vm.$refs.upload.active)?_c('button',{staticClass:"btn btn-success",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = true}}},[_c('i',{staticClass:"fa fa-arrow-up",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Start Upload\n      ")]):_c('button',{staticClass:"btn btn-danger",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = false}}},[_c('i',{staticClass:"fa fa-stop",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Stop Upload\n      ")])],1)]),_vm._m(1)])}
+var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('td',{attrs:{"colspan":"7"}},[_c('div',{staticClass:"text-center p-5"},[_c('h4',[_vm._v("Drop files anywhere to upload"),_c('br'),_vm._v("or")]),_c('label',{staticClass:"btn btn-lg btn-primary",attrs:{"for":"file"}},[_vm._v("Select Files")])])])},function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"pt-5"},[_vm._v("\n    Source code: "),_c('a',{attrs:{"href":"https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Drag.vue"}},[_vm._v("https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Drag.vue")])])}]
+var esExports = { render: render, staticRenderFns: staticRenderFns }
+/* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
 /* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-multiple"},[_vm._v("\n  No content\n")])}
-var staticRenderFns = []
-var esExports = { render: render, staticRenderFns: staticRenderFns }
-/* harmony default export */ __webpack_exports__["a"] = (esExports);
-
-/***/ }),
-/* 64 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5872e1c8_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Vuex_vue__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Multiple_vue__ = __webpack_require__(66);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_1d5e357a_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Multiple_vue__ = __webpack_require__(67);
 function injectStyle (ssrContext) {
-  __webpack_require__(65)
+  __webpack_require__(64)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = null
+
 /* template */
 
 /* styles */
@@ -4325,8 +4701,8 @@ var __vue_scopeId__ = null
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  __vue_script__,
-  __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5872e1c8_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Vuex_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Multiple_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_1d5e357a_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Multiple_vue__["a" /* default */],
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
@@ -4336,20 +4712,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 65 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(66);
+var content = __webpack_require__(65);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(2)("3c76ed06", content, true);
+var update = __webpack_require__(2)("578cf3f8", content, true);
 
 /***/ }),
-/* 66 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -4357,18 +4733,126 @@ exports = module.exports = __webpack_require__(1)(undefined);
 
 
 // module
-exports.push([module.i, "", ""]);
+exports.push([module.i, ".example-multiple label.btn{margin-bottom:0;margin-right:1rem}.example-multiple .upload{margin-bottom:1rem}", ""]);
 
 // exports
 
+
+/***/ }),
+/* 66 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_upload_component__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_upload_component___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue_upload_component__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  components: {
+    FileUpload: __WEBPACK_IMPORTED_MODULE_0_vue_upload_component___default.a
+  },
+
+  data: function data() {
+    return {
+      files1: [],
+      files2: []
+    };
+  }
+});
 
 /***/ }),
 /* 67 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-vuex"},[_vm._v("\n  No content\n")])}
-var staticRenderFns = []
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-multiple"},[_c('h1',{staticClass:"example-title",attrs:{"id":"example-title"}},[_vm._v("Multiple instances")]),_c('div',{staticClass:"upload"},[_c('ul',_vm._l((_vm.files1),function(file,index){return _c('li',{key:file.id},[_c('span',[_vm._v(_vm._s(file.name))]),_vm._v(" -\n        "),_c('span',[_vm._v(_vm._s(_vm._f("formatSize")(file.size)))]),_vm._v(" -\n        "),(file.error)?_c('span',[_vm._v(_vm._s(file.error))]):(file.success)?_c('span',[_vm._v("success")]):(file.active)?_c('span',[_vm._v("active")]):(file.active)?_c('span',[_vm._v("active")]):_c('span')])})),_c('div',{staticClass:"example-btn"},[_c('file-upload',{ref:"upload1",staticClass:"btn btn-primary",attrs:{"input-id":"file1","post-action":"/upload/post"},model:{value:(_vm.files1),callback:function ($$v) {_vm.files1=$$v},expression:"files1"}},[_c('i',{staticClass:"fa fa-plus"}),_vm._v("\n        Select files\n      ")]),_c('label',{staticClass:"btn btn-primary",attrs:{"for":"file1"}},[_vm._v("Label Select files")]),(!_vm.$refs.upload1 || !_vm.$refs.upload1.active)?_c('button',{staticClass:"btn btn-success",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload1.active = true}}},[_c('i',{staticClass:"fa fa-arrow-up",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Start Upload\n      ")]):_c('button',{staticClass:"btn btn-danger",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload1.active = false}}},[_c('i',{staticClass:"fa fa-stop",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Stop Upload\n      ")])],1)]),_c('div',{staticClass:"upload"},[_c('ul',_vm._l((_vm.files2),function(file,index){return _c('li',{key:file.id},[_c('span',[_vm._v(_vm._s(file.name))]),_vm._v(" -\n        "),_c('span',[_vm._v(_vm._s(_vm._f("formatSize")(file.size)))]),_vm._v(" -\n        "),(file.error)?_c('span',[_vm._v(_vm._s(file.error))]):(file.success)?_c('span',[_vm._v("success")]):(file.active)?_c('span',[_vm._v("active")]):(file.active)?_c('span',[_vm._v("active")]):_c('span')])})),_c('div',{staticClass:"example-btn"},[_c('file-upload',{ref:"upload2",staticClass:"btn btn-primary",attrs:{"input-id":"file2","post-action":"/upload/post"},model:{value:(_vm.files2),callback:function ($$v) {_vm.files2=$$v},expression:"files2"}},[_c('i',{staticClass:"fa fa-plus"}),_vm._v("\n        Select files\n      ")]),_c('label',{staticClass:"btn btn-primary",attrs:{"for":"file2"}},[_vm._v("Label Select files")]),(!_vm.$refs.upload2 || !_vm.$refs.upload2.active)?_c('button',{staticClass:"btn btn-success",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload2.active = true}}},[_c('i',{staticClass:"fa fa-arrow-up",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Start Upload\n      ")]):_c('button',{staticClass:"btn btn-danger",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload2.active = false}}},[_c('i',{staticClass:"fa fa-stop",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Stop Upload\n      ")])],1)]),_vm._m(0)])}
+var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"pt-5"},[_vm._v("\n    Source code: "),_c('a',{attrs:{"href":"https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Multiple.vue"}},[_vm._v("https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Multiple.vue")])])}]
 var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
@@ -4377,10 +4861,159 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__ = __webpack_require__(71);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_7c3db476_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Vuex_vue__ = __webpack_require__(71);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5872e1c8_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Vuex_vue__ = __webpack_require__(72);
 function injectStyle (ssrContext) {
   __webpack_require__(69)
+}
+var normalizeComponent = __webpack_require__(0)
+/* script */
+
+/* template */
+
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Vuex_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5872e1c8_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Vuex_vue__["a" /* default */],
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+
+/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+
+
+/***/ }),
+/* 69 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(70);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(2)("3c76ed06", content, true);
+
+/***/ }),
+/* 70 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(1)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, ".example-simple label.btn{margin-bottom:0;margin-right:1rem}", ""]);
+
+// exports
+
+
+/***/ }),
+/* 71 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vuex___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vuex__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_upload_component__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_upload_component___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue_upload_component__);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+  components: {
+    FileUpload: __WEBPACK_IMPORTED_MODULE_1_vue_upload_component___default.a
+  },
+
+  computed: _extends({}, Object(__WEBPACK_IMPORTED_MODULE_0_vuex__["mapState"])(['files'])),
+
+  methods: {
+    inputUpdate: function inputUpdate(files) {
+      this.$store.commit('updateFiles', files);
+    }
+  }
+});
+
+/***/ }),
+/* 72 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-simple"},[_c('h1',{staticClass:"example-title",attrs:{"id":"example-title"}},[_vm._v("Simple Example")]),_c('div',{staticClass:"upload"},[_c('ul',_vm._l((_vm.files),function(file,index){return _c('li',{key:file.id},[_c('span',[_vm._v(_vm._s(file.name))]),_vm._v(" -\n        "),_c('span',[_vm._v(_vm._s(_vm._f("formatSize")(file.size)))]),_vm._v(" -\n        "),(file.error)?_c('span',[_vm._v(_vm._s(file.error))]):(file.success)?_c('span',[_vm._v("success")]):(file.active)?_c('span',[_vm._v("active")]):(file.active)?_c('span',[_vm._v("active")]):_c('span')])})),_c('div',{staticClass:"example-btn"},[_c('file-upload',{ref:"upload",staticClass:"btn btn-primary",attrs:{"post-action":"/upload/post","extensions":"gif,jpg,jpeg,png,webp","accept":"image/png,image/gif,image/jpeg,image/webp","multiple":true,"size":1024 * 1024 * 10,"value":_vm.files},on:{"input":_vm.inputUpdate}},[_c('i',{staticClass:"fa fa-plus"}),_vm._v("\n        Select files\n      ")]),(!_vm.$refs.upload || !_vm.$refs.upload.active)?_c('button',{staticClass:"btn btn-success",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = true}}},[_c('i',{staticClass:"fa fa-arrow-up",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Start Upload\n      ")]):_c('button',{staticClass:"btn btn-danger",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = false}}},[_c('i',{staticClass:"fa fa-stop",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Stop Upload\n      ")])],1)]),_vm._m(0)])}
+var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"pt-5"},[_vm._v("\n    Source code: "),_c('a',{attrs:{"href":"https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Vuex.vue"}},[_vm._v("https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Vuex.vue")]),_c('br'),_c('a',{attrs:{"href":"https://github.com/lian-yue/vue-upload-component/blob/master/docs/store.js"}},[_vm._v("https://github.com/lian-yue/vue-upload-component/blob/master/docs/store.js")])])}]
+var esExports = { render: render, staticRenderFns: staticRenderFns }
+/* harmony default export */ __webpack_exports__["a"] = (esExports);
+
+/***/ }),
+/* 73 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__ = __webpack_require__(76);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_7c3db476_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__ = __webpack_require__(77);
+function injectStyle (ssrContext) {
+  __webpack_require__(74)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
@@ -4405,20 +5038,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 69 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(70);
+var content = __webpack_require__(75);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("f51f536e", content, true);
 
 /***/ }),
-/* 70 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -4432,7 +5065,7 @@ exports.push([module.i, "#header{position:-webkit-sticky;position:sticky;top:0;z
 
 
 /***/ }),
-/* 71 */
+/* 76 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4632,7 +5265,7 @@ exports.push([module.i, "#header{position:-webkit-sticky;position:sticky;top:0;z
 });
 
 /***/ }),
-/* 72 */
+/* 77 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";

@@ -23,9 +23,9 @@ export default {
   example: {
     full: '完整例子',
     simple: '简单例子',
-    avatar: '头像例子',
-    drag: '拖拽例子',
-    multiple: '多实例',
+    avatar: '上传头像',
+    drag: '拖拽上传',
+    multiple: '多个实例',
     vuex: 'Vuex',
   }
 }

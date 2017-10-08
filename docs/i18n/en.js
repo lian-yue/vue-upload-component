@@ -20,11 +20,11 @@ export default {
   },
 
   example: {
-    full: 'Full',
+    full: 'Full Example',
     simple: 'Simple',
-    avatar: 'Avatar',
-    drag: 'Drag',
-    multiple: 'Multiple',
+    avatar: 'Upload avatar',
+    drag: 'Drag and drop',
+    multiple: 'Multiple instances',
     vuex: 'Vuex',
   }
 }
