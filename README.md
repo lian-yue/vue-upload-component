@@ -58,7 +58,7 @@ https://lian-yue.github.io/vue-upload-component/#/zh-cn/
 
 
 
-## 安装
+# 安装
 
 ``` bash
 npm install vue-upload-component --save
