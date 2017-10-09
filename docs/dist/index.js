@@ -65,7 +65,7 @@
 /******/ 	__webpack_require__.p = "/dist";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 10);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -264,7 +264,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
   ) }
 }
 
-var listToStyles = __webpack_require__(26)
+var listToStyles = __webpack_require__(25)
 
 /*
 type StyleObject = {
@@ -469,7 +469,7 @@ function applyToTag (styleElement, obj) {
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(39);
+module.exports = __webpack_require__(35);
 
 /***/ }),
 /* 4 */
@@ -488,10 +488,10 @@ module.exports = Vuex;
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_i18n__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_i18n__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_i18n___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue_i18n__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__en__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__zh_cn__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__en__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__zh_cn__ = __webpack_require__(19);
 // import Vue from 'vue'
 
 
@@ -521,39 +521,33 @@ module.exports = "## 入门开始\n\n### NPM\n\n``` bash\nnpm install vue-upload
 
 /***/ }),
 /* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(36);
-
-/***/ }),
-/* 10 */
 /***/ (function(module, exports) {
 
 module.exports = Cropper;
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(12);
+module.exports = __webpack_require__(11);
 
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_marked__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_marked___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_marked__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_highlight_js__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_highlight_js__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_highlight_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_highlight_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__store__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__router__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__store__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__router__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__i18n__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__views_App__ = __webpack_require__(73);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__views_App__ = __webpack_require__(69);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -696,19 +690,19 @@ new __WEBPACK_IMPORTED_MODULE_0_vue___default.a(_extends({
 }, __WEBPACK_IMPORTED_MODULE_6__views_App__["a" /* default */])).$mount('#app');
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = Vue;
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = hljs;
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -736,22 +730,22 @@ var mutations = {
 }));
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_router__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_router__ = __webpack_require__(16);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_router___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue_router__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__i18n__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__views_Router__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__views_Document__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__views_Example__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__views_examples_Full__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__views_examples_Simple__ = __webpack_require__(48);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__views_examples_Avatar__ = __webpack_require__(53);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__views_examples_Drag__ = __webpack_require__(58);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__views_examples_Multiple__ = __webpack_require__(63);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__views_examples_Vuex__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__views_Router__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__views_Document__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__views_Example__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__views_examples_Full__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__views_examples_Simple__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__views_examples_Avatar__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__views_examples_Drag__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__views_examples_Multiple__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__views_examples_Vuex__ = __webpack_require__(64);
 // import Vue from 'vue'
 
 
@@ -820,19 +814,19 @@ var router = new __WEBPACK_IMPORTED_MODULE_0_vue_router___default.a({
 /* harmony default export */ __webpack_exports__["a"] = (router);
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports) {
 
 module.exports = VueRouter;
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = VueI18n;
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -868,7 +862,7 @@ module.exports = VueI18n;
 });
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -904,11 +898,11 @@ module.exports = VueI18n;
 });
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_0546df56_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Router_vue__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_0546df56_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Router_vue__ = __webpack_require__(21);
 var normalizeComponent = __webpack_require__(0)
 /* script */
 var __vue_script__ = null
@@ -932,7 +926,7 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -942,14 +936,14 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Document_vue__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_102fa427_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Document_vue__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Document_vue__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_102fa427_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Document_vue__ = __webpack_require__(28);
 function injectStyle (ssrContext) {
-  __webpack_require__(24)
+  __webpack_require__(23)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
@@ -974,20 +968,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(25);
+var content = __webpack_require__(24);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("27a8f968", content, true);
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -1001,7 +995,7 @@ exports.push([module.i, ".document-title{margin-bottom:2rem;padding-bottom:1rem;
 
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports) {
 
 /**
@@ -1033,7 +1027,7 @@ module.exports = function listToStyles(parentId, list) {
 };
 
 /***/ }),
-/* 27 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1098,7 +1092,7 @@ module.exports = function listToStyles(parentId, list) {
 /* harmony default export */ __webpack_exports__["a"] = ({
   computed: {
     document: function document() {
-      return __webpack_require__(28)("./" + this.$i18n.locale);
+      return __webpack_require__(27)("./" + this.$i18n.locale);
     },
     navs: function navs() {
       var tokens = __WEBPACK_IMPORTED_MODULE_0_marked___default.a.lexer(this.document);
@@ -1158,7 +1152,7 @@ module.exports = function listToStyles(parentId, list) {
 });
 
 /***/ }),
-/* 28 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
@@ -1181,10 +1175,10 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 28;
+webpackContext.id = 27;
 
 /***/ }),
-/* 29 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1194,11 +1188,11 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 30 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_f18b6ae4_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Example_vue__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__node_modules_vue_loader_lib_template_compiler_index_id_data_v_f18b6ae4_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Example_vue__ = __webpack_require__(30);
 var normalizeComponent = __webpack_require__(0)
 /* script */
 var __vue_script__ = null
@@ -1222,7 +1216,7 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 31 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1232,14 +1226,14 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 32 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Full_vue__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_60fc9379_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Full_vue__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Full_vue__ = __webpack_require__(34);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_60fc9379_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Full_vue__ = __webpack_require__(43);
 function injectStyle (ssrContext) {
-  __webpack_require__(33)
+  __webpack_require__(32)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
@@ -1264,20 +1258,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 33 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(34);
+var content = __webpack_require__(33);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("3e9ccf96", content, true);
 
 /***/ }),
-/* 34 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -1291,21 +1285,15 @@ exports.push([module.i, ".example-full .btn-group .dropdown-menu{display:block;v
 
 
 /***/ }),
-/* 35 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cropperjs__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cropperjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_cropperjs__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_upload_component__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_upload_component___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_vue_upload_component__);
-
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cropperjs__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cropperjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cropperjs__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_upload_component__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_upload_component___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue_upload_component__);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 //
 //
@@ -1677,7 +1665,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 /* harmony default export */ __webpack_exports__["a"] = ({
   components: {
-    FileUpload: __WEBPACK_IMPORTED_MODULE_2_vue_upload_component___default.a
+    FileUpload: __WEBPACK_IMPORTED_MODULE_1_vue_upload_component___default.a
   },
 
   data: function data() {
@@ -1734,7 +1722,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
           if (!this.$refs.editImage) {
             return;
           }
-          var cropper = new __WEBPACK_IMPORTED_MODULE_1_cropperjs___default.a(this.$refs.editImage, {
+          var cropper = new __WEBPACK_IMPORTED_MODULE_0_cropperjs___default.a(this.$refs.editImage, {
             autoCrop: false
           });
           this.editFile = _extends({}, this.editFile, {
@@ -1851,65 +1839,33 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
       this.$refs.upload.update(file, { error: 'edit' });
     },
     onEditorFile: function onEditorFile() {
-      var _this = this;
+      if (!this.$refs.upload.features.html5) {
+        this.alert('Your browser does not support');
+        this.editFile.show = false;
+        return;
+      }
 
-      return _asyncToGenerator( /*#__PURE__*/__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.mark(function _callee() {
-        var data, blob;
-        return __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                if (_this.$refs.upload.features.html5) {
-                  _context.next = 4;
-                  break;
-                }
-
-                _this.alert('Your browser does not support');
-                _this.editFile.show = false;
-                return _context.abrupt('return');
-
-              case 4:
-                data = {
-                  name: _this.editFile.name
-                };
-
-                if (!_this.editFile.cropper) {
-                  _context.next = 12;
-                  break;
-                }
-
-                _context.next = 8;
-                return new Promise(function (resolve, reject) {
-                  _this.editFile.cropper.getCroppedCanvas().toBlob(function (value) {
-                    resolve(value);
-                  });
-                });
-
-              case 8:
-                blob = _context.sent;
-
-                data.file = new File([blob], data.name, { type: blob.type });
-                data.type = blob.type;
-                data.size = blob.size;
-
-              case 12:
-                _this.$refs.upload.update(_this.editFile.id, data);
-                _this.editFile.error = '';
-                _this.editFile.show = false;
-
-              case 15:
-              case 'end':
-                return _context.stop();
-            }
-          }
-        }, _callee, _this);
-      }))();
+      var data = {
+        name: this.editFile.name
+      };
+      if (this.editFile.cropper) {
+        var binStr = atob(this.editFile.cropper.getCroppedCanvas().toDataURL(this.editFile.type).split(',')[1]);
+        var arr = new Uint8Array(binStr.length);
+        for (var i = 0; i < binStr.length; i++) {
+          arr[i] = binStr.charCodeAt(i);
+        }
+        data.file = new File([arr], data.name, { type: this.editFile.type });
+        data.size = data.file.size;
+      }
+      this.$refs.upload.update(this.editFile.id, data);
+      this.editFile.error = '';
+      this.editFile.show = false;
     },
 
 
     // add folader
     onAddFolader: function onAddFolader() {
-      var _this2 = this;
+      var _this = this;
 
       if (!this.$refs.upload.features.directory) {
         this.alert('Your browser does not support');
@@ -1924,7 +1880,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
       input.onclick = null;
       input.click();
       input.onclick = function (e) {
-        _this2.directory = false;
+        _this.directory = false;
         input.directory = false;
         input.webkitdirectory = false;
       };
@@ -1945,784 +1901,15 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 });
 
 /***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// This method of obtaining a reference to the global object needs to be
-// kept identical to the way it is obtained in runtime.js
-var g = function () {
-  return this;
-}() || Function("return this")();
-
-// Use `getOwnPropertyNames` because not all browsers support calling
-// `hasOwnProperty` on the global `self` object in a worker. See #183.
-var hadRuntime = g.regeneratorRuntime && Object.getOwnPropertyNames(g).indexOf("regeneratorRuntime") >= 0;
-
-// Save the old regeneratorRuntime in case it needs to be restored later.
-var oldRuntime = hadRuntime && g.regeneratorRuntime;
-
-// Force reevalutation of runtime.js.
-g.regeneratorRuntime = undefined;
-
-module.exports = __webpack_require__(37);
-
-if (hadRuntime) {
-  // Restore the original runtime.
-  g.regeneratorRuntime = oldRuntime;
-} else {
-  // Remove the global property added by runtime.js.
-  try {
-    delete g.regeneratorRuntime;
-  } catch (e) {
-    g.regeneratorRuntime = undefined;
-  }
-}
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(module) {var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-/**
- * Copyright (c) 2014, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the BSD-style license found in the
- * https://raw.github.com/facebook/regenerator/master/LICENSE file. An
- * additional grant of patent rights can be found in the PATENTS file in
- * the same directory.
- */
-
-!function (global) {
-  "use strict";
-
-  var Op = Object.prototype;
-  var hasOwn = Op.hasOwnProperty;
-  var undefined; // More compressible than void 0.
-  var $Symbol = typeof Symbol === "function" ? Symbol : {};
-  var iteratorSymbol = $Symbol.iterator || "@@iterator";
-  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
-  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
-
-  var inModule = ( false ? "undefined" : _typeof(module)) === "object";
-  var runtime = global.regeneratorRuntime;
-  if (runtime) {
-    if (inModule) {
-      // If regeneratorRuntime is defined globally and we're in a module,
-      // make the exports object identical to regeneratorRuntime.
-      module.exports = runtime;
-    }
-    // Don't bother evaluating the rest of this file if the runtime was
-    // already defined globally.
-    return;
-  }
-
-  // Define the runtime globally (as expected by generated code) as either
-  // module.exports (if we're in a module) or a new, empty object.
-  runtime = global.regeneratorRuntime = inModule ? module.exports : {};
-
-  function wrap(innerFn, outerFn, self, tryLocsList) {
-    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
-    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
-    var generator = Object.create(protoGenerator.prototype);
-    var context = new Context(tryLocsList || []);
-
-    // The ._invoke method unifies the implementations of the .next,
-    // .throw, and .return methods.
-    generator._invoke = makeInvokeMethod(innerFn, self, context);
-
-    return generator;
-  }
-  runtime.wrap = wrap;
-
-  // Try/catch helper to minimize deoptimizations. Returns a completion
-  // record like context.tryEntries[i].completion. This interface could
-  // have been (and was previously) designed to take a closure to be
-  // invoked without arguments, but in all the cases we care about we
-  // already have an existing method we want to call, so there's no need
-  // to create a new function object. We can even get away with assuming
-  // the method takes exactly one argument, since that happens to be true
-  // in every case, so we don't have to touch the arguments object. The
-  // only additional allocation required is the completion record, which
-  // has a stable shape and so hopefully should be cheap to allocate.
-  function tryCatch(fn, obj, arg) {
-    try {
-      return { type: "normal", arg: fn.call(obj, arg) };
-    } catch (err) {
-      return { type: "throw", arg: err };
-    }
-  }
-
-  var GenStateSuspendedStart = "suspendedStart";
-  var GenStateSuspendedYield = "suspendedYield";
-  var GenStateExecuting = "executing";
-  var GenStateCompleted = "completed";
-
-  // Returning this object from the innerFn has the same effect as
-  // breaking out of the dispatch switch statement.
-  var ContinueSentinel = {};
-
-  // Dummy constructor functions that we use as the .constructor and
-  // .constructor.prototype properties for functions that return Generator
-  // objects. For full spec compliance, you may wish to configure your
-  // minifier not to mangle the names of these two functions.
-  function Generator() {}
-  function GeneratorFunction() {}
-  function GeneratorFunctionPrototype() {}
-
-  // This is a polyfill for %IteratorPrototype% for environments that
-  // don't natively support it.
-  var IteratorPrototype = {};
-  IteratorPrototype[iteratorSymbol] = function () {
-    return this;
-  };
-
-  var getProto = Object.getPrototypeOf;
-  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
-  if (NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
-    // This environment has a native %IteratorPrototype%; use it instead
-    // of the polyfill.
-    IteratorPrototype = NativeIteratorPrototype;
-  }
-
-  var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype);
-  GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
-  GeneratorFunctionPrototype.constructor = GeneratorFunction;
-  GeneratorFunctionPrototype[toStringTagSymbol] = GeneratorFunction.displayName = "GeneratorFunction";
-
-  // Helper for defining the .next, .throw, and .return methods of the
-  // Iterator interface in terms of a single ._invoke method.
-  function defineIteratorMethods(prototype) {
-    ["next", "throw", "return"].forEach(function (method) {
-      prototype[method] = function (arg) {
-        return this._invoke(method, arg);
-      };
-    });
-  }
-
-  runtime.isGeneratorFunction = function (genFun) {
-    var ctor = typeof genFun === "function" && genFun.constructor;
-    return ctor ? ctor === GeneratorFunction ||
-    // For the native GeneratorFunction constructor, the best we can
-    // do is to check its .name property.
-    (ctor.displayName || ctor.name) === "GeneratorFunction" : false;
-  };
-
-  runtime.mark = function (genFun) {
-    if (Object.setPrototypeOf) {
-      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
-    } else {
-      genFun.__proto__ = GeneratorFunctionPrototype;
-      if (!(toStringTagSymbol in genFun)) {
-        genFun[toStringTagSymbol] = "GeneratorFunction";
-      }
-    }
-    genFun.prototype = Object.create(Gp);
-    return genFun;
-  };
-
-  // Within the body of any async function, `await x` is transformed to
-  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
-  // `hasOwn.call(value, "__await")` to determine if the yielded value is
-  // meant to be awaited.
-  runtime.awrap = function (arg) {
-    return { __await: arg };
-  };
-
-  function AsyncIterator(generator) {
-    function invoke(method, arg, resolve, reject) {
-      var record = tryCatch(generator[method], generator, arg);
-      if (record.type === "throw") {
-        reject(record.arg);
-      } else {
-        var result = record.arg;
-        var value = result.value;
-        if (value && (typeof value === "undefined" ? "undefined" : _typeof(value)) === "object" && hasOwn.call(value, "__await")) {
-          return Promise.resolve(value.__await).then(function (value) {
-            invoke("next", value, resolve, reject);
-          }, function (err) {
-            invoke("throw", err, resolve, reject);
-          });
-        }
-
-        return Promise.resolve(value).then(function (unwrapped) {
-          // When a yielded Promise is resolved, its final value becomes
-          // the .value of the Promise<{value,done}> result for the
-          // current iteration. If the Promise is rejected, however, the
-          // result for this iteration will be rejected with the same
-          // reason. Note that rejections of yielded Promises are not
-          // thrown back into the generator function, as is the case
-          // when an awaited Promise is rejected. This difference in
-          // behavior between yield and await is important, because it
-          // allows the consumer to decide what to do with the yielded
-          // rejection (swallow it and continue, manually .throw it back
-          // into the generator, abandon iteration, whatever). With
-          // await, by contrast, there is no opportunity to examine the
-          // rejection reason outside the generator function, so the
-          // only option is to throw it from the await expression, and
-          // let the generator function handle the exception.
-          result.value = unwrapped;
-          resolve(result);
-        }, reject);
-      }
-    }
-
-    var previousPromise;
-
-    function enqueue(method, arg) {
-      function callInvokeWithMethodAndArg() {
-        return new Promise(function (resolve, reject) {
-          invoke(method, arg, resolve, reject);
-        });
-      }
-
-      return previousPromise =
-      // If enqueue has been called before, then we want to wait until
-      // all previous Promises have been resolved before calling invoke,
-      // so that results are always delivered in the correct order. If
-      // enqueue has not been called before, then it is important to
-      // call invoke immediately, without waiting on a callback to fire,
-      // so that the async generator function has the opportunity to do
-      // any necessary setup in a predictable way. This predictability
-      // is why the Promise constructor synchronously invokes its
-      // executor callback, and why async functions synchronously
-      // execute code before the first await. Since we implement simple
-      // async functions in terms of async generators, it is especially
-      // important to get this right, even though it requires care.
-      previousPromise ? previousPromise.then(callInvokeWithMethodAndArg,
-      // Avoid propagating failures to Promises returned by later
-      // invocations of the iterator.
-      callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg();
-    }
-
-    // Define the unified helper method that is used to implement .next,
-    // .throw, and .return (see defineIteratorMethods).
-    this._invoke = enqueue;
-  }
-
-  defineIteratorMethods(AsyncIterator.prototype);
-  AsyncIterator.prototype[asyncIteratorSymbol] = function () {
-    return this;
-  };
-  runtime.AsyncIterator = AsyncIterator;
-
-  // Note that simple async functions are implemented on top of
-  // AsyncIterator objects; they just return a Promise for the value of
-  // the final result produced by the iterator.
-  runtime.async = function (innerFn, outerFn, self, tryLocsList) {
-    var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList));
-
-    return runtime.isGeneratorFunction(outerFn) ? iter // If outerFn is a generator, return the full iterator.
-    : iter.next().then(function (result) {
-      return result.done ? result.value : iter.next();
-    });
-  };
-
-  function makeInvokeMethod(innerFn, self, context) {
-    var state = GenStateSuspendedStart;
-
-    return function invoke(method, arg) {
-      if (state === GenStateExecuting) {
-        throw new Error("Generator is already running");
-      }
-
-      if (state === GenStateCompleted) {
-        if (method === "throw") {
-          throw arg;
-        }
-
-        // Be forgiving, per 25.3.3.3.3 of the spec:
-        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
-        return doneResult();
-      }
-
-      context.method = method;
-      context.arg = arg;
-
-      while (true) {
-        var delegate = context.delegate;
-        if (delegate) {
-          var delegateResult = maybeInvokeDelegate(delegate, context);
-          if (delegateResult) {
-            if (delegateResult === ContinueSentinel) continue;
-            return delegateResult;
-          }
-        }
-
-        if (context.method === "next") {
-          // Setting context._sent for legacy support of Babel's
-          // function.sent implementation.
-          context.sent = context._sent = context.arg;
-        } else if (context.method === "throw") {
-          if (state === GenStateSuspendedStart) {
-            state = GenStateCompleted;
-            throw context.arg;
-          }
-
-          context.dispatchException(context.arg);
-        } else if (context.method === "return") {
-          context.abrupt("return", context.arg);
-        }
-
-        state = GenStateExecuting;
-
-        var record = tryCatch(innerFn, self, context);
-        if (record.type === "normal") {
-          // If an exception is thrown from innerFn, we leave state ===
-          // GenStateExecuting and loop back for another invocation.
-          state = context.done ? GenStateCompleted : GenStateSuspendedYield;
-
-          if (record.arg === ContinueSentinel) {
-            continue;
-          }
-
-          return {
-            value: record.arg,
-            done: context.done
-          };
-        } else if (record.type === "throw") {
-          state = GenStateCompleted;
-          // Dispatch the exception by looping back around to the
-          // context.dispatchException(context.arg) call above.
-          context.method = "throw";
-          context.arg = record.arg;
-        }
-      }
-    };
-  }
-
-  // Call delegate.iterator[context.method](context.arg) and handle the
-  // result, either by returning a { value, done } result from the
-  // delegate iterator, or by modifying context.method and context.arg,
-  // setting context.delegate to null, and returning the ContinueSentinel.
-  function maybeInvokeDelegate(delegate, context) {
-    var method = delegate.iterator[context.method];
-    if (method === undefined) {
-      // A .throw or .return when the delegate iterator has no .throw
-      // method always terminates the yield* loop.
-      context.delegate = null;
-
-      if (context.method === "throw") {
-        if (delegate.iterator.return) {
-          // If the delegate iterator has a return method, give it a
-          // chance to clean up.
-          context.method = "return";
-          context.arg = undefined;
-          maybeInvokeDelegate(delegate, context);
-
-          if (context.method === "throw") {
-            // If maybeInvokeDelegate(context) changed context.method from
-            // "return" to "throw", let that override the TypeError below.
-            return ContinueSentinel;
-          }
-        }
-
-        context.method = "throw";
-        context.arg = new TypeError("The iterator does not provide a 'throw' method");
-      }
-
-      return ContinueSentinel;
-    }
-
-    var record = tryCatch(method, delegate.iterator, context.arg);
-
-    if (record.type === "throw") {
-      context.method = "throw";
-      context.arg = record.arg;
-      context.delegate = null;
-      return ContinueSentinel;
-    }
-
-    var info = record.arg;
-
-    if (!info) {
-      context.method = "throw";
-      context.arg = new TypeError("iterator result is not an object");
-      context.delegate = null;
-      return ContinueSentinel;
-    }
-
-    if (info.done) {
-      // Assign the result of the finished delegate to the temporary
-      // variable specified by delegate.resultName (see delegateYield).
-      context[delegate.resultName] = info.value;
-
-      // Resume execution at the desired location (see delegateYield).
-      context.next = delegate.nextLoc;
-
-      // If context.method was "throw" but the delegate handled the
-      // exception, let the outer generator proceed normally. If
-      // context.method was "next", forget context.arg since it has been
-      // "consumed" by the delegate iterator. If context.method was
-      // "return", allow the original .return call to continue in the
-      // outer generator.
-      if (context.method !== "return") {
-        context.method = "next";
-        context.arg = undefined;
-      }
-    } else {
-      // Re-yield the result returned by the delegate method.
-      return info;
-    }
-
-    // The delegate iterator is finished, so forget it and continue with
-    // the outer generator.
-    context.delegate = null;
-    return ContinueSentinel;
-  }
-
-  // Define Generator.prototype.{next,throw,return} in terms of the
-  // unified ._invoke helper method.
-  defineIteratorMethods(Gp);
-
-  Gp[toStringTagSymbol] = "Generator";
-
-  // A Generator should always return itself as the iterator object when the
-  // @@iterator function is called on it. Some browsers' implementations of the
-  // iterator prototype chain incorrectly implement this, causing the Generator
-  // object to not be returned from this call. This ensures that doesn't happen.
-  // See https://github.com/facebook/regenerator/issues/274 for more details.
-  Gp[iteratorSymbol] = function () {
-    return this;
-  };
-
-  Gp.toString = function () {
-    return "[object Generator]";
-  };
-
-  function pushTryEntry(locs) {
-    var entry = { tryLoc: locs[0] };
-
-    if (1 in locs) {
-      entry.catchLoc = locs[1];
-    }
-
-    if (2 in locs) {
-      entry.finallyLoc = locs[2];
-      entry.afterLoc = locs[3];
-    }
-
-    this.tryEntries.push(entry);
-  }
-
-  function resetTryEntry(entry) {
-    var record = entry.completion || {};
-    record.type = "normal";
-    delete record.arg;
-    entry.completion = record;
-  }
-
-  function Context(tryLocsList) {
-    // The root entry object (effectively a try statement without a catch
-    // or a finally block) gives us a place to store values thrown from
-    // locations where there is no enclosing try statement.
-    this.tryEntries = [{ tryLoc: "root" }];
-    tryLocsList.forEach(pushTryEntry, this);
-    this.reset(true);
-  }
-
-  runtime.keys = function (object) {
-    var keys = [];
-    for (var key in object) {
-      keys.push(key);
-    }
-    keys.reverse();
-
-    // Rather than returning an object with a next method, we keep
-    // things simple and return the next function itself.
-    return function next() {
-      while (keys.length) {
-        var key = keys.pop();
-        if (key in object) {
-          next.value = key;
-          next.done = false;
-          return next;
-        }
-      }
-
-      // To avoid creating an additional object, we just hang the .value
-      // and .done properties off the next function object itself. This
-      // also ensures that the minifier will not anonymize the function.
-      next.done = true;
-      return next;
-    };
-  };
-
-  function values(iterable) {
-    if (iterable) {
-      var iteratorMethod = iterable[iteratorSymbol];
-      if (iteratorMethod) {
-        return iteratorMethod.call(iterable);
-      }
-
-      if (typeof iterable.next === "function") {
-        return iterable;
-      }
-
-      if (!isNaN(iterable.length)) {
-        var i = -1,
-            next = function next() {
-          while (++i < iterable.length) {
-            if (hasOwn.call(iterable, i)) {
-              next.value = iterable[i];
-              next.done = false;
-              return next;
-            }
-          }
-
-          next.value = undefined;
-          next.done = true;
-
-          return next;
-        };
-
-        return next.next = next;
-      }
-    }
-
-    // Return an iterator with no values.
-    return { next: doneResult };
-  }
-  runtime.values = values;
-
-  function doneResult() {
-    return { value: undefined, done: true };
-  }
-
-  Context.prototype = {
-    constructor: Context,
-
-    reset: function reset(skipTempReset) {
-      this.prev = 0;
-      this.next = 0;
-      // Resetting context._sent for legacy support of Babel's
-      // function.sent implementation.
-      this.sent = this._sent = undefined;
-      this.done = false;
-      this.delegate = null;
-
-      this.method = "next";
-      this.arg = undefined;
-
-      this.tryEntries.forEach(resetTryEntry);
-
-      if (!skipTempReset) {
-        for (var name in this) {
-          // Not sure about the optimal order of these conditions:
-          if (name.charAt(0) === "t" && hasOwn.call(this, name) && !isNaN(+name.slice(1))) {
-            this[name] = undefined;
-          }
-        }
-      }
-    },
-
-    stop: function stop() {
-      this.done = true;
-
-      var rootEntry = this.tryEntries[0];
-      var rootRecord = rootEntry.completion;
-      if (rootRecord.type === "throw") {
-        throw rootRecord.arg;
-      }
-
-      return this.rval;
-    },
-
-    dispatchException: function dispatchException(exception) {
-      if (this.done) {
-        throw exception;
-      }
-
-      var context = this;
-      function handle(loc, caught) {
-        record.type = "throw";
-        record.arg = exception;
-        context.next = loc;
-
-        if (caught) {
-          // If the dispatched exception was caught by a catch block,
-          // then let that catch block handle the exception normally.
-          context.method = "next";
-          context.arg = undefined;
-        }
-
-        return !!caught;
-      }
-
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        var record = entry.completion;
-
-        if (entry.tryLoc === "root") {
-          // Exception thrown outside of any try block that could handle
-          // it, so set the completion value of the entire function to
-          // throw the exception.
-          return handle("end");
-        }
-
-        if (entry.tryLoc <= this.prev) {
-          var hasCatch = hasOwn.call(entry, "catchLoc");
-          var hasFinally = hasOwn.call(entry, "finallyLoc");
-
-          if (hasCatch && hasFinally) {
-            if (this.prev < entry.catchLoc) {
-              return handle(entry.catchLoc, true);
-            } else if (this.prev < entry.finallyLoc) {
-              return handle(entry.finallyLoc);
-            }
-          } else if (hasCatch) {
-            if (this.prev < entry.catchLoc) {
-              return handle(entry.catchLoc, true);
-            }
-          } else if (hasFinally) {
-            if (this.prev < entry.finallyLoc) {
-              return handle(entry.finallyLoc);
-            }
-          } else {
-            throw new Error("try statement without catch or finally");
-          }
-        }
-      }
-    },
-
-    abrupt: function abrupt(type, arg) {
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) {
-          var finallyEntry = entry;
-          break;
-        }
-      }
-
-      if (finallyEntry && (type === "break" || type === "continue") && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc) {
-        // Ignore the finally entry if control is not jumping to a
-        // location outside the try/catch block.
-        finallyEntry = null;
-      }
-
-      var record = finallyEntry ? finallyEntry.completion : {};
-      record.type = type;
-      record.arg = arg;
-
-      if (finallyEntry) {
-        this.method = "next";
-        this.next = finallyEntry.finallyLoc;
-        return ContinueSentinel;
-      }
-
-      return this.complete(record);
-    },
-
-    complete: function complete(record, afterLoc) {
-      if (record.type === "throw") {
-        throw record.arg;
-      }
-
-      if (record.type === "break" || record.type === "continue") {
-        this.next = record.arg;
-      } else if (record.type === "return") {
-        this.rval = this.arg = record.arg;
-        this.method = "return";
-        this.next = "end";
-      } else if (record.type === "normal" && afterLoc) {
-        this.next = afterLoc;
-      }
-
-      return ContinueSentinel;
-    },
-
-    finish: function finish(finallyLoc) {
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        if (entry.finallyLoc === finallyLoc) {
-          this.complete(entry.completion, entry.afterLoc);
-          resetTryEntry(entry);
-          return ContinueSentinel;
-        }
-      }
-    },
-
-    "catch": function _catch(tryLoc) {
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        if (entry.tryLoc === tryLoc) {
-          var record = entry.completion;
-          if (record.type === "throw") {
-            var thrown = record.arg;
-            resetTryEntry(entry);
-          }
-          return thrown;
-        }
-      }
-
-      // The context.catch method must only be called with a location
-      // argument that corresponds to a known catch block.
-      throw new Error("illegal catch attempt");
-    },
-
-    delegateYield: function delegateYield(iterable, resultName, nextLoc) {
-      this.delegate = {
-        iterator: values(iterable),
-        resultName: resultName,
-        nextLoc: nextLoc
-      };
-
-      if (this.method === "next") {
-        // Deliberately forget the last sent value so that we don't
-        // accidentally pass it on to the delegate.
-        this.arg = undefined;
-      }
-
-      return ContinueSentinel;
-    }
-  };
-}(
-// In sloppy mode, unbound `this` refers to the global object, fallback to
-// Function constructor if we're in global strict mode. That is sadly a form
-// of indirect eval which violates Content Security Policy.
-function () {
-  return this;
-}() || Function("return this")());
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(38)(module)))
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports) {
-
-module.exports = function (module) {
-	if (!module.webpackPolyfill) {
-		module.deprecate = function () {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if (!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function get() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function get() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-/***/ }),
-/* 39 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_FileUpload_vue__ = __webpack_require__(42);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_ce9890fe_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_FileUpload_vue__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_FileUpload_vue__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_ce9890fe_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_FileUpload_vue__ = __webpack_require__(42);
 function injectStyle (ssrContext) {
-  __webpack_require__(40)
+  __webpack_require__(36)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
@@ -2747,20 +1934,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 40 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(41);
+var content = __webpack_require__(37);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("3289e763", content, true);
 
 /***/ }),
-/* 41 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -2774,11 +1961,11 @@ exports.push([module.i, ".file-uploads{overflow:hidden;position:relative;text-al
 
 
 /***/ }),
-/* 42 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__InputFile_vue__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__InputFile_vue__ = __webpack_require__(39);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -3944,12 +3131,12 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 });
 
 /***/ }),
-/* 43 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_InputFile_vue__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_67044c9c_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_InputFile_vue__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_InputFile_vue__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_67044c9c_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_InputFile_vue__ = __webpack_require__(41);
 var normalizeComponent = __webpack_require__(0)
 /* script */
 
@@ -3973,7 +3160,7 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 44 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4005,7 +3192,7 @@ var Component = normalizeComponent(
 });
 
 /***/ }),
-/* 45 */
+/* 41 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4015,7 +3202,7 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 46 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4025,7 +3212,7 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 47 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4035,14 +3222,14 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 48 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Simple_vue__ = __webpack_require__(51);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_2ce22c9c_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Simple_vue__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Simple_vue__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_2ce22c9c_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Simple_vue__ = __webpack_require__(48);
 function injectStyle (ssrContext) {
-  __webpack_require__(49)
+  __webpack_require__(45)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
@@ -4067,20 +3254,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 49 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(50);
+var content = __webpack_require__(46);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("0ad055e8", content, true);
 
 /***/ }),
-/* 50 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -4094,7 +3281,7 @@ exports.push([module.i, ".example-simple label.btn{margin-bottom:0;margin-right:
 
 
 /***/ }),
-/* 51 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4204,7 +3391,7 @@ exports.push([module.i, ".example-simple label.btn{margin-bottom:0;margin-right:
 });
 
 /***/ }),
-/* 52 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4214,14 +3401,14 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 53 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Avatar_vue__ = __webpack_require__(56);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_6a2e90c3_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Avatar_vue__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Avatar_vue__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_6a2e90c3_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Avatar_vue__ = __webpack_require__(53);
 function injectStyle (ssrContext) {
-  __webpack_require__(54)
+  __webpack_require__(50)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
@@ -4246,20 +3433,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 54 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(55);
+var content = __webpack_require__(51);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("dadd018e", content, true);
 
 /***/ }),
-/* 55 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -4273,20 +3460,14 @@ exports.push([module.i, ".example-avatar .avatar-upload .rounded-circle{width:20
 
 
 /***/ }),
-/* 56 */
+/* 52 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cropperjs__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_cropperjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_cropperjs__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_upload_component__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_upload_component___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_vue_upload_component__);
-
-
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cropperjs__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cropperjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cropperjs__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_upload_component__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue_upload_component___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue_upload_component__);
 //
 //
 //
@@ -4377,7 +3558,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 /* harmony default export */ __webpack_exports__["a"] = ({
   components: {
-    FileUpload: __WEBPACK_IMPORTED_MODULE_2_vue_upload_component___default.a
+    FileUpload: __WEBPACK_IMPORTED_MODULE_1_vue_upload_component___default.a
   },
 
   data: function data() {
@@ -4396,10 +3577,9 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
           if (!this.$refs.editImage) {
             return;
           }
-          var cropper = new __WEBPACK_IMPORTED_MODULE_1_cropperjs___default.a(this.$refs.editImage, {
+          var cropper = new __WEBPACK_IMPORTED_MODULE_0_cropperjs___default.a(this.$refs.editImage, {
             aspectRatio: 1 / 1,
-            viewMode: 1,
-            minContainerHeight: 300
+            viewMode: 1
           });
           this.cropper = cropper;
         });
@@ -4414,40 +3594,24 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
   methods: {
     editSave: function editSave() {
-      var _this = this;
+      this.edit = false;
 
-      return _asyncToGenerator( /*#__PURE__*/__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.mark(function _callee() {
-        var blob, file;
-        return __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _this.edit = false;
-                _context.next = 3;
-                return new Promise(function (resolve, reject) {
-                  _this.cropper.getCroppedCanvas().toBlob(function (value) {
-                    resolve(value);
-                  });
-                });
+      var oldFile = this.files[0];
 
-              case 3:
-                blob = _context.sent;
-                file = new File([blob], _this.files[0].name, { type: blob.type });
+      var binStr = atob(this.cropper.getCroppedCanvas().toDataURL(oldFile.type).split(',')[1]);
+      var arr = new Uint8Array(binStr.length);
+      for (var i = 0; i < binStr.length; i++) {
+        arr[i] = binStr.charCodeAt(i);
+      }
 
-                _this.$refs.upload.update(_this.files[0].id, {
-                  file: file,
-                  type: file.type,
-                  size: file.size,
-                  active: true
-                });
+      var file = new File([arr], oldFile.name, { type: oldFile.type });
 
-              case 6:
-              case 'end':
-                return _context.stop();
-            }
-          }
-        }, _callee, _this);
-      }))();
+      this.$refs.upload.update(oldFile.id, {
+        file: file,
+        type: file.type,
+        size: file.size,
+        active: true
+      });
     },
     alert: function (_alert) {
       function alert(_x) {
@@ -4492,7 +3656,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 });
 
 /***/ }),
-/* 57 */
+/* 53 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4502,14 +3666,14 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 58 */
+/* 54 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Drag_vue__ = __webpack_require__(61);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_410878c4_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Drag_vue__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Drag_vue__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_410878c4_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Drag_vue__ = __webpack_require__(58);
 function injectStyle (ssrContext) {
-  __webpack_require__(59)
+  __webpack_require__(55)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
@@ -4534,20 +3698,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 59 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(60);
+var content = __webpack_require__(56);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("1705c8e8", content, true);
 
 /***/ }),
-/* 60 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -4561,7 +3725,7 @@ exports.push([module.i, ".example-drag label.btn{margin-bottom:0;margin-right:1r
 
 
 /***/ }),
-/* 61 */
+/* 57 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4671,7 +3835,7 @@ exports.push([module.i, ".example-drag label.btn{margin-bottom:0;margin-right:1r
 });
 
 /***/ }),
-/* 62 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4681,14 +3845,14 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 63 */
+/* 59 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Multiple_vue__ = __webpack_require__(66);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_1d5e357a_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Multiple_vue__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Multiple_vue__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_1d5e357a_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Multiple_vue__ = __webpack_require__(63);
 function injectStyle (ssrContext) {
-  __webpack_require__(64)
+  __webpack_require__(60)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
@@ -4713,20 +3877,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 64 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(65);
+var content = __webpack_require__(61);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("578cf3f8", content, true);
 
 /***/ }),
-/* 65 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -4740,7 +3904,7 @@ exports.push([module.i, ".example-multiple label.btn{margin-bottom:0;margin-righ
 
 
 /***/ }),
-/* 66 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4848,7 +4012,7 @@ exports.push([module.i, ".example-multiple label.btn{margin-bottom:0;margin-righ
 });
 
 /***/ }),
-/* 67 */
+/* 63 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4858,14 +4022,14 @@ var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 68 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Vuex_vue__ = __webpack_require__(71);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5872e1c8_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Vuex_vue__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_Vuex_vue__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_5872e1c8_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_Vuex_vue__ = __webpack_require__(68);
 function injectStyle (ssrContext) {
-  __webpack_require__(69)
+  __webpack_require__(65)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
@@ -4890,20 +4054,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 69 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(70);
+var content = __webpack_require__(66);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("3c76ed06", content, true);
 
 /***/ }),
-/* 70 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -4911,13 +4075,13 @@ exports = module.exports = __webpack_require__(1)(undefined);
 
 
 // module
-exports.push([module.i, ".example-simple label.btn{margin-bottom:0;margin-right:1rem}", ""]);
+exports.push([module.i, ".example-vuex label.btn{margin-bottom:0;margin-right:1rem}", ""]);
 
 // exports
 
 
 /***/ }),
-/* 71 */
+/* 67 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4996,24 +4160,24 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 });
 
 /***/ }),
-/* 72 */
+/* 68 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-simple"},[_c('h1',{staticClass:"example-title",attrs:{"id":"example-title"}},[_vm._v("Simple Example")]),_c('div',{staticClass:"upload"},[_c('ul',_vm._l((_vm.files),function(file,index){return _c('li',{key:file.id},[_c('span',[_vm._v(_vm._s(file.name))]),_vm._v(" -\n        "),_c('span',[_vm._v(_vm._s(_vm._f("formatSize")(file.size)))]),_vm._v(" -\n        "),(file.error)?_c('span',[_vm._v(_vm._s(file.error))]):(file.success)?_c('span',[_vm._v("success")]):(file.active)?_c('span',[_vm._v("active")]):(file.active)?_c('span',[_vm._v("active")]):_c('span')])})),_c('div',{staticClass:"example-btn"},[_c('file-upload',{ref:"upload",staticClass:"btn btn-primary",attrs:{"post-action":"/upload/post","extensions":"gif,jpg,jpeg,png,webp","accept":"image/png,image/gif,image/jpeg,image/webp","multiple":true,"size":1024 * 1024 * 10,"value":_vm.files},on:{"input":_vm.inputUpdate}},[_c('i',{staticClass:"fa fa-plus"}),_vm._v("\n        Select files\n      ")]),(!_vm.$refs.upload || !_vm.$refs.upload.active)?_c('button',{staticClass:"btn btn-success",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = true}}},[_c('i',{staticClass:"fa fa-arrow-up",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Start Upload\n      ")]):_c('button',{staticClass:"btn btn-danger",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = false}}},[_c('i',{staticClass:"fa fa-stop",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Stop Upload\n      ")])],1)]),_vm._m(0)])}
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"example-vuex"},[_c('h1',{staticClass:"example-title",attrs:{"id":"example-title"}},[_vm._v("Vuex Example")]),_c('div',{staticClass:"upload"},[_c('ul',_vm._l((_vm.files),function(file,index){return _c('li',{key:file.id},[_c('span',[_vm._v(_vm._s(file.name))]),_vm._v(" -\n        "),_c('span',[_vm._v(_vm._s(_vm._f("formatSize")(file.size)))]),_vm._v(" -\n        "),(file.error)?_c('span',[_vm._v(_vm._s(file.error))]):(file.success)?_c('span',[_vm._v("success")]):(file.active)?_c('span',[_vm._v("active")]):(file.active)?_c('span',[_vm._v("active")]):_c('span')])})),_c('div',{staticClass:"example-btn"},[_c('file-upload',{ref:"upload",staticClass:"btn btn-primary",attrs:{"post-action":"/upload/post","extensions":"gif,jpg,jpeg,png,webp","accept":"image/png,image/gif,image/jpeg,image/webp","multiple":true,"size":1024 * 1024 * 10,"value":_vm.files},on:{"input":_vm.inputUpdate}},[_c('i',{staticClass:"fa fa-plus"}),_vm._v("\n        Select files\n      ")]),(!_vm.$refs.upload || !_vm.$refs.upload.active)?_c('button',{staticClass:"btn btn-success",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = true}}},[_c('i',{staticClass:"fa fa-arrow-up",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Start Upload\n      ")]):_c('button',{staticClass:"btn btn-danger",attrs:{"type":"button"},on:{"click":function($event){$event.preventDefault();_vm.$refs.upload.active = false}}},[_c('i',{staticClass:"fa fa-stop",attrs:{"aria-hidden":"true"}}),_vm._v("\n        Stop Upload\n      ")])],1)]),_vm._m(0)])}
 var staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"pt-5"},[_vm._v("\n    Source code: "),_c('a',{attrs:{"href":"https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Vuex.vue"}},[_vm._v("/docs/views/examples/Vuex.vue")]),_vm._v(", "),_c('a',{attrs:{"href":"https://github.com/lian-yue/vue-upload-component/blob/master/docs/store.js"}},[_vm._v("/docs/store.js")])])}]
 var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ __webpack_exports__["a"] = (esExports);
 
 /***/ }),
-/* 73 */
+/* 69 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__ = __webpack_require__(76);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_7c3db476_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__ = __webpack_require__(77);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_App_vue__ = __webpack_require__(72);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_7c3db476_hasScoped_false_preserveWhitespace_false_node_modules_vue_loader_lib_selector_type_template_index_0_App_vue__ = __webpack_require__(73);
 function injectStyle (ssrContext) {
-  __webpack_require__(74)
+  __webpack_require__(70)
 }
 var normalizeComponent = __webpack_require__(0)
 /* script */
@@ -5038,20 +4202,20 @@ var Component = normalizeComponent(
 
 
 /***/ }),
-/* 74 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(75);
+var content = __webpack_require__(71);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
 var update = __webpack_require__(2)("f51f536e", content, true);
 
 /***/ }),
-/* 75 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(1)(undefined);
@@ -5065,7 +4229,7 @@ exports.push([module.i, "#header{position:-webkit-sticky;position:sticky;top:0;z
 
 
 /***/ }),
-/* 76 */
+/* 72 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5265,7 +4429,7 @@ exports.push([module.i, "#header{position:-webkit-sticky;position:sticky;top:0;z
 });
 
 /***/ }),
-/* 77 */
+/* 73 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
