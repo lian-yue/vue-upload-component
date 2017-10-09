@@ -806,7 +806,7 @@ Add, update, remove pre-filter
   ```html
   <app>
     <file-upload ref="upload" :drop="true"></file-upload>
-    <span v-show="$refs.upload && $refs.upload.dropActive">拖拽到这里上传<span>
+    <span v-show="$refs.upload && $refs.upload.dropActive">拖拽到这里上传</span>
   </app>
   ```
 
@@ -828,7 +828,7 @@ Add, update, remove pre-filter
   ```html
   <app>
     <file-upload ref="upload"></file-upload>
-    <span v-show="$refs.upload && $refs.upload.uploaded">全部文件已上传完毕<span>
+    <span v-show="$refs.upload && $refs.upload.uploaded">全部文件已上传完毕</span>
   </app>
   ```
 

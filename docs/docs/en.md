@@ -812,7 +812,7 @@ Is dragging
   ```html
   <app>
     <file-upload ref="upload" :drop="true"></file-upload>
-    <span v-show="$refs.upload && $refs.upload.dropActive">Drag and drop here for upload<span>
+    <span v-show="$refs.upload && $refs.upload.dropActive">Drag and drop here for upload</span>
   </app>
   ```
 
@@ -834,7 +834,7 @@ All uploaded
   ```html
   <app>
     <file-upload ref="upload"></file-upload>
-    <span v-show="$refs.upload && $refs.upload.uploaded">All files have been uploaded<span>
+    <span v-show="$refs.upload && $refs.upload.uploaded">All files have been uploaded</span>
   </app>
   ```
 
