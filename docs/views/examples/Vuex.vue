@@ -1,6 +1,6 @@
 <template>
-  <div class="example-simple">
-    <h1 id="example-title" class="example-title">Simple Example</h1>
+  <div class="example-vuex">
+    <h1 id="example-title" class="example-title">Vuex Example</h1>
     <div class="upload">
       <ul>
         <li v-for="(file, index) in files" :key="file.id">
@@ -43,7 +43,7 @@
   </div>
 </template>
 <style>
-.example-simple label.btn {
+.example-vuex label.btn {
   margin-bottom: 0;
   margin-right: 1rem;
 }
