@@ -109,7 +109,6 @@ export default {
           let cropper = new Cropper(this.$refs.editImage, {
             aspectRatio: 1 / 1,
             viewMode: 1,
-            minContainerHeight: 300,
           })
           this.cropper = cropper
         })
@@ -123,15 +122,20 @@ export default {
   },
 
   methods: {
-    async editSave() {
+    editSave() {
       this.edit = false
-      let blob = await new Promise((resolve, reject) => {
-        this.cropper.getCroppedCanvas().toBlob(function (value) {
-          resolve(value)
-        })
-      })
-      let file = new File([blob], this.files[0].name, { type: blob.type })
-      this.$refs.upload.update(this.files[0].id, {
+
+      let oldFile = this.files[0]
+
+      let binStr = atob(this.cropper.getCroppedCanvas().toDataURL(oldFile.type).split(',')[1])
+      let arr = new Uint8Array(binStr.length)
+      for (let i = 0; i < binStr.length; i++) {
+        arr[i] = binStr.charCodeAt(i)
+      }
+
+      let file = new File([arr], oldFile.name, { type: oldFile.type })
+
+      this.$refs.upload.update(oldFile.id, {
         file,
         type: file.type,
         size: file.size,

@@ -541,7 +541,7 @@ export default {
       this.$refs.upload.update(file, { error: 'edit' })
     },
 
-    async onEditorFile() {
+    onEditorFile() {
       if (!this.$refs.upload.features.html5) {
         this.alert('Your browser does not support')
         this.editFile.show = false
@@ -552,14 +552,13 @@ export default {
         name: this.editFile.name,
       }
       if (this.editFile.cropper) {
-        let blob = await new Promise((resolve, reject) => {
-          this.editFile.cropper.getCroppedCanvas().toBlob(function (value) {
-            resolve(value)
-          })
-        })
-        data.file = new File([blob], data.name, { type: blob.type })
-        data.type = blob.type
-        data.size = blob.size
+        let binStr = atob(this.editFile.cropper.getCroppedCanvas().toDataURL(this.editFile.type).split(',')[1])
+        let arr = new Uint8Array(binStr.length)
+        for (let i = 0; i < binStr.length; i++) {
+          arr[i] = binStr.charCodeAt(i)
+        }
+        data.file = new File([arr], data.name, { type: this.editFile.type })
+        data.size = data.file.size
       }
       this.$refs.upload.update(this.editFile.id, data)
       this.editFile.error = ''
