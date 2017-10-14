@@ -799,7 +799,8 @@ var router = new __WEBPACK_IMPORTED_MODULE_0_vue_router___default.a({
     if (savedPosition) {
       return savedPosition;
     } else if (to.hash) {
-      return { selector: to.hash };
+      var el = document.querySelector(to.hash);
+      return { x: 0, y: el ? el.offsetTop : 0 };
     } else {
       return { x: 0, y: 0 };
     }
