@@ -632,6 +632,11 @@ __WEBPACK_IMPORTED_MODULE_0_vue___default.a.directive('markdown', function (el, 
   for (var i = 0; i < vnode.children.length; i++) {
     text += vnode.children[i].text || '';
   }
+  if (el.markdown === text) {
+    return;
+  }
+
+  el.markdown = text;
 
   el.innerHTML = __WEBPACK_IMPORTED_MODULE_1_marked___default()(text);
   var selectorList = el.querySelectorAll('a');
@@ -790,8 +795,14 @@ var examples = [{
 var router = new __WEBPACK_IMPORTED_MODULE_0_vue_router___default.a({
   mode: 'hash',
   fallback: false,
-  scrollBehavior: function scrollBehavior() {
-    return { y: 0 };
+  scrollBehavior: function scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    } else if (to.hash) {
+      return { selector: to.hash };
+    } else {
+      return { x: 0, y: 0 };
+    }
   },
 
   routes: [{
@@ -1132,21 +1143,6 @@ module.exports = function listToStyles(parentId, list) {
         navPrev = nav;
       }
       return rootNode.children;
-    }
-  },
-  watch: {
-    /**
-     * [$route description]
-     * @param  {[type]} route [description]
-     * @return {[type]}       [description]
-     */
-    $route: function $route(route) {
-      if (route.hash) {
-        var el = document.querySelector(route.hash);
-        window.scrollTo(0, el ? el.offsetTop : 0);
-      } else {
-        window.scrollTo(0, 0);
-      }
     }
   }
 });

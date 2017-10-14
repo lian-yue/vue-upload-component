@@ -100,20 +100,5 @@ export default {
       return rootNode.children
     },
   },
-  watch: {
-    /**
-     * [$route description]
-     * @param  {[type]} route [description]
-     * @return {[type]}       [description]
-     */
-    $route(route) {
-      if (route.hash) {
-        let el = document.querySelector(route.hash)
-        window.scrollTo(0, el ? el.offsetTop : 0)
-      } else {
-        window.scrollTo(0, 0)
-      }
-    }
-  },
 }
 </script>

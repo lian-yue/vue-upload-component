@@ -54,8 +54,14 @@ let examples = [
 const router = new VueRouter({
   mode: 'hash',
   fallback: false,
-  scrollBehavior() {
-    return { y: 0 }
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else if (to.hash) {
+      return { selector: to.hash }
+    } else {
+      return { x: 0, y: 0 }
+    }
   },
   routes: [
     {

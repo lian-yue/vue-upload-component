@@ -68,6 +68,11 @@ Vue.directive('markdown', function (el, binding, vnode) {
   for (let i = 0; i < vnode.children.length; i++) {
     text += vnode.children[i].text || ''
   }
+  if (el.markdown === text) {
+    return
+  }
+
+  el.markdown = text
 
   el.innerHTML = marked(text)
   let selectorList = el.querySelectorAll('a')
