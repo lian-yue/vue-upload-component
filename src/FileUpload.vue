@@ -56,6 +56,10 @@ export default {
       type: Boolean,
     },
 
+    addIndex: {
+      type: [Boolean, Number],
+    },
+
     directory: {
       type: Boolean,
     },
@@ -189,17 +193,7 @@ export default {
      * uploading 正在上传的线程
      * @return {[type]} [description]
      */
-    /*
-    uploading() {
-      let uploading = 0
-      for (var i = 0; i < this.files.length; i++) {
-        if (this.files[i].active) {
-          uploading++
-        }
-      }
-      return uploading
-    },
-    */
+
     /**
      * uploaded 文件列表是否全部已上传
      * @return {[type]} [description]
@@ -309,7 +303,7 @@ export default {
     },
 
     // 添加
-    add(_files, start) {
+    add(_files, index = this.addIndex) {
       let files = _files
       let isArray = files instanceof Array
 
@@ -403,8 +397,11 @@ export default {
 
       // 添加进去 files
       let newFiles
-      if (start) {
+      if (index === true || index === 0) {
         newFiles = addFiles.concat(this.files)
+      } else if (index) {
+        newFiles = addFiles.concat([])
+        newFiles.splice(index, 0, addFiles)
       } else {
         newFiles = this.files.concat(addFiles)
       }
@@ -536,6 +533,25 @@ export default {
     },
 
 
+    replace(id1, id2) {
+      let file1 = this.get(id1)
+      let file2 = this.get(id2)
+      if (!file1 || !file2 || file1 === file2) {
+        return false
+      }
+      let files = this.files.concat([])
+      let index1 = files.indexOf(file1)
+      let index2 = files.indexOf(file2)
+      if (index1 === -1 || index2 === -1) {
+        return false
+      }
+      files[index1] = file2
+      files[index2] = file1
+      this.files = files
+      this.emitInput()
+      return true
+    },
+
     // 移除
     remove(id) {
       let file = this.get(id)
@@ -599,6 +615,7 @@ export default {
       }
       return false
     },
+
 
 
     // 预处理 事件 过滤器

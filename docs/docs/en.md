@@ -545,6 +545,25 @@ Whether to open the drag directory
 
 
 
+### add-index
+
+* **Type:** `Boolean, Number`
+
+* **Default:** `undefined`
+
+* **Version:** : `>=2.6.1`
+
+* **Details:**
+
+  The default value of the `index` parameter for the [`add()`](#instance-methods-add) method
+
+* **Usage:**
+  ```html
+  <file-upload :add-index="true"></file-upload>
+  ```
+
+
+
 
 ## Options / Events
 
@@ -866,7 +885,7 @@ Add one or more files
 * **Arguments:**
 
   * `files: Array<File | window.File | Object> | File | window.File | Object`     If it is an array of responses will be an array
-  * `start: Boolean`                                  Whether it is inserted from the start position
+  * `index: Number | Boolean` = [`props.add-index`](#options-props-add-index)   `true = ` Start, `false = ` End, `Number = ` Index
 
 
 * **Result:** `Object | Array<File | Object> | Boolean`     The incoming array is returned to the array otherwise the object or `false`
@@ -1012,6 +1031,17 @@ Remove a file object
   }
   </script>
   ```
+
+### replace()
+  Replace the location of the two files
+
+* **Arguments:**
+
+  * `id1: File | Object | String`
+  * `id2: File | Object | String`
+
+
+* **Result:**  `Boolean`
 
 
 ### clear()

@@ -540,6 +540,23 @@ input标签的 `name` 属性
   ```
 
 
+### add-index
+
+* **类型:** `Boolean, Number`
+
+* **默认值:** `undefined`
+
+* **详细:**
+
+* **版本:** `>= 2.6.1`
+
+  [`add()`](#实例-方法-add) 方法 `index` 参数的默认值
+
+* **示例:**
+  ```html
+  <file-upload :add-index="true"></file-upload>
+  ```
+
 
 
 ## 选项 / 事件
@@ -860,7 +877,7 @@ Add, update, remove pre-filter
 * **参数:**
 
   * `files: Array<File | window.File | Object> | File | window.File | Object`     如果它是一个数组的响应将是一个数组
-  * `start: Boolean`                                  是否从开始位置插入
+  * `index: Number | Boolean` = [`props.add-index`](#选项-属性-add-index)   `true = ` 开始位置, `false = ` 结束位置, `Number = ` 下标位置
 
 
 * **结果:** `Object | Array<File | Object> | Boolean`     传入的是数组返回数组否则对象或`false`
@@ -1006,6 +1023,19 @@ Add, update, remove pre-filter
   }
   </script>
   ```
+
+
+### replace()
+  替换两个文件的位置
+
+* **参数:**
+
+  * `id1: File | Object | String`
+  * `id2: File | Object | String`
+
+
+* **结果:**  `Boolean`
+
 
 
 ### clear()

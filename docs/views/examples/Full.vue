@@ -97,6 +97,7 @@
           :data="data"
           :drop="drop"
           :drop-directory="dropDirectory"
+          :add-index="addIndex"
           v-model="files"
           @input-filter="inputFilter"
           @input-file="inputFile"
@@ -162,6 +163,14 @@
     <div class="form-group">
       <label for="minSize">Min size:</label>
       <input type="number" min="0" id="minSize" class="form-control" v-model.number="minSize">
+    </div>
+    <div class="form-group">
+      <div class="form-check">
+        <label class="form-check-label">
+          <input type="checkbox" id="add-index" class="form-check-input" v-model="addIndex"> Start position to add
+        </label>
+      </div>
+      <small class="form-text text-muted">Add a file list to start the location to add</small>
     </div>
     <div class="form-group">
       <div class="form-check">
@@ -384,6 +393,7 @@ export default {
       directory: false,
       drop: true,
       dropDirectory: true,
+      addIndex: false,
       thread: 3,
       name: 'file',
       postAction: '/upload/post',
