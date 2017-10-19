@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.6.0-beta.3
+ * Version: 2.6.1
  * Author: LianYue
  */
 (function (global, factory) {
@@ -53,6 +53,10 @@ var FileUpload = { render: function render() {
 
     multiple: {
       type: Boolean
+    },
+
+    addIndex: {
+      type: [Boolean, Number]
     },
 
     directory: {
@@ -188,17 +192,7 @@ var FileUpload = { render: function render() {
      * uploading 正在上传的线程
      * @return {[type]} [description]
      */
-    /*
-    uploading() {
-      let uploading = 0
-      for (var i = 0; i < this.files.length; i++) {
-        if (this.files[i].active) {
-          uploading++
-        }
-      }
-      return uploading
-    },
-    */
+
     /**
      * uploaded 文件列表是否全部已上传
      * @return {[type]} [description]
@@ -299,7 +293,9 @@ var FileUpload = { render: function render() {
 
 
     // 添加
-    add: function add(_files, start) {
+    add: function add(_files) {
+      var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.addIndex;
+
       var files = _files;
       var isArray = files instanceof Array;
 
@@ -385,8 +381,11 @@ var FileUpload = { render: function render() {
 
       // 添加进去 files
       var newFiles = void 0;
-      if (start) {
+      if (index === true || index === 0) {
         newFiles = addFiles.concat(this.files);
+      } else if (index) {
+        newFiles = addFiles.concat([]);
+        newFiles.splice(index, 0, addFiles);
       } else {
         newFiles = this.files.concat(addFiles);
       }
@@ -518,6 +517,24 @@ var FileUpload = { render: function render() {
           resolve([]);
         }
       });
+    },
+    replace: function replace(id1, id2) {
+      var file1 = this.get(id1);
+      var file2 = this.get(id2);
+      if (!file1 || !file2 || file1 === file2) {
+        return false;
+      }
+      var files = this.files.concat([]);
+      var index1 = files.indexOf(file1);
+      var index2 = files.indexOf(file2);
+      if (index1 === -1 || index2 === -1) {
+        return false;
+      }
+      files[index1] = file2;
+      files[index2] = file1;
+      this.files = files;
+      this.emitInput();
+      return true;
     },
 
 
