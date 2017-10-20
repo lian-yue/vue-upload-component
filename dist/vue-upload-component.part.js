@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.6.1
+ * Version: 2.6.2
  * Author: LianYue
  */
 (function (global, factory) {
@@ -308,7 +308,7 @@ var FileUpload = { render: function render() {
       var addFiles = [];
       for (var i = 0; i < files.length; i++) {
         var file = files[i];
-        if (this.features.html5 && file instanceof File) {
+        if (this.features.html5 && file instanceof Blob) {
           file = {
             file: file,
             size: file.size,
@@ -323,7 +323,7 @@ var FileUpload = { render: function render() {
           fileObject = true;
         } else if (typeof Element !== 'undefined' && file.el instanceof Element) {
           fileObject = true;
-        } else if (typeof File !== 'undefined' && file.file instanceof File) {
+        } else if (typeof Blob !== 'undefined' && file.file instanceof Blob) {
           fileObject = true;
         }
         if (fileObject) {
@@ -735,7 +735,7 @@ var FileUpload = { render: function render() {
           form.append(key, value);
         }
       }
-      form.append(this.name, file.file);
+      form.append(this.name, file.file, file.file.filename || file.name);
       var xhr = new XMLHttpRequest();
       xhr.open('POST', file.postAction);
       return this.uploadXhr(xhr, file, form);
