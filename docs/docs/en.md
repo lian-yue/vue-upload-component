@@ -619,7 +619,7 @@ Add, update, remove pre-filter
   If `newFile`, `oldFile` is exist, it is updated
 
   > Synchronization modify `newFile`  
-  > Asynchronous Please use `update`,` add`, `remove`,` clear` method
+  > Asynchronous Please use `update`,` add`, `remove`,` clear` method  
   > Asynchronous Please set an error first to prevent being uploaded
 
   > Synchronization can not use `update`,` add`, `remove`,` clear` methods  
