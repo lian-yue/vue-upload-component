@@ -45,6 +45,7 @@ function baseConfig() {
       'marked': 'marked',
       'highlight.js': 'hljs',
       'cropperjs': 'Cropper',
+      '@xkeshi/image-compressor': 'ImageCompressor',
     },
 
 
