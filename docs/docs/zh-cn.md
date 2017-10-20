@@ -612,8 +612,13 @@ Add, update, remove pre-filter
   如果 `oldFile` 值为 `undefined` 则是添加  
   如果 `newFile`, `oldFile` 都存在则是更新
 
-  > 事件内不可使用 `update`, `add`, `remove`, `clear` 方法  
-  事件内可修改 `newFile` 对象
+  > 事件内同步处理请直接修改 `newFile`  
+  > 事件内异步处理请使用 `update`, `add`, `remove`, `clear` 方法
+  > 异步请先设置一个错误以防止被上传
+
+  > 同步不能使用 `update`, `add`, `remove`, `clear` 方法  
+  > 异步不能修改 `newFile`
+
 
 * **示例:**  
   ```html
@@ -709,11 +714,6 @@ Add, update, remove pre-filter
       inputFile(newFile, oldFile) {
         if (newFile && !oldFile) {
           // 添加文件
-
-          // 自动上传
-          if (!this.$refs.upload.active) {
-            this.$refs.upload.active = true
-          }
         }
 
         if (newFile && oldFile) {
@@ -754,6 +754,13 @@ Add, update, remove pre-filter
             //   type: 'DELETE',
             //   url: '/file/delete?id=' + oldFile.response.id,
             // });
+          }
+        }
+
+        // 自动上传
+        if (Boolean(newFile) !== Boolean(oldFile) || oldFile.error !== newFile.error) {
+          if (!this.$refs.upload.active) {
+            this.$refs.upload.active = true
           }
         }
       }

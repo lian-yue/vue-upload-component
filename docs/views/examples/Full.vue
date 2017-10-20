@@ -59,12 +59,12 @@
                   Action
                 </button>
                 <div class="dropdown-menu">
-                  <a :class="{'dropdown-item': true, disabled: file.active || file.success}" href="#" @click.prevent="file.active || file.success ? false :  onEditFileShow(file)">Edit</a>
+                  <a :class="{'dropdown-item': true, disabled: file.active || file.success || file.error === 'compressing'}" href="#" @click.prevent="file.active || file.success || file.error === 'compressing' ? false :  onEditFileShow(file)">Edit</a>
                   <a :class="{'dropdown-item': true, disabled: !file.active}" href="#" @click.prevent="file.active ? $refs.upload.update(file, {error: 'cancel'}) : false">Cancel</a>
 
                   <a class="dropdown-item" href="#" v-if="file.active" @click.prevent="$refs.upload.update(file, {active: false})">Abort</a>
-                  <a class="dropdown-item" href="#" v-else-if="file.error && $refs.upload.features.html5" @click.prevent="$refs.upload.update(file, {active: true, error: '', progress: '0.00'})">Retry upload</a>
-                  <a :class="{'dropdown-item': true, disabled: file.success}" href="#" v-else @click.prevent="file.success ? false : $refs.upload.update(file, {active: true})">Upload</a>
+                  <a class="dropdown-item" href="#" v-else-if="file.error && file.error !== 'compressing' && $refs.upload.features.html5" @click.prevent="$refs.upload.update(file, {active: true, error: '', progress: '0.00'})">Retry upload</a>
+                  <a :class="{'dropdown-item': true, disabled: file.success || file.error === 'compressing'}" href="#" v-else @click.prevent="file.success || file.error === 'compressing' ? false : $refs.upload.update(file, {active: true})">Upload</a>
 
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="#" @click.prevent="$refs.upload.remove(file)">Remove</a>
@@ -165,6 +165,13 @@
       <input type="number" min="0" id="minSize" class="form-control" v-model.number="minSize">
     </div>
     <div class="form-group">
+      <label for="autoCompress">Automatically compress:</label>
+      <input type="number" min="0" id="autoCompress" class="form-control" v-model.number="autoCompress">
+      <small class="form-text text-muted" v-if="autoCompress > 0">More than {{autoCompress | formatSize}} files are automatically compressed</small>
+      <small class="form-text text-muted" v-else>Set up automatic compression</small>
+    </div>
+
+    <div class="form-group">
       <div class="form-check">
         <label class="form-check-label">
           <input type="checkbox" id="add-index" class="form-check-input" v-model="addIndex"> Start position to add
@@ -172,6 +179,7 @@
       </div>
       <small class="form-text text-muted">Add a file list to start the location to add</small>
     </div>
+
     <div class="form-group">
       <div class="form-check">
         <label class="form-check-label">
@@ -374,6 +382,7 @@
 
 <script>
 import Cropper from 'cropperjs'
+import ImageCompressor from '@xkeshi/image-compressor'
 import FileUpload from 'vue-upload-component'
 export default {
   components: {
@@ -405,7 +414,7 @@ export default {
         '_csrf_token': 'xxxxxx',
       },
 
-
+      autoCompress: 1024 * 1024,
       uploadAuto: false,
       isOption: false,
 
@@ -473,6 +482,24 @@ export default {
         if (/\.(php5?|html?|jsx?)$/i.test(newFile.name)) {
           return prevent()
         }
+
+        // Automatic compression
+        // 自动压缩
+        if (newFile.file && newFile.type.substr(0, 6) === 'image/' && this.autoCompress > 0 && this.autoCompress < newFile.size) {
+          newFile.error = 'compressing'
+          const imageCompressor = new ImageCompressor(null, {
+            convertSize: Infinity,
+            maxWidth: 512,
+            maxHeight: 512,
+          })
+          imageCompressor.compress(newFile.file)
+            .then((file) => {
+              this.$refs.upload.update(newFile, { error: '', file, size: file.size, type: file.type })
+            })
+            .catch((err) => {
+              this.$refs.upload.update(newFile, { error: err.message || 'compress' })
+            })
+        }
       }
 
 
@@ -535,8 +562,10 @@ export default {
 
 
       // Automatically activate upload
-      if (newFile && !oldFile && this.uploadAuto && !this.$refs.upload.active) {
-        this.$refs.upload.active = true
+      if (Boolean(newFile) !== Boolean(oldFile) || oldFile.error !== newFile.error) {
+        if (this.uploadAuto && !this.$refs.upload.active) {
+          this.$refs.upload.active = true
+        }
       }
     },
 

@@ -618,9 +618,12 @@ Add, update, remove pre-filter
   If the `oldFile` value is `undefined` 'is added
   If `newFile`, `oldFile` is exist, it is updated
 
+  > Synchronization modify `newFile`  
+  > Asynchronous Please use `update`,` add`, `remove`,` clear` method
+  > Asynchronous Please set an error first to prevent being uploaded
 
-  > You can not use `update`,` add`, `remove`,` clear` methods in the event  
-  >The `newFile` object can be modified within the event  
+  > Synchronization can not use `update`,` add`, `remove`,` clear` methods  
+  > Asynchronous can not modify `newFile`  
 
 * **Usage:**  
   ```html
@@ -717,11 +720,6 @@ Add, update, remove after
       inputFile(newFile, oldFile) {
         if (newFile && !oldFile) {
           // Add file
-
-          // Automatic upload
-          if (!this.$refs.upload.active) {
-            this.$refs.upload.active = true
-          }
         }
 
         if (newFile && oldFile) {
@@ -762,6 +760,13 @@ Add, update, remove after
             //   type: 'DELETE',
             //   url: '/file/delete?id=' + oldFile.response.id,
             // });
+          }
+        }
+
+        // Automatic upload
+        if (Boolean(newFile) !== Boolean(oldFile) || oldFile.error !== newFile.error) {
+          if (!this.$refs.upload.active) {
+            this.$refs.upload.active = true
           }
         }
       }
