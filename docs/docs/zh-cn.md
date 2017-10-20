@@ -613,7 +613,7 @@ Add, update, remove pre-filter
   如果 `newFile`, `oldFile` 都存在则是更新
 
   > 事件内同步处理请直接修改 `newFile`  
-  > 事件内异步处理请使用 `update`, `add`, `remove`, `clear` 方法
+  > 事件内异步处理请使用 `update`, `add`, `remove`, `clear` 方法  
   > 异步请先设置一个错误以防止被上传
 
   > 同步不能使用 `update`, `add`, `remove`, `clear` 方法  
