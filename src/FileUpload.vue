@@ -316,7 +316,7 @@ export default {
       let addFiles = []
       for (let i = 0; i < files.length; i++) {
         let file = files[i]
-        if (this.features.html5 && file instanceof File) {
+        if (this.features.html5 && file instanceof Blob) {
           file = {
             file,
             size: file.size,
@@ -331,7 +331,7 @@ export default {
           fileObject = true
         } else if (typeof Element !== 'undefined' && file.el instanceof Element) {
           fileObject = true
-        } else if (typeof File !== 'undefined' && file.file instanceof File) {
+        } else if (typeof Blob !== 'undefined' && file.file instanceof Blob) {
           fileObject = true
         }
         if (fileObject) {
@@ -749,7 +749,7 @@ export default {
           form.append(key, value)
         }
       }
-      form.append(this.name, file.file)
+      form.append(this.name, file.file, file.file.filename || file.name)
       let xhr = new XMLHttpRequest()
       xhr.open('POST', file.postAction)
       return this.uploadXhr(xhr, file, form)
