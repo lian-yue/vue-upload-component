@@ -1103,9 +1103,9 @@ module.exports = function listToStyles(parentId, list) {
 
 /* harmony default export */ __webpack_exports__["a"] = ({
   mounted: function mounted() {
-    // auto screenTop hash
+    // auto scrollTo hash
     if (this.$route.hash) {
-      var el = document.querySelector(this.$route.hash);
+      var el = document.querySelector(decodeURIComponent(this.$route.hash));
       if (el) {
         window.scrollTo(0, el.offsetTop);
       }
