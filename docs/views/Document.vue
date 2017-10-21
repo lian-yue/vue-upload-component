@@ -59,7 +59,7 @@ export default {
   mounted() {
     // auto scrollTo hash
     if (this.$route.hash) {
-      let el = document.querySelector(this.$route.hash)
+      let el = document.querySelector(decodeURIComponent(this.$route.hash))
       if (el) {
         window.scrollTo(0, el.offsetTop)
       }
