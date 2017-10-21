@@ -269,7 +269,7 @@ input标签的 `name` 属性
 
 * **示例:**
   ```html
-  <file-upload put-action="/upload/put.php"></file-upload>
+  <file-upload post-action="/upload/post.php"></file-upload>
   ```
 
 

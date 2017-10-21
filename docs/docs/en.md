@@ -273,7 +273,7 @@ The `name` attribute of the input tag
 
 * **Usage:**
   ```html
-  <file-upload put-action="/upload/put.php"></file-upload>
+  <file-upload post-action="/upload/post.php"></file-upload>
   ```
 
 
