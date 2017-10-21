@@ -57,7 +57,7 @@ import marked from 'marked'
 export default {
 
   mounted() {
-    // auto screenTop hash
+    // auto scrollTo hash
     if (this.$route.hash) {
       let el = document.querySelector(this.$route.hash)
       if (el) {
