@@ -55,6 +55,17 @@
 <script>
 import marked from 'marked'
 export default {
+
+  mounted() {
+    // auto screenTop hash
+    if (this.$route.hash) {
+      let el = document.querySelector(this.$route.hash)
+      if (el) {
+        window.scrollTo(0, el.offsetTop)
+      }
+    }
+  },
+
   computed: {
     document() {
       return require('../docs/' + this.$i18n.locale)
