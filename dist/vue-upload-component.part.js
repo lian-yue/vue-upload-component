@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.6.2
+ * Version: 2.6.3
  * Author: LianYue
  */
 (function (global, factory) {
@@ -730,7 +730,11 @@ var FileUpload = { render: function render() {
       for (var key in file.data) {
         value = file.data[key];
         if (value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && typeof value.toString !== 'function') {
-          form.append(key, JSON.stringify(value));
+          if (value instanceof File) {
+            form.append(key, value, value.name);
+          } else {
+            form.append(key, JSON.stringify(value));
+          }
         } else if (value !== null && value !== undefined) {
           form.append(key, value);
         }
