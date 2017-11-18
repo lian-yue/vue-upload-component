@@ -56,6 +56,13 @@ export default {
       type: Boolean,
     },
 
+    maximum: {
+      type: Number,
+      default() {
+        return this.multiple ? 0 : 1
+      }
+    },
+
     addIndex: {
       type: [Boolean, Number],
     },
@@ -377,8 +384,12 @@ export default {
 
         addFiles.push(file)
 
-        // 只允许单个文件
-        if (!this.multiple) {
+        // 最大数量限制
+        if (this.maximum === 1) {
+          break
+        }
+        // 最大数量限制
+        if (this.maximum > 0 && (addFiles.length + this.files.length) >= this.maximum) {
           break
         }
       }
@@ -388,9 +399,8 @@ export default {
         return false
       }
 
-
-      // 只允许单个文件 删除所有
-      if (!this.multiple) {
+      // 如果是 1 清空
+      if (this.maximum === 1) {
         this.clear()
       }
 
@@ -471,8 +481,8 @@ export default {
         return new Promise((resolve, reject) => {
           let forEach = (i) => {
             let item = items[i]
-            // 结束 或者已有文件了
-            if (!item || (!this.multiple && files.length)) {
+            // 结束 文件数量大于 最大数量
+            if (!item || (this.maximum > 0 && files.length >= this.maximum)) {
               return resolve(this.add(files))
             }
             this.getEntry(item).then(function (results) {
@@ -487,7 +497,7 @@ export default {
       if (dataTransfer.files.length) {
         for (let i = 0; i < dataTransfer.files.length; i++) {
           files.push(dataTransfer.files[i])
-          if (!this.multiple) {
+          if (this.maximum > 0 && files.length >= this.maximum) {
             break
           }
         }
@@ -516,7 +526,7 @@ export default {
           entry.createReader().readEntries((entries) => {
             let files = []
             let forEach = (i) => {
-              if (!entries[i] || (files.length && !this.multiple)) {
+              if (!entries[i] || (this.maximum > 0 && files.length >= this.maximum)) {
                 return resolve(files)
               }
               this.getEntry(entries[i], path + entry.name + '/').then((results) => {
