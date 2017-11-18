@@ -382,14 +382,15 @@ export default {
           continue
         }
 
+        // 最大数量限制
+        if (this.maximum > 1 && (addFiles.length + this.files.length) >= this.maximum) {
+          break
+        }
+
         addFiles.push(file)
 
         // 最大数量限制
         if (this.maximum === 1) {
-          break
-        }
-        // 最大数量限制
-        if (this.maximum > 0 && (addFiles.length + this.files.length) >= this.maximum) {
           break
         }
       }
