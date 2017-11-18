@@ -481,6 +481,18 @@ Upload timeout time in milliseconds
   <file-upload :timeout="600 * 1000"></file-upload>
   ```
 
+### maximum
+
+List the maximum number of files
+
+* **Type:** `Number`
+
+* **Default:** `props.multiple ? 0 : 1`
+
+* **Usage:**
+  ```html
+  <file-upload :maximum="10"></file-upload>
+  ```
 
 
 

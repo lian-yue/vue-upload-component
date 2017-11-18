@@ -478,6 +478,20 @@ input标签的 `name` 属性
   ```
 
 
+### maximum
+
+列表最大文件数
+
+* **类型:** `Number`
+
+* **默认值:** `props.multiple ? 0 : 1`
+
+* **示例:**
+  ```html
+  <file-upload :maximum="10"></file-upload>
+  ```
+
+
 
 
 ### thread
