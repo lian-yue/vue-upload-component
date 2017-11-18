@@ -77,7 +77,6 @@ function baseConfig() {
                     }
                   ]
                 ],
-
                 cacheDirectory: isDev
               },
             },

@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.6.3
+ * Version: 2.7.0
  * Author: LianYue
  */
 (function (global, factory) {
@@ -77,6 +77,13 @@ var FileUpload = { render: function render() {
 
     multiple: {
       type: Boolean
+    },
+
+    maximum: {
+      type: Number,
+      default: function _default() {
+        return this.multiple ? 0 : 1;
+      }
     },
 
     addIndex: {
@@ -385,10 +392,15 @@ var FileUpload = { render: function render() {
           continue;
         }
 
+        // 最大数量限制
+        if (this.maximum > 1 && addFiles.length + this.files.length >= this.maximum) {
+          break;
+        }
+
         addFiles.push(file);
 
-        // 只允许单个文件
-        if (!this.multiple) {
+        // 最大数量限制
+        if (this.maximum === 1) {
           break;
         }
       }
@@ -398,8 +410,8 @@ var FileUpload = { render: function render() {
         return false;
       }
 
-      // 只允许单个文件 删除所有
-      if (!this.multiple) {
+      // 如果是 1 清空
+      if (this.maximum === 1) {
         this.clear();
       }
 
@@ -480,8 +492,8 @@ var FileUpload = { render: function render() {
         return new Promise(function (resolve, reject) {
           var forEach = function forEach(i) {
             var item = items[i];
-            // 结束 或者已有文件了
-            if (!item || !_this.multiple && files.length) {
+            // 结束 文件数量大于 最大数量
+            if (!item || _this.maximum > 0 && files.length >= _this.maximum) {
               return resolve(_this.add(files));
             }
             _this.getEntry(item).then(function (results) {
@@ -496,7 +508,7 @@ var FileUpload = { render: function render() {
       if (dataTransfer.files.length) {
         for (var _i3 = 0; _i3 < dataTransfer.files.length; _i3++) {
           files.push(dataTransfer.files[_i3]);
-          if (!this.multiple) {
+          if (this.maximum > 0 && files.length >= this.maximum) {
             break;
           }
         }
@@ -527,7 +539,7 @@ var FileUpload = { render: function render() {
           entry.createReader().readEntries(function (entries) {
             var files = [];
             var forEach = function forEach(i) {
-              if (!entries[i] || files.length && !_this2.multiple) {
+              if (!entries[i] || _this2.maximum > 0 && files.length >= _this2.maximum) {
                 return resolve(files);
               }
               _this2.getEntry(entries[i], path + entry.name + '/').then(function (results) {
@@ -1185,7 +1197,7 @@ var FileUpload = { render: function render() {
     },
     onDragleave: function onDragleave(e) {
       e.preventDefault();
-      if (e.target.nodeName === 'HTML' || e.screenX === 0 && e.screenY === 0 && e.screenY === 0 && !e.fromElement && e.offsetX < 0) {
+      if (e.target.nodeName === 'HTML' || e.screenX === 0 && e.screenY === 0 && !e.fromElement && e.offsetX <= 0) {
         this.dropActive = false;
       }
     },
