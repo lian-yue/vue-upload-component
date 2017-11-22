@@ -524,19 +524,26 @@ export default {
             ])
           })
         } else if (entry.isDirectory && this.dropDirectory) {
-          entry.createReader().readEntries((entries) => {
-            let files = []
-            let forEach = (i) => {
-              if (!entries[i] || (this.maximum > 0 && files.length >= this.maximum)) {
-                return resolve(files)
+          let files = []
+          let dirReader = entry.createReader()
+          let readEntries = () => {
+            dirReader.readEntries((entries) => {
+              let forEach = (i) => {
+                if ((!entries[i] && i === 0) || (this.maximum > 0 && files.length >= this.maximum)) {
+                  return resolve(files)
+                }
+                if (!entries[i]) {
+                  return readEntries()
+                }
+                this.getEntry(entries[i], path + entry.name + '/').then((results) => {
+                  files.push(...results)
+                  forEach(i + 1)
+                })
               }
-              this.getEntry(entries[i], path + entry.name + '/').then((results) => {
-                files.push(...results)
-                forEach(i + 1)
-              })
-            }
-            forEach(0)
-          })
+              forEach(0)
+            })
+          }
+          readEntries()
         } else {
           resolve([])
         }
