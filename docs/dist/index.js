@@ -2543,19 +2543,26 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
             }]);
           });
         } else if (entry.isDirectory && _this2.dropDirectory) {
-          entry.createReader().readEntries(function (entries) {
-            var files = [];
-            var forEach = function forEach(i) {
-              if (!entries[i] || _this2.maximum > 0 && files.length >= _this2.maximum) {
-                return resolve(files);
-              }
-              _this2.getEntry(entries[i], path + entry.name + '/').then(function (results) {
-                files.push.apply(files, _toConsumableArray(results));
-                forEach(i + 1);
-              });
-            };
-            forEach(0);
-          });
+          var files = [];
+          var dirReader = entry.createReader();
+          var readEntries = function readEntries() {
+            dirReader.readEntries(function (entries) {
+              var forEach = function forEach(i) {
+                if (!entries[i] && i === 0 || _this2.maximum > 0 && files.length >= _this2.maximum) {
+                  return resolve(files);
+                }
+                if (!entries[i]) {
+                  return readEntries();
+                }
+                _this2.getEntry(entries[i], path + entry.name + '/').then(function (results) {
+                  files.push.apply(files, _toConsumableArray(results));
+                  forEach(i + 1);
+                });
+              };
+              forEach(0);
+            });
+          };
+          readEntries();
         } else {
           resolve([]);
         }
