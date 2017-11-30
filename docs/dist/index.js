@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.7.0
+ * Version: 2.7.1
  * Author: LianYue
  */
 /******/ (function(modules) { // webpackBootstrap
@@ -2988,6 +2988,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
           input = document.createElement('input');
           input.type = 'hidden';
           input.name = key;
+          input.value = value;
           form.appendChild(input);
         }
       }
