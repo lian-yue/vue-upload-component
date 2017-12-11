@@ -468,9 +468,9 @@ export default {
         for (let i = 0; i < dataTransfer.items.length; i++) {
           let item = dataTransfer.items[i]
           if (item.getAsEntry) {
-            item = item.getAsEntry()
+            item = item.getAsEntry() || item.getAsFile()
           } else if (item.webkitGetAsEntry) {
-            item = item.webkitGetAsEntry()
+            item = item.webkitGetAsEntry() || item.getAsFile()
           } else {
             item = item.getAsFile()
           }
