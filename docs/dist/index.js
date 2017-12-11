@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.7.1
+ * Version: 2.7.3
  * Author: LianYue
  */
 /******/ (function(modules) { // webpackBootstrap
@@ -2485,9 +2485,9 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
         for (var i = 0; i < dataTransfer.items.length; i++) {
           var item = dataTransfer.items[i];
           if (item.getAsEntry) {
-            item = item.getAsEntry();
+            item = item.getAsEntry() || item.getAsFile();
           } else if (item.webkitGetAsEntry) {
-            item = item.webkitGetAsEntry();
+            item = item.webkitGetAsEntry() || item.getAsFile();
           } else {
             item = item.getAsFile();
           }
