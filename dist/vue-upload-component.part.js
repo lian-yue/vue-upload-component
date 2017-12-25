@@ -1151,6 +1151,7 @@ var FileUpload = { render: function render() {
         try {
           document.removeEventListener('dragenter', this.onDragenter, false);
           document.removeEventListener('dragleave', this.onDragleave, false);
+          document.removeEventListener('drop', this.onDocumentDrop, false);
           this.dropElement.removeEventListener('dragover', this.onDragover, false);
           this.dropElement.removeEventListener('drop', this.onDrop, false);
         } catch (e) {}
@@ -1169,6 +1170,7 @@ var FileUpload = { render: function render() {
       if (this.dropElement) {
         document.addEventListener('dragenter', this.onDragenter, false);
         document.addEventListener('dragleave', this.onDragleave, false);
+        document.addEventListener('drop', this.onDocumentDrop, false);
         this.dropElement.addEventListener('dragover', this.onDragover, false);
         this.dropElement.addEventListener('drop', this.onDrop, false);
       }
@@ -1188,9 +1190,11 @@ var FileUpload = { render: function render() {
     onDragover: function onDragover(e) {
       e.preventDefault();
     },
+    onDocumentDrop: function onDocumentDrop() {
+      this.dropActive = false;
+    },
     onDrop: function onDrop(e) {
       e.preventDefault();
-      this.dropActive = false;
       this.addDataTransfer(e.dataTransfer);
     }
   }
