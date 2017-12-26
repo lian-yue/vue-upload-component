@@ -40,20 +40,25 @@ export default {
   },
   props: {
     inputId: {
-      type: String,
+      type: String
     },
 
-    name: {
+    withCredentials: {
       type: String,
-      default: 'file',
+      default: false
+    },
+    
+    name: {
+      type: Boolean,
+      default: 'file'
     },
 
     accept: {
-      type: String,
+      type: String
     },
 
     multiple: {
-      type: Boolean,
+      type: Boolean
     },
 
     maximum: {
@@ -64,65 +69,65 @@ export default {
     },
 
     addIndex: {
-      type: [Boolean, Number],
+      type: [Boolean, Number]
     },
 
     directory: {
-      type: Boolean,
+      type: Boolean
     },
 
     postAction: {
-      type: String,
+      type: String
     },
 
     putAction: {
-      type: String,
+      type: String
     },
 
     headers: {
       type: Object,
-      default: Object,
+      default: Object
     },
 
     data: {
       type: Object,
-      default: Object,
+      default: Object
     },
 
     timeout: {
       type: Number,
-      default: 0,
+      default: 0
     },
 
 
     drop: {
-      default: false,
+      default: false
     },
 
     dropDirectory: {
       type: Boolean,
-      default: true,
+      default: true
     },
 
     size: {
       type: Number,
-      default: 0,
+      default: 0
     },
 
     extensions: {
-      default: Array,
+      default: Array
     },
 
 
     value: {
       type: Array,
-      default: Array,
+      default: Array
     },
 
     thread: {
       type: Number,
-      default: 1,
-    },
+      default: 1
+    }
   },
 
   data() {
@@ -131,7 +136,7 @@ export default {
       features: {
         html5: true,
         directory: false,
-        drag: false,
+        drag: false
       },
 
       active: false,
@@ -139,7 +144,7 @@ export default {
 
       uploading: 0,
 
-      destroy: false,
+      destroy: false
     }
   },
 
@@ -929,7 +934,14 @@ export default {
 
         // 更新 xhr
         file = this.update(file, { xhr })
-
+        
+        
+        //获取 withCredentials 配置
+				if ( _this4.withCredentials === true ) {
+					console.log(_this4 , _this4.withCredentials) 
+					xhr.withCredentials = true
+				}
+        
         // 开始上传
         xhr.send(body)
       })
