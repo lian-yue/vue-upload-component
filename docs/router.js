@@ -11,6 +11,7 @@ import SimpleExampleComponent from './views/examples/Simple'
 import AvatarExampleComponent from './views/examples/Avatar'
 import DragExampleComponent from './views/examples/Drag'
 import MultipleExampleComponent from './views/examples/Multiple'
+import ChunkExampleComponent from './views/examples/Chunk'
 import VuexExampleComponent from './views/examples/Vuex'
 
 
@@ -42,6 +43,10 @@ let examples = [
   {
     path: 'multiple',
     component: MultipleExampleComponent,
+  },
+  {
+    path: 'chunk',
+    component: ChunkExampleComponent,
   },
   {
     path: 'vuex',
