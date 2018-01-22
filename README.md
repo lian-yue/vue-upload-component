@@ -15,6 +15,7 @@
   - [x] `PUT` method
   - [x] Customize the filter
   - [x] thumbnails
+  - [x] Chunk upload
 
 
 

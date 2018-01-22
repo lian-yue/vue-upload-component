@@ -20,6 +20,9 @@
             <router-link active-class="active" class="nav-link" :to="'/examples/multiple' | toLocale">{{$t('example.multiple')}}</router-link>
           </li>
           <li class="nav-item">
+            <router-link active-class="active" class="nav-link" :to="'/examples/chunk' | toLocale">{{$t('example.chunk')}}</router-link>
+          </li>
+          <li class="nav-item">
             <router-link active-class="active" class="nav-link" :to="'/examples/vuex' | toLocale">{{$t('example.vuex')}}</router-link>
           </li>
         </ul>

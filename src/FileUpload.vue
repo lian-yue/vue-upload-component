@@ -33,7 +33,21 @@
 }
 </style>
 <script>
+import ChunkUploadDefaultHandler from './chunk/ChunkUploadHandler'
 import InputFile from './InputFile.vue'
+
+const CHUNK_DEFAULT_OPTIONS = {
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  action: '',
+  minSize: 1048576,
+  maxActive: 3,
+  maxRetries: 5,
+
+  handler: ChunkUploadDefaultHandler
+}
+
 export default {
   components: {
     InputFile,
@@ -123,6 +137,20 @@ export default {
       type: Number,
       default: 1,
     },
+
+    // Chunk upload enabled
+    chunkEnabled: {
+      type: Boolean,
+      default: false
+    },
+
+    // Chunk upload properties
+    chunk: {
+      type: Object,
+      default: () => {
+        return CHUNK_DEFAULT_OPTIONS
+      }
+    }
   },
 
   data() {
@@ -216,6 +244,9 @@ export default {
       return true
     },
 
+    chunkOptions () {
+      return Object.assign(CHUNK_DEFAULT_OPTIONS, this.chunk)
+    },
 
     className() {
       return [
@@ -731,14 +762,41 @@ export default {
         return Promise.reject('size')
       }
 
+      if (this.features.html5) {
+        if (this.shouldUseChunkUpload(file)) {
+          return this.uploadChunk(file)
+        }
+        if (file.putAction) {
+          return this.uploadPut(file)
+        }
 
-      if (this.features.html5 && file.putAction) {
-        return this.uploadPut(file)
-      } else if (this.features.html5) {
         return this.uploadHtml5(file)
-      } else {
-        return this.uploadHtml4(file)
       }
+
+      return this.uploadHtml4(file)
+    },
+
+    /**
+     * Whether this file should be uploaded using chunk upload or not
+     *
+     * @param Object file
+     */
+    shouldUseChunkUpload (file) {
+      return this.chunkEnabled &&
+        !!this.chunkOptions.handler &&
+        file.size > this.chunkOptions.minSize
+    },
+
+    /**
+     * Upload a file using Chunk method
+     *
+     * @param File file
+     */
+    uploadChunk (file) {
+      const HandlerClass = this.chunkOptions.handler
+      file.chunk = new HandlerClass(file, this.chunkOptions)
+
+      return file.chunk.upload()
     },
 
     uploadPut(file) {

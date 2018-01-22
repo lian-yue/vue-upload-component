@@ -131,7 +131,81 @@ new Vue({
 </html>
 ```
 
+### Chunk Upload
 
+This package allows chunk uploads, which means you can upload a file in different parts.
+
+This process is divided in three phases: <strong>start</strong>, <strong>upload</strong>,<strong>finish</strong></p>
+
+#### start
+
+This is the first phase of the process. We'll tell the backend that we are going to upload a file, with certain `size` and `mime_type`.
+
+Use the option `startBody` to add more parameters to the body of this request.
+
+The backend will provide a `session_id` (to identify the upload) and a `end_offset` which is the size of every chunk
+
+#### upload
+
+In this phase we'll upload every chunk until all of them are uploaded. This step allows some failures in the backend, and will retry up to `maxRetries` times.
+
+We'll send the `session_id`, `start_chunk` and `chunk` (the sliced blob - part of file we are uploading). We expect the backend to return `status = 'success'`, we'll retry otherwise.
+
+Use the option `uploadBody` to add more parameters to the body of this request.
+
+#### finish
+
+In this phase we tell the backend that there are no more chunks to upload, so it can wrap everything. We send the `session_id` in this phase.
+
+Use the option `finishBody` to add more parameters to the body of this request.
+
+#### Example
+
+```html
+  <file-upload
+    ref="upload"
+    v-model="files"
+    post-action="/post.method"
+    put-action="/put.method"
+
+    chunk-enabled
+    :chunk="{
+      action: '/upload/chunk',
+      minSize: 1048576,
+      maxActive: 3,
+      maxRetries: 5,
+
+      // In this case our backend also needs the user id to operate
+      startBody: {
+        user_id: user.id
+      }
+    }"
+
+    @input-file="inputFile"
+    @input-filter="inputFilter"
+  >
+  Upload file
+  </file-upload>
+```
+
+#### Extending the handler
+
+We are using the class `src/chunk/ChunkUploadHandler` class to implement this protocol. You can extend this class (or even create a different one from scratch) to implement your own way to communicat with the backend.
+
+This class must implement a method called `upload` which **must** return a promise. This promise will be used by the `FileUpload` component to determinate whether the file was uploaded or failed.
+
+Use the `handler` parameter to use a different Handler
+
+```html
+  :chunk="{
+    action: '/upload/chunk',
+    minSize: 1048576,
+    maxActive: 3,
+    maxRetries: 5,
+
+    handler: MyHandlerClass
+  }
+```
 
 ### SSR (Server isomorphism)
 
@@ -213,9 +287,9 @@ const nodeExternals = require('webpack-node-externals');
 }
 ```
 
-* [https://github.com/liady/webpack-node-externals](https://github.com/liady/webpack-node-externals)  
+* [https://github.com/liady/webpack-node-externals](https://github.com/liady/webpack-node-externals)
 
-* [**`vue-hackernews` demo**](https://github.com/lian-yue/vue-hackernews-2.0/)  
+* [**`vue-hackernews` demo**](https://github.com/lian-yue/vue-hackernews-2.0/)
 
 * [**View changes**](https://github.com/lian-yue/vue-hackernews-2.0/commit/bd6c58a30cc6b8ba6c0148e737b3ce9336b99cf8)
 
@@ -290,9 +364,9 @@ The `name` attribute of the input tag
 
 * **Browser:** `> IE9`
 
-* **Details:**  
+* **Details:**
 
-  `put-action` is not empty Please give priority to` PUT` request  
+  `put-action` is not empty Please give priority to` PUT` request
 
 * **Usage:**
   ```html
@@ -324,7 +398,7 @@ Attach `header` data
 
 ### data
 
-`POST request`:  Append request `body`  
+`POST request`:  Append request `body`
 `PUT request`:  Append request `query`
 
 * **Type:** `Object`
@@ -347,9 +421,9 @@ File List
 
 * **Default:** `[]`
 
-* **Details:**  
+* **Details:**
 
-  View **[`File`](#file)** details  
+  View **[`File`](#file)** details
   > In order to prevent unpredictable errors, can not directly modify the `files`, please use [`add`](#instance-methods-add), [`update`](#instance-methods-update), [`remove`](#instance-methods-remove) method to modify
 
 * **Usage:**
@@ -365,7 +439,7 @@ File List
 
 ### accept
 
-The `accept` attribute of the input tag, MIME type  
+The `accept` attribute of the input tag, MIME type
 
 * **Type:** `String`
 
@@ -386,14 +460,14 @@ The `accept` attribute of the input tag, MIME type
 
 ### multiple
 
-The `multiple` attribute of the input tag  
-Whether to allow multiple files to be selected  
+The `multiple` attribute of the input tag
+Whether to allow multiple files to be selected
 
 * **Type:** `Boolean`
 
 * **Default:** `false`
 
-* **Details:**  
+* **Details:**
 
   If it is `false` file inside only one file will be automatically deleted
 
@@ -406,8 +480,8 @@ Whether to allow multiple files to be selected
 
 ### directory
 
-The `directory` attribute of the input tag  
-Whether it is a upload folder  
+The `directory` attribute of the input tag
+Whether it is a upload folder
 
 * **Type:** `Boolean`
 
@@ -426,7 +500,7 @@ Whether it is a upload folder
 
 ### extensions
 
-Allow upload file extensions  
+Allow upload file extensions
 
 * **Type:** `Array | String | RegExp`
 
@@ -498,7 +572,7 @@ List the maximum number of files
 
 ### thread
 
-Also upload the number of files at the same time (number of threads)  
+Also upload the number of files at the same time (number of threads)
 
 * **Type:** `Number`
 
@@ -512,8 +586,42 @@ Also upload the number of files at the same time (number of threads)
   ```
 
 
+### chunk-enabled
 
+Whether chunk uploads is enabled or not
 
+* **Type:** `Boolean`
+
+* **Default:** `false`
+
+* **Usage:**
+  ```html
+  <file-upload :chunk-enabled="true"></file-upload>
+  <file-upload chunk-enabled></file-upload>
+  ```
+
+### chunk
+
+All the options to handle chunk uploads
+
+* **Type:** `Object`
+
+* **Default:**
+```js
+{
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    action: '',
+    minSize: 1048576,
+    maxActive: 3,
+    maxRetries: 5,
+
+    // This is the default Handler implemented in this package
+    // you can use your own handler if your protocol is different
+    handler: ChunkUploadDefaultHandler
+}
+```
 
 ### drop
 
@@ -527,7 +635,7 @@ Drag and drop upload
 
 * **Details:**
 
-  If set to `true`, read the parent component as a container  
+  If set to `true`, read the parent component as a container
 
 * **Usage:**
   ```html
@@ -615,7 +723,7 @@ Default for `v-model` binding
 
 ### @input-filter
 
-Add, update, remove pre-filter  
+Add, update, remove pre-filter
 
 * **Arguments:**
 
@@ -630,14 +738,14 @@ Add, update, remove pre-filter
   If the `oldFile` value is `undefined` 'is added
   If `newFile`, `oldFile` is exist, it is updated
 
-  > Synchronization modify `newFile`  
-  > Asynchronous Please use `update`,` add`, `remove`,` clear` method  
+  > Synchronization modify `newFile`
+  > Asynchronous Please use `update`,` add`, `remove`,` clear` method
   > Asynchronous Please set an error first to prevent being uploaded
 
-  > Synchronization can not use `update`,` add`, `remove`,` clear` methods  
-  > Asynchronous can not modify `newFile`  
+  > Synchronization can not use `update`,` add`, `remove`,` clear` methods
+  > Asynchronous can not modify `newFile`
 
-* **Usage:**  
+* **Usage:**
   ```html
   <template>
     <ul>
@@ -712,8 +820,8 @@ Add, update, remove after
   If `newFile`, `oldFile` is exist, it is updated
 
 
-  >You can use `update`,` add`, `remove`,` clear` methods in the event  
-  >You can not modify the `newFile` object in the event  
+  >You can use `update`,` add`, `remove`,` clear` methods in the event
+  >You can not modify the `newFile` object in the event
   >You can not modify the `oldFile` object in the event
 
 * **Usage:**
@@ -955,7 +1063,7 @@ Add the file selected by `<input type = "file">` to the upload list
 
 ###  addDataTransfer()
 
-Add files that are dragged or pasted into the upload list  
+Add files that are dragged or pasted into the upload list
 
 * **Arguments:**
 
@@ -1092,7 +1200,7 @@ Empty the file list
 
 * **Details:**
 
-  If the attribute does not exist, the object will not be processed internally  
+  If the attribute does not exist, the object will not be processed internally
   If the attribute does not exist, it is not `File` but `Object`
 
 
@@ -1110,7 +1218,7 @@ File ID
 
 * **Details:**
 
-  >`id` can not be repeated  
+  >`id` can not be repeated
   >Upload can not modify `id`
 
 
@@ -1129,7 +1237,7 @@ File size
 
 ### name
 
-Filename  
+Filename
 
 * **Type:** `String`
 
@@ -1139,7 +1247,7 @@ Filename
 
 * **Details:**
 
-  Format:  `directory/filename.gif`  `filename.gif`  
+  Format:  `directory/filename.gif`  `filename.gif`
 
 
 
@@ -1174,8 +1282,8 @@ Activation or abort upload
 
 * **Details:**
 
-  `true` = Upload  
-  `false` = Abort  
+  `true` = Upload
+  `false` = Abort
 
 
 
@@ -1194,7 +1302,7 @@ Upload failed error code
 
 * **Details:**
 
-  Built-in  
+  Built-in
   `size`, `extension`, `timeout`, `abort`, `network`, `server`, `denied`
 
 

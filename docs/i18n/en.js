@@ -25,6 +25,7 @@ export default {
     avatar: 'Upload avatar',
     drag: 'Drag and drop',
     multiple: 'Multiple instances',
+    chunk: 'Chunk upload',
     vuex: 'Vuex',
   }
 }
