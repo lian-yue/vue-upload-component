@@ -4,6 +4,7 @@ const webpack           = require('webpack')
 
 const packageInfo       = require('./package')
 
+const bodyParser       = require('webpack-body-parser')
 const chunkUpload      = require('./src/utils/chunkUpload')
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production'
@@ -186,8 +187,6 @@ module.exports = merge(baseConfig(), {
       let del = function (req, res) {
         res.json({ success: true })
       }
-
-      const bodyParser = require('webpack-body-parser')
 
       // Chunk upload
       app.post('/upload/chunk', bodyParser.json(), chunkUpload)
