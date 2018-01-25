@@ -143,13 +143,13 @@ This is the first phase of the process. We'll tell the backend that we are going
 
 Use the option `startBody` to add more parameters to the body of this request.
 
-The backend will provide a `session_id` (to identify the upload) and a `end_offset` which is the size of every chunk
+The backend should provide a `session_id` (to identify the upload) and a `end_offset` which is the size of every chunk
 
 #### upload
 
 In this phase we'll upload every chunk until all of them are uploaded. This step allows some failures in the backend, and will retry up to `maxRetries` times.
 
-We'll send the `session_id`, `start_chunk` and `chunk` (the sliced blob - part of file we are uploading). We expect the backend to return `status = 'success'`, we'll retry otherwise.
+We'll send the `session_id`, `start_chunk` and `chunk` (the sliced blob - part of file we are uploading). We expect the backend to return `{ status: 'success' }`, we'll retry otherwise.
 
 Use the option `uploadBody` to add more parameters to the body of this request.
 
@@ -160,6 +160,8 @@ In this phase we tell the backend that there are no more chunks to upload, so it
 Use the option `finishBody` to add more parameters to the body of this request.
 
 #### Example
+
+In the following example we are going to add `Chunk Upload Functionality`. This component will use `Chunk Upload` when the size of the file is > `1MB`, it will behave as the `Simple example` when the size of the file is lower.
 
 ```html
   <file-upload
@@ -175,7 +177,7 @@ Use the option `finishBody` to add more parameters to the body of this request.
       maxActive: 3,
       maxRetries: 5,
 
-      // In this case our backend also needs the user id to operate
+      // Example in the case your backend also needs the user id to operate
       startBody: {
         user_id: user.id
       }
@@ -193,19 +195,6 @@ Use the option `finishBody` to add more parameters to the body of this request.
 We are using the class `src/chunk/ChunkUploadHandler` class to implement this protocol. You can extend this class (or even create a different one from scratch) to implement your own way to communicat with the backend.
 
 This class must implement a method called `upload` which **must** return a promise. This promise will be used by the `FileUpload` component to determinate whether the file was uploaded or failed.
-
-Use the `handler` parameter to use a different Handler
-
-```html
-  :chunk="{
-    action: '/upload/chunk',
-    minSize: 1048576,
-    maxActive: 3,
-    maxRetries: 5,
-
-    handler: MyHandlerClass
-  }
-```
 
 ### SSR (Server isomorphism)
 
@@ -585,7 +574,6 @@ Also upload the number of files at the same time (number of threads)
   <file-upload :thread="3"></file-upload>
   ```
 
-
 ### chunk-enabled
 
 Whether chunk uploads is enabled or not
@@ -593,6 +581,8 @@ Whether chunk uploads is enabled or not
 * **Type:** `Boolean`
 
 * **Default:** `false`
+
+* **Browser:** `> IE9`
 
 * **Usage:**
   ```html
@@ -622,6 +612,14 @@ All the options to handle chunk uploads
     handler: ChunkUploadDefaultHandler
 }
 ```
+
+* **Browser:** `> IE9`
+
+* **Usage:**
+  ```html
+  <file-upload :chunk-enabled="true"></file-upload>
+  <file-upload chunk-enabled></file-upload>
+  ```
 
 ### drop
 
