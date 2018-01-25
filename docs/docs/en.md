@@ -196,6 +196,19 @@ We are using the class `src/chunk/ChunkUploadHandler` class to implement this pr
 
 This class must implement a method called `upload` which **must** return a promise. This promise will be used by the `FileUpload` component to determinate whether the file was uploaded or failed.
 
+Use the `handler` parameter to use a different Handler
+
+```html
+ :chunk="{
+   action: '/upload/chunk',
+   minSize: 1048576,
+   maxActive: 3,
+   maxRetries: 5,
+
+   handler: MyHandlerClass
+ }
+```
+
 ### SSR (Server isomorphism)
 
 
@@ -582,8 +595,6 @@ Whether chunk uploads is enabled or not
 
 * **Default:** `false`
 
-* **Browser:** `> IE9`
-
 * **Usage:**
   ```html
   <file-upload :chunk-enabled="true"></file-upload>
@@ -612,14 +623,6 @@ All the options to handle chunk uploads
     handler: ChunkUploadDefaultHandler
 }
 ```
-
-* **Browser:** `> IE9`
-
-* **Usage:**
-  ```html
-  <file-upload :chunk-enabled="true"></file-upload>
-  <file-upload chunk-enabled></file-upload>
-  ```
 
 ### drop
 
