@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.7.3
+ * Version: 2.8.0
  * Author: LianYue
  */
 (function (global, factory) {
@@ -8,6 +8,486 @@
 	typeof define === 'function' && define.amd ? define(factory) :
 	(global.VueUploadComponent = factory());
 }(this, (function () { 'use strict';
+
+/**
+ * Creates a XHR request
+ *
+ * @param {Object} options
+ */
+var createRequest = function createRequest(options) {
+  var xhr = new XMLHttpRequest();
+  xhr.responseType = 'json';
+  xhr.open(options.method || 'GET', options.url);
+  if (options.headers) {
+    Object.keys(options.headers).forEach(function (key) {
+      xhr.setRequestHeader(key, options.headers[key]);
+    });
+  }
+
+  return xhr;
+};
+
+/**
+ * Sends a XHR request with certain body
+ *
+ * @param {XMLHttpRequest} xhr
+ * @param {Object} body
+ */
+var sendRequest = function sendRequest(xhr, body) {
+  return new Promise(function (resolve, reject) {
+    xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.response);
+      } else {
+        reject(xhr.statusText);
+      }
+    };
+    xhr.onerror = function () {
+      return reject(xhr.statusText);
+    };
+    xhr.send(JSON.stringify(body));
+  });
+};
+
+/**
+ * Creates and sends XHR request
+ *
+ * @param {Object} options
+ *
+ * @returns Promise
+ */
+var request = function (options) {
+  var xhr = createRequest(options);
+
+  return sendRequest(xhr, options.body);
+};
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ChunkUploadHandler = function () {
+  /**
+   * Constructor
+   *
+   * @param {File} file
+   * @param {Object} options
+   */
+  function ChunkUploadHandler(file, options) {
+    _classCallCheck(this, ChunkUploadHandler);
+
+    this.file = file;
+    this.options = options;
+  }
+
+  /**
+   * Gets the max retries from options
+   */
+
+
+  _createClass(ChunkUploadHandler, [{
+    key: 'createChunks',
+
+
+    /**
+     * Creates all the chunks in the initial state
+     */
+    value: function createChunks() {
+      this.chunks = [];
+
+      var start = 0;
+      var end = this.chunkSize;
+      while (start < this.fileSize) {
+        this.chunks.push({
+          blob: this.file.file.slice(start, end),
+          startOffset: start,
+          active: false,
+          retries: this.maxRetries
+        });
+        start = end;
+        end = start + this.chunkSize;
+      }
+    }
+
+    /**
+     * Updates the progress of the file with the handler's progress
+     */
+
+  }, {
+    key: 'updateFileProgress',
+    value: function updateFileProgress() {
+      this.file.progress = this.progress;
+    }
+
+    /**
+     * Paues the upload process
+     * - Stops all active requests
+     * - Sets the file not active
+     */
+
+  }, {
+    key: 'pause',
+    value: function pause() {
+      this.file.active = false;
+      this.chunksUploading.forEach(function (chunk) {
+        chunk.xhr.abort();
+        chunk.active = false;
+      });
+    }
+
+    /**
+     * Resumes the file upload
+     * - Sets the file active
+     * - Starts the following chunks
+     */
+
+  }, {
+    key: 'resume',
+    value: function resume() {
+      this.file.active = true;
+      this.startChunking();
+    }
+
+    /**
+     * Starts the file upload
+     *
+     * @returns Promise
+     * - resolve  The file was uploaded
+     * - reject   The file upload failed
+     */
+
+  }, {
+    key: 'upload',
+    value: function upload() {
+      var _this = this;
+
+      this.promise = new Promise(function (resolve, reject) {
+        _this.resolve = resolve;
+        _this.reject = reject;
+      });
+      this.start();
+
+      return this.promise;
+    }
+
+    /**
+     * Start phase
+     * Sends a request to the backend to initialise the chunks
+     */
+
+  }, {
+    key: 'start',
+    value: function start() {
+      var _this2 = this;
+
+      request({
+        method: 'POST',
+        headers: this.headers,
+        url: this.action,
+        body: Object.assign(this.startBody, {
+          phase: 'start',
+          mime_type: this.fileType,
+          size: this.fileSize
+        })
+      }).then(function (res) {
+        if (res.status !== 'success') {
+          return _this2.reject(res.message);
+        }
+
+        _this2.sessionId = res.data.session_id;
+        _this2.chunkSize = res.data.end_offset;
+
+        _this2.createChunks();
+        _this2.startChunking();
+      }).catch(function (error) {
+        return _this2.reject(error);
+      });
+    }
+
+    /**
+     * Starts to upload chunks
+     */
+
+  }, {
+    key: 'startChunking',
+    value: function startChunking() {
+      for (var i = 0; i < this.maxActiveChunks; i++) {
+        this.uploadNextChunk();
+      }
+    }
+
+    /**
+     * Uploads the next chunk
+     * - Won't do anything if the process is paused
+     * - Will start finish phase if there are no more chunks to upload
+     */
+
+  }, {
+    key: 'uploadNextChunk',
+    value: function uploadNextChunk() {
+      if (this.file.active) {
+        if (this.hasChunksToUpload) {
+          return this.uploadChunk(this.chunksToUpload[0]);
+        }
+
+        if (this.chunksUploading.length === 0) {
+          return this.finish();
+        }
+      }
+    }
+
+    /**
+     * Uploads a chunk
+     * - Sends the chunk to the backend
+     * - Sets the chunk as uploaded if everything went well
+     * - Decreases the number of retries if anything went wrong
+     * - Fails if there are no more retries
+     *
+     * @param {Object} chunk
+     */
+
+  }, {
+    key: 'uploadChunk',
+    value: function uploadChunk(chunk) {
+      var _this3 = this;
+
+      chunk.progress = 0;
+      chunk.active = true;
+      this.updateFileProgress();
+      chunk.xhr = createRequest({
+        method: 'POST',
+        headers: this.headers,
+        url: this.action
+      });
+
+      chunk.xhr.upload.addEventListener('progress', function (evt) {
+        if (evt.lengthComputable) {
+          chunk.progress = Math.round(evt.loaded / evt.total * 100);
+        }
+      }, false);
+
+      sendRequest(chunk.xhr, Object.assign(this.uploadBody, {
+        phase: 'upload',
+        session_id: this.sessionId,
+        start_offset: chunk.startOffset,
+        chunk: chunk.blob
+      })).then(function (res) {
+        chunk.active = false;
+        if (res.status === 'success') {
+          chunk.uploaded = true;
+        } else {
+          if (chunk.retries-- <= 0) {
+            _this3.pause();
+            return _this3.reject('File upload failed');
+          }
+        }
+
+        _this3.uploadNextChunk();
+      }).catch(function () {
+        chunk.active = false;
+        if (chunk.retries-- <= 0) {
+          _this3.pause();
+          return _this3.reject('File upload failed');
+        }
+
+        _this3.uploadNextChunk();
+      });
+    }
+
+    /**
+     * Finish phase
+     * Sends a request to the backend to finish the process
+     */
+
+  }, {
+    key: 'finish',
+    value: function finish() {
+      var _this4 = this;
+
+      this.updateFileProgress();
+
+      request({
+        method: 'POST',
+        headers: this.headers,
+        url: this.action,
+        body: Object.assign(this.finishBody, {
+          phase: 'finish',
+          session_id: this.sessionId
+        })
+      }).then(function (res) {
+        if (res.status !== 'success') {
+          return _this4.reject(res.message);
+        }
+
+        _this4.resolve(res);
+      }).catch(function (error) {
+        return _this4.reject(error);
+      });
+    }
+  }, {
+    key: 'maxRetries',
+    get: function get() {
+      return parseInt(this.options.maxRetries);
+    }
+
+    /**
+     * Gets the max number of active chunks being uploaded at once from options
+     */
+
+  }, {
+    key: 'maxActiveChunks',
+    get: function get() {
+      return parseInt(this.options.maxActive);
+    }
+
+    /**
+     * Gets the file type
+     */
+
+  }, {
+    key: 'fileType',
+    get: function get() {
+      return this.file.type;
+    }
+
+    /**
+     * Gets the file size
+     */
+
+  }, {
+    key: 'fileSize',
+    get: function get() {
+      return this.file.size;
+    }
+
+    /**
+     * Gets action (url) to upload the file
+     */
+
+  }, {
+    key: 'action',
+    get: function get() {
+      return this.options.action || null;
+    }
+
+    /**
+     * Gets the body to be merged when sending the request in start phase
+     */
+
+  }, {
+    key: 'startBody',
+    get: function get() {
+      return this.options.startBody || {};
+    }
+
+    /**
+     * Gets the body to be merged when sending the request in upload phase
+     */
+
+  }, {
+    key: 'uploadBody',
+    get: function get() {
+      return this.options.uploadBody || {};
+    }
+
+    /**
+     * Gets the body to be merged when sending the request in finish phase
+     */
+
+  }, {
+    key: 'finishBody',
+    get: function get() {
+      return this.options.finishBody || {};
+    }
+
+    /**
+     * Gets the headers of the requests from options
+     */
+
+  }, {
+    key: 'headers',
+    get: function get() {
+      return this.options.headers || {};
+    }
+
+    /**
+     * Whether it's ready to upload files or not
+     */
+
+  }, {
+    key: 'readyToUpload',
+    get: function get() {
+      return !!this.chunks;
+    }
+
+    /**
+     * Gets the progress of the chunk upload
+     * - Gets all the completed chunks
+     * - Gets the progress of all the chunks that are being uploaded
+     */
+
+  }, {
+    key: 'progress',
+    get: function get() {
+      var _this5 = this;
+
+      var completedProgress = this.chunksUploaded.length / this.chunks.length * 100;
+      var uploadingProgress = this.chunksUploading.reduce(function (progress, chunk) {
+        return progress + (chunk.progress | 0) / _this5.chunks.length;
+      }, 0);
+
+      return Math.min(completedProgress + uploadingProgress, 100);
+    }
+
+    /**
+     * Gets all the chunks that are pending to be uploaded
+     */
+
+  }, {
+    key: 'chunksToUpload',
+    get: function get() {
+      return this.chunks.filter(function (chunk) {
+        return !chunk.active && !chunk.uploaded;
+      });
+    }
+
+    /**
+     * Whether there are chunks to upload or not
+     */
+
+  }, {
+    key: 'hasChunksToUpload',
+    get: function get() {
+      return this.chunksToUpload.length > 0;
+    }
+
+    /**
+     * Gets all the chunks that are uploading
+     */
+
+  }, {
+    key: 'chunksUploading',
+    get: function get() {
+      return this.chunks.filter(function (chunk) {
+        return !!chunk.xhr && !!chunk.active;
+      });
+    }
+
+    /**
+     * Gets all the chunks that have finished uploading
+     */
+
+  }, {
+    key: 'chunksUploaded',
+    get: function get() {
+      return this.chunks.filter(function (chunk) {
+        return !!chunk.uploaded;
+      });
+    }
+  }]);
+
+  return ChunkUploadHandler;
+}();
 
 (function () {
   if (typeof document !== 'undefined') {
@@ -54,6 +534,18 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
     }head.appendChild(style);
   }
 })();
+
+var CHUNK_DEFAULT_OPTIONS = {
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  action: '',
+  minSize: 1048576,
+  maxActive: 3,
+  maxRetries: 5,
+
+  handler: ChunkUploadHandler
+};
 
 var FileUpload = { render: function render() {
     var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('label', { class: _vm.className }, [_vm._t("default"), _vm._v(" "), _c('input-file')], 2);
@@ -143,6 +635,20 @@ var FileUpload = { render: function render() {
     thread: {
       type: Number,
       default: 1
+    },
+
+    // Chunk upload enabled
+    chunkEnabled: {
+      type: Boolean,
+      default: false
+    },
+
+    // Chunk upload properties
+    chunk: {
+      type: Object,
+      default: function _default() {
+        return CHUNK_DEFAULT_OPTIONS;
+      }
     }
   },
 
@@ -237,6 +743,9 @@ var FileUpload = { render: function render() {
         }
       }
       return true;
+    },
+    chunkOptions: function chunkOptions() {
+      return Object.assign(CHUNK_DEFAULT_OPTIONS, this.chunk);
     },
     className: function className() {
       return ['file-uploads', this.features.html5 ? 'file-uploads-html5' : 'file-uploads-html4', this.features.directory && this.directory ? 'file-uploads-directory' : undefined, this.features.drop && this.drop ? 'file-uploads-drop' : undefined];
@@ -745,13 +1254,41 @@ var FileUpload = { render: function render() {
         return Promise.reject('size');
       }
 
-      if (this.features.html5 && file.putAction) {
-        return this.uploadPut(file);
-      } else if (this.features.html5) {
+      if (this.features.html5) {
+        if (this.shouldUseChunkUpload(file)) {
+          return this.uploadChunk(file);
+        }
+        if (file.putAction) {
+          return this.uploadPut(file);
+        }
+
         return this.uploadHtml5(file);
-      } else {
-        return this.uploadHtml4(file);
       }
+
+      return this.uploadHtml4(file);
+    },
+
+
+    /**
+     * Whether this file should be uploaded using chunk upload or not
+     *
+     * @param Object file
+     */
+    shouldUseChunkUpload: function shouldUseChunkUpload(file) {
+      return this.chunkEnabled && !!this.chunkOptions.handler && file.size > this.chunkOptions.minSize;
+    },
+
+
+    /**
+     * Upload a file using Chunk method
+     *
+     * @param File file
+     */
+    uploadChunk: function uploadChunk(file) {
+      var HandlerClass = this.chunkOptions.handler;
+      file.chunk = new HandlerClass(file, this.chunkOptions);
+
+      return file.chunk.upload();
     },
     uploadPut: function uploadPut(file) {
       var querys = [];
