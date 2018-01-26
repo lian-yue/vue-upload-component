@@ -35,7 +35,6 @@ https://lian-yue.github.io/vue-upload-component/#/documents
 
 
 
----
 
 
 
@@ -68,3 +67,9 @@ npm install vue-upload-component --save
 # 文档
 
 https://lian-yue.github.io/vue-upload-component/#/zh-cn/documents
+
+
+
+# Special thanks (特别感谢)
+
+- [@josec89](https://github.com/josec89)
