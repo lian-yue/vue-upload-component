@@ -25,7 +25,7 @@ function baseConfig() {
           '.js',
           '.jsx',
           '.json',
-          '.vue'
+          // '.vue'
         ],
       }),
     ],
