@@ -28,11 +28,36 @@ export const sendRequest = (xhr, body) => {
       if (xhr.status >= 200 && xhr.status < 300) {
         resolve(xhr.response)
       } else {
-        reject(xhr.statusText)
+        reject(xhr.response)
       }
     }
-    xhr.onerror = () => reject(xhr.statusText)
+    xhr.onerror = () => reject(xhr.response)
     xhr.send(JSON.stringify(body))
+  })
+}
+
+/**
+ * Sends a XHR request with certain form data
+ *
+ * @param {XMLHttpRequest} xhr
+ * @param {Object} data
+ */
+export const sendFormRequest = (xhr, data) => {
+  const body = new FormData()
+  for (var name in data) {
+    body.append(name, data[name])
+  }
+
+  return new Promise((resolve, reject) => {
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.response)
+      } else {
+        reject(xhr.response)
+      }
+    }
+    xhr.onerror = () => reject(xhr.response)
+    xhr.send(body)
   })
 }
 

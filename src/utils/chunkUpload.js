@@ -42,6 +42,10 @@ const chunkUploadFinish = (req, res) => {
 }
 
 module.exports = (req, res) => {
+  if (!req.body.phase) {
+    return chunkUploadPart(req, res)
+  }
+
   switch (req.body.phase) {
     case 'start':
       return chunkUploadStart(req, res)
