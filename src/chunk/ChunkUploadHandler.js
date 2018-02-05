@@ -1,4 +1,8 @@
-import { default as request, createRequest, sendRequest } from '../utils/request'
+import {
+  default as request,
+  createRequest,
+  sendFormRequest
+} from '../utils/request'
 
 export default class ChunkUploadHandler {
   /**
@@ -204,7 +208,9 @@ export default class ChunkUploadHandler {
   start () {
     request({
       method: 'POST',
-      headers: this.headers,
+      headers: Object.assign(this.headers, {
+        'Content-Type': 'application/json'
+      }),
       url: this.action,
       body: Object.assign(this.startBody, {
         phase: 'start',
@@ -213,7 +219,8 @@ export default class ChunkUploadHandler {
       })
     }).then(res => {
       if (res.status !== 'success') {
-        return this.reject(res.message)
+        this.file.response = res
+        return this.reject('server')
       }
 
       this.sessionId = res.data.session_id
@@ -221,7 +228,10 @@ export default class ChunkUploadHandler {
 
       this.createChunks()
       this.startChunking()
-    }).catch(error => this.reject(error))
+    }).catch(res => {
+      this.file.response = res
+      this.reject('server')
+    })
   }
 
   /**
@@ -265,17 +275,19 @@ export default class ChunkUploadHandler {
     this.updateFileProgress()
     chunk.xhr = createRequest({
       method: 'POST',
-      headers: this.headers,
+      headers: Object.assign(this.headers, {
+        'Content-Type': 'multipart/form-data'
+      }),
       url: this.action
     })
 
-    chunk.xhr.upload.addEventListener('progress', function(evt) {
+    chunk.xhr.upload.addEventListener('progress', function (evt) {
       if (evt.lengthComputable) {
         chunk.progress = Math.round(evt.loaded / evt.total * 100)
       }
     }, false)
 
-    sendRequest(chunk.xhr, Object.assign(this.uploadBody, {
+    sendFormRequest(chunk.xhr, Object.assign(this.uploadBody, {
       phase: 'upload',
       session_id: this.sessionId,
       start_offset: chunk.startOffset,
@@ -287,7 +299,7 @@ export default class ChunkUploadHandler {
       } else {
         if (chunk.retries-- <= 0) {
           this.pause()
-          return this.reject('File upload failed')
+          return this.reject('upload')
         }
       }
 
@@ -296,7 +308,7 @@ export default class ChunkUploadHandler {
       chunk.active = false
       if (chunk.retries-- <= 0) {
         this.pause()
-        return this.reject('File upload failed')
+        return this.reject('upload')
       }
 
       this.uploadNextChunk()
@@ -312,18 +324,24 @@ export default class ChunkUploadHandler {
 
     request({
       method: 'POST',
-      headers: this.headers,
+      headers: Object.assign(this.headers, {
+        'Content-Type': 'application/json'
+      }),
       url: this.action,
       body: Object.assign(this.finishBody, {
         phase: 'finish',
         session_id: this.sessionId
       })
     }).then(res => {
+      this.file.response = res
       if (res.status !== 'success') {
-        return this.reject(res.message)
+        return this.reject('server')
       }
 
       this.resolve(res)
-    }).catch(error => this.reject(error))
+    }).catch(res => {
+      this.file.response = res
+      this.reject('server')
+    })
   }
 }
