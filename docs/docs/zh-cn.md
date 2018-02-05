@@ -297,6 +297,29 @@ input标签的 `name` 属性
 
 
 
+### custom-action
+
+自定义上传方法
+
+* **类型:** `async Function`
+
+* **默认值:** `undefined`
+
+* **详细:**  
+
+  `custom-action` 优先级高于 `put-action, post-action`
+
+* **示例:**
+  ```html
+  <file-upload :custom-action="customAction"></file-upload>
+  ```
+  ```js
+  async function customAction(file, component) {
+    // return component.uploadPut(file)
+    return component.uploadHtml4(file)
+  }
+  ```
+
 
 
 ### headers

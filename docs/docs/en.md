@@ -377,6 +377,31 @@ The `name` attribute of the input tag
 
 
 
+### custom-action
+
+Custom upload method
+
+* **Type:** `async Function`
+
+* **Default:** `undefined`
+
+* **Details:**  
+
+  `custom-action` priority than `put-action, post-action`
+
+* **Usage:**
+  ```html
+  <file-upload :custom-action="customAction"></file-upload>
+  ```
+  ```js
+  async function customAction(file, component) {
+    // return component.uploadPut(file)
+    return component.uploadHtml4(file)
+  }
+  ```
+
+
+
 
 
 ### headers
