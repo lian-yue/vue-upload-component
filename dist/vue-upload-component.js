@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.0
+ * Version: 2.8.1
  * Author: LianYue
  */
 (function (global, factory) {
@@ -39,13 +39,40 @@ var sendRequest = function sendRequest(xhr, body) {
       if (xhr.status >= 200 && xhr.status < 300) {
         resolve(xhr.response);
       } else {
-        reject(xhr.statusText);
+        reject(xhr.response);
       }
     };
     xhr.onerror = function () {
-      return reject(xhr.statusText);
+      return reject(xhr.response);
     };
     xhr.send(JSON.stringify(body));
+  });
+};
+
+/**
+ * Sends a XHR request with certain form data
+ *
+ * @param {XMLHttpRequest} xhr
+ * @param {Object} data
+ */
+var sendFormRequest = function sendFormRequest(xhr, data) {
+  var body = new FormData();
+  for (var name in data) {
+    body.append(name, data[name]);
+  }
+
+  return new Promise(function (resolve, reject) {
+    xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(xhr.response);
+      } else {
+        reject(xhr.response);
+      }
+    };
+    xhr.onerror = function () {
+      return reject(xhr.response);
+    };
+    xhr.send(body);
   });
 };
 
@@ -182,7 +209,9 @@ var ChunkUploadHandler = function () {
 
       request({
         method: 'POST',
-        headers: this.headers,
+        headers: Object.assign(this.headers, {
+          'Content-Type': 'application/json'
+        }),
         url: this.action,
         body: Object.assign(this.startBody, {
           phase: 'start',
@@ -191,7 +220,8 @@ var ChunkUploadHandler = function () {
         })
       }).then(function (res) {
         if (res.status !== 'success') {
-          return _this2.reject(res.message);
+          _this2.file.response = res;
+          return _this2.reject('server');
         }
 
         _this2.sessionId = res.data.session_id;
@@ -199,8 +229,9 @@ var ChunkUploadHandler = function () {
 
         _this2.createChunks();
         _this2.startChunking();
-      }).catch(function (error) {
-        return _this2.reject(error);
+      }).catch(function (res) {
+        _this2.file.response = res;
+        _this2.reject('server');
       });
     }
 
@@ -256,7 +287,9 @@ var ChunkUploadHandler = function () {
       this.updateFileProgress();
       chunk.xhr = createRequest({
         method: 'POST',
-        headers: this.headers,
+        headers: Object.assign(this.headers, {
+          'Content-Type': 'multipart/form-data'
+        }),
         url: this.action
       });
 
@@ -266,7 +299,7 @@ var ChunkUploadHandler = function () {
         }
       }, false);
 
-      sendRequest(chunk.xhr, Object.assign(this.uploadBody, {
+      sendFormRequest(chunk.xhr, Object.assign(this.uploadBody, {
         phase: 'upload',
         session_id: this.sessionId,
         start_offset: chunk.startOffset,
@@ -278,7 +311,7 @@ var ChunkUploadHandler = function () {
         } else {
           if (chunk.retries-- <= 0) {
             _this3.pause();
-            return _this3.reject('File upload failed');
+            return _this3.reject('upload');
           }
         }
 
@@ -287,7 +320,7 @@ var ChunkUploadHandler = function () {
         chunk.active = false;
         if (chunk.retries-- <= 0) {
           _this3.pause();
-          return _this3.reject('File upload failed');
+          return _this3.reject('upload');
         }
 
         _this3.uploadNextChunk();
@@ -308,20 +341,24 @@ var ChunkUploadHandler = function () {
 
       request({
         method: 'POST',
-        headers: this.headers,
+        headers: Object.assign(this.headers, {
+          'Content-Type': 'application/json'
+        }),
         url: this.action,
         body: Object.assign(this.finishBody, {
           phase: 'finish',
           session_id: this.sessionId
         })
       }).then(function (res) {
+        _this4.file.response = res;
         if (res.status !== 'success') {
-          return _this4.reject(res.message);
+          return _this4.reject('server');
         }
 
         _this4.resolve(res);
-      }).catch(function (error) {
-        return _this4.reject(error);
+      }).catch(function (res) {
+        _this4.file.response = res;
+        _this4.reject('server');
       });
     }
   }, {
@@ -592,6 +629,10 @@ var FileUpload = { render: function render() {
 
     putAction: {
       type: String
+    },
+
+    customAction: {
+      type: Function
     },
 
     headers: {
@@ -1254,6 +1295,10 @@ var FileUpload = { render: function render() {
         return Promise.reject('size');
       }
 
+      if (this.customAction) {
+        return this.customAction(file, this);
+      }
+
       if (this.features.html5) {
         if (this.shouldUseChunkUpload(file)) {
           return this.uploadChunk(file);
@@ -1261,11 +1306,14 @@ var FileUpload = { render: function render() {
         if (file.putAction) {
           return this.uploadPut(file);
         }
-
-        return this.uploadHtml5(file);
+        if (file.postAction) {
+          return this.uploadHtml5(file);
+        }
       }
-
-      return this.uploadHtml4(file);
+      if (file.postAction) {
+        return this.uploadHtml4(file);
+      }
+      return Promise.reject('No action configured');
     },
 
 
