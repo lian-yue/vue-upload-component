@@ -4,6 +4,7 @@
     :name="$parent.name"
     :id="$parent.inputId || $parent.name"
     :accept="$parent.accept"
+    :capture="$parent.capture"
     @change="change"
     :webkitdirectory="$parent.directory && $parent.features.directory"
     :directory="$parent.directory && $parent.features.directory"

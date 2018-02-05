@@ -66,6 +66,9 @@ export default {
       type: String,
     },
 
+    capture: {
+    },
+
     multiple: {
       type: Boolean,
     },
