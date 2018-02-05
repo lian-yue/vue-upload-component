@@ -93,6 +93,10 @@ export default {
       type: String,
     },
 
+    customAction: {
+      type: Function,
+    },
+
     headers: {
       type: Object,
       default: Object,
@@ -762,6 +766,10 @@ export default {
         return Promise.reject('size')
       }
 
+      if (this.customAction) {
+        return this.customAction(file, this)
+      }
+
       if (this.features.html5) {
         if (this.shouldUseChunkUpload(file)) {
           return this.uploadChunk(file)
@@ -769,11 +777,14 @@ export default {
         if (file.putAction) {
           return this.uploadPut(file)
         }
-
-        return this.uploadHtml5(file)
+        if (file.postAction) {
+          return this.uploadHtml5(file)
+        }
       }
-
-      return this.uploadHtml4(file)
+      if (file.postAction) {
+        return this.uploadHtml4(file)
+      }
+      return Promise.reject('No action configured')
     },
 
     /**
