@@ -315,8 +315,8 @@ input标签的 `name` 属性
   ```
   ```js
   async function customAction(file, component) {
-    // return component.uploadPut(file)
-    return component.uploadHtml4(file)
+    // return await component.uploadPut(file)
+    return await component.uploadHtml4(file)
   }
   ```
 
