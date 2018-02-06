@@ -156,6 +156,16 @@ var ChunkUploadHandler = function () {
     key: 'pause',
     value: function pause() {
       this.file.active = false;
+      this.stopChunks();
+    }
+
+    /**
+     * Stops all the current chunks
+     */
+
+  }, {
+    key: 'stopChunks',
+    value: function stopChunks() {
       this.chunksUploading.forEach(function (chunk) {
         chunk.xhr.abort();
         chunk.active = false;
@@ -209,7 +219,7 @@ var ChunkUploadHandler = function () {
 
       request({
         method: 'POST',
-        headers: Object.assign(this.headers, {
+        headers: Object.assign({}, this.headers, {
           'Content-Type': 'application/json'
         }),
         url: this.action,
@@ -287,9 +297,7 @@ var ChunkUploadHandler = function () {
       this.updateFileProgress();
       chunk.xhr = createRequest({
         method: 'POST',
-        headers: Object.assign(this.headers, {
-          'Content-Type': 'multipart/form-data'
-        }),
+        headers: this.headers,
         url: this.action
       });
 
@@ -310,7 +318,7 @@ var ChunkUploadHandler = function () {
           chunk.uploaded = true;
         } else {
           if (chunk.retries-- <= 0) {
-            _this3.pause();
+            _this3.stopChunks();
             return _this3.reject('upload');
           }
         }
@@ -319,7 +327,7 @@ var ChunkUploadHandler = function () {
       }).catch(function () {
         chunk.active = false;
         if (chunk.retries-- <= 0) {
-          _this3.pause();
+          _this3.stopChunks();
           return _this3.reject('upload');
         }
 
@@ -341,7 +349,7 @@ var ChunkUploadHandler = function () {
 
       request({
         method: 'POST',
-        headers: Object.assign(this.headers, {
+        headers: Object.assign({}, this.headers, {
           'Content-Type': 'application/json'
         }),
         url: this.action,
@@ -549,9 +557,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var CHUNK_DEFAULT_OPTIONS = {
-  headers: {
-    'Content-Type': 'application/json'
-  },
+  headers: {},
   action: '',
   minSize: 1048576,
   maxActive: 3,

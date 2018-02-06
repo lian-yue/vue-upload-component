@@ -1375,9 +1375,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 
 var CHUNK_DEFAULT_OPTIONS = {
-  headers: {
-    'Content-Type': 'application/json'
-  },
+  headers: {},
   action: '',
   minSize: 1048576,
   maxActive: 3,
@@ -4358,7 +4356,7 @@ module.exports = ImageCompressor;
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_FileUpload_vue__ = __webpack_require__(12);
 /* empty harmony namespace reexport */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_56571c4e_hasScoped_false_preserveWhitespace_false_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_FileUpload_vue__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_167f252c_hasScoped_false_preserveWhitespace_false_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_FileUpload_vue__ = __webpack_require__(52);
 function injectStyle (ssrContext) {
   __webpack_require__(46)
 }
@@ -4378,7 +4376,7 @@ var __vue_scopeId__ = null
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
   __WEBPACK_IMPORTED_MODULE_0__babel_loader_presets_env_modules_false_stage_0_plugins_transform_runtime_helpers_false_polyfill_false_regenerator_true_moduleName_babel_runtime_cacheDirectory_false_node_modules_vue_loader_lib_selector_type_script_index_0_FileUpload_vue__["a" /* default */],
-  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_56571c4e_hasScoped_false_preserveWhitespace_false_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_FileUpload_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__node_modules_vue_loader_lib_template_compiler_index_id_data_v_167f252c_hasScoped_false_preserveWhitespace_false_buble_transforms_node_modules_vue_loader_lib_selector_type_template_index_0_FileUpload_vue__["a" /* default */],
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
@@ -4399,7 +4397,7 @@ var content = __webpack_require__(47);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(2)("5c4b1e14", content, true, {});
+var update = __webpack_require__(2)("1926ac1c", content, true, {});
 
 /***/ }),
 /* 47 */
@@ -4490,6 +4488,16 @@ var ChunkUploadHandler = function () {
     key: 'pause',
     value: function pause() {
       this.file.active = false;
+      this.stopChunks();
+    }
+
+    /**
+     * Stops all the current chunks
+     */
+
+  }, {
+    key: 'stopChunks',
+    value: function stopChunks() {
       this.chunksUploading.forEach(function (chunk) {
         chunk.xhr.abort();
         chunk.active = false;
@@ -4543,7 +4551,7 @@ var ChunkUploadHandler = function () {
 
       Object(__WEBPACK_IMPORTED_MODULE_0__utils_request__["b" /* default */])({
         method: 'POST',
-        headers: Object.assign(this.headers, {
+        headers: Object.assign({}, this.headers, {
           'Content-Type': 'application/json'
         }),
         url: this.action,
@@ -4621,9 +4629,7 @@ var ChunkUploadHandler = function () {
       this.updateFileProgress();
       chunk.xhr = Object(__WEBPACK_IMPORTED_MODULE_0__utils_request__["a" /* createRequest */])({
         method: 'POST',
-        headers: Object.assign(this.headers, {
-          'Content-Type': 'multipart/form-data'
-        }),
+        headers: this.headers,
         url: this.action
       });
 
@@ -4644,7 +4650,7 @@ var ChunkUploadHandler = function () {
           chunk.uploaded = true;
         } else {
           if (chunk.retries-- <= 0) {
-            _this3.pause();
+            _this3.stopChunks();
             return _this3.reject('upload');
           }
         }
@@ -4653,7 +4659,7 @@ var ChunkUploadHandler = function () {
       }).catch(function () {
         chunk.active = false;
         if (chunk.retries-- <= 0) {
-          _this3.pause();
+          _this3.stopChunks();
           return _this3.reject('upload');
         }
 
@@ -4675,7 +4681,7 @@ var ChunkUploadHandler = function () {
 
       Object(__WEBPACK_IMPORTED_MODULE_0__utils_request__["b" /* default */])({
         method: 'POST',
-        headers: Object.assign(this.headers, {
+        headers: Object.assign({}, this.headers, {
           'Content-Type': 'application/json'
         }),
         url: this.action,
