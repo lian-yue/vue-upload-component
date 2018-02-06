@@ -168,6 +168,13 @@ export default class ChunkUploadHandler {
    */
   pause () {
     this.file.active = false
+    this.stopChunks()
+  }
+
+  /**
+   * Stops all the current chunks
+   */
+  stopChunks () {
     this.chunksUploading.forEach(chunk => {
       chunk.xhr.abort()
       chunk.active = false
@@ -208,7 +215,7 @@ export default class ChunkUploadHandler {
   start () {
     request({
       method: 'POST',
-      headers: Object.assign(this.headers, {
+      headers: Object.assign({}, this.headers, {
         'Content-Type': 'application/json'
       }),
       url: this.action,
@@ -275,9 +282,7 @@ export default class ChunkUploadHandler {
     this.updateFileProgress()
     chunk.xhr = createRequest({
       method: 'POST',
-      headers: Object.assign(this.headers, {
-        'Content-Type': 'multipart/form-data'
-      }),
+      headers: this.headers,
       url: this.action
     })
 
@@ -298,7 +303,7 @@ export default class ChunkUploadHandler {
         chunk.uploaded = true
       } else {
         if (chunk.retries-- <= 0) {
-          this.pause()
+          this.stopChunks()
           return this.reject('upload')
         }
       }
@@ -307,7 +312,7 @@ export default class ChunkUploadHandler {
     }).catch(() => {
       chunk.active = false
       if (chunk.retries-- <= 0) {
-        this.pause()
+        this.stopChunks()
         return this.reject('upload')
       }
 
@@ -324,7 +329,7 @@ export default class ChunkUploadHandler {
 
     request({
       method: 'POST',
-      headers: Object.assign(this.headers, {
+      headers: Object.assign({}, this.headers, {
         'Content-Type': 'application/json'
       }),
       url: this.action,

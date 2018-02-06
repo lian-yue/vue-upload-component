@@ -37,9 +37,7 @@ import ChunkUploadDefaultHandler from './chunk/ChunkUploadHandler'
 import InputFile from './InputFile.vue'
 
 const CHUNK_DEFAULT_OPTIONS = {
-  headers: {
-    'Content-Type': 'application/json'
-  },
+  headers: {},
   action: '',
   minSize: 1048576,
   maxActive: 3,
