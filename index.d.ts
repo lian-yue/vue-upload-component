@@ -26,14 +26,14 @@ global {
   }
 }
 
-interface VueUploadComponent extends Vue, Element {
+class _ extends Vue {
   // Instance / Methods
   get(id: VueUpload.File | object | string): VueUpload.File | object | boolean
   add(files: Array<VueUpload.File | File | object> | VueUpload.File | File | object): object | Array<VueUpload.File | object> | boolean
   addInputFile(el: HTMLInputElement): Array<VueUpload.File>
   addDataTransfer(dataTransfer: DataTransfer): Promise<Array<VueUpload.File>>
   update(id: VueUpload.File | object | string, data: object): object | boolean
-  // remove(id: VueUpload.File | object | string): object | boolean // Types are incompatible with Element
+  remove(id: VueUpload.File | object | string): object | boolean
   replace(id1: VueUpload.File | object | string, id2: VueUpload.File | object | string): boolean
   clear(): boolean
 
@@ -52,4 +52,4 @@ interface VueUploadComponent extends Vue, Element {
   // }
 // }
 
-export default VueUploadComponent
+export default _
