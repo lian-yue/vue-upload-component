@@ -13,6 +13,7 @@
   "module": "dist/vue-upload-component.js",
   "unpkg": "dist/vue-upload-component.js",
   "jsdelivr": "dist/vue-upload-component.js",
+  "typings": "index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lian-yue/vue-upload-component.git"
