@@ -1,44 +1,43 @@
 import Vue from 'vue'
-  
+
 // Instance / File
-global {
-  namespace VueUpload {
-    interface File {
-      readonly fileObject: boolean
-      id: string | number
-      size: number
-      name: string
-      type: string
-      active: boolean
-      error: string
-      success: boolean
-      putAction: string
-      postAction: string
-      headers: object
-      data: object
-      timeout: number
-      response: object | string
-      progress: string
-      speed: number
-      xhr: XMLHttpRequest
-      iframe: Element
-    }
+declare global {
+  interface VUFile {
+    file: File
+    readonly fileObject: boolean
+    id: string | number
+    size: number
+    name: string
+    type: string
+    active: boolean
+    error: string
+    success: boolean
+    putAction: string
+    postAction: string
+    headers: object
+    data: object
+    timeout: number
+    response: object | string
+    progress: string
+    speed: number
+    xhr: XMLHttpRequest
+    iframe: Element
   }
 }
 
-class _ extends Vue {
+declare class _ extends Vue {
   // Instance / Methods
-  get(id: VueUpload.File | object | string): VueUpload.File | object | boolean
-  add(files: Array<VueUpload.File | File | object> | VueUpload.File | File | object): object | Array<VueUpload.File | object> | boolean
-  addInputFile(el: HTMLInputElement): Array<VueUpload.File>
-  addDataTransfer(dataTransfer: DataTransfer): Promise<Array<VueUpload.File>>
-  update(id: VueUpload.File | object | string, data: object): object | boolean
-  remove(id: VueUpload.File | object | string): object | boolean
-  replace(id1: VueUpload.File | object | string, id2: VueUpload.File | object | string): boolean
+  get(id: VUFile | object | string): VUFile | object | boolean
+  add(files: Array<VUFile | File | object> | VUFile | File | object): object | Array<VUFile | object> | boolean
+  addInputFile(el: HTMLInputElement): Array<VUFile>
+  addDataTransfer(dataTransfer: DataTransfer): Promise<Array<VUFile>>
+  update(id: VUFile | object | string, data: object): object | boolean
+  remove(id: VUFile | object | string): object | boolean
+  replace(id1: VUFile | object | string, id2: VUFile | object | string): boolean
   clear(): boolean
 
   // Instance / Data
-  readonly files: Array<VueUpload.File>
+  readonly files: Array<VUFile>
   readonly features: { html5?: boolean; directory?: boolean; drag?: boolean }
   active: boolean
   readonly dropActive: true
