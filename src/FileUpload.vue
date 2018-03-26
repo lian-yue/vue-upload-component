@@ -124,7 +124,7 @@ export default {
     },
 
     size: {
-      type: Number,
+      type: [Function, Number],
       default: 0,
     },
 
@@ -763,7 +763,9 @@ export default {
       }
 
       // 大小
-      if (this.size > 0 && file.size >= 0 && file.size > this.size) {
+      let size = (typeof this.size === 'function' ? this.size(file) : this.size)
+
+      if (size > 0 && file.size >= 0 && file.size > size) {
         return Promise.reject('size')
       }
 

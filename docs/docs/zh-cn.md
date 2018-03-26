@@ -467,7 +467,7 @@ input标签的 `name` 属性
 
 允许上传的最大字节
 
-* **类型:** `Number`
+* **类型:** `Number | Function`
 
 * **默认值:** `0`
 
@@ -476,10 +476,36 @@ input标签的 `name` 属性
 * **详细:**
 
   `0` 等于不限制
+  如果给出了一个`Function`，它就会以作为参数传递的`File`对象被调用，并且应该返回一个`Number`
 
 * **示例:**
   ```html
   <file-upload :size="1024 * 1024"></file-upload>
+  <!--or-->
+  <template>
+    <file-upload :size="this.calcSize"></file-upload>
+  </template>
+  <script>
+  export default {
+    methods: {
+      calcSize(file) {
+        let size = 0;
+        let mimePrefix = file.type.substr(0, file.type.indexOf('/'));
+
+        switch (mimePrefix) {
+          case 'image':
+            size = 1024 * 1024; // 1 MiB
+            break;
+          case 'video':
+            size = 1024 * 1024 * 500; // 500 MiB
+            break;
+        }
+
+        return size;
+      }
+    }
+  }
+  </script>
   ```
 
 
