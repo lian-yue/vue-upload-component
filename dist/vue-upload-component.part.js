@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.2
+ * Version: 2.8.5
  * Author: LianYue
  */
 (function (global, factory) {
@@ -16,8 +16,8 @@
  */
 var createRequest = function createRequest(options) {
   var xhr = new XMLHttpRequest();
-  xhr.responseType = 'json';
   xhr.open(options.method || 'GET', options.url);
+  xhr.responseType = 'json';
   if (options.headers) {
     Object.keys(options.headers).forEach(function (key) {
       xhr.setRequestHeader(key, options.headers[key]);
@@ -37,7 +37,13 @@ var sendRequest = function sendRequest(xhr, body) {
   return new Promise(function (resolve, reject) {
     xhr.onload = function () {
       if (xhr.status >= 200 && xhr.status < 300) {
-        resolve(xhr.response);
+        var response;
+        try {
+          response = JSON.parse(xhr.response);
+        } catch (err) {
+          response = xhr.response;
+        }
+        resolve(response);
       } else {
         reject(xhr.response);
       }
@@ -64,7 +70,13 @@ var sendFormRequest = function sendFormRequest(xhr, data) {
   return new Promise(function (resolve, reject) {
     xhr.onload = function () {
       if (xhr.status >= 200 && xhr.status < 300) {
-        resolve(xhr.response);
+        var response;
+        try {
+          response = JSON.parse(xhr.response);
+        } catch (err) {
+          response = xhr.response;
+        }
+        resolve(response);
       } else {
         reject(xhr.response);
       }

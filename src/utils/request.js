@@ -5,8 +5,8 @@
  */
 export const createRequest = (options) => {
   const xhr = new XMLHttpRequest()
-  xhr.responseType = 'json'
   xhr.open(options.method || 'GET', options.url)
+  xhr.responseType = 'json'
   if (options.headers) {
     Object.keys(options.headers).forEach(key => {
       xhr.setRequestHeader(key, options.headers[key])
@@ -26,7 +26,13 @@ export const sendRequest = (xhr, body) => {
   return new Promise((resolve, reject) => {
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
-        resolve(xhr.response)
+        var response
+        try {
+          response = JSON.parse(xhr.response)
+        } catch (err) {
+          response = xhr.response
+        }
+        resolve(response)
       } else {
         reject(xhr.response)
       }
@@ -51,7 +57,13 @@ export const sendFormRequest = (xhr, data) => {
   return new Promise((resolve, reject) => {
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
-        resolve(xhr.response)
+        var response
+        try {
+          response = JSON.parse(xhr.response)
+        } catch (err) {
+          response = xhr.response
+        }
+        resolve(response)
       } else {
         reject(xhr.response)
       }
