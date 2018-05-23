@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.5
+ * Version: 2.8.6
  * Author: LianYue
  */
 (function (global, factory) {
