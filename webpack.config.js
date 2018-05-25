@@ -6,6 +6,7 @@ const packageInfo       = require('./package')
 
 const bodyParser       = require('webpack-body-parser')
 const chunkUpload      = require('./src/utils/chunkUpload')
+const { VueLoaderPlugin } =  require('vue-loader')
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production'
 
@@ -13,6 +14,7 @@ const isDev = process.env.NODE_ENV === 'development'
 
 function baseConfig() {
   let config = {
+    mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
     output: {
       path: path.join(__dirname, 'dist'),
       publicPath: '/dist',
@@ -96,6 +98,36 @@ function baseConfig() {
           ]
         },
         {
+          test: /\.css$/,
+          use: [
+            {
+              loader: 'vue-style-loader',
+            },
+            {
+              loader: 'css-loader',
+              options: {
+                minimize: !isDev,
+              },
+            },
+          ]
+        },
+        {
+          test: /\.vue$/,
+          use: [
+            {
+              loader: 'vue-loader',
+              options: {
+                preserveWhitespace: false,
+                cssModules: {
+                  localIdentName: '[hash:base64:8]',
+                  camelCase: true,
+                },
+              },
+            },
+          ],
+        },
+        /*
+        {
           test: /\.vue$/,
           use: [
             {
@@ -139,11 +171,13 @@ function baseConfig() {
             },
           ]
         }
+        */
       ]
     },
 
     plugins: [
       new webpack.BannerPlugin(`Name: ${packageInfo.name}\nVersion: ${packageInfo.version}\nAuthor: ${packageInfo.author}`),
+      new VueLoaderPlugin(),
     ],
     devtool: isDev ? 'eval-source-map' : 'source-map'
   }

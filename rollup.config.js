@@ -1,9 +1,10 @@
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import babel from 'rollup-plugin-babel'
-import uglify from 'rollup-plugin-uglify'
+import { uglify } from 'rollup-plugin-uglify'
 import vue from 'rollup-plugin-vue'
 import packageInfo from './package.json'
+const pluginCSS = require('rollup-plugin-css-only')
 
 
 // const isDev = process.env.NODE_ENV === 'development'
@@ -13,6 +14,8 @@ function baseConfig() {
   return {
     output: {
       format: 'umd',
+      sourcemap: true,
+      banner: `/*!\n * Name: ${packageInfo.name}\n * Version: ${packageInfo.version}\n * Author: ${packageInfo.author}\n */`,
     },
     plugins: [
       resolve({
@@ -29,8 +32,6 @@ function baseConfig() {
         ],
       }),
     ],
-    banner: `/*!\n * Name: ${packageInfo.name}\n * Version: ${packageInfo.version}\n * Author: ${packageInfo.author}\n */`,
-    sourcemap: true,
   }
 }
 
@@ -40,7 +41,6 @@ config.output.file = 'dist/vue-upload-component.js'
 config.output.name = 'VueUploadComponent'
 config.plugins.push(
   vue({
-    autoStyles: false,
     css: true,
   }),
   babel()
@@ -52,7 +52,14 @@ configMin.output.file = 'dist/vue-upload-component.min.js'
 configMin.output.name = 'VueUploadComponent'
 configMin.plugins.push(
   vue({
-    autoStyles: false,
+    sourceMap: true,
+    style: {
+      trim: true,
+    },
+    template: {
+      isProduction: true,
+      optimizeSSR: true,
+    },
     css: true,
   }),
   babel(),
@@ -64,15 +71,25 @@ configMin.plugins.push(
 )
 
 
-
 let configPart = baseConfig()
 configPart.input = 'src/index.js'
 configPart.output.file = 'dist/vue-upload-component.part.js'
 configPart.output.name = 'VueUploadComponent'
 configPart.plugins.push(
+  pluginCSS({
+    include: '**/*.css?*',
+    output: 'dist/vue-upload-component.part.css',
+  }),
   vue({
-    autoStyles: false,
-    css: 'dist/vue-upload-component.part.css',
+    sourceMap: true,
+    style: {
+      trim: true,
+    },
+    template: {
+      isProduction: true,
+      optimizeSSR: true,
+    },
+    css: false,
   }),
   babel()
 )
