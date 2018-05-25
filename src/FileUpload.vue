@@ -1290,7 +1290,7 @@ export default {
 
     onDragleave(e) {
       e.preventDefault()
-      if (e.target.nodeName === 'HTML' || (e.screenX === 0 && e.screenY === 0 && !e.fromElement && e.offsetX <= 0)) {
+      if (e.target.nodeName === 'HTML' || e.target === e.explicitOriginalTarget || (e.screenX === 0 && e.screenY === 0 && !e.fromElement && e.offsetX <= 0)) {
         this.dropActive = false
       }
     },
