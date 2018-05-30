@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.7
+ * Version: 2.8.8
  * Author: LianYue
  */
 (function (global, factory) {
@@ -1114,8 +1114,9 @@
             });
           }
         } else {
+          var names = el.value.replace(/\\/g, '/').split('/');
           files.push({
-            name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1'),
+            name: names[names.length - 1],
             el: el
           });
         }
@@ -1925,7 +1926,7 @@
   /* scoped */
   var __vue_scope_id__$1 = undefined;
   /* module identifier */
-  var __vue_module_identifier__$1 = "data-v-62fe22ff";
+  var __vue_module_identifier__$1 = "data-v-00c97c04";
   /* functional template */
   var __vue_is_functional_template__$1 = false;
   /* component normalizer */
