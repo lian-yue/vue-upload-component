@@ -487,8 +487,9 @@ export default {
           })
         }
       } else {
+        var names = el.value.replace(/\\/g, '/').split('/')
         files.push({
-          name: el.value.replace(/^.*?([^\/\\\r\n]+)$/, '$1'),
+          name: names[names.length - 1],
           el,
         })
       }
