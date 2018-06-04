@@ -45,6 +45,13 @@ export default class ChunkUploadHandler {
   }
 
   /**
+   * Gets the file size
+   */
+  get fileName () {
+    return this.file.name
+  }
+
+  /**
    * Gets action (url) to upload the file
    */
   get action () {
@@ -222,7 +229,8 @@ export default class ChunkUploadHandler {
       body: Object.assign(this.startBody, {
         phase: 'start',
         mime_type: this.fileType,
-        size: this.fileSize
+        size: this.fileSize,
+        name: this.fileName
       })
     }).then(res => {
       if (res.status !== 'success') {

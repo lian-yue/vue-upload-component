@@ -149,7 +149,7 @@ The backend should provide a `session_id` (to identify the upload) and a `end_of
 
 In this phase we'll upload every chunk until all of them are uploaded. This step allows some failures in the backend, and will retry up to `maxRetries` times.
 
-We'll send the `session_id`, `start_chunk` and `chunk` (the sliced blob - part of file we are uploading). We expect the backend to return `{ status: 'success' }`, we'll retry otherwise.
+We'll send the `session_id`, `start_offset` and `chunk` (the sliced blob - part of file we are uploading). We expect the backend to return `{ status: 'success' }`, we'll retry otherwise.
 
 Use the option `uploadBody` to add more parameters to the body of this request.
 
