@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.8
+ * Version: 2.8.9
  * Author: LianYue
  */
 (function (global, factory) {
@@ -238,7 +238,8 @@
           body: Object.assign(this.startBody, {
             phase: 'start',
             mime_type: this.fileType,
-            size: this.fileSize
+            size: this.fileSize,
+            name: this.fileName
           })
         }).then(function (res) {
           if (res.status !== 'success') {
@@ -415,6 +416,16 @@
       key: 'fileSize',
       get: function get() {
         return this.file.size;
+      }
+
+      /**
+       * Gets the file size
+       */
+
+    }, {
+      key: 'fileName',
+      get: function get() {
+        return this.file.name;
       }
 
       /**
@@ -2044,4 +2055,3 @@
   return src;
 
 })));
-//# sourceMappingURL=vue-upload-component.js.map
