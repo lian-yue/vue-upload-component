@@ -14,7 +14,7 @@ function baseConfig() {
   return {
     output: {
       format: 'umd',
-      sourcemap: true,
+      sourceMap: true,
       banner: `/*!\n * Name: ${packageInfo.name}\n * Version: ${packageInfo.version}\n * Author: ${packageInfo.author}\n */`,
     },
     plugins: [
