@@ -182,7 +182,7 @@ export default {
    * @return {[type]} [description]
    */
   mounted() {
-    let input = document.createElement('input')
+    const input = document.createElement('input')
     input.type = 'file'
     input.multiple = true
 
@@ -239,9 +239,8 @@ export default {
      * @return {[type]} [description]
      */
     uploaded() {
-      let file
       for (let i = 0; i < this.files.length; i++) {
-        file = this.files[i]
+        const file = this.files[i]
         if (file.fileObject && !file.error && !file.success) {
           return false
         }
@@ -249,7 +248,7 @@ export default {
       return true
     },
 
-    chunkOptions () {
+    chunkOptions() {
       return Object.assign(CHUNK_DEFAULT_OPTIONS, this.chunk)
     },
 
@@ -285,19 +284,19 @@ export default {
       }
       this.files = files
 
-      let oldMaps = this.maps
+      const oldMaps = this.maps
 
       // 重写 maps 缓存
       this.maps = {}
       for (let i = 0; i < this.files.length; i++) {
-        let file = this.files[i]
+        const file = this.files[i]
         this.maps[file.id] = file
       }
 
       // add, update
       for (let key in this.maps) {
-        let newFile = this.maps[key]
-        let oldFile = oldMaps[key]
+        const newFile = this.maps[key]
+        const oldFile = oldMaps[key]
         if (newFile !== oldFile) {
           this.emitFile(newFile, oldFile)
         }
@@ -317,7 +316,7 @@ export default {
     // 清空
     clear() {
       if (this.files.length) {
-        let files = this.files
+        const files = this.files
         this.files = []
 
         // 定位
