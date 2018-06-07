@@ -139,7 +139,7 @@ This process is divided in three phases: <strong>start</strong>, <strong>upload<
 
 #### start
 
-This is the first phase of the process. We'll tell the backend that we are going to upload a file, with certain `size` and `mime_type`.
+This is the first phase of the process. We'll tell the backend that we are going to upload a file, with certain `size`, `name` and `mime_type`.
 
 Use the option `startBody` to add more parameters to the body of this request.
 
