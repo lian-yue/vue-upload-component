@@ -219,6 +219,7 @@ Use the `handler` parameter to use a different Handler
 <style>
 /*
 import '~vue-upload-component/dist/vue-upload-component.part.css'
+@import "~vue-upload-component/dist/vue-upload-component.part.css";
 
 
 or

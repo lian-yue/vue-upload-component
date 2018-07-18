@@ -14,7 +14,7 @@ function baseConfig() {
   return {
     output: {
       format: 'umd',
-      sourceMap: true,
+      sourcemap: true,
       banner: `/*!\n * Name: ${packageInfo.name}\n * Version: ${packageInfo.version}\n * Author: ${packageInfo.author}\n */`,
     },
     plugins: [
@@ -41,6 +41,9 @@ config.output.file = 'dist/vue-upload-component.js'
 config.output.name = 'VueUploadComponent'
 config.plugins.push(
   vue({
+    template: {
+      isProduction: true,
+    },
     css: true,
   }),
   babel()
@@ -52,13 +55,11 @@ configMin.output.file = 'dist/vue-upload-component.min.js'
 configMin.output.name = 'VueUploadComponent'
 configMin.plugins.push(
   vue({
-    sourceMap: true,
     style: {
       trim: true,
     },
     template: {
       isProduction: true,
-      optimizeSSR: true,
     },
     css: true,
   }),
@@ -76,18 +77,13 @@ configPart.input = 'src/index.js'
 configPart.output.file = 'dist/vue-upload-component.part.js'
 configPart.output.name = 'VueUploadComponent'
 configPart.plugins.push(
-  pluginCSS({
-    include: '**/*.css?*',
-    output: 'dist/vue-upload-component.part.css',
-  }),
+  pluginCSS(),
   vue({
-    sourceMap: true,
     style: {
       trim: true,
     },
     template: {
       isProduction: true,
-      optimizeSSR: true,
     },
     css: false,
   }),

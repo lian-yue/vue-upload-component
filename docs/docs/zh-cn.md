@@ -140,7 +140,7 @@ new Vue({
 <style>
 /*
 import '~vue-upload-component/dist/vue-upload-component.part.css'
-
+@import "~vue-upload-component/dist/vue-upload-component.part.css";
 
 或
 

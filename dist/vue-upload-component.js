@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.9
+ * Version: 2.8.10
  * Author: LianYue
  */
 (function (global, factory) {
@@ -585,6 +585,7 @@
     }
   };
 
+  /* script */
   var __vue_script__ = script;
 
   /* template */
@@ -593,7 +594,6 @@
   };
   var __vue_staticRenderFns__ = [];
 
-  var __vue_template__ = typeof __vue_render__ !== 'undefined' ? { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ } : {};
   /* style */
   var __vue_inject_styles__ = undefined;
   /* scoped */
@@ -604,7 +604,7 @@
   var __vue_is_functional_template__ = false;
   /* component normalizer */
   function __vue_normalize__(template, style, script$$1, scope, functional, moduleIdentifier, createInjector, createInjectorSSR) {
-    var component = script$$1 || {};
+    var component = (typeof script$$1 === 'function' ? script$$1.options : script$$1) || {};
 
     if (!component.render) {
       component.render = template.render;
@@ -680,7 +680,7 @@
   }
   /* style inject SSR */
 
-  var InputFile = __vue_normalize__(__vue_template__, __vue_inject_styles__, typeof __vue_script__ === 'undefined' ? {} : __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, typeof __vue_create_injector__ !== 'undefined' ? __vue_create_injector__ : function () {}, typeof __vue_create_injector_ssr__ !== 'undefined' ? __vue_create_injector_ssr__ : function () {});
+  var InputFile = __vue_normalize__({ render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ }, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, __vue_create_injector__, undefined);
 
   var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -1920,6 +1920,7 @@
     }
   };
 
+  /* script */
   var __vue_script__$1 = script$1;
 
   /* template */
@@ -1928,7 +1929,6 @@
   };
   var __vue_staticRenderFns__$1 = [];
 
-  var __vue_template__$1 = typeof __vue_render__$1 !== 'undefined' ? { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 } : {};
   /* style */
   var __vue_inject_styles__$1 = function (inject) {
     if (!inject) return;
@@ -1942,7 +1942,7 @@
   var __vue_is_functional_template__$1 = false;
   /* component normalizer */
   function __vue_normalize__$1(template, style, script, scope, functional, moduleIdentifier, createInjector, createInjectorSSR) {
-    var component = script || {};
+    var component = (typeof script === 'function' ? script.options : script) || {};
 
     if (!component.render) {
       component.render = template.render;
@@ -2042,7 +2042,7 @@
   }
   /* style inject SSR */
 
-  var FileUpload = __vue_normalize__$1(__vue_template__$1, __vue_inject_styles__$1, typeof __vue_script__$1 === 'undefined' ? {} : __vue_script__$1, __vue_scope_id__$1, __vue_is_functional_template__$1, __vue_module_identifier__$1, typeof __vue_create_injector__$1 !== 'undefined' ? __vue_create_injector__$1 : function () {}, typeof __vue_create_injector_ssr__ !== 'undefined' ? __vue_create_injector_ssr__ : function () {});
+  var FileUpload = __vue_normalize__$1({ render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 }, __vue_inject_styles__$1, __vue_script__$1, __vue_scope_id__$1, __vue_is_functional_template__$1, __vue_module_identifier__$1, __vue_create_injector__$1, undefined);
 
   var FileUpload$1 = /*#__PURE__*/Object.freeze({
     default: FileUpload
@@ -2055,3 +2055,4 @@
   return src;
 
 })));
+//# sourceMappingURL=vue-upload-component.js.map
