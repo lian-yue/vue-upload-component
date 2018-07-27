@@ -447,8 +447,8 @@ export default {
       if (index === true || index === 0) {
         newFiles = addFiles.concat(this.files)
       } else if (index) {
-        newFiles = addFiles.concat([])
-        newFiles.splice(index, 0, addFiles)
+        newFiles = this.files.concat([])
+        newFiles.splice(index, 0, ...addFiles)
       } else {
         newFiles = this.files.concat(addFiles)
       }
