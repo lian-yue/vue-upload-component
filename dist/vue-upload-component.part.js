@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.10
+ * Version: 2.8.11
  * Author: LianYue
  */
 (function (global, factory) {
@@ -1082,8 +1082,10 @@
         if (index === true || index === 0) {
           newFiles = addFiles.concat(this.files);
         } else if (index) {
-          newFiles = addFiles.concat([]);
-          newFiles.splice(index, 0, addFiles);
+          var _newFiles;
+
+          newFiles = this.files.concat([]);
+          (_newFiles = newFiles).splice.apply(_newFiles, [index, 0].concat(addFiles));
         } else {
           newFiles = this.files.concat(addFiles);
         }
