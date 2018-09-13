@@ -1285,13 +1285,30 @@ export default {
 
     onDragenter(e) {
       e.preventDefault()
-      if (!this.dropActive) {
+      if (this.dropActive) {
+        return
+      }
+      if (!e.dataTransfer) {
+        return
+      }
+      let dt = e.dataTransfer
+      if (dt.files && dt.files.length) {
+        this.dropActive = true
+      } else if (!dt.types) {
+        this.dropActive = true
+      } else if (dt.types.indexOf && dt.types.indexOf('Files') !== -1) {
+        this.dropActive = true
+      } else if (dt.types.contains && dt.types.contains('Files')) {
         this.dropActive = true
       }
     },
 
     onDragleave(e) {
       e.preventDefault()
+      if (!this.dropActive) {
+        return
+      }
+
       if (e.target.nodeName === 'HTML' || e.target === e.explicitOriginalTarget || (e.screenX === 0 && e.screenY === 0 && !e.fromElement && e.offsetX <= 0)) {
         this.dropActive = false
       }
