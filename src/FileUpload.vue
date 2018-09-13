@@ -1,8 +1,9 @@
 <template>
-  <label :class="className">
+  <span :class="className">
     <slot></slot>
+    <label :for="inputId || name"></label>
     <input-file></input-file>
-  </label>
+  </span>
 </template>
 <style>
 .file-uploads {
@@ -11,7 +12,7 @@
   text-align: center;
   display: inline-block;
 }
-.file-uploads.file-uploads-html4 input[type="file"] {
+.file-uploads.file-uploads-html4 input[type="file"], .file-uploads.file-uploads-html5 label {
   opacity: 0;
   font-size: 20em;
   z-index: 1;
@@ -23,7 +24,7 @@
   width: 100%;
   height: 100%;
 }
-.file-uploads.file-uploads-html5 input[type="file"] {
+.file-uploads.file-uploads-html5 input[type="file"], .file-uploads.file-uploads-html4 label {
   overflow: hidden;
   position: fixed;
   width: 1px;
