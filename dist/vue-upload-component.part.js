@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.12
+ * Version: 2.8.13
  * Author: LianYue
  */
 (function (global, factory) {
@@ -1921,8 +1921,7 @@
         if (!this.dropActive) {
           return;
         }
-
-        if (e.target.nodeName === 'HTML' || e.target === e.explicitOriginalTarget || e.screenX === 0 && e.screenY === 0 && !e.fromElement && e.offsetX <= 0) {
+        if (e.target.nodeName === 'HTML' || e.target === e.explicitOriginalTarget || !e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight)) {
           this.dropActive = false;
         }
       },
