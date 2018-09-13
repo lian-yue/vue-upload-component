@@ -230,6 +230,7 @@ module.exports = merge(baseConfig(), {
       app.post('/upload/delete', del)
       app.delete('/upload/delete', del)
     },
+    host: '0.0.0.0',
     hot: true,
     contentBase: path.join(__dirname, 'docs'),
     clientLogLevel: 'error',
