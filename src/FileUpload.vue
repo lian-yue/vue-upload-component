@@ -13,6 +13,8 @@
   display: inline-block;
 }
 .file-uploads.file-uploads-html4 input[type="file"], .file-uploads.file-uploads-html5 label {
+  /* background fix ie  click */
+  background: #fff;
   opacity: 0;
   font-size: 20em;
   z-index: 1;
@@ -25,6 +27,8 @@
   height: 100%;
 }
 .file-uploads.file-uploads-html5 input[type="file"], .file-uploads.file-uploads-html4 label {
+  /* background fix ie  click */
+  background: rgba(255, 255, 255, 0);
   overflow: hidden;
   position: fixed;
   width: 1px;

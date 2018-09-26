@@ -15,13 +15,17 @@
 export default {
   methods: {
     change(e) {
-      this.$destroy()
       this.$parent.addInputFile(e.target)
-      // eslint-disable-next-line
-      new this.constructor({
-        parent: this.$parent,
-        el: this.$el,
-      })
+      e.target.value = ''
+      if (!e.target.files) {
+        // ie9 fix #219
+        this.$destroy()
+        // eslint-disable-next-line
+        new this.constructor({
+          parent: this.$parent,
+          el: this.$el,
+        })
+      }
     }
   }
 }
