@@ -208,6 +208,12 @@ export default {
 
     // files 定位缓存
     this.maps = {}
+    if (this.files) {
+      for (let i = 0; i < this.files.length; i++) {
+        let file = this.files[i]
+        this.maps[file.id] = file
+      }
+    }
 
     this.$nextTick(function () {
 
@@ -488,11 +494,11 @@ export default {
             name: file.webkitRelativePath || file.relativePath || file.name,
             type: file.type,
             file,
-            el
           })
         }
       } else {
         var names = el.value.replace(/\\/g, '/').split('/')
+        delete el.__vuex__
         files.push({
           name: names[names.length - 1],
           el,
