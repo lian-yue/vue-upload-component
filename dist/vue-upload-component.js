@@ -856,6 +856,12 @@
 
       // files 定位缓存
       this.maps = {};
+      if (this.files) {
+        for (var i = 0; i < this.files.length; i++) {
+          var file = this.files[i];
+          this.maps[file.id] = file;
+        }
+      }
 
       this.$nextTick(function () {
 
@@ -1122,12 +1128,12 @@
               size: file.size,
               name: file.webkitRelativePath || file.relativePath || file.name,
               type: file.type,
-              file: file,
-              el: el
+              file: file
             });
           }
         } else {
           var names = el.value.replace(/\\/g, '/').split('/');
+          delete el.__vuex__;
           files.push({
             name: names[names.length - 1],
             el: el
@@ -1954,7 +1960,7 @@
   /* style */
   var __vue_inject_styles__$1 = function (inject) {
     if (!inject) return;
-    inject("data-v-37fa7525_0", { source: "\n.file-uploads{overflow:hidden;position:relative;text-align:center;display:inline-block\n}\n.file-uploads.file-uploads-html4 input[type=file],.file-uploads.file-uploads-html5 label{background:#fff;opacity:0;font-size:20em;z-index:1;top:0;left:0;right:0;bottom:0;position:absolute;width:100%;height:100%\n}\n.file-uploads.file-uploads-html4 label,.file-uploads.file-uploads-html5 input[type=file]{background:rgba(255,255,255,0);overflow:hidden;position:fixed;width:1px;height:1px;z-index:-1;opacity:0\n}", map: undefined, media: undefined });
+    inject("data-v-1bd46226_0", { source: "\n.file-uploads{overflow:hidden;position:relative;text-align:center;display:inline-block\n}\n.file-uploads.file-uploads-html4 input[type=file],.file-uploads.file-uploads-html5 label{background:#fff;opacity:0;font-size:20em;z-index:1;top:0;left:0;right:0;bottom:0;position:absolute;width:100%;height:100%\n}\n.file-uploads.file-uploads-html4 label,.file-uploads.file-uploads-html5 input[type=file]{background:rgba(255,255,255,0);overflow:hidden;position:fixed;width:1px;height:1px;z-index:-1;opacity:0\n}", map: undefined, media: undefined });
   };
   /* scoped */
   var __vue_scope_id__$1 = undefined;

@@ -856,6 +856,12 @@
 
       // files 定位缓存
       this.maps = {};
+      if (this.files) {
+        for (var i = 0; i < this.files.length; i++) {
+          var file = this.files[i];
+          this.maps[file.id] = file;
+        }
+      }
 
       this.$nextTick(function () {
 
@@ -1122,12 +1128,12 @@
               size: file.size,
               name: file.webkitRelativePath || file.relativePath || file.name,
               type: file.type,
-              file: file,
-              el: el
+              file: file
             });
           }
         } else {
           var names = el.value.replace(/\\/g, '/').split('/');
+          delete el.__vuex__;
           files.push({
             name: names[names.length - 1],
             el: el
