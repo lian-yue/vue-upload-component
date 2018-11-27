@@ -72,6 +72,9 @@ export default {
     capture: {
     },
 
+    disabled: {
+    },
+
     multiple: {
       type: Boolean,
     },
@@ -270,6 +273,7 @@ export default {
         this.features.html5 ? 'file-uploads-html5' : 'file-uploads-html4',
         this.features.directory && this.directory ? 'file-uploads-directory' : undefined,
         this.features.drop && this.drop ? 'file-uploads-drop' : undefined,
+        this.disabled ? 'file-uploads-disabled' : undefined,
       ]
     }
   },

@@ -5,6 +5,7 @@
     :id="$parent.inputId || $parent.name"
     :accept="$parent.accept"
     :capture="$parent.capture"
+    :disabled="$parent.disabled"
     @change="change"
     :webkitdirectory="$parent.directory && $parent.features.directory"
     :directory="$parent.directory && $parent.features.directory"
