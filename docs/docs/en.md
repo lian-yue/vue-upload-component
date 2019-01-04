@@ -145,6 +145,30 @@ Use the option `startBody` to add more parameters to the body of this request.
 
 The backend should provide a `session_id` (to identify the upload) and a `end_offset` which is the size of every chunk
 
+##### HTTP start phase example
+
+Request body example:
+```
+{
+  "phase": "start",
+  "mime_type": "image/png",
+  "size": 12669430,
+  "name":"hubbleimage1stscihp1809af6400x4800.png"
+}
+```
+
+Response body example:
+```
+{
+  "data": {
+    "end_offset": 6291456,
+    "session_id": "61db8102-fca6-44ae-81e2-a499d438e7a5"
+  },
+  "status": "success"
+}
+
+```
+
 #### upload
 
 In this phase we'll upload every chunk until all of them are uploaded. This step allows some failures in the backend, and will retry up to `maxRetries` times.
@@ -153,11 +177,117 @@ We'll send the `session_id`, `start_offset` and `chunk` (the sliced blob - part 
 
 Use the option `uploadBody` to add more parameters to the body of this request.
 
+##### HTTP upload phase example with 3 chunks
+
+Request body example - chunk 1 from 3:
+```
+------WebKitFormBoundaryuI0uiY8h7MCbcysx
+Content-Disposition: form-data; name="phase"
+
+upload
+------WebKitFormBoundaryuI0uiY8h7MCbcysx
+Content-Disposition: form-data; name="session_id"
+
+61db8102-fca6-44ae-81e2-a499d438e7a5
+------WebKitFormBoundaryuI0uiY8h7MCbcysx
+Content-Disposition: form-data; name="start_offset"
+
+0
+------WebKitFormBoundaryuI0uiY8h7MCbcysx
+Content-Disposition: form-data; name="chunk"; filename="blob"
+Content-Type: application/octet-stream
+
+
+------WebKitFormBoundaryuI0uiY8h7MCbcysx--
+```
+
+Response body example - chunk 1 from 3:
+```
+{
+  "status": "success"
+}
+```
+
+Request body example - chunk 2 from 3:
+```
+------WebKitFormBoundary4cjBupFqrx1SrHoR
+Content-Disposition: form-data; name="phase"
+
+upload
+------WebKitFormBoundary4cjBupFqrx1SrHoR
+Content-Disposition: form-data; name="session_id"
+
+61db8102-fca6-44ae-81e2-a499d438e7a5
+------WebKitFormBoundary4cjBupFqrx1SrHoR
+Content-Disposition: form-data; name="start_offset"
+
+6291456
+------WebKitFormBoundary4cjBupFqrx1SrHoR
+Content-Disposition: form-data; name="chunk"; filename="blob"
+Content-Type: application/octet-stream
+
+
+------WebKitFormBoundary4cjBupFqrx1SrHoR-
+```
+
+Response body example - chunk 2 from 3:
+```
+{
+  "status": "success"
+}
+```
+
+Request body example - chunk 3 from 3:
+```
+------WebKitFormBoundarypWxg4xnB5QBDoFys
+Content-Disposition: form-data; name="phase"
+
+upload
+------WebKitFormBoundarypWxg4xnB5QBDoFys
+Content-Disposition: form-data; name="session_id"
+
+61db8102-fca6-44ae-81e2-a499d438e7a5
+------WebKitFormBoundarypWxg4xnB5QBDoFys
+Content-Disposition: form-data; name="start_offset"
+
+12582912
+------WebKitFormBoundarypWxg4xnB5QBDoFys
+Content-Disposition: form-data; name="chunk"; filename="blob"
+Content-Type: application/octet-stream
+
+
+------WebKitFormBoundarypWxg4xnB5QBDoFys--
+```
+
+Response body example - chunk 1 from 3:
+```
+{
+  "status": "success"
+}
+```
+
 #### finish
 
 In this phase we tell the backend that there are no more chunks to upload, so it can wrap everything. We send the `session_id` in this phase.
 
 Use the option `finishBody` to add more parameters to the body of this request.
+
+##### HTTP finish phase example
+
+Request body example:
+```
+{
+  "phase": "finish",
+  "session_id": "61db8102-fca6-44ae-81e2-a499d438e7a5"
+}
+```
+
+Response body example:
+```
+{
+  "status": "success"
+}
+```
 
 #### Example
 
