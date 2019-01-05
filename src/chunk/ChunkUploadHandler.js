@@ -333,7 +333,7 @@ export default class ChunkUploadHandler {
       if (res.status === 'success') {
         this.uploadPhaseSuccessResponseCallback(
           this.sessionId,
-          res.data !== null ? res.data : null
+          res
         )
         chunk.uploaded = true
       } else {
