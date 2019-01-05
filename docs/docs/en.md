@@ -725,10 +725,10 @@ Whether chunk uploads callbacks is enabled or not
 Ready to use only when chunk-callbacks-enabled property is enabled or set true.
 Chunk callbacks it is class based on `DefaultChunkUploadCallbacks` example.
 Extend behaviours in few specific chunked upload phases by dedicated functions/callbacks:
- startPhaseSuccessResponse,
- uploadPhaseSuccessResponse,
- finishPhaseBeforeRequest,
- finishPhaseSuccessResponse.
+ startPhaseSuccessResponse (called in success response start phase),
+ uploadPhaseSuccessResponse (called in success response upload phase),
+ finishPhaseBeforeRequest (MUST returns optional modified or original body for finish phase request),
+ finishPhaseSuccessResponse (called in success response finished phase).
 
 
 * **Type:** `Object`
