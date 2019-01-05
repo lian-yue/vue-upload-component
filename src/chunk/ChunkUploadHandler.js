@@ -16,6 +16,38 @@ export default class ChunkUploadHandler {
     this.options = options
   }
 
+  get startPhaseSuccessResponseCallback () {
+    let callbacks = this.options.chunkedUploadCallbacks || null
+    if (callbacks && !this.options.callbacks.startPhaseSuccessResponse instanceof Function) {
+      throw new TypeError('Function type is required in "startPhaseSuccessResponse" callback', "ChunkUploadHandler", 22);
+    }
+    return this.options.callbacks.startPhaseSuccessResponse
+  }
+
+  get uploadPhaseSuccessResponseCallback () {
+    let callbacks = this.options.chunkedUploadCallbacks || null
+    if (callbacks && !this.options.callbacks.uploadPhaseSuccessResponse instanceof Function) {
+      throw new TypeError('Function type is required in "uploadPhaseSuccessResponse" callback', "ChunkUploadHandler", 31);
+    }
+    return this.options.callbacks.uploadPhaseSuccessResponse
+  }
+
+  get finishPhaseBeforeRequestCallback () {
+    let callbacks = this.options.chunkedUploadCallbacks || null
+    if (callbacks && !this.options.callbacks.finishPhaseBeforeRequest instanceof Function) {
+      throw new TypeError('Function type is required in "finishPhaseBeforeRequest" callback', "ChunkUploadHandler", 39);
+    }
+    return this.options.callbacks.finishPhaseBeforeRequest
+  }
+
+  get finishPhaseSuccessResponseCallback () {
+    let callbacks = this.options.chunkedUploadCallbacks || null
+    if (callbacks && !this.options.callbacks.finishPhaseSuccessResponse instanceof Function) {
+      throw new TypeError('Function type is required in "finishPhaseSuccessResponse" callback', "ChunkUploadHandler", 31);
+    }
+    return this.options.callbacks.finishPhaseSuccessResponse
+  }
+
   /**
    * Gets the max retries from options
    */
@@ -241,6 +273,12 @@ export default class ChunkUploadHandler {
       this.sessionId = res.data.session_id
       this.chunkSize = res.data.end_offset
 
+      if (this.startPhaseSuccessResponseCallback) {
+        this.startPhaseSuccessResponseCallback(
+          this.sessionId
+        )
+      }
+
       this.createChunks()
       this.startChunking()
     }).catch(res => {
@@ -308,6 +346,12 @@ export default class ChunkUploadHandler {
     })).then(res => {
       chunk.active = false
       if (res.status === 'success') {
+        if (this.uploadPhaseSuccessResponseCallback) {
+          this.uploadPhaseSuccessResponseCallback(
+            this.sessionId,
+            res.data !== null ? res.data : null
+          )
+        }
         chunk.uploaded = true
       } else {
         if (chunk.retries-- <= 0) {
@@ -335,6 +379,13 @@ export default class ChunkUploadHandler {
   finish () {
     this.updateFileProgress()
 
+    if (this.finishPhaseBeforeRequestCallback) {
+      this.finishBody = this.finishPhaseBeforeRequestCallback(
+        this.sessionId,
+        this.finishBody
+      )
+    }
+
     request({
       method: 'POST',
       headers: Object.assign({}, this.headers, {
@@ -351,6 +402,11 @@ export default class ChunkUploadHandler {
         return this.reject('server')
       }
 
+      if (this.finishPhaseSuccessResponseCallback) {
+        this.finishBody = this.finishPhaseSuccessResponseCallback(
+          this.sessionId
+        )
+      }
       this.resolve(res)
     }).catch(res => {
       this.file.response = res
@@ -358,3 +414,4 @@ export default class ChunkUploadHandler {
     })
   }
 }
+
