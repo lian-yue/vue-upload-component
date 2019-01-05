@@ -8,7 +8,6 @@
           <span v-if="file.error">{{file.error}}</span>
           <span v-else-if="file.success">success</span>
           <span v-else-if="file.active">active</span>
-          <span v-else-if="file.active">active</span>
           <span v-else></span>
         </li>
       </ul>
