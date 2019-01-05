@@ -18,6 +18,10 @@ export default {
     change(e) {
       this.$parent.addInputFile(e.target)
       if (e.target.files) {
+        e.target.type = ''
+        e.target.value = ''
+        e.target.type = 'file'
+      } else {
         // ie9 fix #219
         this.$destroy()
         // eslint-disable-next-line
@@ -25,10 +29,6 @@ export default {
           parent: this.$parent,
           el: this.$el,
         })
-      } else {
-        e.target.type = ''
-        e.target.value = ''
-        e.target.type = 'file'
       }
     }
   }
