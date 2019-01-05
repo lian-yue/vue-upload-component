@@ -12,7 +12,7 @@
   text-align: center;
   display: inline-block;
 }
-.file-uploads.file-uploads-html4 input[type="file"], .file-uploads.file-uploads-html5 label {
+.file-uploads.file-uploads-html4 input, .file-uploads.file-uploads-html5 label {
   /* background fix ie  click */
   background: #fff;
   opacity: 0;
@@ -26,7 +26,7 @@
   width: 100%;
   height: 100%;
 }
-.file-uploads.file-uploads-html5 input[type="file"], .file-uploads.file-uploads-html4 label {
+.file-uploads.file-uploads-html5 input, .file-uploads.file-uploads-html4 label {
   /* background fix ie  click */
   background: rgba(255, 255, 255, 0);
   overflow: hidden;
