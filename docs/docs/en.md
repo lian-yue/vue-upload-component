@@ -209,6 +209,62 @@ Use the `handler` parameter to use a different Handler
  }
 ```
 
+##### Extending the handler using callbacks properties
+
+Another option for extending handler is possible with below dedicated peperties:
+ * chunk-enabled - must be `true`
+ * chunk-callbacks-enabled - must be `true`
+ * chunk-callbacks - nust be `Object` with interface based on `DefaultChunkUploadCallbacks`
+
+###### How to use calbacks in Vue template and script
+
+```html
+  <file-upload
+    :chunk-enabled="true"
+    :chunk-callbacks-enabled="true"
+    :chunk-callbacks="chunkCallbacksClassInstance"
+    ></file-upload>
+
+<script>
+    // ...
+
+    class ExampleChunkUploadCallbacks {
+        startPhaseSuccessResponse(sessionId) {
+            console.info('CALL startPhaseSuccessResponseCallback - sessionId: ', sessionId);
+        }
+
+        uploadPhaseSuccessResponse(sessionId, data) {
+            console.info('CALL uploadPhaseSuccessResponseCallback - sessionId: ', sessionId, ', data:', data);
+        }
+
+        finishPhaseBeforeRequest(sessionId, finishBody) {
+            console.info('CALL finishPhaseBeforeRequestCallback - sessionId: ', sessionId, ', finishBody: ', finishBody);
+            return finishBody
+        }
+
+        finishPhaseSuccessResponse(sessionId) {
+            console.info('CALL finishPhaseSuccessResponseCallback - sessionId: ', sessionId);
+        }
+    }
+
+    export default {
+        name: 'ComponentName',
+        components: {
+            // ...
+            FileUpload
+        },
+        data: () => {
+            return {
+                chunkCallbacks: new ExampleChunkUploadCallbacks()
+            }
+        }
+
+        // ...
+
+     }
+
+```
+
 ### SSR (Server isomorphism)
 
 
@@ -649,6 +705,45 @@ All the options to handle chunk uploads
     handler: ChunkUploadDefaultHandler
 }
 ```
+
+### chunk-callbacks-enabled
+
+Whether chunk uploads callbacks is enabled or not
+
+* **Type:** `Boolean`
+
+* **Default:** `false`
+
+* **Usage:**
+  ```html
+  <file-upload :chunk-callbacks-enabled="true"></file-upload>
+  <file-upload chunk-callbacks-enabled></file-upload>
+  ```
+
+### chunk-callbacks
+
+Ready to use only when chunk-callbacks-enabled property is enabled or set true.
+Chunk callbacks it is class based on `DefaultChunkUploadCallbacks` example.
+Extend behaviours in few specific chunked upload phases by dedicated functions/callbacks:
+ startPhaseSuccessResponse,
+ uploadPhaseSuccessResponse,
+ finishPhaseBeforeRequest,
+ finishPhaseSuccessResponse.
+
+
+* **Type:** `Object`
+
+* **Default:** `undefined`
+
+* **Usage:**
+  ```html
+  <file-upload
+    :chunk-enabled="true"
+    :chunk-callbacks-enabled="true"
+    :chunk-callbacks="chunkCallbacksClassInstance"
+    ></file-upload>
+  ```
+
 
 ### drop
 
