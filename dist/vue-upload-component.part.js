@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.16
+ * Version: 2.8.17
  * Author: LianYue
  */
 (function (global, factory) {
@@ -576,8 +576,7 @@
     methods: {
       change: function change(e) {
         this.$parent.addInputFile(e.target);
-        e.target.value = '';
-        if (!e.target.files) {
+        if (e.target.files) {
           // ie9 fix #219
           this.$destroy();
           // eslint-disable-next-line
@@ -585,6 +584,10 @@
             parent: this.$parent,
             el: this.$el
           });
+        } else {
+          e.target.type = '';
+          e.target.value = '';
+          e.target.type = 'file';
         }
       }
     }
