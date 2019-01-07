@@ -12,7 +12,7 @@ export class DefaultChunkUploadCallbacks {
   uploadPhaseSuccessResponse (sessionId, data) {
   }
 
-  finishPhaseBeforeRequest (sessionId, finishBody) {
+  async finishPhaseBeforeRequest (sessionId, finishBody) {
     return finishBody
   }
 
@@ -307,7 +307,7 @@ export default class ChunkUploadHandler {
    *
    * @param {Object} chunk
    */
-  uploadChunk (chunk) {
+  async uploadChunk (chunk) {
     chunk.progress = 0
     chunk.active = true
     this.updateFileProgress()
@@ -359,12 +359,17 @@ export default class ChunkUploadHandler {
    * Finish phase
    * Sends a request to the backend to finish the process
    */
-  finish () {
+  async finish () {
     this.updateFileProgress()
 
-    let finishBody = this.finishPhaseBeforeRequestCallback(
+    let finishBody = Object.assign(this.finishBody, {
+      phase: 'finish',
+      session_id: this.sessionId
+    })
+
+    let newBody = await this.finishPhaseBeforeRequestCallback(
       this.sessionId,
-      this.finishBody
+      finishBody
     )
 
     request({
@@ -373,10 +378,7 @@ export default class ChunkUploadHandler {
         'Content-Type': 'application/json'
       }),
       url: this.action,
-      body: Object.assign(finishBody, {
-        phase: 'finish',
-        session_id: this.sessionId
-      })
+      body: newBody
     }).then(res => {
       this.file.response = res
       if (res.status !== 'success') {
@@ -407,7 +409,7 @@ export default class ChunkUploadHandler {
     return this.chunkCallbacks.uploadPhaseSuccessResponse(sessionId, data)
   }
 
-  finishPhaseBeforeRequestCallback (sessionId, finishBody) {
+  async finishPhaseBeforeRequestCallback (sessionId, finishBody) {
     if (!this.chunkCallbacksEnabled || this.chunkCallbacks.finishPhaseBeforeRequest instanceof Function === false) {
       return finishBody
     }
