@@ -257,7 +257,7 @@ export default class ChunkUploadHandler {
         return this.reject('server')
       }
 
-      this.sessionId = res.data.session_id
+      this.sessionId = res.data.upload_id
       this.chunkSize = res.data.end_offset
 
       this.startPhaseSuccessResponseCallback(
