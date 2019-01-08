@@ -6,7 +6,7 @@ import {
 
 
 export class DefaultChunkUploadCallbacks {
-  startPhaseSuccessResponse (sessionId) {
+  startPhaseSuccessResponse (sessionId, filename) {
   }
 
   uploadPhaseSuccessResponse (sessionId, data) {
@@ -64,7 +64,7 @@ export default class ChunkUploadHandler {
   }
 
   /**
-   * Gets the file size
+   * Gets the file name
    */
   get fileName () {
     return this.file.name
@@ -261,7 +261,8 @@ export default class ChunkUploadHandler {
       this.chunkSize = res.data.end_offset
 
       this.startPhaseSuccessResponseCallback(
-        this.sessionId
+        this.sessionId,
+        this.fileName
       )
 
       this.createChunks()
@@ -323,12 +324,19 @@ export default class ChunkUploadHandler {
       }
     }, false)
 
-    sendFormRequest(chunk.xhr, Object.assign(this.uploadBody, {
+    let uploadBody = Object.assign(this.uploadBody, {
       phase: 'upload',
       session_id: this.sessionId,
       start_offset: chunk.startOffset,
       chunk: chunk.blob
-    })).then(res => {
+    })
+
+    let newBody = await this.uploadPhaseBeforeRequestCallback(
+      this.sessionId,
+      uploadBody
+    )
+
+    sendFormRequest(chunk.xhr, newBody).then(res => {
       chunk.active = false
       if (res.status === 'success') {
         this.uploadPhaseSuccessResponseCallback(
@@ -395,11 +403,18 @@ export default class ChunkUploadHandler {
     })
   }
 
-  startPhaseSuccessResponseCallback (sessionId) {
+  startPhaseSuccessResponseCallback (sessionId, fileName) {
     if (!this.chunkCallbacksEnabled || this.chunkCallbacks.startPhaseSuccessResponse instanceof Function === false) {
       return false
     }
-    return this.chunkCallbacks.startPhaseSuccessResponse(sessionId)
+    return this.chunkCallbacks.startPhaseSuccessResponse(sessionId, fileName)
+  }
+
+  async uploadPhaseBeforeRequestCallback (sessionId, uploadBody) {
+    if (!this.chunkCallbacksEnabled || this.chunkCallbacks.uploadPhaseBeforeRequest instanceof Function === false) {
+      return uploadBody
+    }
+    return this.chunkCallbacks.uploadPhaseBeforeRequest(sessionId, uploadBody)
   }
 
   uploadPhaseSuccessResponseCallback (sessionId, data) {
