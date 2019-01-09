@@ -1,22 +1,17 @@
-import {
-  default as request,
-  createRequest,
-  sendFormRequest
-} from '../utils/request'
-
+import axios from 'axios'
 
 export class DefaultChunkUploadCallbacks {
-  startPhaseSuccessResponse (sessionId, filename) {
+  async startPhaseSuccessResponse (sessionId, filename) {
   }
 
-  uploadPhaseSuccessResponse (sessionId, data) {
+  async uploadPhaseSuccessResponse (sessionId, data) {
   }
 
   async finishPhaseBeforeRequest (sessionId, finishBody) {
     return finishBody
   }
 
-  finishPhaseSuccessResponse (sessionId) {
+  async finishPhaseSuccessResponse (sessionId) {
   }
 }
 
@@ -239,19 +234,21 @@ export default class ChunkUploadHandler {
    * Sends a request to the backend to initialise the chunks
    */
   start () {
-    request({
-      method: 'POST',
-      headers: Object.assign({}, this.headers, {
-        'Content-Type': 'application/json'
-      }),
-      url: this.action,
-      body: Object.assign(this.startBody, {
+    axios.post(
+      this.action,
+      Object.assign(this.startBody, {
         phase: 'start',
         mime_type: this.fileType,
         size: this.fileSize,
         name: this.fileName
-      })
-    }).then(res => {
+      }),
+      {
+        headers: Object.assign({}, this.headers, {
+          'Content-Type': 'application/json'
+        })
+      }
+    ).then(response => {
+      const res = response.data
       if (res.status !== 'success') {
         this.file.response = res
         return this.reject('server')
@@ -263,13 +260,17 @@ export default class ChunkUploadHandler {
       this.startPhaseSuccessResponseCallback(
         this.sessionId,
         this.fileName
-      )
-
-      this.createChunks()
-      this.startChunking()
-    }).catch(res => {
+      ).then(() => {
+        console.debug('[vue-upload-component] ChunkUploadHandler -- START createChunks')
+        this.createChunks()
+        console.debug('[vue-upload-component] ChunkUploadHandler -- START startChunking')
+        this.startChunking()
+      })
+    }).catch(response => {
+      const res = response.data
       this.file.response = res
       this.reject('server')
+      console.error('[vue-upload-component] ChunkUploadHandler -- START reject server - response:', response)
     })
   }
 
@@ -312,17 +313,6 @@ export default class ChunkUploadHandler {
     chunk.progress = 0
     chunk.active = true
     this.updateFileProgress()
-    chunk.xhr = createRequest({
-      method: 'POST',
-      headers: this.headers,
-      url: this.action
-    })
-
-    chunk.xhr.upload.addEventListener('progress', function (evt) {
-      if (evt.lengthComputable) {
-        chunk.progress = Math.round(evt.loaded / evt.total * 100)
-      }
-    }, false)
 
     let uploadBody = Object.assign(this.uploadBody, {
       phase: 'upload',
@@ -331,35 +321,64 @@ export default class ChunkUploadHandler {
       chunk: chunk.blob
     })
 
-    let newBody = await this.uploadPhaseBeforeRequestCallback(
+    this.uploadPhaseBeforeRequestCallback(
       this.sessionId,
       uploadBody
-    )
+    ).then(newBody => {
+      console.info('[vue-upload-component] ChunkUploadHandler -- UPLOAD uploadPhaseBeforeRequestCallback then - newBody:', newBody)
+      const formData = new FormData()
+      for (var name in newBody) {
+        formData.append(name, newBody[name])
+      }
 
-    sendFormRequest(chunk.xhr, newBody).then(res => {
-      chunk.active = false
-      if (res.status === 'success') {
-        this.uploadPhaseSuccessResponseCallback(
-          this.sessionId,
-          res
-        )
-        chunk.uploaded = true
-      } else {
+      console.info('[vue-upload-component] ChunkUploadHandler -- UPLOAD formData:', formData)
+
+      axios.post(
+        this.action,
+        formData,
+        {
+          headers: Object.assign({}, this.headers, {
+            'Content-Type': 'multipart/form-data'
+          }),
+          onUploadProgress: function(progressEvent) {
+            if (progressEvent.lengthComputable) {
+              chunk.progress = Math.round(progressEvent.loaded / progressEvent.total * 100)
+            }
+          }
+        }
+      ).then(response => {
+        console.info('[vue-upload-component] ChunkUploadHandler -- UPLOAD response:', response)
+        const res = response.data
+        chunk.active = false
+        if (res.status === 'success') {
+          this.uploadPhaseSuccessResponseCallback(
+            this.sessionId,
+            res
+          )
+          console.info('[vue-upload-component] ChunkUploadHandler -- UPLOAD success')
+          chunk.uploaded = true
+        } else {
+          if (chunk.retries-- <= 0) {
+            this.stopChunks()
+            console.error('[vue-upload-component] ChunkUploadHandler -- UPLOAD stopChunks if (chunk.retries-- <= 0) { - reject upload')
+            return this.reject('upload')
+          }
+        }
+
+        this.uploadNextChunk()
+      }).catch((response) => {
+        console.error('[vue-upload-component] ChunkUploadHandler -- UPLOAD catch - response:', response)
+        chunk.active = false
         if (chunk.retries-- <= 0) {
           this.stopChunks()
+          console.error('[vue-upload-component] ChunkUploadHandler -- UPLOAD stopChunks - reject upload')
           return this.reject('upload')
         }
-      }
-
-      this.uploadNextChunk()
-    }).catch(() => {
-      chunk.active = false
-      if (chunk.retries-- <= 0) {
-        this.stopChunks()
-        return this.reject('upload')
-      }
-
-      this.uploadNextChunk()
+        console.error('[vue-upload-component] ChunkUploadHandler -- UPLOAD uploadNextChunk')
+        this.uploadNextChunk()
+      })
+    }).catch((data) => {
+      console.error('[vue-upload-component] ChunkUploadHandler -- UPLOAD uploadPhaseBeforeRequestCallback - data:', data)
     })
   }
 
@@ -375,35 +394,43 @@ export default class ChunkUploadHandler {
       session_id: this.sessionId
     })
 
-    let newBody = await this.finishPhaseBeforeRequestCallback(
+    this.finishPhaseBeforeRequestCallback(
       this.sessionId,
       finishBody
-    )
+    ).then(newBody => {
+      axios.post(
+        this.action,
+        newBody,
+        {
+          headers: Object.assign({}, this.headers, {
+            'Content-Type': 'application/json'
+          })
+        }
+      ).then(response => {
+        const res = response.data
+        this.file.response = res
+        if (res.status !== 'success') {
+          console.error('[vue-upload-component] ChunkUploadHandler -- FINISH reject server ' +
+                        '- IF res.status !== "success"- response:', response)
+          return this.reject('server')
+        }
 
-    request({
-      method: 'POST',
-      headers: Object.assign({}, this.headers, {
-        'Content-Type': 'application/json'
-      }),
-      url: this.action,
-      body: newBody
-    }).then(res => {
-      this.file.response = res
-      if (res.status !== 'success') {
-        return this.reject('server')
-      }
+        this.finishPhaseSuccessResponseCallback(
+          this.sessionId
+        )
 
-      this.finishPhaseSuccessResponseCallback(
-        this.sessionId
-      )
-      this.resolve(res)
-    }).catch(res => {
-      this.file.response = res
-      this.reject('server')
+        this.resolve(res)
+      }).catch(response => {
+        const res = response.data
+        this.file.response = res
+        this.reject('server')
+        console.error('[vue-upload-component] ChunkUploadHandler ' +
+                      '-- FINISH reject server - response:', response)
+      })
     })
   }
 
-  startPhaseSuccessResponseCallback (sessionId, fileName) {
+  async startPhaseSuccessResponseCallback (sessionId, fileName) {
     if (!this.chunkCallbacksEnabled || this.chunkCallbacks.startPhaseSuccessResponse instanceof Function === false) {
       return false
     }
@@ -417,7 +444,7 @@ export default class ChunkUploadHandler {
     return this.chunkCallbacks.uploadPhaseBeforeRequest(sessionId, uploadBody)
   }
 
-  uploadPhaseSuccessResponseCallback (sessionId, data) {
+  async uploadPhaseSuccessResponseCallback (sessionId, data) {
     if (!this.chunkCallbacksEnabled || this.chunkCallbacks.uploadPhaseSuccessResponse instanceof Function === false) {
       return false
     }
@@ -431,7 +458,7 @@ export default class ChunkUploadHandler {
     return this.chunkCallbacks.finishPhaseBeforeRequest(sessionId, finishBody)
   }
 
-  finishPhaseSuccessResponseCallback (sessionId) {
+  async finishPhaseSuccessResponseCallback (sessionId) {
     if (!this.chunkCallbacksEnabled || this.chunkCallbacks.finishPhaseSuccessResponse instanceof Function === false) {
       return false
     }
