@@ -7,6 +7,10 @@ export class DefaultChunkUploadCallbacks {
   async uploadPhaseSuccessResponse (sessionId, data) {
   }
 
+  async uploadPhaseBeforeRequestCallback (sessionId, uploadBody) {
+    return uploadBody
+  }
+
   async finishPhaseBeforeRequest (sessionId, finishBody) {
     return finishBody
   }
