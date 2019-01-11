@@ -229,21 +229,26 @@ Another option for extending handler is possible with below dedicated peperties:
     // ...
 
     class ExampleChunkUploadCallbacks {
-        startPhaseSuccessResponse(sessionId) {
-            console.info('CALL startPhaseSuccessResponseCallback - sessionId: ', sessionId);
+        async startPhaseSuccessResponse(sessionId) {
+            console.info('CALL startPhaseSuccessResponseCallback - sessionId: ', sessionId)
         }
 
-        uploadPhaseSuccessResponse(sessionId, data) {
-            console.info('CALL uploadPhaseSuccessResponseCallback - sessionId: ', sessionId, ', data:', data);
+        async uploadPhaseBeforeRequestCallback (sessionId, uploadBody) {
+            console.info('CALL uploadPhaseBeforeRequestCallback - sessionId: ', sessionId, ', uploadBody: ', uploadBody)
+            return uploadBody
         }
 
-        finishPhaseBeforeRequest(sessionId, finishBody) {
-            console.info('CALL finishPhaseBeforeRequestCallback - sessionId: ', sessionId, ', finishBody: ', finishBody);
+        async uploadPhaseSuccessResponse(sessionId, data) {
+            console.info('CALL uploadPhaseSuccessResponseCallback - sessionId: ', sessionId, ', data:', data)
+        }
+
+        async finishPhaseBeforeRequest(sessionId, finishBody) {
+            console.info('CALL finishPhaseBeforeRequestCallback - sessionId: ', sessionId, ', finishBody: ', finishBody)
             return finishBody
         }
 
-        finishPhaseSuccessResponse(sessionId) {
-            console.info('CALL finishPhaseSuccessResponseCallback - sessionId: ', sessionId);
+        async finishPhaseSuccessResponse(sessionId) {
+            console.info('CALL finishPhaseSuccessResponseCallback - sessionId: ', sessionId)
         }
     }
 
