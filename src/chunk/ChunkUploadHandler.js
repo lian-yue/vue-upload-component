@@ -45,7 +45,7 @@ export default class ChunkUploadHandler {
   }
 
   /**
-   * Gets the file size
+   * Gets the file name
    */
   get fileName () {
     return this.file.name
