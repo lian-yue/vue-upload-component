@@ -269,6 +269,9 @@ export default class ChunkUploadHandler {
         this.createChunks()
         console.debug('[vue-upload-component] ChunkUploadHandler -- START startChunking')
         this.startChunking()
+      }).catch(ex => {
+        this.reject('server')
+        console.error('[vue-upload-component] ChunkUploadHandler -- START reject server - startPhaseSuccessResponseCallback exception:', ex)
       })
     }).catch(response => {
       const res = response.data
@@ -358,17 +361,27 @@ export default class ChunkUploadHandler {
           this.uploadPhaseSuccessResponseCallback(
             this.sessionId,
             res
-          )
-          console.info('[vue-upload-component] ChunkUploadHandler -- UPLOAD success')
-          chunk.uploaded = true
+          ).then(() => {
+            console.info('[vue-upload-component] ChunkUploadHandler -- UPLOAD success')
+            chunk.uploaded = true
+          }).catch(ex => {
+            this.reject('server')
+            chunk.active = false
+            if (chunk.retries-- <= 0) {
+              this.stopChunks()
+              console.error('[vue-upload-component] ChunkUploadHandler -- UPLOAD stopChunks if (chunk.retries-- <= 0) { - reject upload - exception:', ex)
+              return this.reject('upload')
+            }
+          })
         } else {
+          chunk.active = false
           if (chunk.retries-- <= 0) {
             this.stopChunks()
             console.error('[vue-upload-component] ChunkUploadHandler -- UPLOAD stopChunks if (chunk.retries-- <= 0) { - reject upload')
             return this.reject('upload')
           }
         }
-
+        console.warn('[vue-upload-component] ChunkUploadHandler -- UPLOAD uploadNextChunk')
         this.uploadNextChunk()
       }).catch((response) => {
         console.error('[vue-upload-component] ChunkUploadHandler -- UPLOAD catch - response:', response)
@@ -378,11 +391,18 @@ export default class ChunkUploadHandler {
           console.error('[vue-upload-component] ChunkUploadHandler -- UPLOAD stopChunks - reject upload')
           return this.reject('upload')
         }
-        console.error('[vue-upload-component] ChunkUploadHandler -- UPLOAD uploadNextChunk')
+        console.warn('[vue-upload-component] ChunkUploadHandler -- UPLOAD uploadNextChunk')
         this.uploadNextChunk()
       })
-    }).catch((data) => {
-      console.error('[vue-upload-component] ChunkUploadHandler -- UPLOAD uploadPhaseBeforeRequestCallback - data:', data)
+    }).catch((ex) => {
+      chunk.active = false
+      if (chunk.retries-- <= 0) {
+        this.stopChunks()
+        console.error('[vue-upload-component] ChunkUploadHandler -- UPLOAD stopChunks - reject upload')
+        return this.reject('upload')
+      }
+      console.warn('[vue-upload-component] ChunkUploadHandler -- UPLOAD uploadPhaseBeforeRequestCallback - exception:', ex)
+      this.uploadNextChunk()
     })
   }
 
@@ -421,9 +441,13 @@ export default class ChunkUploadHandler {
 
         this.finishPhaseSuccessResponseCallback(
           this.sessionId
-        )
-
-        this.resolve(res)
+        ).then(() => {
+          this.resolve(res)
+        }).catch(ex => {
+          console.error('[vue-upload-component] ChunkUploadHandler ' +
+                        '-- FINISH reject server - exception:', ex)
+          this.reject('server')
+        })
       }).catch(response => {
         const res = response.data
         this.file.response = res
@@ -431,6 +455,10 @@ export default class ChunkUploadHandler {
         console.error('[vue-upload-component] ChunkUploadHandler ' +
                       '-- FINISH reject server - response:', response)
       })
+    }).catch(ex => {
+      this.reject('server')
+      console.error('[vue-upload-component] ChunkUploadHandler ' +
+                    '-- FINISH reject server - exception:', ex)
     })
   }
 
