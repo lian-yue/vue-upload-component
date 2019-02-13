@@ -35,6 +35,7 @@ declare class _ extends Vue {
   remove(id: VUFile | object | string): object | boolean
   replace(id1: VUFile | object | string, id2: VUFile | object | string): boolean
   clear(): boolean
+  open(): boolean
 
   // Instance / Data
   readonly files: Array<VUFile>

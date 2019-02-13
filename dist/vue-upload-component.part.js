@@ -881,6 +881,11 @@
         // 拖拽渲染
         this.watchDrop(this.drop);
       });
+
+      this.open = function () {
+        input.click();
+        return true;
+      };
     },
 
 

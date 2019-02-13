@@ -1333,6 +1333,11 @@ Empty the file list
 * **Result:**  `Boolean`  Always return `true`
 
 
+### open()
+
+Opens the file input dialog
+
+* **Result:**  `Boolean`  Always return `true`
 
 ## Instance / File
 

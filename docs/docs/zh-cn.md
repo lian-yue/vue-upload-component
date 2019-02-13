@@ -1090,6 +1090,14 @@ Add, update, remove pre-filter
 
 
 
+### open()
+
+打开文件输入对话框
+
+* **结果:**  `Boolean`  总是返回 `true`
+
+
+
 ## 实例 / File
 
 

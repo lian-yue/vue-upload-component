@@ -228,6 +228,11 @@ export default {
       // 拖拽渲染
       this.watchDrop(this.drop)
     })
+
+    this.open = () => {
+      input.click();
+      return true;
+    };
   },
 
   /**
