@@ -806,6 +806,37 @@ Add, update, remove pre-filter
   </script>
   ```
 
+### @uploaded
+
+文件列表全部已上传 后
+
+* **参数:**
+
+  * `files: File | Object | undefined` `只读`
+
+
+* **示例:**
+  ```html
+  <template>
+    <file-upload v-model="files" @uploaded="uploaded"></file-upload>
+  </template>
+  <script>
+  export default {
+    data() {
+      return {
+        files: []
+      }
+    },
+    methods: {
+      uploaded(files) {
+        // 提示上传成功
+        console.log(files)
+      }
+    }
+  }
+  </script>
+  ```
+
 
 
 ## 实例 / 数据
