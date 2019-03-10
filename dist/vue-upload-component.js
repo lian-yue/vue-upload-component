@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.19
+ * Version: 2.8.20
  * Author: LianYue
  */
 (function (global, factory) {
@@ -578,7 +578,7 @@
         this.$parent.addInputFile(e.target);
         if (e.target.files) {
           e.target.value = '';
-          if (!/safari/i.test(navigator.userAgent)) {
+          if (e.target.files.length && !/safari/i.test(navigator.userAgent)) {
             e.target.type = '';
             e.target.type = 'file';
           }
