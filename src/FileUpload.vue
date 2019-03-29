@@ -223,10 +223,14 @@ export default {
       // 更新下父级
       if (this.$parent) {
         this.$parent.$forceUpdate()
+        // 拖拽渲染
+        this.$parent.$nextTick(() => {
+          this.watchDrop(this.drop)
+        })
+      } else {
+        // 拖拽渲染
+        this.watchDrop(this.drop)
       }
-
-      // 拖拽渲染
-      this.watchDrop(this.drop)
     })
   },
 
@@ -240,6 +244,9 @@ export default {
 
     // 设置成不激活
     this.active = false
+
+    // 销毁拖拽事件
+    this.watchDrop(false)
   },
 
   computed: {
