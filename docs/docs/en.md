@@ -302,7 +302,7 @@ In the following example we are going to add `Chunk Upload Functionality`. This 
 
     chunk-enabled
     :chunk="{
-      action: '/upload/start',
+      startAction: '/upload/start',
       uploadAction: '/upload/chunk',
       finishAction: '/upload/finish',
       minSize: 1048576,
