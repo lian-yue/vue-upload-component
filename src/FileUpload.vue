@@ -48,7 +48,11 @@ const CHUNK_DEFAULT_OPTIONS = {
   maxActive: 3,
   maxRetries: 5,
 
-  handler: ChunkUploadDefaultHandler
+  handler: ChunkUploadDefaultHandler,
+
+  onFinish: () => {
+    this.$emit('finish');
+  }
 }
 
 export default {

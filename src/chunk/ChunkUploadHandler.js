@@ -351,6 +351,10 @@ export default class ChunkUploadHandler {
         return this.reject('server')
       }
 
+      if (this.options.onFinish && typeof(this.options.onFinish) === 'function') {
+        this.options.onFinish.call();
+      }
+
       this.resolve(res)
     }).catch(res => {
       this.file.response = res
