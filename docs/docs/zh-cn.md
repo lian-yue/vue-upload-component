@@ -373,7 +373,7 @@ input标签的 `name` 属性
 
 * **示例:**
   ```html
-  <file-upload :value="files" @input="updatetValue"></file-upload>
+  <file-upload :value="files" @input="updatedValue"></file-upload>
   <!--或-->
   <file-upload v-model="files"></file-upload>
   ```
@@ -610,7 +610,7 @@ input标签的 `name` 属性
 * **示例:**
   ```html
   <template>
-    <file-upload :value="files" @input="updatetValue"></file-upload>
+    <file-upload :value="files" @input="updatedValue"></file-upload>
     <!--或者-->
     <file-upload v-model="files"></file-upload>
   </template>
@@ -622,7 +622,7 @@ input标签的 `name` 属性
       }
     },
     methods: {
-      updatetValue(value) {
+      updatedValue(value) {
         this.files = value
       }
     }
