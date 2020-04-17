@@ -182,6 +182,8 @@
           chunk.xhr.abort();
           chunk.active = false;
         });
+
+        this.stopSpeedCalc();
       }
 
       /**
@@ -268,6 +270,8 @@
         for (var i = 0; i < this.maxActiveChunks; i++) {
           this.uploadNextChunk();
         }
+
+        this.startSpeedCalc();
       }
 
       /**
@@ -359,6 +363,7 @@
         var _this4 = this;
 
         this.updateFileProgress();
+        this.stopSpeedCalc();
 
         request({
           method: 'POST',
@@ -381,6 +386,37 @@
           _this4.file.response = res;
           _this4.reject('server');
         });
+      }
+
+      /**
+       * Sets an interval to calculate and
+       * set upload speed every 3 seconds
+       */
+
+    }, {
+      key: 'startSpeedCalc',
+      value: function startSpeedCalc() {
+        var _this5 = this;
+
+        this.file.speed = 0;
+        var lastUploadedBytes = 0;
+
+        window[this.fileName + '_speed'] = window.setInterval(function () {
+          var uploadedBytes = _this5.progress / 100 * _this5.fileSize;
+          _this5.file.speed = (uploadedBytes - lastUploadedBytes) / 3; // -> byte/s
+          lastUploadedBytes = uploadedBytes;
+        }, 3000);
+      }
+
+      /**
+       * Removes the upload speed interval
+       */
+
+    }, {
+      key: 'stopSpeedCalc',
+      value: function stopSpeedCalc() {
+        window.clearInterval(window[this.fileName + '_speed']);
+        this.file.speed = 0;
       }
     }, {
       key: 'maxRetries',
@@ -497,11 +533,11 @@
     }, {
       key: 'progress',
       get: function get() {
-        var _this5 = this;
+        var _this6 = this;
 
         var completedProgress = this.chunksUploaded.length / this.chunks.length * 100;
         var uploadingProgress = this.chunksUploading.reduce(function (progress, chunk) {
-          return progress + (chunk.progress | 0) / _this5.chunks.length;
+          return progress + (chunk.progress | 0) / _this6.chunks.length;
         }, 0);
 
         return Math.min(completedProgress + uploadingProgress, 100);
@@ -872,14 +908,19 @@
       }
 
       this.$nextTick(function () {
+        var _this = this;
 
         // 更新下父级
         if (this.$parent) {
           this.$parent.$forceUpdate();
+          // 拖拽渲染
+          this.$parent.$nextTick(function () {
+            _this.watchDrop(_this.drop);
+          });
+        } else {
+          // 拖拽渲染
+          this.watchDrop(this.drop);
         }
-
-        // 拖拽渲染
-        this.watchDrop(this.drop);
       });
     },
 
@@ -894,6 +935,9 @@
 
       // 设置成不激活
       this.active = false;
+
+      // 销毁拖拽事件
+      this.watchDrop(false);
     },
 
 
@@ -1153,7 +1197,7 @@
 
       // 添加 DataTransfer
       addDataTransfer: function addDataTransfer(dataTransfer) {
-        var _this = this;
+        var _this2 = this;
 
         var files = [];
         if (dataTransfer.items && dataTransfer.items.length) {
@@ -1176,10 +1220,10 @@
             var forEach = function forEach(i) {
               var item = items[i];
               // 结束 文件数量大于 最大数量
-              if (!item || _this.maximum > 0 && files.length >= _this.maximum) {
-                return resolve(_this.add(files));
+              if (!item || _this2.maximum > 0 && files.length >= _this2.maximum) {
+                return resolve(_this2.add(files));
               }
-              _this.getEntry(item).then(function (results) {
+              _this2.getEntry(item).then(function (results) {
                 files.push.apply(files, _toConsumableArray(results));
                 forEach(i + 1);
               });
@@ -1204,7 +1248,7 @@
 
       // 获得 entry
       getEntry: function getEntry(entry) {
-        var _this2 = this;
+        var _this3 = this;
 
         var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
 
@@ -1218,19 +1262,19 @@
                 file: file
               }]);
             });
-          } else if (entry.isDirectory && _this2.dropDirectory) {
+          } else if (entry.isDirectory && _this3.dropDirectory) {
             var files = [];
             var dirReader = entry.createReader();
             var readEntries = function readEntries() {
               dirReader.readEntries(function (entries) {
                 var forEach = function forEach(i) {
-                  if (!entries[i] && i === 0 || _this2.maximum > 0 && files.length >= _this2.maximum) {
+                  if (!entries[i] && i === 0 || _this3.maximum > 0 && files.length >= _this3.maximum) {
                     return resolve(files);
                   }
                   if (!entries[i]) {
                     return readEntries();
                   }
-                  _this2.getEntry(entries[i], path + entry.name + '/').then(function (results) {
+                  _this3.getEntry(entries[i], path + entry.name + '/').then(function (results) {
                     files.push.apply(files, _toConsumableArray(results));
                     forEach(i + 1);
                   });
@@ -1345,20 +1389,20 @@
           this.uploading++;
           // 激活
           this.$nextTick(function () {
-            var _this3 = this;
+            var _this4 = this;
 
             setTimeout(function () {
-              _this3.upload(newFile).then(function () {
+              _this4.upload(newFile).then(function () {
                 // eslint-disable-next-line
-                newFile = _this3.get(newFile);
+                newFile = _this4.get(newFile);
                 if (newFile && newFile.fileObject) {
-                  _this3.update(newFile, {
+                  _this4.update(newFile, {
                     active: false,
                     success: !newFile.error
                   });
                 }
               }).catch(function (e) {
-                _this3.update(newFile, {
+                _this4.update(newFile, {
                   active: false,
                   success: false,
                   error: e.code || e.error || e.message || e
@@ -1506,7 +1550,7 @@
         return this.uploadXhr(xhr, file, form);
       },
       uploadXhr: function uploadXhr(xhr, _file, body) {
-        var _this4 = this;
+        var _this5 = this;
 
         var file = _file;
         var speedTime = 0;
@@ -1515,7 +1559,7 @@
         // 进度条
         xhr.upload.onprogress = function (e) {
           // 还未开始上传 已删除 未激活
-          file = _this4.get(file);
+          file = _this5.get(file);
           if (!e.lengthComputable || !file || !file.fileObject || !file.active) {
             return;
           }
@@ -1527,7 +1571,7 @@
           }
           speedTime = speedTime2;
 
-          file = _this4.update(file, {
+          file = _this5.update(file, {
             progress: (e.loaded / e.total * 100).toFixed(2),
             speed: e.loaded - speedLoaded
           });
@@ -1536,7 +1580,7 @@
 
         // 检查激活状态
         var interval = setInterval(function () {
-          file = _this4.get(file);
+          file = _this5.get(file);
           if (file && file.fileObject && !file.success && !file.error && file.active) {
             return;
           }
@@ -1565,7 +1609,7 @@
               interval = false;
             }
 
-            file = _this4.get(file);
+            file = _this5.get(file);
 
             // 不存在直接响应
             if (!file) {
@@ -1628,7 +1672,7 @@
             }
 
             // 更新
-            file = _this4.update(file, data);
+            file = _this5.update(file, data);
 
             // 相应错误
             if (file.error) {
@@ -1656,14 +1700,14 @@
           }
 
           // 更新 xhr
-          file = _this4.update(file, { xhr: xhr });
+          file = _this5.update(file, { xhr: xhr });
 
           // 开始上传
           xhr.send(body);
         });
       },
       uploadHtml4: function uploadHtml4(_file) {
-        var _this5 = this;
+        var _this6 = this;
 
         var file = _file;
         var onKeydown = function onKeydown(e) {
@@ -1729,7 +1773,7 @@
 
         return new Promise(function (resolve, reject) {
           setTimeout(function () {
-            file = _this5.update(file, { iframe: iframe });
+            file = _this6.update(file, { iframe: iframe });
 
             // 不存在
             if (!file) {
@@ -1738,7 +1782,7 @@
 
             // 定时检查
             var interval = setInterval(function () {
-              file = _this5.get(file);
+              file = _this6.get(file);
               if (file && file.fileObject && !file.success && !file.error && file.active) {
                 return;
               }
@@ -1767,7 +1811,7 @@
               // 关闭 esc 事件
               document.body.removeEventListener('keydown', onKeydown);
 
-              file = _this5.get(file);
+              file = _this6.get(file);
 
               // 不存在直接响应
               if (!file) {
@@ -1829,7 +1873,7 @@
               }
 
               // 更新
-              file = _this5.update(file, data);
+              file = _this6.update(file, data);
 
               if (file.error) {
                 return reject(file.error);
