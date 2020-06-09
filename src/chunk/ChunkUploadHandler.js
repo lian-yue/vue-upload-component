@@ -374,9 +374,9 @@ export default class ChunkUploadHandler {
 
     window[this.fileName + '_speed'] = window.setInterval(() => {
       let uploadedBytes = (this.progress / 100)  * this.fileSize
-      this.file.speed = (uploadedBytes - lastUploadedBytes) / 3 // -> byte/s
+      this.file.speed = (uploadedBytes - lastUploadedBytes)
       lastUploadedBytes = uploadedBytes
-    }, 3000)
+    }, 1000)
   }
 
   /**
