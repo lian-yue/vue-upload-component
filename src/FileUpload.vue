@@ -157,6 +157,17 @@ export default {
       default: false
     },
 
+    // Chunk upload callbacks enabled
+    chunkCallbacksEnabled: {
+      type: Boolean,
+      default: false
+    },
+
+    // Chunk upload callbacks (optional)
+    chunkCallbacks: {
+      type: Object
+    },
+
     // Chunk upload properties
     chunk: {
       type: Object,
@@ -271,7 +282,10 @@ export default {
     },
 
     chunkOptions () {
-      return Object.assign(CHUNK_DEFAULT_OPTIONS, this.chunk)
+      return Object.assign(CHUNK_DEFAULT_OPTIONS, this.chunk, {
+        chunkCallbacksEnabled: this.chunkCallbacksEnabled,
+        chunkCallbacks: this.chunkCallbacks
+      })
     },
 
     className() {
