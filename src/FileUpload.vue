@@ -1303,6 +1303,15 @@ export default {
       }
     },
 
+    dropActiveOn() {
+      this.dropActive = true
+      this.$emit('dropActive', true)
+    },
+
+    dropActiveOff() {
+      this.dropActive = false
+      this.$emit('dropActive', false)
+    },
 
     onDragenter(e) {
       e.preventDefault()
@@ -1314,13 +1323,13 @@ export default {
       }
       let dt = e.dataTransfer
       if (dt.files && dt.files.length) {
-        this.dropActive = true
+        this.dropActiveOn()
       } else if (!dt.types) {
-        this.dropActive = true
+        this.dropActiveOn()
       } else if (dt.types.indexOf && dt.types.indexOf('Files') !== -1) {
-        this.dropActive = true
+        this.dropActiveOn()
       } else if (dt.types.contains && dt.types.contains('Files')) {
-        this.dropActive = true
+        this.dropActiveOn()
       }
     },
 
@@ -1330,7 +1339,7 @@ export default {
         return
       }
       if (e.target.nodeName === 'HTML' || e.target === e.explicitOriginalTarget || (!e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight))) {
-        this.dropActive = false
+        this.dropActiveOff()
       }
     },
 
@@ -1339,7 +1348,7 @@ export default {
     },
 
     onDocumentDrop() {
-      this.dropActive = false
+      this.dropActiveOff()
     },
 
     onDrop(e) {
