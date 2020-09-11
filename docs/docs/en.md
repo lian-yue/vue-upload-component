@@ -302,7 +302,9 @@ In the following example we are going to add `Chunk Upload Functionality`. This 
 
     chunk-enabled
     :chunk="{
-      action: '/upload/chunk',
+      startAction: '/upload/start',
+      uploadAction: '/upload/chunk',
+      finishAction: '/upload/finish',
       minSize: 1048576,
       maxActive: 3,
       maxRetries: 5,
@@ -330,7 +332,9 @@ Use the `handler` parameter to use a different Handler
 
 ```html
  :chunk="{
-   action: '/upload/chunk',
+   startAction: '/upload/start',
+   uploadAction: '/upload/chunk',
+   finishAction: '/upload/finish',
    minSize: 1048576,
    maxActive: 3,
    maxRetries: 5,

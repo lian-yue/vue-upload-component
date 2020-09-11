@@ -58,6 +58,18 @@ export default class ChunkUploadHandler {
     return this.options.action || null
   }
 
+  get startAction() {
+    return this.options.startAction || this.action
+  }
+
+  get uploadAction() {
+    return this.options.uploadAction || this.action
+  }
+
+  get finishAction() {
+    return this.options.finishAction || this.action
+  }
+
   /**
    * Gets the body to be merged when sending the request in start phase
    */
@@ -225,7 +237,7 @@ export default class ChunkUploadHandler {
       headers: Object.assign({}, this.headers, {
         'Content-Type': 'application/json'
       }),
-      url: this.action,
+      url: this.startAction,
       body: Object.assign(this.startBody, {
         phase: 'start',
         mime_type: this.fileType,
@@ -291,7 +303,7 @@ export default class ChunkUploadHandler {
     chunk.xhr = createRequest({
       method: 'POST',
       headers: this.headers,
-      url: this.action
+      url: this.uploadAction
     })
 
     chunk.xhr.upload.addEventListener('progress', function (evt) {
@@ -340,7 +352,7 @@ export default class ChunkUploadHandler {
       headers: Object.assign({}, this.headers, {
         'Content-Type': 'application/json'
       }),
-      url: this.action,
+      url: this.finishAction,
       body: Object.assign(this.finishBody, {
         phase: 'finish',
         session_id: this.sessionId
