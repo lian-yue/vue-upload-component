@@ -267,6 +267,7 @@ export default {
           return false
         }
       }
+      this.emitUploaded()
       return true
     },
 
@@ -744,6 +745,10 @@ export default {
 
     emitInput() {
       this.$emit('input', this.files)
+    },
+
+    emitUploaded() {
+      this.$emit('uploaded', this.files)
     },
 
 
