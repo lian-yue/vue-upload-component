@@ -680,7 +680,7 @@ Allow upload file extensions
 
 Allow the maximum byte to upload
 
-* **Type:** `Number`
+* **Type:** `Number | Function`
 
 * **Default:** `0`
 
@@ -689,10 +689,36 @@ Allow the maximum byte to upload
 * **Details:**
 
   `0` is equal to not limit
+  If a `Function` is given, it will be called with the `File` object passed as an argument, and it should return a `Number`
 
 * **Usage:**
   ```html
   <file-upload :size="1024 * 1024"></file-upload>
+  <!--or-->
+  <template>
+    <file-upload :size="this.calcSize"></file-upload>
+  </template>
+  <script>
+  export default {
+    methods: {
+      calcSize(file) {
+        let size = 0;
+        let mimePrefix = file.type.substr(0, file.type.indexOf('/'));
+
+        switch (mimePrefix) {
+          case 'image':
+            size = 1024 * 1024; // 1 MiB
+            break;
+          case 'video':
+            size = 1024 * 1024 * 500; // 500 MiB
+            break;
+        }
+
+        return size;
+      }
+    }
+  }
+  </script>
   ```
 
 
