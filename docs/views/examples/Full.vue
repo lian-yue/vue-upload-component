@@ -108,7 +108,7 @@
         </file-upload>
         <div class="dropdown-menu">
           <label class="dropdown-item" :for="name">Add files</label>
-          <a class="dropdown-item" href="#" @click="onAddFolader">Add folder</a>
+          <a class="dropdown-item" href="#" @click="onAddFolder">Add folder</a>
           <a class="dropdown-item" href="#" @click.prevent="addData.show = true">Add data</a>
         </div>
       </div>
@@ -617,8 +617,8 @@ export default {
       this.editFile.show = false
     },
 
-    // add folader
-    onAddFolader() {
+    // add folder
+    onAddFolder() {
       if (!this.$refs.upload.features.directory) {
         this.alert('Your browser does not support')
         return

@@ -43,7 +43,7 @@ https://lian-yue.github.io/vue-upload-component/#/documents
 
 
 
-> Vue.js 文件上传组建
+> Vue.js 文件上传组件
 > 组件只是一个按钮
 
   - [x] 上传多文件
