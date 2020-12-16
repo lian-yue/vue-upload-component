@@ -1,8 +1,21 @@
 <template>
   <span :class="className">
     <slot></slot>
-    <label :for="inputId || name"></label>
-    <input-file></input-file>
+    <label :for="forId"></label>
+    <input
+        ref="input"
+        type="file"
+        :name="name"
+        :id="forId"
+        :accept="accept"
+        :capture="capture"
+        :disabled="disabled"
+        :webkitdirectory="directory && features.directory"
+        :allowdirs="directory && features.directory"
+        :directory="directory && features.directory"
+        :multiple="multiple && features.html5"
+        @change="inputOnChange"
+      />
   </span>
 </template>
 <style>
@@ -37,154 +50,141 @@
   opacity: 0;
 }
 </style>
-<script>
-import ChunkUploadDefaultHandler from './chunk/ChunkUploadHandler'
-import InputFile from './InputFile.vue'
-
+<script lang="ts">
+import {PropType, defineComponent} from "vue";
+import type{ ChunkOptions, Data, Features, VueUploadItem, FileSystemEntry, FileSystemFileEntry, FileSystemDirectoryEntry} from "./types";
+// @ts-ignore
+import ChunkUploadDefaultHandler from './chunk/ChunkUploadHandler.js'
 const CHUNK_DEFAULT_OPTIONS = {
   headers: {},
   action: '',
   minSize: 1048576,
   maxActive: 3,
   maxRetries: 5,
-
   handler: ChunkUploadDefaultHandler
 }
 
-export default {
-  components: {
-    InputFile,
-  },
+export default defineComponent({
   props: {
     inputId: {
       type: String,
     },
-
     name: {
       type: String,
       default: 'file',
     },
-
     accept: {
       type: String,
     },
-
     capture: {
     },
-
     disabled: {
+      default: false,
     },
-
     multiple: {
       type: Boolean,
+      default: false,
     },
-
     maximum: {
       type: Number,
-      default() {
-        return this.multiple ? 0 : 1
-      }
     },
-
     addIndex: {
       type: [Boolean, Number],
     },
-
     directory: {
       type: Boolean,
     },
-
+    createDirectory: {
+      type: Boolean,
+      default: false
+    },
     postAction: {
       type: String,
     },
-
     putAction: {
       type: String,
     },
-
     customAction: {
-      type: Function,
+      type: Function as PropType<(file: VueUploadItem, self: any) => Promise<VueUploadItem>>
     },
-
     headers: {
-      type: Object,
-      default: Object,
+      type: Object as PropType<{[key:string]: any}>,
+      default:() => {
+        return {}
+      },
     },
 
     data: {
-      type: Object,
-      default: Object,
+      type: Object as PropType<{[key:string]: any}>,
+      default:() => {
+        return {}
+      },
     },
-
     timeout: {
       type: Number,
       default: 0,
     },
-
-
     drop: {
       default: false,
     },
-
     dropDirectory: {
       type: Boolean,
       default: true,
     },
-
     size: {
       type: Number,
       default: 0,
     },
-
     extensions: {
-      default: Array,
+      type: [RegExp, String, Array] as PropType<RegExp| string| string[]>,
+      default: () => {
+        return []
+      },
     },
-
-
-    value: {
-      type: Array,
-      default: Array,
+    modelValue: {
+      type: Array as PropType<VueUploadItem[]>,
+      default:() => {
+        return []
+      },
     },
-
     thread: {
       type: Number,
       default: 1,
     },
-
     // Chunk upload enabled
     chunkEnabled: {
       type: Boolean,
       default: false
     },
-
     // Chunk upload properties
     chunk: {
-      type: Object,
+      type: Object as PropType<{headers?: {[key:string]: any}; action?: string; minSize?: number; maxActive?: number; maxRetries?: number; handler?: any;}>,
       default: () => {
         return CHUNK_DEFAULT_OPTIONS
       }
     }
   },
-
-  data() {
+  emits: [
+    'update:modelValue',
+    'input-filter',
+    'input-file',
+  ],
+  data(): Data {
     return {
-      files: this.value,
+      files: this.modelValue,
       features: {
         html5: true,
         directory: false,
-        drag: false,
+        drop: false,
       },
-
       active: false,
       dropActive: false,
-
       uploading: 0,
-
       destroy: false,
+      maps: {},
+      dropElement: null,
     }
   },
-
-
   /**
    * mounted
    * @return {[type]} [description]
@@ -193,14 +193,13 @@ export default {
     let input = document.createElement('input')
     input.type = 'file'
     input.multiple = true
-
     // html5 特征
     if (window.FormData && input.files) {
       // 上传目录特征
+      // @ts-ignore
       if (typeof input.webkitdirectory === 'boolean' || typeof input.directory === 'boolean') {
         this.features.directory = true
       }
-
       // 拖拽特征
       if (this.features.html5 && typeof input.ondrop !== 'undefined') {
         this.features.drop = true
@@ -208,7 +207,6 @@ export default {
     } else {
       this.features.html5 = false
     }
-
     // files 定位缓存
     this.maps = {}
     if (this.files) {
@@ -218,8 +216,8 @@ export default {
       }
     }
 
-    this.$nextTick(function () {
-
+    // @ts-ignore
+    this.$nextTick( () => {
       // 更新下父级
       if (this.$parent) {
         this.$parent.$forceUpdate()
@@ -233,18 +231,15 @@ export default {
       }
     })
   },
-
   /**
-   * beforeDestroy
+   * beforeUnmount
    * @return {[type]} [description]
    */
-  beforeDestroy() {
+  beforeUnmount() {
     // 已销毁
     this.destroy = true
-
     // 设置成不激活
     this.active = false
-
     // 销毁拖拽事件
     this.watchDrop(false)
   },
@@ -254,7 +249,6 @@ export default {
      * uploading 正在上传的线程
      * @return {[type]} [description]
      */
-
     /**
      * uploaded 文件列表是否全部已上传
      * @return {[type]} [description]
@@ -269,12 +263,10 @@ export default {
       }
       return true
     },
-
-    chunkOptions () {
+    chunkOptions(): ChunkOptions {
       return Object.assign(CHUNK_DEFAULT_OPTIONS, this.chunk)
     },
-
-    className() {
+    className(): Array<string | undefined> {
       return [
         'file-uploads',
         this.features.html5 ? 'file-uploads-html5' : 'file-uploads-html4',
@@ -282,40 +274,57 @@ export default {
         this.features.drop && this.drop ? 'file-uploads-drop' : undefined,
         this.disabled ? 'file-uploads-disabled' : undefined,
       ]
-    }
+    },
+    forId(): string {
+      return this.inputId || this.name
+    },
+    iMaximum(): number {
+      if (this.maximum === undefined) {
+        return this.multiple ? 0 : 1
+      }
+      return this.maximum
+    },
+    iExtensions(): RegExp | undefined {
+      if (!this.extensions) {
+        return
+      }
+      if (this.extensions instanceof RegExp) {
+        return this.extensions
+      }
+      let exts: string[] = []
+      if (typeof this.extensions === 'string') {
+        exts = this.extensions.split(',')
+      } else {
+        exts = this.extensions
+      }
+      exts = exts.map(function(value) { return value.trim() }).filter(function(value) { return value })
+      return new RegExp('\\.(' + exts.join('|').replace(/\./g, '\\.') + ')$', 'i')
+    },
   },
-
-
   watch: {
-    active(active) {
+    active(active: boolean) {
       this.watchActive(active)
     },
-
     dropActive() {
       if (this.$parent) {
         this.$parent.$forceUpdate()
       }
     },
-
-    drop(value) {
+    drop(value: boolean) {
       this.watchDrop(value)
     },
-
-    value(files) {
+    modelValue(files: VueUploadItem[]) {
       if (this.files === files) {
         return
       }
       this.files = files
-
       let oldMaps = this.maps
-
       // 重写 maps 缓存
       this.maps = {}
       for (let i = 0; i < this.files.length; i++) {
         let file = this.files[i]
         this.maps[file.id] = file
       }
-
       // add, update
       for (let key in this.maps) {
         let newFile = this.maps[key]
@@ -324,7 +333,6 @@ export default {
           this.emitFile(newFile, oldFile)
         }
       }
-
       // delete
       for (let key in oldMaps) {
         if (!this.maps[key]) {
@@ -333,18 +341,17 @@ export default {
       }
     },
   },
-
   methods: {
-
+    newId(): string {
+      return Math.random().toString(36).substr(2)
+    },
     // 清空
     clear() {
       if (this.files.length) {
         let files = this.files
         this.files = []
-
         // 定位
         this.maps = {}
-
         // 事件
         this.emitInput()
         for (let i = 0; i < files.length; i++) {
@@ -353,48 +360,50 @@ export default {
       }
       return true
     },
-
     // 选择
-    get(id) {
+    get(id: string | VueUploadItem): VueUploadItem | false {
       if (!id) {
         return false
       }
-
       if (typeof id === 'object') {
-        return this.maps[id.id] || false
+        return this.maps[id.id|| ''] || false
       }
-
       return this.maps[id] || false
     },
-
     // 添加
-    add(_files, index = this.addIndex) {
-      let files = _files
-      let isArray = files instanceof Array
-
+    add(_files: VueUploadItem | Blob | Array<VueUploadItem | Blob>, index?: number | boolean): VueUploadItem | VueUploadItem[] | undefined {
       // 不是数组整理成数组
-      if (!isArray) {
-        files = [files]
+      let files: Array<VueUploadItem | Blob>
+      if (_files instanceof Array) {
+        files = _files
+      } else {
+        files = [_files]
       }
-
+      if (index === undefined) {
+        // eslint-disable-next-line
+        index = this.addIndex
+      }
       // 遍历规范对象
       let addFiles = []
       for (let i = 0; i < files.length; i++) {
-        let file = files[i]
+        let file: VueUploadItem | Blob = files[i]
         if (this.features.html5 && file instanceof Blob) {
           file = {
+            id: '',
             file,
             size: file.size,
+            // @ts-ignore
             name: file.webkitRelativePath || file.relativePath || file.name || 'unknown',
             type: file.type,
           }
         }
+        file = file as VueUploadItem
         let fileObject = false
         if (file.fileObject === false) {
           // false
         } else if (file.fileObject) {
           fileObject = true
-        } else if (typeof Element !== 'undefined' && file.el instanceof Element) {
+        } else if (typeof Element !== 'undefined' && file.el instanceof HTMLInputElement) {
           fileObject = true
         } else if (typeof Blob !== 'undefined' && file.file instanceof Blob) {
           fileObject = true
@@ -413,57 +422,47 @@ export default {
             timeout: this.timeout,
             ...file,
             response: {},
-
             progress: '0.00',          // 只读
             speed: 0,                  // 只读
-            // xhr: false,                // 只读
-            // iframe: false,             // 只读
+            // file: undefined,
+            // xhr: undefined,
+            // el: undefined,
+            // iframe: undefined,
           }
-
           file.data = {
             ...this.data,
             ...file.data ? file.data : {},
           }
-
           file.headers = {
             ...this.headers,
             ...file.headers ? file.headers : {},
           }
         }
-
         // 必须包含 id
         if (!file.id) {
-          file.id = Math.random().toString(36).substr(2)
+          file.id = this.newId();
         }
-
         if (this.emitFilter(file, undefined)) {
           continue
         }
-
         // 最大数量限制
-        if (this.maximum > 1 && (addFiles.length + this.files.length) >= this.maximum) {
+        if (this.iMaximum > 1 && (addFiles.length + this.files.length) >= this.iMaximum) {
           break
         }
-
         addFiles.push(file)
-
         // 最大数量限制
-        if (this.maximum === 1) {
+        if (this.iMaximum === 1) {
           break
         }
       }
-
       // 没有文件
       if (!addFiles.length) {
-        return false
+        return
       }
-
       // 如果是 1 清空
-      if (this.maximum === 1) {
+      if (this.iMaximum === 1) {
         this.clear()
       }
-
-
       // 添加进去 files
       let newFiles
       if (index === true || index === 0) {
@@ -474,107 +473,149 @@ export default {
       } else {
         newFiles = this.files.concat(addFiles)
       }
-
       this.files = newFiles
-
       // 定位
       for (let i = 0; i < addFiles.length; i++) {
         let file = addFiles[i]
         this.maps[file.id] = file
       }
-
       // 事件
       this.emitInput()
       for (let i = 0; i < addFiles.length; i++) {
         this.emitFile(addFiles[i], undefined)
       }
-
-      return isArray ? addFiles : addFiles[0]
+      return _files instanceof Array ? addFiles : addFiles[0]
     },
-
-
-
     // 添加表单文件
-    addInputFile(el) {
-      let files = []
+    addInputFile(el: HTMLInputElement): Promise<VueUploadItem[]> {
+      const files: Array<VueUploadItem | File> = []
+      const maximumValue = this.iMaximum
+      // @ts-ignore
+      const entrys = el.webkitEntries || el.entries || undefined
+      if (entrys && entrys.length) {
+        return this.getFileSystemEntry(entrys).then((files) => {
+          return this.add(files) as VueUploadItem[]
+        })
+      }
+      
       if (el.files) {
         for (let i = 0; i < el.files.length; i++) {
-          let file = el.files[i]
+          let file: File = el.files[i]
           files.push({
+            id: '',
             size: file.size,
+            // @ts-ignore
             name: file.webkitRelativePath || file.relativePath || file.name,
             type: file.type,
             file,
           })
         }
       } else {
-        var names = el.value.replace(/\\/g, '/').split('/')
+        let names = el.value.replace(/\\/g, '/').split('/')
+        if (!names || !names.length) {
+          names = [el.value]
+        }
+        // @ts-ignore
         delete el.__vuex__
         files.push({
+          id: '',
           name: names[names.length - 1],
           el,
         })
       }
-      return this.add(files)
+      return Promise.resolve(this.add(files) as VueUploadItem[])
     },
 
-
     // 添加 DataTransfer
-    addDataTransfer(dataTransfer) {
-      let files = []
-      if (dataTransfer.items && dataTransfer.items.length) {
-        let items = []
+    addDataTransfer(dataTransfer: DataTransfer):Promise<VueUploadItem[] | undefined> {
+      // dataTransfer.items 支持
+      if (dataTransfer?.items?.length) {
+        const entrys: Array<File| FileSystemFileEntry | FileSystemDirectoryEntry> = []
+        // 遍历出所有 dataTransferVueUploadItem
         for (let i = 0; i < dataTransfer.items.length; i++) {
-          let item = dataTransfer.items[i]
-          if (item.getAsEntry) {
-            item = item.getAsEntry() || item.getAsFile()
-          } else if (item.webkitGetAsEntry) {
-            item = item.webkitGetAsEntry() || item.getAsFile()
+          const dataTransferTtem = dataTransfer.items[i]
+          let entry: File| FileSystemFileEntry | FileSystemDirectoryEntry | null
+          // @ts-ignore
+          if (dataTransferTtem.getAsEntry) {
+            // @ts-ignore
+            entry = dataTransferTtem.getAsEntry() || dataTransferTtem.getAsFile()
+          } else if (dataTransferTtem.webkitGetAsEntry) {
+            entry = dataTransferTtem.webkitGetAsEntry() || dataTransferTtem.getAsFile()
           } else {
-            item = item.getAsFile()
+            entry = dataTransferTtem.getAsFile()
           }
-          if (item) {
-            items.push(item)
+          if (entry) {
+            entrys.push(entry)
           }
         }
-
-        return new Promise((resolve, reject) => {
-          let forEach = (i) => {
-            let item = items[i]
-            // 结束 文件数量大于 最大数量
-            if (!item || (this.maximum > 0 && files.length >= this.maximum)) {
-              return resolve(this.add(files))
-            }
-            this.getEntry(item).then(function (results) {
-              files.push(...results)
-              forEach(i + 1)
-            })
-          }
-          forEach(0)
+        return this.getFileSystemEntry(entrys).then((files) => {
+          return this.add(files) as VueUploadItem[]
         })
       }
 
+      // dataTransfer.files 支持
+      const maximumValue = this.iMaximum
+      const files: Array<VueUploadItem | File> = []
       if (dataTransfer.files.length) {
         for (let i = 0; i < dataTransfer.files.length; i++) {
           files.push(dataTransfer.files[i])
-          if (this.maximum > 0 && files.length >= this.maximum) {
+          if (maximumValue > 0 && files.length >= maximumValue) {
             break
           }
         }
-        return Promise.resolve(this.add(files))
+        return Promise.resolve(this.add(files) as VueUploadItem[])
       }
 
       return Promise.resolve([])
     },
 
+     
+    // 获得 entrys    
+    getFileSystemEntry(entry: Array<File | FileSystemFileEntry | FileSystemDirectoryEntry> | File | FileSystemFileEntry | FileSystemDirectoryEntry, path = ''): Promise<VueUploadItem[]> {
+      return new Promise((resolve) => {
+        const maximumValue = this.iMaximum
+        
+        if (!entry) {
+          return resolve([])
+        }
 
-    // 获得 entry
-    getEntry(entry, path = '') {
-      return new Promise((resolve, reject) => {
+        if (entry instanceof Array) {
+          // 多个
+          const uploadFiles: VueUploadItem[] = []
+          const forEach = (i:number) => {
+            const v = entry[i]
+            if (!v || (maximumValue > 0 && uploadFiles.length >= maximumValue)) {
+              return resolve(uploadFiles)
+            }
+            this.getFileSystemEntry(v, path).then(function(results) {
+              uploadFiles.push(...results)
+              forEach(i + 1)
+            })
+          }
+          forEach(0)
+          return 
+        }
+
+        if (entry instanceof Blob) {
+          resolve([
+            {
+              id: '',
+              size: entry.size,
+              name: path + entry.name,
+              type: entry.type,
+              file: entry,
+            }
+          ])
+          return
+        }
+
+        
+        
         if (entry.isFile) {
           entry.file(function (file) {
             resolve([
               {
+                id:'',
                 size: file.size,
                 name: path + file.name,
                 type: file.type,
@@ -582,20 +623,34 @@ export default {
               }
             ])
           })
-        } else if (entry.isDirectory && this.dropDirectory) {
-          let files = []
-          let dirReader = entry.createReader()
-          let readEntries = () => {
+          return
+        }
+        
+        if (entry.isDirectory && this.dropDirectory) {
+          const uploadFiles: VueUploadItem[] = []
+          // 目录也要添加到文件列表
+          if (this.createDirectory) {
+            uploadFiles.push({
+              id: '',
+              name: path + entry.name,
+              size: 0,
+              type: 'text/directory',
+              file: new File([], path + entry.name, {type: 'text/directory'}),
+            })
+          }
+
+          const dirReader = entry.createReader()
+          const readEntries = () => {
             dirReader.readEntries((entries) => {
-              let forEach = (i) => {
-                if ((!entries[i] && i === 0) || (this.maximum > 0 && files.length >= this.maximum)) {
-                  return resolve(files)
+              const forEach = (i:number) => {
+                if ((!entries[i] && i === 0) || (maximumValue > 0 && uploadFiles.length >= maximumValue)) {
+                  return resolve(uploadFiles)
                 }
                 if (!entries[i]) {
                   return readEntries()
                 }
-                this.getEntry(entries[i], path + entry.name + '/').then((results) => {
-                  files.push(...results)
+                this.getFileSystemEntry(entries[i], path + entry.name + '/').then(function(results) {
+                  uploadFiles.push(...results)
                   forEach(i + 1)
                 })
               }
@@ -603,14 +658,14 @@ export default {
             })
           }
           readEntries()
-        } else {
-          resolve([])
+          return
         }
+
+        resolve([])
       })
     },
-
-
-    replace(id1, id2) {
+    // 替换
+    replace(id1:VueUploadItem | string, id2: VueUploadItem | string): boolean {
       let file1 = this.get(id1)
       let file2 = this.get(id2)
       if (!file1 || !file2 || file1 === file2) {
@@ -628,9 +683,8 @@ export default {
       this.emitInput()
       return true
     },
-
     // 移除
-    remove(id) {
+    remove(id: VueUploadItem | string): VueUploadItem | false {
       let file = this.get(id)
       if (file) {
         if (this.emitFilter(undefined, file)) {
@@ -644,19 +698,16 @@ export default {
         }
         files.splice(index, 1)
         this.files = files
-
         // 定位
         delete this.maps[file.id]
-
         // 事件
         this.emitInput()
         this.emitFile(undefined, file)
       }
       return file
     },
-
     // 更新
-    update(id, data) {
+    update(id: VueUploadItem | string, data: {[key:string]: any}): VueUploadItem | false {
       let file = this.get(id)
       if (file) {
         let newFile = {
@@ -667,11 +718,9 @@ export default {
         if (file.fileObject && file.active && !newFile.active && !newFile.error && !newFile.success) {
           newFile.error = 'abort'
         }
-
         if (this.emitFilter(newFile, file)) {
           return false
         }
-
         let files = this.files.concat([])
         let index = files.indexOf(file)
         if (index === -1) {
@@ -680,11 +729,9 @@ export default {
         }
         files.splice(index, 1, newFile)
         this.files = files
-
         // 删除  旧定位 写入 新定位 （已便支持修改id)
         delete this.maps[file.id]
         this.maps[newFile.id] = newFile
-
         // 事件
         this.emitInput()
         this.emitFile(newFile, file)
@@ -692,108 +739,96 @@ export default {
       }
       return false
     },
-
-
-
     // 预处理 事件 过滤器
-    emitFilter(newFile, oldFile) {
+    emitFilter(newFile: VueUploadItem | undefined, oldFile: VueUploadItem | undefined): boolean {
       let isPrevent = false
-      this.$emit('input-filter', newFile, oldFile, function () {
-        isPrevent = true
+      this.$emit('input-filter', newFile, oldFile, function(prevent = true): boolean {
+        isPrevent = prevent
         return isPrevent
       })
       return isPrevent
     },
 
     // 处理后 事件 分发
-    emitFile(newFile, oldFile) {
+    emitFile(newFile: VueUploadItem | undefined, oldFile: VueUploadItem | undefined) {
       this.$emit('input-file', newFile, oldFile)
-      if (newFile && newFile.fileObject && newFile.active && (!oldFile || !oldFile.active)) {
+      if (newFile?.fileObject && newFile.active && (!oldFile || !oldFile.active)) {
         this.uploading++
         // 激活
-        this.$nextTick(function () {
+        // @ts-ignore
+        this.$nextTick(() => {
           setTimeout(() => {
-            this.upload(newFile).then(() => {
-              // eslint-disable-next-line
-              newFile = this.get(newFile)
-              if (newFile && newFile.fileObject) {
+            newFile && this.upload(newFile).then(() => {
+              if (newFile) {
+                // eslint-disable-next-line
+                newFile = this.get(newFile) || undefined
+              }
+              if (newFile?.fileObject) {
                 this.update(newFile, {
                   active: false,
                   success: !newFile.error
                 })
               }
-            }).catch((e) => {
-              this.update(newFile, {
+            }).catch((e: any) => {
+              newFile && this.update(newFile, {
                 active: false,
                 success: false,
                 error: e.code || e.error || e.message || e
               })
             })
-          }, parseInt(Math.random() * 50 + 50, 10))
+          }, Math.ceil(Math.random() * 50 + 50))
         })
       } else if ((!newFile || !newFile.fileObject || !newFile.active) && oldFile && oldFile.fileObject && oldFile.active) {
         // 停止
         this.uploading--
       }
-
       // 自动延续激活
+      // @ts-ignore
       if (this.active && (Boolean(newFile) !== Boolean(oldFile) || newFile.active !== oldFile.active)) {
         this.watchActive(true)
       }
     },
-
     emitInput() {
-      this.$emit('input', this.files)
+      this.$emit('update:modelValue', this.files)
     },
-
-
     // 上传
-    upload(id) {
+    upload(id: VueUploadItem | string): Promise<VueUploadItem> {
       let file = this.get(id)
-
       // 被删除
       if (!file) {
-        return Promise.reject('not_exists')
+        return Promise.reject(new Error('not_exists'))
       }
-
       // 不是文件对象
       if (!file.fileObject) {
-        return Promise.reject('file_object')
+        return Promise.reject(new Error('file_object'))
       }
-
       // 有错误直接响应
       if (file.error) {
-        return Promise.reject(file.error)
+        if (file.error instanceof Error) {
+          return Promise.reject(file.error)
+        }
+        return Promise.reject(new Error(file.error))
       }
-
       // 已完成直接响应
       if (file.success) {
         return Promise.resolve(file)
       }
-
       // 后缀
       let extensions = this.extensions
-      if (extensions && (extensions.length || typeof extensions.length === 'undefined')) {
-        if (typeof extensions !== 'object' || !(extensions instanceof RegExp)) {
-          if (typeof extensions === 'string') {
-            extensions = extensions.split(',').map(value => value.trim()).filter(value => value)
-          }
-          extensions = new RegExp('\\.(' + extensions.join('|').replace(/\./g, '\\.') + ')$', 'i')
-        }
-        if (file.name.search(extensions) === -1) {
-          return Promise.reject('extension')
+      if (file.name && this.iExtensions) {
+        if (file.name.search(this.iExtensions) === -1) {
+          return Promise.reject(new Error('extension'))
         }
       }
 
       // 大小
-      if (this.size > 0 && file.size >= 0 && file.size > this.size) {
-        return Promise.reject('size')
+      if (this.size > 0 && file.size !== undefined && file.size >= 0 && file.size > this.size) {
+        return Promise.reject(new Error('size'))
       }
 
       if (this.customAction) {
         return this.customAction(file, this)
       }
-
       if (this.features.html5) {
         if (this.shouldUseChunkUpload(file)) {
           return this.uploadChunk(file)
@@ -808,48 +843,44 @@ export default {
       if (file.postAction) {
         return this.uploadHtml4(file)
       }
-      return Promise.reject('No action configured')
+      return Promise.reject(new Error('No action configured'))
     },
-
     /**
      * Whether this file should be uploaded using chunk upload or not
      *
      * @param Object file
      */
-    shouldUseChunkUpload (file) {
+    shouldUseChunkUpload (file: VueUploadItem) {
       return this.chunkEnabled &&
         !!this.chunkOptions.handler &&
-        file.size > this.chunkOptions.minSize
+        file.size && file.size > this.chunkOptions.minSize
     },
-
     /**
      * Upload a file using Chunk method
      *
      * @param File file
      */
-    uploadChunk (file) {
+    uploadChunk(file: VueUploadItem): Promise<VueUploadItem> {
       const HandlerClass = this.chunkOptions.handler
       file.chunk = new HandlerClass(file, this.chunkOptions)
-
-      return file.chunk.upload()
+      return file.chunk.upload().then((res: any) => { return file })
     },
-
-    uploadPut(file) {
-      let querys = []
+    uploadPut(file: VueUploadItem): Promise<VueUploadItem> {
+      const querys = []
       let value
-      for (let key in file.data) {
+      for (const key in file.data) {
         value = file.data[key]
         if (value !== null && value !== undefined) {
           querys.push(encodeURIComponent(key) + '=' + encodeURIComponent(value))
         }
       }
-      let queryString = querys.length ? (file.putAction.indexOf('?') === -1 ? '?' : '&') + querys.join('&') : ''
-      let xhr = new XMLHttpRequest()
-      xhr.open('PUT', file.putAction + queryString)
-      return this.uploadXhr(xhr, file, file.file)
+      const putAction = file.putAction || ''
+      const queryString = querys.length ? (putAction.indexOf('?') === -1 ? '?' : '&') + querys.join('&') : ''
+      const xhr = new XMLHttpRequest()
+      xhr.open('PUT', putAction + queryString)
+      return this.uploadXhr(xhr, file, file.file as File)
     },
-
-    uploadHtml5(file) {
+    uploadHtml5(file: VueUploadItem): Promise<VueUploadItem> {
       let form = new window.FormData()
       let value
       for (let key in file.data) {
@@ -864,32 +895,37 @@ export default {
           form.append(key, value)
         }
       }
-      form.append(this.name, file.file, file.file.filename || file.name)
+      // @ts-ignore
+      form.append(this.name, file.file, file.file.name || file.file.filename  || file.name)
       let xhr = new XMLHttpRequest()
-      xhr.open('POST', file.postAction)
+      xhr.open('POST', file.postAction || '')
       return this.uploadXhr(xhr, file, form)
     },
 
-    uploadXhr(xhr, _file, body) {
-      let file = _file
+    uploadXhr(xhr:XMLHttpRequest, ufile: VueUploadItem | undefined | false, body: FormData | Blob): Promise<VueUploadItem> {
+      let file = ufile
       let speedTime = 0
       let speedLoaded = 0
 
       // 进度条
-      xhr.upload.onprogress = (e) => {
+      xhr.upload.onprogress = (e: ProgressEvent) => {
         // 还未开始上传 已删除 未激活
+        if (!file) {
+          return
+        }
         file = this.get(file)
         if (!e.lengthComputable || !file || !file.fileObject || !file.active) {
           return
         }
 
         // 进度 速度 每秒更新一次
-        let speedTime2 = Math.round(Date.now() / 1000)
+        const speedTime2 = Math.round(Date.now() / 1000)
         if (speedTime2 === speedTime) {
           return
         }
         speedTime = speedTime2
 
+        
         file = this.update(file, {
           progress: (e.loaded / e.total * 100).toFixed(2),
           speed: e.loaded - speedLoaded,
@@ -898,15 +934,17 @@ export default {
       }
 
       // 检查激活状态
-      let interval = setInterval(() => {
-        file = this.get(file)
-        if (file && file.fileObject && !file.success && !file.error && file.active) {
-          return
+      let interval: number| undefined = window.setInterval(()  => {
+        if (file) {
+          file = this.get(file)
+          if (file && file?.fileObject && !file.success && !file.error && file.active) {
+            return
+          }
         }
 
         if (interval) {
           clearInterval(interval)
-          interval = false
+          interval = undefined
         }
 
         try {
@@ -916,9 +954,12 @@ export default {
         }
       }, 100)
 
-      return new Promise((resolve, reject) => {
-        let complete
-        let fn = (e) => {
+      return new Promise((resolve: (u: VueUploadItem) => void, reject: (e: Error) => void) => {
+        if (!file) {
+          return reject(new Error('not_exists'))
+        }
+        let complete: boolean
+        const fn = (e: ProgressEvent) => {
           // 已经处理过了
           if (complete) {
             return
@@ -926,29 +967,34 @@ export default {
           complete = true
           if (interval) {
             clearInterval(interval)
-            interval = false
+            interval = undefined
           }
-
+          if (!file) {
+            return reject(new Error('not_exists'))
+          }
           file = this.get(file)
 
           // 不存在直接响应
           if (!file) {
-            return reject('not_exists')
+            return reject(new Error('not_exists'))
           }
 
           // 不是文件对象
           if (!file.fileObject) {
-            return reject('file_object')
+            return reject(new Error('file_object'))
           }
 
           // 有错误自动响应
           if (file.error) {
-            return reject(file.error)
+            if (file.error instanceof Error) {
+              return reject(file.error)
+            }
+            return reject(new Error(file.error))
           }
 
           // 未激活
           if (!file.active) {
-            return reject('abort')
+            return reject(new Error('abort'))
           }
 
 
@@ -957,7 +1003,7 @@ export default {
             return resolve(file)
           }
 
-          let data = {}
+          const data: {[key: string]: any} = {}
 
           switch (e.type) {
             case 'timeout':
@@ -984,7 +1030,7 @@ export default {
           }
 
           if (xhr.responseText) {
-            let contentType = xhr.getResponseHeader('Content-Type')
+            const contentType = xhr.getResponseHeader('Content-Type')
             if (contentType && contentType.indexOf('/json') !== -1) {
               data.response = JSON.parse(xhr.responseText)
             } else {
@@ -993,11 +1039,19 @@ export default {
           }
 
           // 更新
+          // @ts-ignore
           file = this.update(file, data)
+          
+          if (!file) {
+            return reject(new Error('abort'))
+          }
 
-          // 相应错误
+          // 有错误自动响应
           if (file.error) {
-            return reject(file.error)
+            if (file.error instanceof Error) {
+              return reject(file.error)
+            }
+            return reject(new Error(file.error))
           }
 
           // 响应
@@ -1009,6 +1063,7 @@ export default {
         xhr.onerror = fn
         xhr.onabort = fn
         xhr.ontimeout = fn
+        
 
         // 超时
         if (file.timeout) {
@@ -1016,70 +1071,66 @@ export default {
         }
 
         // headers
-        for (let key in file.headers) {
+        for (const key in file.headers) {
           xhr.setRequestHeader(key, file.headers[key])
         }
 
         // 更新 xhr
+        // @ts-ignore
         file = this.update(file, { xhr })
 
         // 开始上传
-        xhr.send(body)
+        file && xhr.send(body)
       })
     },
-
-
-
-
-    uploadHtml4(_file) {
-      let file = _file
-      let onKeydown = function (e) {
+    uploadHtml4(ufile: VueUploadItem | undefined | false): Promise<VueUploadItem> {
+      let file = ufile
+      if (!file) {
+        return Promise.reject(new Error('not_exists'))
+      }
+      const onKeydown = function (e: any) {
         if (e.keyCode === 27) {
           e.preventDefault()
         }
       }
 
-      let iframe = document.createElement('iframe')
+      const iframe = document.createElement('iframe')
       iframe.id = 'upload-iframe-' + file.id
       iframe.name = 'upload-iframe-' + file.id
       iframe.src = 'about:blank'
       iframe.setAttribute('style', 'width:1px;height:1px;top:-999em;position:absolute; margin-top:-999em;')
 
 
-      let form = document.createElement('form')
+      const form: HTMLFormElement = document.createElement('form')
 
-      form.action = file.postAction
+      form.setAttribute('action', file.postAction || '')
 
       form.name = 'upload-form-' + file.id
-
 
       form.setAttribute('method', 'POST')
       form.setAttribute('target', 'upload-iframe-' + file.id)
       form.setAttribute('enctype', 'multipart/form-data')
 
-      let value
-      let input
-      for (let key in file.data) {
-        value = file.data[key]
+      for (const key in file.data) {
+        let value = file.data[key]
         if (value && typeof value === 'object' && typeof value.toString !== 'function') {
           value = JSON.stringify(value)
         }
         if (value !== null && value !== undefined) {
-          input = document.createElement('input')
-          input.type = 'hidden'
-          input.name = key
-          input.value = value
-          form.appendChild(input)
+          const el = document.createElement('input')
+          el.type = 'hidden'
+          el.name = key
+          el.value = value
+          form.appendChild(el)
         }
       }
-      form.appendChild(file.el)
+
+      form.appendChild(file.el as HTMLInputElement)
 
       document.body.appendChild(iframe).appendChild(form)
 
 
-
-
-      let getResponseData = function () {
+      const getResponseData = function (): string | null {
         let doc
         try {
           if (iframe.contentWindow) {
@@ -1089,80 +1140,94 @@ export default {
         }
         if (!doc) {
           try {
+            // @ts-ignore
             doc = iframe.contentDocument ? iframe.contentDocument : iframe.document
           } catch (err) {
+            // @ts-ignore
             doc = iframe.document
           }
         }
-        if (doc && doc.body) {
+        // @ts-ignore
+        if (doc?.body) {
           return doc.body.innerHTML
         }
         return null
       }
 
-
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve: (u: VueUploadItem) => void, reject: (e: Error) => void) => {
         setTimeout(() => {
+          if (!file)   {
+            return reject(new Error('not_exists'))
+          }
+
           file = this.update(file, { iframe })
 
           // 不存在
           if (!file) {
-            return reject('not_exists')
+            return reject(new Error('not_exists'))
           }
 
           // 定时检查
-          let interval = setInterval(() => {
-            file = this.get(file)
-            if (file && file.fileObject && !file.success && !file.error && file.active) {
-              return
+          let interval: number | undefined = window.setInterval(() => {
+            if (file) {
+              file = this.get(file)
+              if (file && file?.fileObject && !file.success && !file.error && file.active) {
+                return
+              }
             }
 
             if (interval) {
               clearInterval(interval)
-              interval = false
+              interval = undefined
             }
-
+            // @ts-ignore
             iframe.onabort({ type: file ? 'abort' : 'not_exists' })
           }, 100)
 
 
-          let complete
-          let fn = (e) => {
+          let complete: boolean
+          const fn = (e: Event | string) => {
             // 已经处理过了
             if (complete) {
               return
             }
             complete = true
 
-
             if (interval) {
               clearInterval(interval)
-              interval = false
+              interval = undefined
             }
 
             // 关闭 esc 事件
             document.body.removeEventListener('keydown', onKeydown)
 
+            if (!file) {
+              return reject(new Error('not_exists'))
+            }
+
             file = this.get(file)
 
             // 不存在直接响应
             if (!file) {
-              return reject('not_exists')
+              return reject(new Error('not_exists'))
             }
 
             // 不是文件对象
             if (!file.fileObject) {
-              return reject('file_object')
+              return reject(new Error('file_object'))
             }
 
             // 有错误自动响应
             if (file.error) {
-              return reject(file.error)
+              if (file.error instanceof Error) {
+                return reject(file.error)
+              }
+              return reject(new Error(file.error))
             }
 
             // 未激活
             if (!file.active) {
-              return reject('abort')
+              return reject(new Error('abort'))
             }
 
             // 已完成 直接相应
@@ -1170,8 +1235,11 @@ export default {
               return resolve(file)
             }
 
-            let response = getResponseData()
-            let data = {}
+            let response: any = getResponseData()
+            const data: {[key: string]: any} = {}
+            if (typeof e === 'string') {
+               return reject(new Error(e))
+            }
             switch (e.type) {
               case 'abort':
                 data.error = 'abort'
@@ -1188,7 +1256,7 @@ export default {
               default:
                 if (file.error) {
                   data.error = file.error
-                } else if (data === null) {
+                } else if (response === null) {
                   data.error = 'network'
                 } else {
                   data.progress = '100.00'
@@ -1207,9 +1275,15 @@ export default {
 
             // 更新
             file = this.update(file, data)
+            if (!file) {
+              return reject(new Error('not_exists'))
+            }
 
-            if (file.error) {
-              return reject(file.error)
+            if (file?.error) {
+              if (file.error instanceof Error) {
+                return reject(file.error)
+              }
+              return reject(new Error(file.error))
             }
 
             // 响应
@@ -1229,18 +1303,16 @@ export default {
           // 提交
           form.submit()
         }, 50)
-      }).then(function (res) {
-        iframe.parentNode && iframe.parentNode.removeChild(iframe)
+      }).then(function (res: VueUploadItem): VueUploadItem {
+        iframe?.parentNode?.removeChild(iframe)
         return res
-      }).catch(function (res) {
-        iframe.parentNode && iframe.parentNode.removeChild(iframe)
+      }).catch(function (res: any) {
+        iframe?.parentNode?.removeChild(iframe)
         return res
       })
     },
 
-
-
-    watchActive(active) {
+    watchActive(active: boolean) {
       let file
       let index = 0
       while ((file = this.files[index])) {
@@ -1265,10 +1337,11 @@ export default {
       }
     },
 
-
-    watchDrop(_el) {
-      let el = _el
+    watchDrop(newDrop: boolean | string | HTMLElement | null, oldDrop: boolean | string | HTMLElement | undefined = undefined) {
       if (!this.features.drop) {
+        return
+      }
+      if (newDrop === oldDrop) {
         return
       }
 
@@ -1284,14 +1357,19 @@ export default {
         }
       }
 
-      if (!el) {
-        el = false
-      } else if (typeof el === 'string') {
-        el = document.querySelector(el) || this.$root.$el.querySelector(el)
-      } else if (el === true) {
-        el = this.$parent.$el
-      }
+      let el: HTMLElement | null = null
 
+      if (!newDrop) {
+        // empty
+      } else if (typeof newDrop === 'string') {
+        // @ts-ignore
+        const el = document.querySelector(newDrop) || this.$root.$el.querySelector(newDrop)
+      } else if (newDrop === true) {
+        // @ts-ignore
+        el = this.$parent.$el
+      } else {
+        el = newDrop
+      }
       this.dropElement = el
 
       if (this.dropElement) {
@@ -1303,8 +1381,7 @@ export default {
       }
     },
 
-
-    onDragenter(e) {
+    onDragenter(e: DragEvent) {
       e.preventDefault()
       if (this.dropActive) {
         return
@@ -1313,39 +1390,66 @@ export default {
         return
       }
       let dt = e.dataTransfer
-      if (dt.files && dt.files.length) {
+      if (dt?.files?.length) {
         this.dropActive = true
       } else if (!dt.types) {
         this.dropActive = true
       } else if (dt.types.indexOf && dt.types.indexOf('Files') !== -1) {
         this.dropActive = true
-      } else if (dt.types.contains && dt.types.contains('Files')) {
+        // @ts-ignore
+      } else if (dt.types?.contains && dt.types.contains('Files')) {
         this.dropActive = true
       }
     },
-
-    onDragleave(e) {
+    onDragleave(e: DragEvent) {
       e.preventDefault()
       if (!this.dropActive) {
         return
       }
+
+      // @ts-ignore
       if (e.target.nodeName === 'HTML' || e.target === e.explicitOriginalTarget || (!e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight))) {
         this.dropActive = false
       }
     },
-
-    onDragover(e) {
+    onDragover(e: DragEvent) {
       e.preventDefault()
     },
-
     onDocumentDrop() {
       this.dropActive = false
     },
-
-    onDrop(e) {
+    onDrop(e: DragEvent) {
       e.preventDefault()
-      this.addDataTransfer(e.dataTransfer)
+      e.dataTransfer && this.addDataTransfer(e.dataTransfer)
     },
-  }
-}
+    async inputOnChange(e: Event) {
+      if (!(e.target instanceof HTMLInputElement)) {
+        return Promise.reject(new Error("not HTMLInputElement"))
+      }
+      const target = e.target
+      const reinput = (res: any) => {
+        if (target.files) {
+          target.value = ''
+          if (target.files.length && !/safari/i.test(navigator.userAgent)) {
+            target.type = ''
+            target.type = 'file'
+          }
+        } else {
+          // ie9 fix #219
+          const oldInput = document.getElementById(this.forId) as HTMLInputElement
+          const newInput = oldInput.cloneNode(true) as HTMLInputElement
+          newInput.value = ''
+          newInput.type = 'file'
+          // @ts-ignore
+          newInput.onChange = inputOnChange
+          oldInput.parentNode?.replaceChild(newInput, oldInput)
+          this.$refs.input = newInput
+        }
+        return res
+      }
+
+      return this.addInputFile(e.target).then(reinput).catch(reinput)
+    },
+  },
+})
 </script>

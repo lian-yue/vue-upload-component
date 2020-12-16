@@ -1,20 +1,20 @@
 <template>
   <div>
     <header id="header" class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <router-link :exact="true" class="navbar-brand"  :to="'/' | toLocale">{{$t('header.logo')}}</router-link>
+      <router-link :exact="true" class="navbar-brand"  :to="$toLocale('/')">{{$t('header.logo')}}</router-link>
       <button class="navbar-toggler" type="button" @click.prevent="showNav = !showNav">
         <span class="navbar-toggler-icon"></span>
       </button>
       <nav :class="{collapse: true, 'navbar-collapse': true, show: showNav}" id="navbar">
         <ul class="navbar-nav">
           <li class="nav-item">
-            <router-link active-class="active" :exact="true" :class="'nav-link' + ($route.path === '/' ? ' active' : '')"  :to="'/' | toLocale">{{$t('header.home')}}</router-link>
+            <router-link active-class="active" :exact="true" :class="'nav-link' + ($route.path === '/' ? ' active' : '')"  :to="$toLocale('/')">{{$t('header.home')}}</router-link>
           </li>
           <li class="nav-item">
-            <router-link active-class="active" class="nav-link" :to="'/documents' | toLocale">{{$t('header.documents')}}</router-link>
+            <router-link active-class="active" class="nav-link" :to="$toLocale('/documents')">{{$t('header.documents')}}</router-link>
           </li>
           <li class="nav-item">
-            <router-link active-class="active" class="nav-link" :to="'/examples' | toLocale">{{$t('header.examples')}}</router-link>
+            <router-link active-class="active" class="nav-link" :to="$toLocale('/examples')">{{$t('header.examples')}}</router-link>
           </li>
           <li class="nav-item">
             <a rel="license noopener" class="nav-link" href="https://www.lianyue.org" target="_blank">{{$t('header.blog')}}</a>

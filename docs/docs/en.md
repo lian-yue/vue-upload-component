@@ -1064,13 +1064,13 @@ Used to determine the browser support features
 
 * **Read only:** `true`
 
-* **Default:** `{ html5: true, directory: false, drag: false }`
+* **Default:** `{ html5: true, directory: false, drop: false }`
 
 * **Usage:**
   ```html
   <app>
     <file-upload ref="upload"></file-upload>
-    <span v-show="$refs.upload && $refs.upload.features.drag">Support drag and drop upload</span>
+    <span v-show="$refs.upload && $refs.upload.features.drop">Support drag and drop upload</span>
     <span v-show="$refs.upload && $refs.upload.features.directory">Support folder upload</span>
     <span v-show="$refs.upload && $refs.upload.features.html5">Support for HTML5</span>
   </app>
@@ -1212,9 +1212,15 @@ Add the file selected by `<input type = "file">` to the upload list
   * `el: HTMLInputElement`     File element
 
 
+* **Result:** `Promise<Array<File>>`  Added list of files
+
+* **Version:** : `>=3.0.0`
+
+The results of Vue 2. X
+
 * **Result:** `Array<File>`  Added list of files
 
-* **Version:** : `>=2.5.1`
+* **Version:** : `<3.0.0`
 
 
 

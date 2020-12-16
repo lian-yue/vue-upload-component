@@ -61,10 +61,10 @@
           </tr>
         </thead>
         <tbody>
-          <template v-for="file in files">
-            <tr :key="file.id + '-info'">
+          <template v-for="file in files" :key="file.id">
+            <tr>
               <td>{{ file.name }}</td>
-              <td class="text-right">{{ file.size | formatSize }}</td>
+              <td class="text-right">{{ $formatSize(file.size) }}</td>
               <td class="text-right">{{ file.progress }}%</td>
 
               <td v-if="file.error">{{ file.error }}</td>
@@ -103,7 +103,7 @@
               </template>
             </tr>
 
-            <tr :key="file.id + '-loading'">
+            <tr>
               <td colspan="8">
                 <div class="chunk-loading" v-if="file.chunk">
                   <span

@@ -1,207 +1,84 @@
-const path              = require('path')
-const merge             = require('webpack-merge')
-const webpack           = require('webpack')
+/* eslint @typescript-eslint/no-require-imports: 0 */
 
-const packageInfo       = require('./package')
-
-const bodyParser       = require('webpack-body-parser')
-const chunkUpload      = require('./src/utils/chunkUpload')
-const { VueLoaderPlugin } =  require('vue-loader')
-
-process.env.NODE_ENV = process.env.NODE_ENV || 'production'
-
+const fs = require('fs')
+const path = require('path')
+const webpack = require('webpack')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const chunkUpload = require('./src/utils/chunkUpload')
+const bodyParser = require('webpack-body-parser')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const packageInfo = require('./package.json')
+const { VueLoaderPlugin } = require('vue-loader')
 const isDev = process.env.NODE_ENV === 'development'
 
-function baseConfig() {
-  let config = {
-    mode: process.env.NODE_ENV === 'development' ? 'development' : 'production',
-    output: {
-      path: path.join(__dirname, 'dist'),
-      publicPath: '/dist',
-      filename: '[name].js',
-      chunkFilename: '[chunkhash:8].[name].chunk.js',
-    },
+const IsCssExtract = !isDev
 
-    resolve: {
-      modules: [
-        path.join(__dirname, 'node_modules'),
-      ],
-
-      alias: {
-        'vue-upload-component': path.join(__dirname, 'src'),
-      },
-
-      extensions: [
-        '.js',
-        '.jsx',
-        '.json',
-        '.vue',
-        '.md',
-      ],
-    },
-
-
-    externals: {
-      vue: 'Vue',
-      vuex: 'Vuex',
-      'vue-router': 'VueRouter',
-      'vue-i18n': 'VueI18n',
-      'marked': 'marked',
-      'highlight.js': 'hljs',
-      'cropperjs': 'Cropper',
-      '@xkeshi/image-compressor': 'ImageCompressor',
-    },
-
-
-    module: {
-      rules: [
-        {
-          test: /\.jsx?$/,
-          use: [
-            {
-              loader: 'babel-loader',
-              options: {
-                presets: [
-                  [
-                    'env',
-                    {
-                      modules: false
-                    }
-                  ],
-                  'stage-0',
-                ],
-                plugins: [
-                  [
-                    'transform-runtime',
-                    {
-                      helpers: false,
-                      polyfill: false,
-                      regenerator: true,
-                      moduleName: 'babel-runtime'
-                    }
-                  ]
-                ],
-                cacheDirectory: isDev
-              },
-            },
-            {
-              loader: 'eslint-loader',
-            },
-          ],
-        },
-        {
-          test: /\.(md|txt)$/,
-          use: [
-            {
-              loader: 'raw-loader',
-            },
-          ]
-        },
-        {
-          test: /\.css$/,
-          use: [
-            {
-              loader: 'vue-style-loader',
-            },
-            {
-              loader: 'css-loader',
-              options: {
-                minimize: !isDev,
-              },
-            },
-          ]
-        },
-        {
-          test: /\.vue$/,
-          use: [
-            {
-              loader: 'vue-loader',
-              options: {
-                preserveWhitespace: false,
-                cssModules: {
-                  localIdentName: '[hash:base64:8]',
-                  camelCase: true,
-                },
-              },
-            },
-          ],
-        },
-        /*
-        {
-          test: /\.vue$/,
-          use: [
-            {
-              loader: 'vue-loader',
-              options: {
-                preserveWhitespace: false,
-                loaders: {
-                  js: [
-                    {
-                      loader: 'babel-loader',
-                      options: {
-                        presets: [
-                          [
-                            'env',
-                            {
-                              modules: false
-                            }
-                          ],
-                          'stage-0'
-                        ],
-                        plugins: [
-                          [
-                            'transform-runtime',
-                            {
-                              helpers: false,
-                              polyfill: false,
-                              regenerator: true,
-                              moduleName: 'babel-runtime'
-                            }
-                          ]
-                        ],
-                        cacheDirectory: isDev
-                      }
-                    },
-                  ],
-                }
-              },
-            },
-            {
-              loader: 'eslint-loader',
-            },
-          ]
-        }
-        */
-      ]
-    },
-
-    plugins: [
-      new webpack.BannerPlugin(`Name: ${packageInfo.name}\nVersion: ${packageInfo.version}\nAuthor: ${packageInfo.author}`),
-      new VueLoaderPlugin(),
-    ],
-    devtool: isDev ? 'eval-source-map' : 'source-map'
-  }
-
-  if (isDev) {
-    config.plugins.push(new webpack.HotModuleReplacementPlugin())
-  }
-  return config
+if (!isDev) {
+  let version = packageInfo.version.split('.');
+  version[version.length - 1] = parseInt(version[version.length - 1], 10) + 1;
+  packageInfo.version = version.join('.');
+  fs.writeFileSync('./package.json', JSON.stringify(packageInfo, null, 2), { flags: 'utf8' })
 }
 
 
+module.exports = {
+  mode: process.env.NODE_ENV,
+  devtool: isDev ? 'eval-source-map' : 'source-map',
 
-module.exports = merge(baseConfig(), {
   entry: {
-    index: [
-      path.join(__dirname, 'docs/index.js'),
+    docs: [
+      path.join(__dirname, 'docs/entry.js'),
     ],
   },
 
   output: {
-    path: path.join(__dirname, 'docs/dist'),
+    path: __dirname,
+    publicPath: '/',
+    filename: 'docs/dist/[name].js',
+    chunkFilename: 'docs/dist/[chunkhash:8].[name].chunk.js',
   },
 
+  resolve: {
+    modules: [
+      path.join(__dirname, 'node_modules'),
+      path.join(__dirname, 'docs'),
+    ],
+    alias: {
+      // "vue": "@vue/runtime-dom",
+      "@": path.join(__dirname, 'src'),
+      "@/": path.join(__dirname, 'src/'),
+      'vue-upload-component': path.join(__dirname, isDev && false ? 'src' : 'dist/vue-upload-component.js'),
+    },
+    extensions: [
+      '.js',
+      '.ts',
+      '.tsx',
+      '.json',
+      '.vue',
+      '.md',
+    ],
+  },
+  externals: {
+    // vue: 'Vue',
+    // vuex: 'Vuex',
+    // 'vue-router': 'VueRouter',
+    // 'vue-i18n': 'VueI18n',
+    'marked': 'marked',
+    'highlight.js': 'hljs',
+    'cropperjs': 'Cropper',
+    '@xkeshi/image-compressor': 'ImageCompressor',
+  },
+  // cache: false,
   devServer: {
+    inline: true,
+    hot: true,
+    liveReload: true,
+    overlay: true,
+    disableHostCheck: true,
+    watchOptions: {
+      poll: true
+    },
     before(app) {
       let id = 1000000
       let put = function (req, res) {
@@ -231,17 +108,128 @@ module.exports = merge(baseConfig(), {
       app.delete('/upload/delete', del)
     },
     // host: '0.0.0.0',
-    hot: true,
-    contentBase: path.join(__dirname, 'docs'),
+    contentBase: __dirname,
     clientLogLevel: 'error',
     noInfo: true,
-    publicPath: '/dist',
-    inline: true,
+    publicPath: '/',
     historyApiFallback: true,
-    overlay: {
-      warnings: true,
-      errors: true
-    },
-    // host: '172.16.23.1'
   },
-})
+
+  target: 'web',
+
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        use: [
+          {
+            loader: 'vue-loader',
+            options: {
+              compilerOptions: {
+                whitespace: 'condense',
+              },
+              transpileOptions: {
+                transforms: {
+                  dangerousTaggedTemplateString: true
+                }
+              },
+            },
+          }
+        ],
+      },
+      {
+        test: /\.html?$/,
+        use: [
+          {
+            loader: 'html-loader',
+          }
+        ]
+      },
+      {
+        test: /\.(js|jsx)$/,
+        use: [
+          {
+            loader: 'babel-loader',
+          },
+          {
+            loader: 'eslint-loader',
+          },
+        ],
+      },
+      {
+        test: /\.(md|txt)$/,
+        use: [
+          {
+            loader: 'raw-loader',
+          },
+        ]
+      },
+      {
+        test: /\.tsx?$/,
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              appendTsSuffixTo: [/\.(vue|tsx?)$/],
+            }
+          },
+          {
+            loader: 'eslint-loader',
+          }
+        ],
+      },
+      {
+        test: /(\.css)$/,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1,
+            },
+          },
+        ],
+      },
+    ]
+  },
+
+
+  plugins: [
+    // new webpack.HotModuleReplacementPlugin(),
+    new webpack.BannerPlugin(`Name: ${packageInfo.name}\nComponent URI: ${packageInfo.homepage}\nVersion: ${packageInfo.version}\nAuthor: ${packageInfo.author}\nLicense: ${packageInfo.license}\nDescription: ${packageInfo.description}`),
+    new webpack.DefinePlugin({
+      'process.version': JSON.stringify(packageInfo.version),
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_DEVTOOLS__: true,
+    }),
+
+
+    // new MiniCssExtractPlugin({
+    //   filename: 'assets/[name].css',
+    //   chunkFilename: 'assets/[name].[id].css',
+    // }),
+    new VueLoaderPlugin(),
+
+    new OptimizeCssAssetsPlugin(),
+
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: path.join(__dirname, 'docs/index.template.html'),
+      minify: {
+        collapseWhitespace: true,
+        collapseInlineTagWhitespace: true,
+        removeComments: true,
+        removeRedundantAttributes: true,
+        removeScriptTypeAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        useShortDoctype: true,
+        html5: true,
+      },
+      xhtml: true,
+      inlineSource: '.(js|css)$',
+    }),
+  ],
+};
+

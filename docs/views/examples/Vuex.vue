@@ -3,12 +3,11 @@
     <h1 id="example-title" class="example-title">Vuex Example</h1>
     <div class="upload">
       <ul>
-        <li v-for="(file, index) in files" :key="file.id">
+        <li v-for="file in files" :key="file.id">
           <span>{{file.name}}</span> -
-          <span>{{file.size | formatSize}}</span> -
+          <span>{{$formatSize(file.size)}}</span> -
           <span v-if="file.error">{{file.error}}</span>
           <span v-else-if="file.success">success</span>
-          <span v-else-if="file.active">active</span>
           <span v-else-if="file.active">active</span>
           <span v-else></span>
         </li>
@@ -22,7 +21,7 @@
           :multiple="true"
           :size="1024 * 1024 * 10"
           :value="files"
-          @input="inputUpdate"
+          @update:modelValue="inputUpdate"
           ref="upload">
           <i class="fa fa-plus"></i>
           Select files

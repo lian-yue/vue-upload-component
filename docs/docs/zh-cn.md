@@ -217,6 +217,50 @@ const nodeExternals = require('webpack-node-externals');
 
 
 
+### 扩展分片上传
+  **CustomUpload.js**
+  ```js
+//   import axios from 'axios'
+//   import VueUploadComponent from 'vue-upload-component'
+//   import { STORAGE_CREATE, STORAGE_UPDATE, STORAGE_UPLOAD } from 'src/urls'
+//
+//   VueUploadComponent.props.partThread = {
+//     type: Number,
+//     default: 2,
+//   }
+//   VueUploadComponent.props.partTimeout = {
+//     type: String,
+//     default: '',
+//   }
+//
+//   VueUploadComponent.Methods.partInit = async functuon (file) {
+//     let data = await axios({
+//       method: 'post',
+//       size: file.size,
+//       name: file.name,
+//     })
+//     return data
+//   }
+//   VueUploadComponent.props.customAction.default = async function (_file, component) {
+//     let file = _file
+//     let fileObject = file.file
+//
+//     // 创建 文件
+//     let data = await axios({
+//       method: 'post',
+//     })
+// component.partMethod, component.partAction, { user: 'me' }, {}, { size: fileObject.size, name: file.name }, {}, 2)
+//     file = component.update(file, { storage })
+//     if (!file || !file.fileObject || !file.active) {
+//       throw new Error('abort')
+//     }
+//     if (file.error) {
+//       throw new Error(file.error)
+//     }
+//
+//   }
+  ```
+
 
 ## 选项 / 属性
 
@@ -818,13 +862,13 @@ Add, update, remove pre-filter
 
 * **只读:** `true`
 
-* **默认值:** `{ html5: true, directory: false, drag: false }`
+* **默认值:** `{ html5: true, directory: false, drop: false }`
 
 * **示例:**
   ```html
   <app>
     <file-upload ref="upload"></file-upload>
-    <span v-show="$refs.upload && $refs.upload.features.drag">支持拖拽上传</span>
+    <span v-show="$refs.upload && $refs.upload.features.drop">支持拖拽上传</span>
     <span v-show="$refs.upload && $refs.upload.features.directory">支持文件夹上传</span>
     <span v-show="$refs.upload && $refs.upload.features.html5">支持HTML5</span>
   </app>
@@ -966,9 +1010,17 @@ Add, update, remove pre-filter
   * `el: HTMLInputElement`     文件元素
 
 
+* **结果:** `Promise<Array<File>>`  返回已添加的文件列表
+
+* **版本:** : `>=3.0.0`
+
+* **结果:** `Promise<Array<File>>`  返回已添加的文件列表
+
+vue 2.x 的结果
+
 * **结果:** `Array<File>`  返回已添加的文件列表
 
-* **版本:** : `>=2.5.1`
+* **版本:** : `<=3.0.0`
 
 
 

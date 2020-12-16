@@ -3,13 +3,13 @@
     <h1 id="example-title" class="example-title">Simple Example</h1>
     <div class="upload">
       <ul>
-        <li v-for="(file, index) in files" :key="file.id">
+        <li v-for="file in files" :key="file.id">
           <span>{{file.name}}</span> -
-          <span>{{file.size | formatSize}}</span> -
+          <span>{{$formatSize(file.size)}}</span> -
           <span v-if="file.error">{{file.error}}</span>
           <span v-else-if="file.success">success</span>
           <span v-else-if="file.active">active</span>
-          <span v-else-if="file.active">active</span>
+          <span v-else-if="!!file.error">{{file.error}}</span>
           <span v-else></span>
         </li>
       </ul>
@@ -28,11 +28,11 @@
           <i class="fa fa-plus"></i>
           Select files
         </file-upload>
-        <button type="button" class="btn btn-success" v-if="!$refs.upload || !$refs.upload.active" @click.prevent="$refs.upload.active = true">
+        <button type="button" class="btn btn-success" v-if="!upload || !upload.active" @click.prevent="upload.active = true">
           <i class="fa fa-arrow-up" aria-hidden="true"></i>
           Start Upload
         </button>
-        <button type="button" class="btn btn-danger"  v-else @click.prevent="$refs.upload.active = false">
+        <button type="button" class="btn btn-danger"  v-else @click.prevent="upload.active = false">
           <i class="fa fa-stop" aria-hidden="true"></i>
           Stop Upload
         </button>
@@ -51,20 +51,19 @@
 </style>
 
 <script>
+import {ref} from 'vue'
 import FileUpload from 'vue-upload-component'
 export default {
   components: {
     FileUpload,
   },
 
-  data() {
-    return {
-      files: [],
-    }
-  },
+  setup(props, context) {
+    const upload = ref(null)
+    
+    const files = ref([])
 
-  methods: {
-    inputFilter(newFile, oldFile, prevent) {
+    function inputFilter(newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
         // Before adding a file
         // 添加文件前
@@ -74,16 +73,16 @@ export default {
         if (/(\/|^)(Thumbs\.db|desktop\.ini|\..+)$/.test(newFile.name)) {
           return prevent()
         }
-
+        
         // Filter php html js file
         // 过滤 php html js 文件
         if (/\.(php5?|html?|jsx?)$/i.test(newFile.name)) {
           return prevent()
         }
       }
-    },
+    }
 
-    inputFile(newFile, oldFile) {
+    function inputFile(newFile, oldFile) {
       if (newFile && !oldFile) {
         // add
         console.log('add', newFile)
@@ -97,6 +96,13 @@ export default {
         // remove
         console.log('remove', oldFile)
       }
+    }
+
+    return {
+      files,
+      upload,
+      inputFilter,
+      inputFile,
     }
   }
 }

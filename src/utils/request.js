@@ -26,7 +26,7 @@ export const sendRequest = (xhr, body) => {
   return new Promise((resolve, reject) => {
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
-        var response
+        let response
         try {
           response = JSON.parse(xhr.response)
         } catch (err) {
@@ -50,14 +50,14 @@ export const sendRequest = (xhr, body) => {
  */
 export const sendFormRequest = (xhr, data) => {
   const body = new FormData()
-  for (var name in data) {
+  for (let name in data) {
     body.append(name, data[name])
   }
 
   return new Promise((resolve, reject) => {
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
-        var response
+        let response
         try {
           response = JSON.parse(xhr.response)
         } catch (err) {

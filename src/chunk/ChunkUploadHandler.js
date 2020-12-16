@@ -14,20 +14,23 @@ export default class ChunkUploadHandler {
   constructor (file, options) {
     this.file = file
     this.options = options
-  }
+    this.chunks = []
+    this.sessionId = null
+    this.chunkSize = null
+   }
 
   /**
    * Gets the max retries from options
    */
   get maxRetries () {
-    return parseInt(this.options.maxRetries)
+    return parseInt(this.options.maxRetries, 10)
   }
 
   /**
    * Gets the max number of active chunks being uploaded at once from options
    */
   get maxActiveChunks () {
-    return parseInt(this.options.maxActive)
+    return parseInt(this.options.maxActive, 10)
   }
 
   /**
@@ -111,6 +114,7 @@ export default class ChunkUploadHandler {
    * Gets all the chunks that are pending to be uploaded
    */
   get chunksToUpload () {
+    console.log(this.chunks)
     return this.chunks.filter(chunk => {
       return !chunk.active && !chunk.uploaded
     })
@@ -222,16 +226,18 @@ export default class ChunkUploadHandler {
   start () {
     request({
       method: 'POST',
-      headers: Object.assign({}, this.headers, {
+      headers: {
+        ...this.headers, 
         'Content-Type': 'application/json'
-      }),
+      },
       url: this.action,
-      body: Object.assign(this.startBody, {
+      body: {
+        ...this.startBody,
         phase: 'start',
         mime_type: this.fileType,
         size: this.fileSize,
         name: this.fileName
-      })
+      }
     }).then(res => {
       if (res.status !== 'success') {
         this.file.response = res
@@ -300,12 +306,13 @@ export default class ChunkUploadHandler {
       }
     }, false)
 
-    sendFormRequest(chunk.xhr, Object.assign(this.uploadBody, {
+    sendFormRequest(chunk.xhr, {
+      ...this.uploadBody,
       phase: 'upload',
       session_id: this.sessionId,
       start_offset: chunk.startOffset,
       chunk: chunk.blob
-    })).then(res => {
+    }).then(res => {
       chunk.active = false
       if (res.status === 'success') {
         chunk.uploaded = true
@@ -337,14 +344,16 @@ export default class ChunkUploadHandler {
 
     request({
       method: 'POST',
-      headers: Object.assign({}, this.headers, {
+      headers: {
+        ...this.headers,
         'Content-Type': 'application/json'
-      }),
+      },
       url: this.action,
-      body: Object.assign(this.finishBody, {
+      body: {
+        ...this.finishBody, 
         phase: 'finish',
-        session_id: this.sessionId
-      })
+        session_id: this.sessionId,
+      }
     }).then(res => {
       this.file.response = res
       if (res.status !== 'success') {

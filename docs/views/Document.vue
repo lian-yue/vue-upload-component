@@ -4,10 +4,10 @@
     <div class="col-12 col-md-3 col-xl-2" id="sidebar">
       <nav id="sidebar-nav" class="collapse show">
         <ul class="nav">
-          <li :class="{'nav-item': true, active: (!$route.hash && !index) || $route.hash.indexOf(group.hash) === 1}" v-for="(group, index) in navs">
+          <li :class="{'nav-item': true, active: (!$route.hash && !index) || $route.hash.indexOf(group.hash) === 1}" v-for="(group, index) in navs" :key="index">
             <router-link active-class="active" :class="{'nav-link': true, active: $route.hash.indexOf(group.hash) === 1}" :to="'#' + group.hash">{{group.name}}</router-link>
             <ul class="nav" v-if="group.children.length">
-              <li class="nav-item" v-for="child in group.children">
+              <li class="nav-item" v-for="(child,index2) in group.children" :key="index + '-'+ index2">
                 <router-link active-class="active" class="nav-link" :to="'#' + group.hash + '-' + child.hash">{{child.name}}</router-link>
               </li>
             </ul>
@@ -17,12 +17,12 @@
     </div>
     <main class="col-12 col-md-9 col-xl-10 py-md-3 pr-md-5 pl-md-5" id="main" role="main">
       <h1 class="document-title" id="document-title">{{$t('document.title')}}</h1>
-      <div class="document-content" v-markdown>{{document}}</div>
+    <div class="document-content" v-markdown>{{document}}</div>
     </main>
-  </div>
   </div>
 </div>
 </template>
+
 <style>
 .document-title {
   margin-bottom: 2rem;
@@ -68,7 +68,7 @@ export default {
 
   computed: {
     document() {
-      return require('../docs/' + this.$i18n.locale)
+      return require('../docs/' + this.$i18n.locale + '.md').default
     },
 
     navs() {

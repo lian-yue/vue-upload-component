@@ -1,0 +1,33 @@
+/*!
+   * define properties
+   */
+
+/*!
+  * @intlify/runtime v9.0.0-beta.12
+  * (c) 2020 kazuya kawaguchi
+  * Released under the MIT License.
+  */
+
+/*!
+ * Name: vue-upload-component
+ * Component URI: https://github.com/lian-yue/vue-upload-component#readme
+ * Version: 3.0.35
+ * Author: LianYue
+ * License: Apache-2.0
+ * Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter
+ */
+
+/*!
+ * vuex v4.0.0-rc.2
+ * (c) 2020 Evan You
+ * @license MIT
+ */
+
+/*!
+ Name: vue-upload-component 
+Component URI: https://github.com/lian-yue/vue-upload-component#readme 
+Version: 3.0.34 
+Author: LianYue 
+License: Apache-2.0 
+Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
+ */

@@ -1,23 +1,119 @@
 /*!
- * Name: vue-upload-component
- * Version: 2.8.20
- * Author: LianYue
+ Name: vue-upload-component 
+Component URI: https://github.com/lian-yue/vue-upload-component#readme 
+Version: 3.0.34 
+Author: LianYue 
+License: Apache-2.0 
+Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
  */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  (global.VueUploadComponent = factory());
-}(this, (function () { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('vue')) :
+  typeof define === 'function' && define.amd ? define(['vue'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.VueUploadComponent = factory(global.Vue));
+}(this, (function (vue) { 'use strict';
 
+  function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+  function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+  function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+  function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+  function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+  function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+  function _ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { _ownKeys(Object(source), true).forEach(function (key) { _defineProperty2(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { _ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+  function _defineProperty2(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+  function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+  }
+
+  function _defineProperty(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+
+    return obj;
+  }
+
+  function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      if (enumerableOnly) symbols = symbols.filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      });
+      keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread2(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i] != null ? arguments[i] : {};
+
+      if (i % 2) {
+        ownKeys(Object(source), true).forEach(function (key) {
+          _defineProperty(target, key, source[key]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys(Object(source)).forEach(function (key) {
+          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
+      }
+    }
+
+    return target;
+  }
   /**
    * Creates a XHR request
    *
    * @param {Object} options
    */
+
+
   var createRequest = function createRequest(options) {
     var xhr = new XMLHttpRequest();
     xhr.open(options.method || 'GET', options.url);
     xhr.responseType = 'json';
+
     if (options.headers) {
       Object.keys(options.headers).forEach(function (key) {
         xhr.setRequestHeader(key, options.headers[key]);
@@ -26,43 +122,50 @@
 
     return xhr;
   };
-
   /**
    * Sends a XHR request with certain body
    *
    * @param {XMLHttpRequest} xhr
    * @param {Object} body
    */
+
+
   var sendRequest = function sendRequest(xhr, body) {
     return new Promise(function (resolve, reject) {
       xhr.onload = function () {
         if (xhr.status >= 200 && xhr.status < 300) {
           var response;
+
           try {
             response = JSON.parse(xhr.response);
           } catch (err) {
             response = xhr.response;
           }
+
           resolve(response);
         } else {
           reject(xhr.response);
         }
       };
+
       xhr.onerror = function () {
         return reject(xhr.response);
       };
+
       xhr.send(JSON.stringify(body));
     });
   };
-
   /**
    * Sends a XHR request with certain form data
    *
    * @param {XMLHttpRequest} xhr
    * @param {Object} data
    */
+
+
   var sendFormRequest = function sendFormRequest(xhr, data) {
     var body = new FormData();
+
     for (var name in data) {
       body.append(name, data[name]);
     }
@@ -71,23 +174,26 @@
       xhr.onload = function () {
         if (xhr.status >= 200 && xhr.status < 300) {
           var response;
+
           try {
             response = JSON.parse(xhr.response);
           } catch (err) {
             response = xhr.response;
           }
+
           resolve(response);
         } else {
           reject(xhr.response);
         }
       };
+
       xhr.onerror = function () {
         return reject(xhr.response);
       };
+
       xhr.send(body);
     });
   };
-
   /**
    * Creates and sends XHR request
    *
@@ -95,17 +201,14 @@
    *
    * @returns Promise
    */
-  function request (options) {
-    var xhr = createRequest(options);
 
+
+  function request(options) {
+    var xhr = createRequest(options);
     return sendRequest(xhr, options.body);
   }
 
-  var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-  var ChunkUploadHandler = function () {
+  var ChunkUploadHandler = /*#__PURE__*/function () {
     /**
      * Constructor
      *
@@ -117,25 +220,26 @@
 
       this.file = file;
       this.options = options;
+      this.chunks = [];
+      this.sessionId = null;
+      this.chunkSize = null;
     }
-
     /**
      * Gets the max retries from options
      */
 
 
     _createClass(ChunkUploadHandler, [{
-      key: 'createChunks',
-
+      key: "createChunks",
 
       /**
        * Creates all the chunks in the initial state
        */
       value: function createChunks() {
         this.chunks = [];
-
         var start = 0;
         var end = this.chunkSize;
+
         while (start < this.fileSize) {
           this.chunks.push({
             blob: this.file.file.slice(start, end),
@@ -147,17 +251,15 @@
           end = start + this.chunkSize;
         }
       }
-
       /**
        * Updates the progress of the file with the handler's progress
        */
 
     }, {
-      key: 'updateFileProgress',
+      key: "updateFileProgress",
       value: function updateFileProgress() {
         this.file.progress = this.progress;
       }
-
       /**
        * Paues the upload process
        * - Stops all active requests
@@ -165,25 +267,23 @@
        */
 
     }, {
-      key: 'pause',
+      key: "pause",
       value: function pause() {
         this.file.active = false;
         this.stopChunks();
       }
-
       /**
        * Stops all the current chunks
        */
 
     }, {
-      key: 'stopChunks',
+      key: "stopChunks",
       value: function stopChunks() {
         this.chunksUploading.forEach(function (chunk) {
           chunk.xhr.abort();
           chunk.active = false;
         });
       }
-
       /**
        * Resumes the file upload
        * - Sets the file active
@@ -191,12 +291,11 @@
        */
 
     }, {
-      key: 'resume',
+      key: "resume",
       value: function resume() {
         this.file.active = true;
         this.startChunking();
       }
-
       /**
        * Starts the file upload
        *
@@ -206,7 +305,7 @@
        */
 
     }, {
-      key: 'upload',
+      key: "upload",
       value: function upload() {
         var _this = this;
 
@@ -215,27 +314,25 @@
           _this.reject = reject;
         });
         this.start();
-
         return this.promise;
       }
-
       /**
        * Start phase
        * Sends a request to the backend to initialise the chunks
        */
 
     }, {
-      key: 'start',
+      key: "start",
       value: function start() {
         var _this2 = this;
 
         request({
           method: 'POST',
-          headers: Object.assign({}, this.headers, {
+          headers: _objectSpread2(_objectSpread2({}, this.headers), {}, {
             'Content-Type': 'application/json'
           }),
           url: this.action,
-          body: Object.assign(this.startBody, {
+          body: _objectSpread2(_objectSpread2({}, this.startBody), {}, {
             phase: 'start',
             mime_type: this.fileType,
             size: this.fileSize,
@@ -251,25 +348,25 @@
           _this2.chunkSize = res.data.end_offset;
 
           _this2.createChunks();
+
           _this2.startChunking();
         }).catch(function (res) {
           _this2.file.response = res;
+
           _this2.reject('server');
         });
       }
-
       /**
        * Starts to upload chunks
        */
 
     }, {
-      key: 'startChunking',
+      key: "startChunking",
       value: function startChunking() {
         for (var i = 0; i < this.maxActiveChunks; i++) {
           this.uploadNextChunk();
         }
       }
-
       /**
        * Uploads the next chunk
        * - Won't do anything if the process is paused
@@ -277,7 +374,7 @@
        */
 
     }, {
-      key: 'uploadNextChunk',
+      key: "uploadNextChunk",
       value: function uploadNextChunk() {
         if (this.file.active) {
           if (this.hasChunksToUpload) {
@@ -289,7 +386,6 @@
           }
         }
       }
-
       /**
        * Uploads a chunk
        * - Sends the chunk to the backend
@@ -301,7 +397,7 @@
        */
 
     }, {
-      key: 'uploadChunk',
+      key: "uploadChunk",
       value: function uploadChunk(chunk) {
         var _this3 = this;
 
@@ -313,25 +409,25 @@
           headers: this.headers,
           url: this.action
         });
-
         chunk.xhr.upload.addEventListener('progress', function (evt) {
           if (evt.lengthComputable) {
             chunk.progress = Math.round(evt.loaded / evt.total * 100);
           }
         }, false);
-
-        sendFormRequest(chunk.xhr, Object.assign(this.uploadBody, {
+        sendFormRequest(chunk.xhr, _objectSpread2(_objectSpread2({}, this.uploadBody), {}, {
           phase: 'upload',
           session_id: this.sessionId,
           start_offset: chunk.startOffset,
           chunk: chunk.blob
         })).then(function (res) {
           chunk.active = false;
+
           if (res.status === 'success') {
             chunk.uploaded = true;
           } else {
             if (chunk.retries-- <= 0) {
               _this3.stopChunks();
+
               return _this3.reject('upload');
             }
           }
@@ -339,39 +435,40 @@
           _this3.uploadNextChunk();
         }).catch(function () {
           chunk.active = false;
+
           if (chunk.retries-- <= 0) {
             _this3.stopChunks();
+
             return _this3.reject('upload');
           }
 
           _this3.uploadNextChunk();
         });
       }
-
       /**
        * Finish phase
        * Sends a request to the backend to finish the process
        */
 
     }, {
-      key: 'finish',
+      key: "finish",
       value: function finish() {
         var _this4 = this;
 
         this.updateFileProgress();
-
         request({
           method: 'POST',
-          headers: Object.assign({}, this.headers, {
+          headers: _objectSpread2(_objectSpread2({}, this.headers), {}, {
             'Content-Type': 'application/json'
           }),
           url: this.action,
-          body: Object.assign(this.finishBody, {
+          body: _objectSpread2(_objectSpread2({}, this.finishBody), {}, {
             phase: 'finish',
             session_id: this.sessionId
           })
         }).then(function (res) {
           _this4.file.response = res;
+
           if (res.status !== 'success') {
             return _this4.reject('server');
           }
@@ -379,115 +476,105 @@
           _this4.resolve(res);
         }).catch(function (res) {
           _this4.file.response = res;
+
           _this4.reject('server');
         });
       }
     }, {
-      key: 'maxRetries',
+      key: "maxRetries",
       get: function get() {
-        return parseInt(this.options.maxRetries);
+        return parseInt(this.options.maxRetries, 10);
       }
-
       /**
        * Gets the max number of active chunks being uploaded at once from options
        */
 
     }, {
-      key: 'maxActiveChunks',
+      key: "maxActiveChunks",
       get: function get() {
-        return parseInt(this.options.maxActive);
+        return parseInt(this.options.maxActive, 10);
       }
-
       /**
        * Gets the file type
        */
 
     }, {
-      key: 'fileType',
+      key: "fileType",
       get: function get() {
         return this.file.type;
       }
-
       /**
        * Gets the file size
        */
 
     }, {
-      key: 'fileSize',
+      key: "fileSize",
       get: function get() {
         return this.file.size;
       }
-
       /**
        * Gets the file name
        */
 
     }, {
-      key: 'fileName',
+      key: "fileName",
       get: function get() {
         return this.file.name;
       }
-
       /**
        * Gets action (url) to upload the file
        */
 
     }, {
-      key: 'action',
+      key: "action",
       get: function get() {
         return this.options.action || null;
       }
-
       /**
        * Gets the body to be merged when sending the request in start phase
        */
 
     }, {
-      key: 'startBody',
+      key: "startBody",
       get: function get() {
         return this.options.startBody || {};
       }
-
       /**
        * Gets the body to be merged when sending the request in upload phase
        */
 
     }, {
-      key: 'uploadBody',
+      key: "uploadBody",
       get: function get() {
         return this.options.uploadBody || {};
       }
-
       /**
        * Gets the body to be merged when sending the request in finish phase
        */
 
     }, {
-      key: 'finishBody',
+      key: "finishBody",
       get: function get() {
         return this.options.finishBody || {};
       }
-
       /**
        * Gets the headers of the requests from options
        */
 
     }, {
-      key: 'headers',
+      key: "headers",
       get: function get() {
         return this.options.headers || {};
       }
-
       /**
        * Whether it's ready to upload files or not
        */
 
     }, {
-      key: 'readyToUpload',
+      key: "readyToUpload",
       get: function get() {
         return !!this.chunks;
       }
-
       /**
        * Gets the progress of the chunk upload
        * - Gets all the completed chunks
@@ -495,7 +582,7 @@
        */
 
     }, {
-      key: 'progress',
+      key: "progress",
       get: function get() {
         var _this5 = this;
 
@@ -503,50 +590,46 @@
         var uploadingProgress = this.chunksUploading.reduce(function (progress, chunk) {
           return progress + (chunk.progress | 0) / _this5.chunks.length;
         }, 0);
-
         return Math.min(completedProgress + uploadingProgress, 100);
       }
-
       /**
        * Gets all the chunks that are pending to be uploaded
        */
 
     }, {
-      key: 'chunksToUpload',
+      key: "chunksToUpload",
       get: function get() {
+        console.log(this.chunks);
         return this.chunks.filter(function (chunk) {
           return !chunk.active && !chunk.uploaded;
         });
       }
-
       /**
        * Whether there are chunks to upload or not
        */
 
     }, {
-      key: 'hasChunksToUpload',
+      key: "hasChunksToUpload",
       get: function get() {
         return this.chunksToUpload.length > 0;
       }
-
       /**
        * Gets all the chunks that are uploading
        */
 
     }, {
-      key: 'chunksUploading',
+      key: "chunksUploading",
       get: function get() {
         return this.chunks.filter(function (chunk) {
           return !!chunk.xhr && !!chunk.active;
         });
       }
-
       /**
        * Gets all the chunks that have finished uploading
        */
 
     }, {
-      key: 'chunksUploaded',
+      key: "chunksUploaded",
       get: function get() {
         return this.chunks.filter(function (chunk) {
           return !!chunk.uploaded;
@@ -557,259 +640,104 @@
     return ChunkUploadHandler;
   }();
 
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-
-  var script = {
-    methods: {
-      change: function change(e) {
-        this.$parent.addInputFile(e.target);
-        if (e.target.files) {
-          e.target.value = '';
-          if (e.target.files.length && !/safari/i.test(navigator.userAgent)) {
-            e.target.type = '';
-            e.target.type = 'file';
-          }
-        } else {
-          // ie9 fix #219
-          this.$destroy();
-          // eslint-disable-next-line
-          new this.constructor({
-            parent: this.$parent,
-            el: this.$el
-          });
-        }
-      }
-    }
-  };
-
-  /* script */
-  var __vue_script__ = script;
-
-  /* template */
-  var __vue_render__ = function __vue_render__() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('input', { attrs: { "type": "file", "name": _vm.$parent.name, "id": _vm.$parent.inputId || _vm.$parent.name, "accept": _vm.$parent.accept, "capture": _vm.$parent.capture, "disabled": _vm.$parent.disabled, "webkitdirectory": _vm.$parent.directory && _vm.$parent.features.directory, "directory": _vm.$parent.directory && _vm.$parent.features.directory, "multiple": _vm.$parent.multiple && _vm.$parent.features.html5 }, on: { "change": _vm.change } });
-  };
-  var __vue_staticRenderFns__ = [];
-
-  /* style */
-  var __vue_inject_styles__ = undefined;
-  /* scoped */
-  var __vue_scope_id__ = undefined;
-  /* module identifier */
-  var __vue_module_identifier__ = undefined;
-  /* functional template */
-  var __vue_is_functional_template__ = false;
-  /* component normalizer */
-  function __vue_normalize__(template, style, script$$1, scope, functional, moduleIdentifier, createInjector, createInjectorSSR) {
-    var component = (typeof script$$1 === 'function' ? script$$1.options : script$$1) || {};
-
-    if (!component.render) {
-      component.render = template.render;
-      component.staticRenderFns = template.staticRenderFns;
-      component._compiled = true;
-
-      if (functional) component.functional = true;
-    }
-
-    component._scopeId = scope;
-
-    return component;
-  }
-  /* style inject */
-  function __vue_create_injector__() {
-    var head = document.head || document.getElementsByTagName('head')[0];
-    var styles = __vue_create_injector__.styles || (__vue_create_injector__.styles = {});
-    var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\\b/.test(navigator.userAgent.toLowerCase());
-
-    return function addStyle(id, css) {
-      if (document.querySelector('style[data-vue-ssr-id~="' + id + '"]')) return; // SSR styles are present.
-
-      var group = isOldIE ? css.media || 'default' : id;
-      var style = styles[group] || (styles[group] = { ids: [], parts: [], element: undefined });
-
-      if (!style.ids.includes(id)) {
-        var code = css.source;
-        var index = style.ids.length;
-
-        style.ids.push(id);
-
-        if (css.map) {
-          // https://developer.chrome.com/devtools/docs/javascript-debugging
-          // this makes source maps inside style tags work properly in Chrome
-          code += '\n/*# sourceURL=' + css.map.sources[0] + ' */';
-          // http://stackoverflow.com/a/26603875
-          code += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(css.map)))) + ' */';
-        }
-
-        if (isOldIE) {
-          style.element = style.element || document.querySelector('style[data-group=' + group + ']');
-        }
-
-        if (!style.element) {
-          var el = style.element = document.createElement('style');
-          el.type = 'text/css';
-
-          if (css.media) el.setAttribute('media', css.media);
-          if (isOldIE) {
-            el.setAttribute('data-group', group);
-            el.setAttribute('data-next-index', '0');
-          }
-
-          head.appendChild(el);
-        }
-
-        if (isOldIE) {
-          index = parseInt(style.element.getAttribute('data-next-index'));
-          style.element.setAttribute('data-next-index', index + 1);
-        }
-
-        if (style.element.styleSheet) {
-          style.parts.push(code);
-          style.element.styleSheet.cssText = style.parts.filter(Boolean).join('\n');
-        } else {
-          var textNode = document.createTextNode(code);
-          var nodes = style.element.childNodes;
-          if (nodes[index]) style.element.removeChild(nodes[index]);
-          if (nodes.length) style.element.insertBefore(textNode, nodes[index]);else style.element.appendChild(textNode);
-        }
-      }
-    };
-  }
-  /* style inject SSR */
-
-  var InputFile = __vue_normalize__({ render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ }, __vue_inject_styles__, __vue_script__, __vue_scope_id__, __vue_is_functional_template__, __vue_module_identifier__, __vue_create_injector__, undefined);
-
-  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-  function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
   var CHUNK_DEFAULT_OPTIONS = {
     headers: {},
     action: '',
     minSize: 1048576,
     maxActive: 3,
     maxRetries: 5,
-
     handler: ChunkUploadHandler
   };
-
-  var script$1 = {
-    components: {
-      InputFile: InputFile
-    },
+  var script = vue.defineComponent({
     props: {
       inputId: {
         type: String
       },
-
       name: {
         type: String,
         default: 'file'
       },
-
       accept: {
         type: String
       },
-
       capture: {},
-
-      disabled: {},
-
+      disabled: {
+        default: false
+      },
       multiple: {
-        type: Boolean
+        type: Boolean,
+        default: false
       },
-
       maximum: {
-        type: Number,
-        default: function _default() {
-          return this.multiple ? 0 : 1;
-        }
+        type: Number
       },
-
       addIndex: {
         type: [Boolean, Number]
       },
-
       directory: {
         type: Boolean
       },
-
+      createDirectory: {
+        type: Boolean,
+        default: false
+      },
       postAction: {
         type: String
       },
-
       putAction: {
         type: String
       },
-
       customAction: {
         type: Function
       },
-
       headers: {
         type: Object,
-        default: Object
+        default: function _default() {
+          return {};
+        }
       },
-
       data: {
         type: Object,
-        default: Object
+        default: function _default() {
+          return {};
+        }
       },
-
       timeout: {
         type: Number,
         default: 0
       },
-
       drop: {
         default: false
       },
-
       dropDirectory: {
         type: Boolean,
         default: true
       },
-
       size: {
         type: Number,
         default: 0
       },
-
       extensions: {
-        default: Array
+        type: [RegExp, String, Array],
+        default: function _default() {
+          return [];
+        }
       },
-
-      value: {
+      modelValue: {
         type: Array,
-        default: Array
+        default: function _default() {
+          return [];
+        }
       },
-
       thread: {
         type: Number,
         default: 1
       },
-
       // Chunk upload enabled
       chunkEnabled: {
         type: Boolean,
         default: false
       },
-
       // Chunk upload properties
       chunk: {
         type: Object,
@@ -818,85 +746,89 @@
         }
       }
     },
-
+    emits: ['update:modelValue', 'input-filter', 'input-file'],
     data: function data() {
       return {
-        files: this.value,
+        files: this.modelValue,
         features: {
           html5: true,
           directory: false,
-          drag: false
+          drop: false
         },
-
         active: false,
         dropActive: false,
-
         uploading: 0,
-
-        destroy: false
+        destroy: false,
+        maps: {},
+        dropElement: null
       };
     },
-
 
     /**
      * mounted
      * @return {[type]} [description]
      */
     mounted: function mounted() {
+      var _this6 = this;
+
       var input = document.createElement('input');
       input.type = 'file';
-      input.multiple = true;
+      input.multiple = true; // html5 特征
 
-      // html5 特征
       if (window.FormData && input.files) {
         // 上传目录特征
+        // @ts-ignore
         if (typeof input.webkitdirectory === 'boolean' || typeof input.directory === 'boolean') {
           this.features.directory = true;
-        }
+        } // 拖拽特征
 
-        // 拖拽特征
+
         if (this.features.html5 && typeof input.ondrop !== 'undefined') {
           this.features.drop = true;
         }
       } else {
         this.features.html5 = false;
-      }
+      } // files 定位缓存
 
-      // files 定位缓存
+
       this.maps = {};
+
       if (this.files) {
         for (var i = 0; i < this.files.length; i++) {
           var file = this.files[i];
           this.maps[file.id] = file;
         }
-      }
+      } // @ts-ignore
+
 
       this.$nextTick(function () {
-
         // 更新下父级
-        if (this.$parent) {
-          this.$parent.$forceUpdate();
-        }
+        if (_this6.$parent) {
+          _this6.$parent.$forceUpdate(); // 拖拽渲染
 
-        // 拖拽渲染
-        this.watchDrop(this.drop);
+
+          _this6.$parent.$nextTick(function () {
+            _this6.watchDrop(_this6.drop);
+          });
+        } else {
+          // 拖拽渲染
+          _this6.watchDrop(_this6.drop);
+        }
       });
     },
 
-
     /**
-     * beforeDestroy
+     * beforeUnmount
      * @return {[type]} [description]
      */
-    beforeDestroy: function beforeDestroy() {
+    beforeUnmount: function beforeUnmount() {
       // 已销毁
-      this.destroy = true;
+      this.destroy = true; // 设置成不激活
 
-      // 设置成不激活
-      this.active = false;
+      this.active = false; // 销毁拖拽事件
+
+      this.watchDrop(false);
     },
-
-
     computed: {
       /**
        * uploading 正在上传的线程
@@ -908,13 +840,16 @@
        * @return {[type]} [description]
        */
       uploaded: function uploaded() {
-        var file = void 0;
+        var file;
+
         for (var i = 0; i < this.files.length; i++) {
           file = this.files[i];
+
           if (file.fileObject && !file.error && !file.success) {
             return false;
           }
         }
+
         return true;
       },
       chunkOptions: function chunkOptions() {
@@ -922,9 +857,42 @@
       },
       className: function className() {
         return ['file-uploads', this.features.html5 ? 'file-uploads-html5' : 'file-uploads-html4', this.features.directory && this.directory ? 'file-uploads-directory' : undefined, this.features.drop && this.drop ? 'file-uploads-drop' : undefined, this.disabled ? 'file-uploads-disabled' : undefined];
+      },
+      forId: function forId() {
+        return this.inputId || this.name;
+      },
+      iMaximum: function iMaximum() {
+        if (this.maximum === undefined) {
+          return this.multiple ? 0 : 1;
+        }
+
+        return this.maximum;
+      },
+      iExtensions: function iExtensions() {
+        if (!this.extensions) {
+          return;
+        }
+
+        if (this.extensions instanceof RegExp) {
+          return this.extensions;
+        }
+
+        var exts = [];
+
+        if (typeof this.extensions === 'string') {
+          exts = this.extensions.split(',');
+        } else {
+          exts = this.extensions;
+        }
+
+        exts = exts.map(function (value) {
+          return value.trim();
+        }).filter(function (value) {
+          return value;
+        });
+        return new RegExp('\\.(' + exts.join('|').replace(/\./g, '\\.') + ')$', 'i');
       }
     },
-
     watch: {
       active: function active(_active) {
         this.watchActive(_active);
@@ -937,31 +905,32 @@
       drop: function drop(value) {
         this.watchDrop(value);
       },
-      value: function value(files) {
+      modelValue: function modelValue(files) {
         if (this.files === files) {
           return;
         }
+
         this.files = files;
+        var oldMaps = this.maps; // 重写 maps 缓存
 
-        var oldMaps = this.maps;
-
-        // 重写 maps 缓存
         this.maps = {};
+
         for (var i = 0; i < this.files.length; i++) {
           var file = this.files[i];
           this.maps[file.id] = file;
-        }
+        } // add, update
 
-        // add, update
+
         for (var key in this.maps) {
           var newFile = this.maps[key];
           var oldFile = oldMaps[key];
+
           if (newFile !== oldFile) {
             this.emitFile(newFile, oldFile);
           }
-        }
+        } // delete
 
-        // delete
+
         for (var _key in oldMaps) {
           if (!this.maps[_key]) {
             this.emitFile(undefined, oldMaps[_key]);
@@ -969,76 +938,84 @@
         }
       }
     },
-
     methods: {
-
+      newId: function newId() {
+        return Math.random().toString(36).substr(2);
+      },
       // 清空
       clear: function clear() {
         if (this.files.length) {
           var files = this.files;
-          this.files = [];
+          this.files = []; // 定位
 
-          // 定位
-          this.maps = {};
+          this.maps = {}; // 事件
 
-          // 事件
           this.emitInput();
+
           for (var i = 0; i < files.length; i++) {
             this.emitFile(undefined, files[i]);
           }
         }
+
         return true;
       },
-
-
       // 选择
       get: function get(id) {
         if (!id) {
           return false;
         }
 
-        if ((typeof id === 'undefined' ? 'undefined' : _typeof(id)) === 'object') {
-          return this.maps[id.id] || false;
+        if (_typeof(id) === 'object') {
+          return this.maps[id.id || ''] || false;
         }
 
         return this.maps[id] || false;
       },
-
-
       // 添加
-      add: function add(_files) {
-        var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.addIndex;
-
-        var files = _files;
-        var isArray = files instanceof Array;
-
+      add: function add(_files, index) {
         // 不是数组整理成数组
-        if (!isArray) {
-          files = [files];
+        var files;
+
+        if (_files instanceof Array) {
+          files = _files;
+        } else {
+          files = [_files];
         }
 
-        // 遍历规范对象
+        if (index === undefined) {
+          // eslint-disable-next-line
+          index = this.addIndex;
+        } // 遍历规范对象
+
+
         var addFiles = [];
+
         for (var i = 0; i < files.length; i++) {
           var file = files[i];
+
           if (this.features.html5 && file instanceof Blob) {
             file = {
+              id: '',
               file: file,
               size: file.size,
+              // @ts-ignore
               name: file.webkitRelativePath || file.relativePath || file.name || 'unknown',
               type: file.type
             };
           }
+
+          file = file;
           var fileObject = false;
-          if (file.fileObject === false) ; else if (file.fileObject) {
+          if (file.fileObject === false) ;else if (file.fileObject) {
             fileObject = true;
-          } else if (typeof Element !== 'undefined' && file.el instanceof Element) {
+          } else if (typeof Element !== 'undefined' && file.el instanceof HTMLInputElement) {
             fileObject = true;
           } else if (typeof Blob !== 'undefined' && file.file instanceof Blob) {
             fileObject = true;
           }
+
           if (fileObject) {
-            file = _extends({
+            file = _objectSpread(_objectSpread({
               fileObject: true,
               size: -1,
               name: 'Filename',
@@ -1049,91 +1026,99 @@
               putAction: this.putAction,
               postAction: this.postAction,
               timeout: this.timeout
-            }, file, {
+            }, file), {}, {
               response: {},
-
-              progress: '0.00', // 只读
-              speed: 0 // 只读
-              // xhr: false,                // 只读
-              // iframe: false,             // 只读
+              progress: '0.00',
+              speed: 0
             });
+            file.data = _objectSpread(_objectSpread({}, this.data), file.data ? file.data : {});
+            file.headers = _objectSpread(_objectSpread({}, this.headers), file.headers ? file.headers : {});
+          } // 必须包含 id
 
-            file.data = _extends({}, this.data, file.data ? file.data : {});
 
-            file.headers = _extends({}, this.headers, file.headers ? file.headers : {});
-          }
-
-          // 必须包含 id
           if (!file.id) {
-            file.id = Math.random().toString(36).substr(2);
+            file.id = this.newId();
           }
 
           if (this.emitFilter(file, undefined)) {
             continue;
-          }
+          } // 最大数量限制
 
-          // 最大数量限制
-          if (this.maximum > 1 && addFiles.length + this.files.length >= this.maximum) {
+
+          if (this.iMaximum > 1 && addFiles.length + this.files.length >= this.iMaximum) {
             break;
           }
 
-          addFiles.push(file);
+          addFiles.push(file); // 最大数量限制
 
-          // 最大数量限制
-          if (this.maximum === 1) {
+          if (this.iMaximum === 1) {
             break;
           }
-        }
+        } // 没有文件
 
-        // 没有文件
+
         if (!addFiles.length) {
-          return false;
-        }
+          return;
+        } // 如果是 1 清空
 
-        // 如果是 1 清空
-        if (this.maximum === 1) {
+
+        if (this.iMaximum === 1) {
           this.clear();
-        }
+        } // 添加进去 files
 
-        // 添加进去 files
-        var newFiles = void 0;
+
+        var newFiles;
+
         if (index === true || index === 0) {
           newFiles = addFiles.concat(this.files);
         } else if (index) {
           var _newFiles;
 
           newFiles = this.files.concat([]);
+
           (_newFiles = newFiles).splice.apply(_newFiles, [index, 0].concat(addFiles));
         } else {
           newFiles = this.files.concat(addFiles);
         }
 
-        this.files = newFiles;
+        this.files = newFiles; // 定位
 
-        // 定位
         for (var _i = 0; _i < addFiles.length; _i++) {
-          var _file2 = addFiles[_i];
-          this.maps[_file2.id] = _file2;
-        }
+          var _file = addFiles[_i];
+          this.maps[_file.id] = _file;
+        } // 事件
 
-        // 事件
+
         this.emitInput();
+
         for (var _i2 = 0; _i2 < addFiles.length; _i2++) {
           this.emitFile(addFiles[_i2], undefined);
         }
 
-        return isArray ? addFiles : addFiles[0];
+        return _files instanceof Array ? addFiles : addFiles[0];
       },
-
-
       // 添加表单文件
       addInputFile: function addInputFile(el) {
+        var _this7 = this;
+
         var files = [];
+        var maximumValue = this.iMaximum; // @ts-ignore
+
+        var entrys = el.webkitEntries || el.entries || undefined;
+
+        if (entrys && entrys.length) {
+          return this.getFileSystemEntry(entrys).then(function (files) {
+            return _this7.add(files);
+          });
+        }
+
         if (el.files) {
           for (var i = 0; i < el.files.length; i++) {
             var file = el.files[i];
             files.push({
+              id: '',
               size: file.size,
+              // @ts-ignore
               name: file.webkitRelativePath || file.relativePath || file.name,
               type: file.type,
               file: file
@@ -1141,162 +1126,234 @@
           }
         } else {
           var names = el.value.replace(/\\/g, '/').split('/');
+
+          if (!names || !names.length) {
+            names = [el.value];
+          } // @ts-ignore
+
+
           delete el.__vuex__;
           files.push({
+            id: '',
             name: names[names.length - 1],
             el: el
           });
         }
-        return this.add(files);
+
+        return Promise.resolve(this.add(files));
       },
-
-
       // 添加 DataTransfer
       addDataTransfer: function addDataTransfer(dataTransfer) {
-        var _this = this;
+        var _dataTransfer$items,
+            _this8 = this;
 
-        var files = [];
-        if (dataTransfer.items && dataTransfer.items.length) {
-          var items = [];
+        // dataTransfer.items 支持
+        if (dataTransfer !== null && dataTransfer !== void 0 && (_dataTransfer$items = dataTransfer.items) !== null && _dataTransfer$items !== void 0 && _dataTransfer$items.length) {
+          var entrys = []; // 遍历出所有 dataTransferVueUploadItem
+
           for (var i = 0; i < dataTransfer.items.length; i++) {
-            var item = dataTransfer.items[i];
-            if (item.getAsEntry) {
-              item = item.getAsEntry() || item.getAsFile();
-            } else if (item.webkitGetAsEntry) {
-              item = item.webkitGetAsEntry() || item.getAsFile();
+            var dataTransferTtem = dataTransfer.items[i];
+            var entry = void 0; // @ts-ignore
+
+            if (dataTransferTtem.getAsEntry) {
+              // @ts-ignore
+              entry = dataTransferTtem.getAsEntry() || dataTransferTtem.getAsFile();
+            } else if (dataTransferTtem.webkitGetAsEntry) {
+              entry = dataTransferTtem.webkitGetAsEntry() || dataTransferTtem.getAsFile();
             } else {
-              item = item.getAsFile();
+              entry = dataTransferTtem.getAsFile();
             }
-            if (item) {
-              items.push(item);
+
+            if (entry) {
+              entrys.push(entry);
             }
           }
 
-          return new Promise(function (resolve, reject) {
-            var forEach = function forEach(i) {
-              var item = items[i];
-              // 结束 文件数量大于 最大数量
-              if (!item || _this.maximum > 0 && files.length >= _this.maximum) {
-                return resolve(_this.add(files));
-              }
-              _this.getEntry(item).then(function (results) {
-                files.push.apply(files, _toConsumableArray(results));
-                forEach(i + 1);
-              });
-            };
-            forEach(0);
+          return this.getFileSystemEntry(entrys).then(function (files) {
+            return _this8.add(files);
           });
-        }
+        } // dataTransfer.files 支持
+
+
+        var maximumValue = this.iMaximum;
+        var files = [];
 
         if (dataTransfer.files.length) {
           for (var _i3 = 0; _i3 < dataTransfer.files.length; _i3++) {
             files.push(dataTransfer.files[_i3]);
-            if (this.maximum > 0 && files.length >= this.maximum) {
+
+            if (maximumValue > 0 && files.length >= maximumValue) {
               break;
             }
           }
+
           return Promise.resolve(this.add(files));
         }
 
         return Promise.resolve([]);
       },
-
-
-      // 获得 entry
-      getEntry: function getEntry(entry) {
-        var _this2 = this;
+      // 获得 entrys    
+      getFileSystemEntry: function getFileSystemEntry(entry) {
+        var _this9 = this;
 
         var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+        return new Promise(function (resolve) {
+          var maximumValue = _this9.iMaximum;
 
-        return new Promise(function (resolve, reject) {
+          if (!entry) {
+            return resolve([]);
+          }
+
+          if (entry instanceof Array) {
+            // 多个
+            var uploadFiles = [];
+
+            var forEach = function forEach(i) {
+              var v = entry[i];
+
+              if (!v || maximumValue > 0 && uploadFiles.length >= maximumValue) {
+                return resolve(uploadFiles);
+              }
+
+              _this9.getFileSystemEntry(v, path).then(function (results) {
+                uploadFiles.push.apply(uploadFiles, _toConsumableArray(results));
+                forEach(i + 1);
+              });
+            };
+
+            forEach(0);
+            return;
+          }
+
+          if (entry instanceof Blob) {
+            resolve([{
+              id: '',
+              size: entry.size,
+              name: path + entry.name,
+              type: entry.type,
+              file: entry
+            }]);
+            return;
+          }
+
           if (entry.isFile) {
             entry.file(function (file) {
               resolve([{
+                id: '',
                 size: file.size,
                 name: path + file.name,
                 type: file.type,
                 file: file
               }]);
             });
-          } else if (entry.isDirectory && _this2.dropDirectory) {
-            var files = [];
+            return;
+          }
+
+          if (entry.isDirectory && _this9.dropDirectory) {
+            var _uploadFiles = []; // 目录也要添加到文件列表
+
+            if (_this9.createDirectory) {
+              _uploadFiles.push({
+                id: '',
+                name: path + entry.name,
+                size: 0,
+                type: 'text/directory',
+                file: new File([], path + entry.name, {
+                  type: 'text/directory'
+                })
+              });
+            }
+
             var dirReader = entry.createReader();
+
             var readEntries = function readEntries() {
               dirReader.readEntries(function (entries) {
                 var forEach = function forEach(i) {
-                  if (!entries[i] && i === 0 || _this2.maximum > 0 && files.length >= _this2.maximum) {
-                    return resolve(files);
+                  if (!entries[i] && i === 0 || maximumValue > 0 && _uploadFiles.length >= maximumValue) {
+                    return resolve(_uploadFiles);
                   }
+
                   if (!entries[i]) {
                     return readEntries();
                   }
-                  _this2.getEntry(entries[i], path + entry.name + '/').then(function (results) {
-                    files.push.apply(files, _toConsumableArray(results));
+
+                  _this9.getFileSystemEntry(entries[i], path + entry.name + '/').then(function (results) {
+                    _uploadFiles.push.apply(_uploadFiles, _toConsumableArray(results));
+
                     forEach(i + 1);
                   });
                 };
+
                 forEach(0);
               });
             };
+
             readEntries();
-          } else {
-            resolve([]);
+            return;
           }
+
+          resolve([]);
         });
       },
+      // 替换
       replace: function replace(id1, id2) {
         var file1 = this.get(id1);
         var file2 = this.get(id2);
+
         if (!file1 || !file2 || file1 === file2) {
           return false;
         }
+
         var files = this.files.concat([]);
         var index1 = files.indexOf(file1);
         var index2 = files.indexOf(file2);
+
         if (index1 === -1 || index2 === -1) {
           return false;
         }
+
         files[index1] = file2;
         files[index2] = file1;
         this.files = files;
         this.emitInput();
         return true;
       },
-
-
       // 移除
       remove: function remove(id) {
         var file = this.get(id);
+
         if (file) {
           if (this.emitFilter(undefined, file)) {
             return false;
           }
+
           var files = this.files.concat([]);
           var index = files.indexOf(file);
+
           if (index === -1) {
             console.error('remove', file);
             return false;
           }
+
           files.splice(index, 1);
-          this.files = files;
+          this.files = files; // 定位
 
-          // 定位
-          delete this.maps[file.id];
+          delete this.maps[file.id]; // 事件
 
-          // 事件
           this.emitInput();
           this.emitFile(undefined, file);
         }
+
         return file;
       },
-
-
       // 更新
       update: function update(id, data) {
         var file = this.get(id);
+
         if (file) {
-          var newFile = _extends({}, file, data);
-          // 停用必须加上错误
+          var newFile = _objectSpread(_objectSpread({}, file), data); // 停用必须加上错误
+
+
           if (file.fileObject && file.active && !newFile.active && !newFile.error && !newFile.success) {
             newFile.error = 'abort';
           }
@@ -1307,125 +1364,124 @@
 
           var files = this.files.concat([]);
           var index = files.indexOf(file);
+
           if (index === -1) {
             console.error('update', file);
             return false;
           }
+
           files.splice(index, 1, newFile);
-          this.files = files;
+          this.files = files; // 删除  旧定位 写入 新定位 （已便支持修改id)
 
-          // 删除  旧定位 写入 新定位 （已便支持修改id)
           delete this.maps[file.id];
-          this.maps[newFile.id] = newFile;
+          this.maps[newFile.id] = newFile; // 事件
 
-          // 事件
           this.emitInput();
           this.emitFile(newFile, file);
           return newFile;
         }
+
         return false;
       },
-
-
       // 预处理 事件 过滤器
       emitFilter: function emitFilter(newFile, oldFile) {
         var isPrevent = false;
         this.$emit('input-filter', newFile, oldFile, function () {
-          isPrevent = true;
+          var prevent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+          isPrevent = prevent;
           return isPrevent;
         });
         return isPrevent;
       },
-
-
       // 处理后 事件 分发
       emitFile: function emitFile(newFile, oldFile) {
-        this.$emit('input-file', newFile, oldFile);
-        if (newFile && newFile.fileObject && newFile.active && (!oldFile || !oldFile.active)) {
-          this.uploading++;
-          // 激活
-          this.$nextTick(function () {
-            var _this3 = this;
+        var _newFile,
+            _this10 = this;
 
+        this.$emit('input-file', newFile, oldFile);
+
+        if ((_newFile = newFile) !== null && _newFile !== void 0 && _newFile.fileObject && newFile.active && (!oldFile || !oldFile.active)) {
+          this.uploading++; // 激活
+          // @ts-ignore
+
+          this.$nextTick(function () {
             setTimeout(function () {
-              _this3.upload(newFile).then(function () {
-                // eslint-disable-next-line
-                newFile = _this3.get(newFile);
-                if (newFile && newFile.fileObject) {
-                  _this3.update(newFile, {
+              newFile && _this10.upload(newFile).then(function () {
+                var _newFile2;
+
+                if (newFile) {
+                  // eslint-disable-next-line
+                  newFile = _this10.get(newFile) || undefined;
+                }
+
+                if ((_newFile2 = newFile) !== null && _newFile2 !== void 0 && _newFile2.fileObject) {
+                  _this10.update(newFile, {
                     active: false,
                     success: !newFile.error
                   });
                 }
               }).catch(function (e) {
-                _this3.update(newFile, {
+                newFile && _this10.update(newFile, {
                   active: false,
                   success: false,
                   error: e.code || e.error || e.message || e
                 });
               });
-            }, parseInt(Math.random() * 50 + 50, 10));
+            }, Math.ceil(Math.random() * 50 + 50));
           });
         } else if ((!newFile || !newFile.fileObject || !newFile.active) && oldFile && oldFile.fileObject && oldFile.active) {
           // 停止
           this.uploading--;
-        }
+        } // 自动延续激活
+        // @ts-ignore
 
-        // 自动延续激活
+
         if (this.active && (Boolean(newFile) !== Boolean(oldFile) || newFile.active !== oldFile.active)) {
           this.watchActive(true);
         }
       },
       emitInput: function emitInput() {
-        this.$emit('input', this.files);
+        this.$emit('update:modelValue', this.files);
       },
-
-
       // 上传
       upload: function upload(id) {
-        var file = this.get(id);
+        var file = this.get(id); // 被删除
 
-        // 被删除
         if (!file) {
-          return Promise.reject('not_exists');
-        }
+          return Promise.reject(new Error('not_exists'));
+        } // 不是文件对象
 
-        // 不是文件对象
+
         if (!file.fileObject) {
-          return Promise.reject('file_object');
-        }
+          return Promise.reject(new Error('file_object'));
+        } // 有错误直接响应
 
-        // 有错误直接响应
+
         if (file.error) {
-          return Promise.reject(file.error);
-        }
+          if (file.error instanceof Error) {
+            return Promise.reject(file.error);
+          }
 
-        // 已完成直接响应
+          return Promise.reject(new Error(file.error));
+        } // 已完成直接响应
+
+
         if (file.success) {
           return Promise.resolve(file);
-        }
+        } // 后缀
 
-        // 后缀
+
         var extensions = this.extensions;
-        if (extensions && (extensions.length || typeof extensions.length === 'undefined')) {
-          if ((typeof extensions === 'undefined' ? 'undefined' : _typeof(extensions)) !== 'object' || !(extensions instanceof RegExp)) {
-            if (typeof extensions === 'string') {
-              extensions = extensions.split(',').map(function (value) {
-                return value.trim();
-              }).filter(function (value) {
-                return value;
-              });
-            }
-            extensions = new RegExp('\\.(' + extensions.join('|').replace(/\./g, '\\.') + ')$', 'i');
-          }
-          if (file.name.search(extensions) === -1) {
-            return Promise.reject('extension');
-          }
-        }
 
-        // 大小
-        if (this.size > 0 && file.size >= 0 && file.size > this.size) {
-          return Promise.reject('size');
+        if (file.name && this.iExtensions) {
+          if (file.name.search(this.iExtensions) === -1) {
+            return Promise.reject(new Error('extension'));
+          }
+        } // 大小
+
+
+        if (this.size > 0 && file.size !== undefined && file.size >= 0 && file.size > this.size) {
+          return Promise.reject(new Error('size'));
         }
 
         if (this.customAction) {
@@ -1436,19 +1492,22 @@
           if (this.shouldUseChunkUpload(file)) {
             return this.uploadChunk(file);
           }
+
           if (file.putAction) {
             return this.uploadPut(file);
           }
+
           if (file.postAction) {
             return this.uploadHtml5(file);
           }
         }
+
         if (file.postAction) {
           return this.uploadHtml4(file);
         }
-        return Promise.reject('No action configured');
-      },
 
+        return Promise.reject(new Error('No action configured'));
+      },
 
       /**
        * Whether this file should be uploaded using chunk upload or not
@@ -1456,9 +1515,8 @@
        * @param Object file
        */
       shouldUseChunkUpload: function shouldUseChunkUpload(file) {
-        return this.chunkEnabled && !!this.chunkOptions.handler && file.size > this.chunkOptions.minSize;
+        return this.chunkEnabled && !!this.chunkOptions.handler && file.size && file.size > this.chunkOptions.minSize;
       },
-
 
       /**
        * Upload a file using Chunk method
@@ -1468,29 +1526,36 @@
       uploadChunk: function uploadChunk(file) {
         var HandlerClass = this.chunkOptions.handler;
         file.chunk = new HandlerClass(file, this.chunkOptions);
-
-        return file.chunk.upload();
+        return file.chunk.upload().then(function (res) {
+          return file;
+        });
       },
       uploadPut: function uploadPut(file) {
         var querys = [];
-        var value = void 0;
+        var value;
+
         for (var key in file.data) {
           value = file.data[key];
+
           if (value !== null && value !== undefined) {
             querys.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
           }
         }
-        var queryString = querys.length ? (file.putAction.indexOf('?') === -1 ? '?' : '&') + querys.join('&') : '';
+
+        var putAction = file.putAction || '';
+        var queryString = querys.length ? (putAction.indexOf('?') === -1 ? '?' : '&') + querys.join('&') : '';
         var xhr = new XMLHttpRequest();
-        xhr.open('PUT', file.putAction + queryString);
+        xhr.open('PUT', putAction + queryString);
         return this.uploadXhr(xhr, file, file.file);
       },
       uploadHtml5: function uploadHtml5(file) {
         var form = new window.FormData();
-        var value = void 0;
+        var value;
+
         for (var key in file.data) {
           value = file.data[key];
-          if (value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && typeof value.toString !== 'function') {
+
+          if (value && _typeof(value) === 'object' && typeof value.toString !== 'function') {
             if (value instanceof File) {
               form.append(key, value, value.name);
             } else {
@@ -1499,51 +1564,63 @@
           } else if (value !== null && value !== undefined) {
             form.append(key, value);
           }
-        }
-        form.append(this.name, file.file, file.file.filename || file.name);
+        } // @ts-ignore
+
+
+        form.append(this.name, file.file, file.file.name || file.file.filename || file.name);
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', file.postAction);
+        xhr.open('POST', file.postAction || '');
         return this.uploadXhr(xhr, file, form);
       },
-      uploadXhr: function uploadXhr(xhr, _file, body) {
-        var _this4 = this;
+      uploadXhr: function uploadXhr(xhr, ufile, body) {
+        var _this11 = this;
 
-        var file = _file;
+        var file = ufile;
         var speedTime = 0;
-        var speedLoaded = 0;
+        var speedLoaded = 0; // 进度条
 
-        // 进度条
         xhr.upload.onprogress = function (e) {
           // 还未开始上传 已删除 未激活
-          file = _this4.get(file);
-          if (!e.lengthComputable || !file || !file.fileObject || !file.active) {
+          if (!file) {
             return;
           }
 
-          // 进度 速度 每秒更新一次
+          file = _this11.get(file);
+
+          if (!e.lengthComputable || !file || !file.fileObject || !file.active) {
+            return;
+          } // 进度 速度 每秒更新一次
+
+
           var speedTime2 = Math.round(Date.now() / 1000);
+
           if (speedTime2 === speedTime) {
             return;
           }
-          speedTime = speedTime2;
 
-          file = _this4.update(file, {
+          speedTime = speedTime2;
+          file = _this11.update(file, {
             progress: (e.loaded / e.total * 100).toFixed(2),
             speed: e.loaded - speedLoaded
           });
           speedLoaded = e.loaded;
-        };
+        }; // 检查激活状态
 
-        // 检查激活状态
-        var interval = setInterval(function () {
-          file = _this4.get(file);
-          if (file && file.fileObject && !file.success && !file.error && file.active) {
-            return;
+
+        var interval = window.setInterval(function () {
+          if (file) {
+            var _file2;
+
+            file = _this11.get(file);
+
+            if (file && (_file2 = file) !== null && _file2 !== void 0 && _file2.fileObject && !file.success && !file.error && file.active) {
+              return;
+            }
           }
 
           if (interval) {
             clearInterval(interval);
-            interval = false;
+            interval = undefined;
           }
 
           try {
@@ -1551,43 +1628,56 @@
             xhr.timeout = 1;
           } catch (e) {}
         }, 100);
-
         return new Promise(function (resolve, reject) {
-          var complete = void 0;
+          if (!file) {
+            return reject(new Error('not_exists'));
+          }
+
+          var complete;
+
           var fn = function fn(e) {
             // 已经处理过了
             if (complete) {
               return;
             }
+
             complete = true;
+
             if (interval) {
               clearInterval(interval);
-              interval = false;
+              interval = undefined;
             }
 
-            file = _this4.get(file);
-
-            // 不存在直接响应
             if (!file) {
-              return reject('not_exists');
+              return reject(new Error('not_exists'));
             }
 
-            // 不是文件对象
+            file = _this11.get(file); // 不存在直接响应
+
+            if (!file) {
+              return reject(new Error('not_exists'));
+            } // 不是文件对象
+
+
             if (!file.fileObject) {
-              return reject('file_object');
-            }
+              return reject(new Error('file_object'));
+            } // 有错误自动响应
 
-            // 有错误自动响应
+
             if (file.error) {
-              return reject(file.error);
-            }
+              if (file.error instanceof Error) {
+                return reject(file.error);
+              }
 
-            // 未激活
+              return reject(new Error(file.error));
+            } // 未激活
+
+
             if (!file.active) {
-              return reject('abort');
-            }
+              return reject(new Error('abort'));
+            } // 已完成 直接相应
 
-            // 已完成 直接相应
+
             if (file.success) {
               return resolve(file);
             }
@@ -1599,6 +1689,7 @@
               case 'abort':
                 data.error = e.type;
                 break;
+
               case 'error':
                 if (!xhr.status) {
                   data.error = 'network';
@@ -1607,7 +1698,9 @@
                 } else if (xhr.status >= 400) {
                   data.error = 'denied';
                 }
+
                 break;
+
               default:
                 if (xhr.status >= 500) {
                   data.error = 'server';
@@ -1616,56 +1709,73 @@
                 } else {
                   data.progress = '100.00';
                 }
+
             }
 
             if (xhr.responseText) {
               var contentType = xhr.getResponseHeader('Content-Type');
+
               if (contentType && contentType.indexOf('/json') !== -1) {
                 data.response = JSON.parse(xhr.responseText);
               } else {
                 data.response = xhr.responseText;
               }
-            }
+            } // 更新
+            // @ts-ignore
 
-            // 更新
-            file = _this4.update(file, data);
 
-            // 相应错误
+            file = _this11.update(file, data);
+
+            if (!file) {
+              return reject(new Error('abort'));
+            } // 有错误自动响应
+
+
             if (file.error) {
-              return reject(file.error);
-            }
+              if (file.error instanceof Error) {
+                return reject(file.error);
+              }
 
-            // 响应
+              return reject(new Error(file.error));
+            } // 响应
+
+
             return resolve(file);
-          };
+          }; // 事件
 
-          // 事件
+
           xhr.onload = fn;
           xhr.onerror = fn;
           xhr.onabort = fn;
-          xhr.ontimeout = fn;
+          xhr.ontimeout = fn; // 超时
 
-          // 超时
           if (file.timeout) {
             xhr.timeout = file.timeout;
-          }
+          } // headers
 
-          // headers
+
           for (var key in file.headers) {
             xhr.setRequestHeader(key, file.headers[key]);
-          }
+          } // 更新 xhr
+          // @ts-ignore
 
-          // 更新 xhr
-          file = _this4.update(file, { xhr: xhr });
 
-          // 开始上传
-          xhr.send(body);
+          file = _this11.update(file, {
+            xhr: xhr
+          }); // 开始上传
+
+          file && xhr.send(body);
         });
       },
-      uploadHtml4: function uploadHtml4(_file) {
-        var _this5 = this;
+      uploadHtml4: function uploadHtml4(ufile) {
+        var _this12 = this;
 
-        var file = _file;
+        var file = ufile;
+
+        if (!file) {
+          return Promise.reject(new Error('not_exists'));
+        }
+
         var onKeydown = function onKeydown(e) {
           if (e.keyCode === 27) {
             e.preventDefault();
@@ -1677,129 +1787,163 @@
         iframe.name = 'upload-iframe-' + file.id;
         iframe.src = 'about:blank';
         iframe.setAttribute('style', 'width:1px;height:1px;top:-999em;position:absolute; margin-top:-999em;');
-
         var form = document.createElement('form');
-
-        form.action = file.postAction;
-
+        form.setAttribute('action', file.postAction || '');
         form.name = 'upload-form-' + file.id;
-
         form.setAttribute('method', 'POST');
         form.setAttribute('target', 'upload-iframe-' + file.id);
         form.setAttribute('enctype', 'multipart/form-data');
 
-        var value = void 0;
-        var input = void 0;
         for (var key in file.data) {
-          value = file.data[key];
-          if (value && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && typeof value.toString !== 'function') {
+          var value = file.data[key];
+
+          if (value && _typeof(value) === 'object' && typeof value.toString !== 'function') {
             value = JSON.stringify(value);
           }
+
           if (value !== null && value !== undefined) {
-            input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = value;
-            form.appendChild(input);
+            var el = document.createElement('input');
+            el.type = 'hidden';
+            el.name = key;
+            el.value = value;
+            form.appendChild(el);
           }
         }
-        form.appendChild(file.el);
 
+        form.appendChild(file.el);
         document.body.appendChild(iframe).appendChild(form);
 
         var getResponseData = function getResponseData() {
-          var doc = void 0;
+          var _doc;
+
+          var doc;
+
           try {
             if (iframe.contentWindow) {
               doc = iframe.contentWindow.document;
             }
           } catch (err) {}
+
           if (!doc) {
             try {
+              // @ts-ignore
               doc = iframe.contentDocument ? iframe.contentDocument : iframe.document;
             } catch (err) {
+              // @ts-ignore
               doc = iframe.document;
             }
-          }
-          if (doc && doc.body) {
+          } // @ts-ignore
+
+
+          if ((_doc = doc) !== null && _doc !== void 0 && _doc.body) {
             return doc.body.innerHTML;
           }
+
           return null;
         };
 
         return new Promise(function (resolve, reject) {
           setTimeout(function () {
-            file = _this5.update(file, { iframe: iframe });
-
-            // 不存在
             if (!file) {
-              return reject('not_exists');
+              return reject(new Error('not_exists'));
             }
 
-            // 定时检查
-            var interval = setInterval(function () {
-              file = _this5.get(file);
-              if (file && file.fileObject && !file.success && !file.error && file.active) {
-                return;
+            file = _this12.update(file, {
+              iframe: iframe
+            }); // 不存在
+
+            if (!file) {
+              return reject(new Error('not_exists'));
+            } // 定时检查
+
+
+            var interval = window.setInterval(function () {
+              if (file) {
+                var _file3;
+
+                file = _this12.get(file);
+
+                if (file && (_file3 = file) !== null && _file3 !== void 0 && _file3.fileObject && !file.success && !file.error && file.active) {
+                  return;
+                }
               }
 
               if (interval) {
                 clearInterval(interval);
-                interval = false;
-              }
+                interval = undefined;
+              } // @ts-ignore
 
-              iframe.onabort({ type: file ? 'abort' : 'not_exists' });
+
+              iframe.onabort({
+                type: file ? 'abort' : 'not_exists'
+              });
             }, 100);
+            var complete;
 
-            var complete = void 0;
             var fn = function fn(e) {
+              var _file4;
+
               // 已经处理过了
               if (complete) {
                 return;
               }
+
               complete = true;
 
               if (interval) {
                 clearInterval(interval);
-                interval = false;
-              }
+                interval = undefined;
+              } // 关闭 esc 事件
 
-              // 关闭 esc 事件
+
               document.body.removeEventListener('keydown', onKeydown);
 
-              file = _this5.get(file);
-
-              // 不存在直接响应
               if (!file) {
-                return reject('not_exists');
+                return reject(new Error('not_exists'));
               }
 
-              // 不是文件对象
+              file = _this12.get(file); // 不存在直接响应
+
+              if (!file) {
+                return reject(new Error('not_exists'));
+              } // 不是文件对象
+
+
               if (!file.fileObject) {
-                return reject('file_object');
-              }
+                return reject(new Error('file_object'));
+              } // 有错误自动响应
 
-              // 有错误自动响应
+
               if (file.error) {
-                return reject(file.error);
-              }
+                if (file.error instanceof Error) {
+                  return reject(file.error);
+                }
 
-              // 未激活
+                return reject(new Error(file.error));
+              } // 未激活
+
+
               if (!file.active) {
-                return reject('abort');
-              }
+                return reject(new Error('abort'));
+              } // 已完成 直接相应
 
-              // 已完成 直接相应
+
               if (file.success) {
                 return resolve(file);
               }
 
               var response = getResponseData();
               var data = {};
+
+              if (typeof e === 'string') {
+                return reject(new Error(e));
+              }
+
               switch (e.type) {
                 case 'abort':
                   data.error = 'abort';
                   break;
+
                 case 'error':
                   if (file.error) {
                     data.error = file.error;
@@ -1808,15 +1952,18 @@
                   } else {
                     data.error = 'denied';
                   }
+
                   break;
+
                 default:
                   if (file.error) {
                     data.error = file.error;
-                  } else if (data === null) {
+                  } else if (response === null) {
                     data.error = 'network';
                   } else {
                     data.progress = '100.00';
                   }
+
               }
 
               if (response !== null) {
@@ -1825,68 +1972,91 @@
                     response = JSON.parse(response);
                   } catch (err) {}
                 }
+
                 data.response = response;
+              } // 更新
+
+
+              file = _this12.update(file, data);
+
+              if (!file) {
+                return reject(new Error('not_exists'));
               }
 
-              // 更新
-              file = _this5.update(file, data);
+              if ((_file4 = file) !== null && _file4 !== void 0 && _file4.error) {
+                if (file.error instanceof Error) {
+                  return reject(file.error);
+                }
 
-              if (file.error) {
-                return reject(file.error);
-              }
+                return reject(new Error(file.error));
+              } // 响应
 
-              // 响应
+
               return resolve(file);
-            };
+            }; // 添加事件
 
-            // 添加事件
+
             iframe.onload = fn;
             iframe.onerror = fn;
-            iframe.onabort = fn;
+            iframe.onabort = fn; // 禁止 esc 键
 
-            // 禁止 esc 键
-            document.body.addEventListener('keydown', onKeydown);
+            document.body.addEventListener('keydown', onKeydown); // 提交
 
-            // 提交
             form.submit();
           }, 50);
         }).then(function (res) {
-          iframe.parentNode && iframe.parentNode.removeChild(iframe);
+          var _iframe$parentNode;
+
+          iframe === null || iframe === void 0 ? void 0 : (_iframe$parentNode = iframe.parentNode) === null || _iframe$parentNode === void 0 ? void 0 : _iframe$parentNode.removeChild(iframe);
           return res;
         }).catch(function (res) {
-          iframe.parentNode && iframe.parentNode.removeChild(iframe);
+          var _iframe$parentNode2;
+
+          iframe === null || iframe === void 0 ? void 0 : (_iframe$parentNode2 = iframe.parentNode) === null || _iframe$parentNode2 === void 0 ? void 0 : _iframe$parentNode2.removeChild(iframe);
           return res;
         });
       },
       watchActive: function watchActive(active) {
-        var file = void 0;
+        var file;
         var index = 0;
+
         while (file = this.files[index]) {
           index++;
-          if (!file.fileObject) ; else if (active && !this.destroy) {
+          if (!file.fileObject) ;else if (active && !this.destroy) {
             if (this.uploading >= this.thread || this.uploading && !this.features.html5) {
               break;
             }
+
             if (!file.active && !file.error && !file.success) {
-              this.update(file, { active: true });
+              this.update(file, {
+                active: true
+              });
             }
           } else {
             if (file.active) {
-              this.update(file, { active: false });
+              this.update(file, {
+                active: false
+              });
             }
           }
         }
+
         if (this.uploading === 0) {
           this.active = false;
         }
       },
-      watchDrop: function watchDrop(_el) {
-        var el = _el;
+      watchDrop: function watchDrop(newDrop) {
+        var oldDrop = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : undefined;
+
         if (!this.features.drop) {
           return;
         }
 
-        // 移除挂载
+        if (newDrop === oldDrop) {
+          return;
+        } // 移除挂载
+
+
         if (this.dropElement) {
           try {
             document.removeEventListener('dragenter', this.onDragenter, false);
@@ -1897,14 +2067,16 @@
           } catch (e) {}
         }
 
-        if (!el) {
-          el = false;
-        } else if (typeof el === 'string') {
-          el = document.querySelector(el) || this.$root.$el.querySelector(el);
-        } else if (el === true) {
+        var el = null;
+        if (!newDrop) ;else if (typeof newDrop === 'string') {
+          // @ts-ignore
+          var _el = document.querySelector(newDrop) || this.$root.$el.querySelector(newDrop);
+        } else if (newDrop === true) {
+          // @ts-ignore
           el = this.$parent.$el;
+        } else {
+          el = newDrop;
         }
-
         this.dropElement = el;
 
         if (this.dropElement) {
@@ -1916,29 +2088,38 @@
         }
       },
       onDragenter: function onDragenter(e) {
+        var _dt$files, _dt$types;
+
         e.preventDefault();
+
         if (this.dropActive) {
           return;
         }
+
         if (!e.dataTransfer) {
           return;
         }
+
         var dt = e.dataTransfer;
-        if (dt.files && dt.files.length) {
+
+        if (dt !== null && dt !== void 0 && (_dt$files = dt.files) !== null && _dt$files !== void 0 && _dt$files.length) {
           this.dropActive = true;
         } else if (!dt.types) {
           this.dropActive = true;
         } else if (dt.types.indexOf && dt.types.indexOf('Files') !== -1) {
-          this.dropActive = true;
-        } else if (dt.types.contains && dt.types.contains('Files')) {
+          this.dropActive = true; // @ts-ignore
+        } else if ((_dt$types = dt.types) !== null && _dt$types !== void 0 && _dt$types.contains && dt.types.contains('Files')) {
           this.dropActive = true;
         }
       },
       onDragleave: function onDragleave(e) {
         e.preventDefault();
+
         if (!this.dropActive) {
           return;
-        }
+        } // @ts-ignore
+
+
         if (e.target.nodeName === 'HTML' || e.target === e.explicitOriginalTarget || !e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight)) {
           this.dropActive = false;
         }
@@ -1951,144 +2132,114 @@
       },
       onDrop: function onDrop(e) {
         e.preventDefault();
-        this.addDataTransfer(e.dataTransfer);
-      }
-    }
-  };
+        e.dataTransfer && this.addDataTransfer(e.dataTransfer);
+      },
+      inputOnChange: function (_inputOnChange) {
+        function inputOnChange(_x) {
+          return _inputOnChange.apply(this, arguments);
+        }
 
-  /* script */
-  var __vue_script__$1 = script$1;
-
-  /* template */
-  var __vue_render__$1 = function __vue_render__() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('span', { class: _vm.className }, [_vm._t("default"), _vm._v(" "), _c('label', { attrs: { "for": _vm.inputId || _vm.name } }), _vm._v(" "), _c('input-file')], 2);
-  };
-  var __vue_staticRenderFns__$1 = [];
-
-  /* style */
-  var __vue_inject_styles__$1 = function (inject) {
-    if (!inject) return;
-    inject("data-v-595958af_0", { source: "\n.file-uploads{overflow:hidden;position:relative;text-align:center;display:inline-block\n}\n.file-uploads.file-uploads-html4 input,.file-uploads.file-uploads-html5 label{background:#fff;opacity:0;font-size:20em;z-index:1;top:0;left:0;right:0;bottom:0;position:absolute;width:100%;height:100%\n}\n.file-uploads.file-uploads-html4 label,.file-uploads.file-uploads-html5 input{background:rgba(255,255,255,0);overflow:hidden;position:fixed;width:1px;height:1px;z-index:-1;opacity:0\n}", map: undefined, media: undefined });
-  };
-  /* scoped */
-  var __vue_scope_id__$1 = undefined;
-  /* module identifier */
-  var __vue_module_identifier__$1 = undefined;
-  /* functional template */
-  var __vue_is_functional_template__$1 = false;
-  /* component normalizer */
-  function __vue_normalize__$1(template, style, script, scope, functional, moduleIdentifier, createInjector, createInjectorSSR) {
-    var component = (typeof script === 'function' ? script.options : script) || {};
-
-    if (!component.render) {
-      component.render = template.render;
-      component.staticRenderFns = template.staticRenderFns;
-      component._compiled = true;
-
-      if (functional) component.functional = true;
-    }
-
-    component._scopeId = scope;
-
-    {
-      var hook = void 0;
-      if (style) {
-        hook = function hook(context) {
-          style.call(this, createInjector(context));
+        inputOnChange.toString = function () {
+          return _inputOnChange.toString();
         };
-      }
 
-      if (hook !== undefined) {
-        if (component.functional) {
-          // register for functional component in vue file
-          var originalRender = component.render;
-          component.render = function renderWithStyleInjection(h, context) {
-            hook.call(context);
-            return originalRender(h, context);
-          };
-        } else {
-          // inject component registration as beforeCreate hook
-          var existing = component.beforeCreate;
-          component.beforeCreate = existing ? [].concat(existing, hook) : [hook];
-        }
-      }
-    }
+        return inputOnChange;
+      }(async function (e) {
+        var _this13 = this;
 
-    return component;
-  }
-  /* style inject */
-  function __vue_create_injector__$1() {
-    var head = document.head || document.getElementsByTagName('head')[0];
-    var styles = __vue_create_injector__$1.styles || (__vue_create_injector__$1.styles = {});
-    var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\\b/.test(navigator.userAgent.toLowerCase());
-
-    return function addStyle(id, css) {
-      if (document.querySelector('style[data-vue-ssr-id~="' + id + '"]')) return; // SSR styles are present.
-
-      var group = isOldIE ? css.media || 'default' : id;
-      var style = styles[group] || (styles[group] = { ids: [], parts: [], element: undefined });
-
-      if (!style.ids.includes(id)) {
-        var code = css.source;
-        var index = style.ids.length;
-
-        style.ids.push(id);
-
-        if (css.map) {
-          // https://developer.chrome.com/devtools/docs/javascript-debugging
-          // this makes source maps inside style tags work properly in Chrome
-          code += '\n/*# sourceURL=' + css.map.sources[0] + ' */';
-          // http://stackoverflow.com/a/26603875
-          code += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(css.map)))) + ' */';
+        if (!(e.target instanceof HTMLInputElement)) {
+          return Promise.reject(new Error("not HTMLInputElement"));
         }
 
-        if (isOldIE) {
-          style.element = style.element || document.querySelector('style[data-group=' + group + ']');
-        }
+        var target = e.target;
 
-        if (!style.element) {
-          var el = style.element = document.createElement('style');
-          el.type = 'text/css';
+        var reinput = function reinput(res) {
+          if (target.files) {
+            target.value = '';
 
-          if (css.media) el.setAttribute('media', css.media);
-          if (isOldIE) {
-            el.setAttribute('data-group', group);
-            el.setAttribute('data-next-index', '0');
+            if (target.files.length && !/safari/i.test(navigator.userAgent)) {
+              target.type = '';
+              target.type = 'file';
+            }
+          } else {
+            var _oldInput$parentNode;
+
+            // ie9 fix #219
+            var oldInput = document.getElementById(_this13.forId);
+            var newInput = oldInput.cloneNode(true);
+            newInput.value = '';
+            newInput.type = 'file'; // @ts-ignore
+
+            newInput.onChange = inputOnChange;
+            (_oldInput$parentNode = oldInput.parentNode) === null || _oldInput$parentNode === void 0 ? void 0 : _oldInput$parentNode.replaceChild(newInput, oldInput);
+            _this13.$refs.input = newInput;
           }
 
-          head.appendChild(el);
-        }
+          return res;
+        };
 
-        if (isOldIE) {
-          index = parseInt(style.element.getAttribute('data-next-index'));
-          style.element.setAttribute('data-next-index', index + 1);
-        }
-
-        if (style.element.styleSheet) {
-          style.parts.push(code);
-          style.element.styleSheet.cssText = style.parts.filter(Boolean).join('\n');
-        } else {
-          var textNode = document.createTextNode(code);
-          var nodes = style.element.childNodes;
-          if (nodes[index]) style.element.removeChild(nodes[index]);
-          if (nodes.length) style.element.insertBefore(textNode, nodes[index]);else style.element.appendChild(textNode);
-        }
-      }
-    };
-  }
-  /* style inject SSR */
-
-  var FileUpload = __vue_normalize__$1({ render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 }, __vue_inject_styles__$1, __vue_script__$1, __vue_scope_id__$1, __vue_is_functional_template__$1, __vue_module_identifier__$1, __vue_create_injector__$1, undefined);
-
-  var FileUpload$1 = /*#__PURE__*/Object.freeze({
-    default: FileUpload
+        return this.addInputFile(e.target).then(reinput).catch(reinput);
+      })
+    }
   });
 
-  var require$$0 = ( FileUpload$1 && FileUpload ) || FileUpload$1;
+  function render(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createBlock("span", {
+      class: _ctx.className
+    }, [vue.renderSlot(_ctx.$slots, "default"), vue.createVNode("label", {
+      for: _ctx.forId
+    }, null, 8, ["for"]), vue.createVNode("input", {
+      ref: "input",
+      type: "file",
+      name: _ctx.name,
+      id: _ctx.forId,
+      accept: _ctx.accept,
+      capture: _ctx.capture,
+      disabled: _ctx.disabled,
+      webkitdirectory: _ctx.directory && _ctx.features.directory,
+      allowdirs: _ctx.directory && _ctx.features.directory,
+      directory: _ctx.directory && _ctx.features.directory,
+      multiple: _ctx.multiple && _ctx.features.html5,
+      onChange: _cache[1] || (_cache[1] = function () {
+        return _ctx.inputOnChange && _ctx.inputOnChange.apply(_ctx, arguments);
+      })
+    }, null, 40, ["name", "id", "accept", "capture", "disabled", "webkitdirectory", "allowdirs", "directory", "multiple"])], 2);
+  }
 
-  var src = require$$0;
+  function styleInject(css, ref) {
+    if (ref === void 0) ref = {};
+    var insertAt = ref.insertAt;
 
-  return src;
+    if (!css || typeof document === 'undefined') {
+      return;
+    }
+
+    var head = document.head || document.getElementsByTagName('head')[0];
+    var style = document.createElement('style');
+    style.type = 'text/css';
+
+    if (insertAt === 'top') {
+      if (head.firstChild) {
+        head.insertBefore(style, head.firstChild);
+      } else {
+        head.appendChild(style);
+      }
+    } else {
+      head.appendChild(style);
+    }
+
+    if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }
+  }
+
+  var css_248z = "\n.file-uploads {\n  overflow: hidden;\n  position: relative;\n  text-align: center;\n  display: inline-block;\n}\n.file-uploads.file-uploads-html4 input, .file-uploads.file-uploads-html5 label {\n  /* background fix ie  click */\n  background: #fff;\n  opacity: 0;\n  font-size: 20em;\n  z-index: 1;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n}\n.file-uploads.file-uploads-html5 input, .file-uploads.file-uploads-html4 label {\n  /* background fix ie  click */\n  background: rgba(255, 255, 255, 0);\n  overflow: hidden;\n  position: fixed;\n  width: 1px;\n  height: 1px;\n  z-index: -1;\n  opacity: 0;\n}\n";
+  styleInject(css_248z);
+  script.render = render;
+
+  return script;
 
 })));
 //# sourceMappingURL=vue-upload-component.js.map

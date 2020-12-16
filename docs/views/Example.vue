@@ -5,25 +5,25 @@
       <nav id="sidebar-nav" class="collapse show">
         <ul class="nav">
           <li class="nav-item">
-            <router-link active-class="active" class="nav-link" :to="'/examples/full' | toLocale">{{$t('example.full')}}</router-link>
+            <router-link active-class="active" class="nav-link" :to="$toLocale('/examples/full')">{{$t('example.full')}}</router-link>
           </li>
           <li class="nav-item">
-            <router-link active-class="active" class="nav-link" :to="'/examples/simple' | toLocale">{{$t('example.simple')}}</router-link>
+            <router-link active-class="active" class="nav-link" :to="$toLocale('/examples/simple')">{{$t('example.simple')}}</router-link>
           </li>
           <li class="nav-item">
-            <router-link active-class="active" class="nav-link" :to="'/examples/avatar' | toLocale">{{$t('example.avatar')}}</router-link>
+            <router-link active-class="active" class="nav-link" :to="$toLocale('/examples/avatar')">{{$t('example.avatar')}}</router-link>
           </li>
           <li class="nav-item">
-            <router-link active-class="active" class="nav-link" :to="'/examples/drag' | toLocale">{{$t('example.drag')}}</router-link>
+            <router-link active-class="active" class="nav-link" :to="$toLocale('/examples/drag')">{{$t('example.drag')}}</router-link>
           </li>
           <li class="nav-item">
-            <router-link active-class="active" class="nav-link" :to="'/examples/multiple' | toLocale">{{$t('example.multiple')}}</router-link>
+            <router-link active-class="active" class="nav-link" :to="$toLocale('/examples/multiple')">{{$t('example.multiple')}}</router-link>
           </li>
           <li class="nav-item">
-            <router-link active-class="active" class="nav-link" :to="'/examples/chunk' | toLocale">{{$t('example.chunk')}}</router-link>
+            <router-link active-class="active" class="nav-link" :to="$toLocale('/examples/chunk')">{{$t('example.chunk')}}</router-link>
           </li>
           <li class="nav-item">
-            <router-link active-class="active" class="nav-link" :to="'/examples/vuex' | toLocale">{{$t('example.vuex')}}</router-link>
+            <router-link active-class="active" class="nav-link" :to="$toLocale('/examples/vuex')">{{$t('example.vuex')}}</router-link>
           </li>
         </ul>
       </nav>

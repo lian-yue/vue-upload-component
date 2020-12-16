@@ -35,7 +35,7 @@
           <tr v-for="(file, index) in files" :key="file.id">
             <td>{{index}}</td>
             <td>
-              <img v-if="file.thumb" :src="file.thumb" width="40" height="auto" />
+              <img class="td-image-thumb" v-if="file.thumb" :src="file.thumb" />
               <span v-else>No Image</span>
             </td>
             <td>
@@ -46,8 +46,8 @@
                 <div :class="{'progress-bar': true, 'progress-bar-striped': true, 'bg-danger': file.error, 'progress-bar-animated': file.active}" role="progressbar" :style="{width: file.progress + '%'}">{{file.progress}}%</div>
               </div>
             </td>
-            <td>{{file.size | formatSize}}</td>
-            <td>{{file.speed | formatSize}}</td>
+            <td>{{$formatSize(file.size)}}</td>
+            <td>{{$formatSize(file.speed)}}</td>
 
             <td v-if="file.error">{{file.error}}</td>
             <td v-else-if="file.success">success</td>
@@ -91,6 +91,7 @@
           :accept="accept"
           :multiple="multiple"
           :directory="directory"
+          :create-directory="createDirectory"
           :size="size || 0"
           :thread="thread < 1 ? 1 : (thread > 5 ? 5 : thread)"
           :headers="headers"
@@ -167,7 +168,7 @@
     <div class="form-group">
       <label for="autoCompress">Automatically compress:</label>
       <input type="number" min="0" id="autoCompress" class="form-control" v-model.number="autoCompress">
-      <small class="form-text text-muted" v-if="autoCompress > 0">More than {{autoCompress | formatSize}} files are automatically compressed</small>
+      <small class="form-text text-muted" v-if="autoCompress > 0">More than {{$formatSize(autoCompress)}} files are automatically compressed</small>
       <small class="form-text text-muted" v-else>Set up automatic compression</small>
     </div>
 
@@ -199,6 +200,14 @@
     <div class="form-group">
       <div class="form-check">
         <label class="form-check-label">
+          <input type="checkbox" id="create-directory" class="form-check-input" v-model="createDirectory"> Create Directory
+        </label>
+      </div>
+      <small class="form-text text-muted">The directory file will send an upload request. The mime type is <code>text/directory</code></small>
+    </div>
+    <div class="form-group">
+      <div class="form-check">
+        <label class="form-check-label">
           <input type="checkbox" id="upload-auto" class="form-check-input" v-model="uploadAuto"> Auto start
         </label>
       </div>
@@ -226,13 +235,13 @@
         <form @submit.prevent="onAddData">
           <div class="modal-body">
             <div class="form-group">
-              <label for="name">Name:</label>
-              <input type="text" class="form-control" required id="name"  placeholder="Please enter a file name" v-model="addData.name">
+              <label for="data-name">Name:</label>
+              <input type="text" class="form-control" required id="data-name"  placeholder="Please enter a file name" v-model="addData.name">
               <small class="form-text text-muted">Such as <code>filename.txt</code></small>
             </div>
             <div class="form-group">
-              <label for="type">Type:</label>
-              <input type="text" class="form-control" required id="type"  placeholder="Please enter the MIME type" v-model="addData.type">
+              <label for="data-type">Type:</label>
+              <input type="text" class="form-control" required id="data-type"  placeholder="Please enter the MIME type" v-model="addData.type">
               <small class="form-text text-muted">Such as <code>text/plain</code></small>
             </div>
             <div class="form-group">
@@ -321,7 +330,10 @@
   margin-right: .6rem
 }
 
-
+.td-image-thumb {
+  max-width: 4em;
+  max-height: 4em;
+}
 
 .example-full .filename {
   margin-bottom: .3rem
@@ -402,6 +414,7 @@ export default {
       directory: false,
       drop: true,
       dropDirectory: true,
+      createDirectory: false,
       addIndex: false,
       thread: 3,
       name: 'file',
@@ -610,18 +623,19 @@ export default {
         this.alert('Your browser does not support')
         return
       }
-
-      let input = this.$refs.upload.$el.querySelector('input')
-      input.directory = true
-      input.webkitdirectory = true
-      this.directory = true
-
-      input.onclick = null
+      let input = document.createElement('input')
+      input.style = "background: rgba(255, 255, 255, 0);overflow: hidden;position: fixed;width: 1px;height: 1px;z-index: -1;opacity: 0;"
+      input.type = 'file'
+      input.setAttribute('allowdirs', true)
+      input.setAttribute('directory', true)
+      input.setAttribute('webkitdirectory', true)
+      input.multiple = true
+      document.querySelector("body").appendChild(input)
       input.click()
-      input.onclick = (e) => {
-        this.directory = false
-        input.directory = false
-        input.webkitdirectory = false
+      input.onchange = (e) => {
+        this.$refs.upload.addInputFile(input).then(function() {
+          document.querySelector("body").removeChild(input)
+        })
       }
     },
 

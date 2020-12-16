@@ -1,7 +1,4 @@
-// import Vue from 'vue'
-import Vuex from 'vuex'
-//
-// Vue.use(Vuex)
+import { createStore } from 'vuex'
 
 
 const state = {
@@ -13,7 +10,7 @@ const mutations = {
     state.files = files
   }
 }
-export default new Vuex.Store({
+export default createStore({
   strict: true,
   state,
   mutations

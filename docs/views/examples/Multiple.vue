@@ -3,12 +3,11 @@
     <h1 id="example-title" class="example-title">Multiple instances</h1>
     <div class="upload">
       <ul>
-        <li v-for="(file, index) in files1" :key="file.id">
+        <li v-for="(file) in files1" :key="file.id">
           <span>{{file.name}}</span> -
-          <span>{{file.size | formatSize}}</span> -
+          <span>{{$formatSize(file.size)}}</span> -
           <span v-if="file.error">{{file.error}}</span>
           <span v-else-if="file.success">success</span>
-          <span v-else-if="file.active">active</span>
           <span v-else-if="file.active">active</span>
           <span v-else></span>
         </li>
@@ -38,12 +37,11 @@
 
     <div class="upload">
       <ul>
-        <li v-for="(file, index) in files2" :key="file.id">
+        <li v-for="(file) in files2" :key="file.id">
           <span>{{file.name}}</span> -
-          <span>{{file.size | formatSize}}</span> -
+          <span>{{$formatSize(file.size)}}</span> -
           <span v-if="file.error">{{file.error}}</span>
           <span v-else-if="file.success">success</span>
-          <span v-else-if="file.active">active</span>
           <span v-else-if="file.active">active</span>
           <span v-else></span>
         </li>
