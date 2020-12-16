@@ -1,39 +1,58 @@
-// http://eslint.org/docs/user-guide/configuring
-
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
-  parserOptions: {
-    sourceType: 'module'
-  },
   env: {
-    browser: true,
-    jest: true
+    node: true
   },
-  // https://github.com/standard/standard/blob/master/docs/RULES-en.md
-  extends: "standard",
+  extends: [
+    'alloy',
+    'alloy/typescript',
+    'plugin:vue/essential',
+    '@vue/typescript',
 
-  // required to lint *.vue files
-  plugins: [
-    'html'
+    'prettier',
+    'plugin:prettier/recommended',
+    'prettier/react',
+    'prettier/standard',
   ],
-  // add your custom rules here
-  'rules': {
-    // allow paren-less arrow functions
-    'arrow-parens': 0,
-    // allow async-await
-    'generator-star-spacing': 0,
-    // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
-
-    'no-control-regex': 0,
-    'no-useless-escape': 0,
-    'comma-dangle': 0,
-    'space-before-function-paren': 0,
-    'no-multiple-empty-lines': 0,
-    'no-multi-spaces': 0,
-    'padded-blocks': 0,
-    'prefer-promise-reject-errors': 0,
-    'operator-linebreak': 0
-  }
+  rules: {
+    'no-console': 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'complexity': ["error", 40],
+    'max-params': ["error", 10],
+    '@typescript-eslint/no-empty-interface': 'off',
+    '@typescript-eslint/prefer-for-of': 'off',
+    'guard-for-in': 'off',
+    "@typescript-eslint/explicit-member-accessibility": "off"
+  },
+  parserOptions: {
+    parser: '@typescript-eslint/parser'
+  },
+  plugins: ['@typescript-eslint', 'prettier'],
+  overrides: [
+    {
+      files: [
+        '**/__tests__/*.{j,t}s?(x)',
+        '**/tests/unit/**/*.spec.{j,t}s?(x)'
+      ],
+      env: {
+        jest: true
+      }
+    },
+    // {
+    //   // enable the rule specifically for TypeScript files
+    //   "files": ["*.ts", "*.tsx"],
+    //   "rules": {
+    //     "@typescript-eslint/explicit-member-accessibility": ["error"]
+    //   }
+    // },
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "@typescript-eslint/explicit-member-accessibility": ["error"]
+      }
+    },
+  ]
 }
+
+
+
