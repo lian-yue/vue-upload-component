@@ -6,10 +6,26 @@
 npm install vue-upload-component --save
 ```
 
+#### Vue3
+``` bash
+npm install vue-upload-component@next --save
+```
+
 ``` js
 const VueUploadComponent = require('vue-upload-component')
-Vue.component('file-upload', VueUploadComponent)
+app.component('file-upload', VueUploadComponent)
+// or 
+import VueUploadComponent from 'vue-upload-component'
+app.component('file-upload', VueUploadComponent)
 ```
+
+### Typescript
+``` js
+import VueUploadComponent from 'vue-upload-component/src/FileUpload.vue'
+// vue-upload-component/src/types.d.ts
+app.component('file-upload', VueUploadComponent)
+```
+
 
 ### Curated
 

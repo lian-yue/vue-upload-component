@@ -28,6 +28,10 @@ https://lian-yue.github.io/vue-upload-component/
 ``` bash
 npm install vue-upload-component --save
 ```
+## Vue3
+``` bash
+npm install vue-upload-component@next --save
+```
 
 # Documentation
 
@@ -62,6 +66,10 @@ https://lian-yue.github.io/vue-upload-component/#/zh-cn/
 
 ``` bash
 npm install vue-upload-component --save
+```
+## Vue3
+``` bash
+npm install vue-upload-component@next --save
 ```
 
 # 文档
