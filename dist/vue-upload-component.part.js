@@ -1,7 +1,7 @@
 /*!
  Name: vue-upload-component 
 Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.0.37 
+Version: 3.0.39 
 Author: LianYue 
 License: Apache-2.0 
 Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
@@ -24,11 +24,11 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
 
   function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-  function _ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+  function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { _ownKeys(Object(source), true).forEach(function (key) { _defineProperty2(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { _ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-  function _defineProperty2(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+  function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
   function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
@@ -52,55 +52,6 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     if (protoProps) _defineProperties(Constructor.prototype, protoProps);
     if (staticProps) _defineProperties(Constructor, staticProps);
     return Constructor;
-  }
-
-  function _defineProperty(obj, key, value) {
-    if (key in obj) {
-      Object.defineProperty(obj, key, {
-        value: value,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
-    } else {
-      obj[key] = value;
-    }
-
-    return obj;
-  }
-
-  function ownKeys(object, enumerableOnly) {
-    var keys = Object.keys(object);
-
-    if (Object.getOwnPropertySymbols) {
-      var symbols = Object.getOwnPropertySymbols(object);
-      if (enumerableOnly) symbols = symbols.filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-      });
-      keys.push.apply(keys, symbols);
-    }
-
-    return keys;
-  }
-
-  function _objectSpread2(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i] != null ? arguments[i] : {};
-
-      if (i % 2) {
-        ownKeys(Object(source), true).forEach(function (key) {
-          _defineProperty(target, key, source[key]);
-        });
-      } else if (Object.getOwnPropertyDescriptors) {
-        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-      } else {
-        ownKeys(Object(source)).forEach(function (key) {
-          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-        });
-      }
-    }
-
-    return target;
   }
   /**
    * Creates a XHR request
@@ -223,6 +174,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
       this.chunks = [];
       this.sessionId = null;
       this.chunkSize = null;
+      this.speedInterval = null;
     }
     /**
      * Gets the max retries from options
@@ -283,6 +235,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           chunk.xhr.abort();
           chunk.active = false;
         });
+        this.stopSpeedCalc();
       }
       /**
        * Resumes the file upload
@@ -328,11 +281,11 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
 
         request({
           method: 'POST',
-          headers: _objectSpread2(_objectSpread2({}, this.headers), {}, {
+          headers: Object.assign({}, this.headers, {
             'Content-Type': 'application/json'
           }),
           url: this.action,
-          body: _objectSpread2(_objectSpread2({}, this.startBody), {}, {
+          body: Object.assign(this.startBody, {
             phase: 'start',
             mime_type: this.fileType,
             size: this.fileSize,
@@ -366,6 +319,8 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         for (var i = 0; i < this.maxActiveChunks; i++) {
           this.uploadNextChunk();
         }
+
+        this.startSpeedCalc();
       }
       /**
        * Uploads the next chunk
@@ -414,7 +369,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
             chunk.progress = Math.round(evt.loaded / evt.total * 100);
           }
         }, false);
-        sendFormRequest(chunk.xhr, _objectSpread2(_objectSpread2({}, this.uploadBody), {}, {
+        sendFormRequest(chunk.xhr, Object.assign(this.uploadBody, {
           phase: 'upload',
           session_id: this.sessionId,
           start_offset: chunk.startOffset,
@@ -456,13 +411,14 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         var _this4 = this;
 
         this.updateFileProgress();
+        this.stopSpeedCalc();
         request({
           method: 'POST',
-          headers: _objectSpread2(_objectSpread2({}, this.headers), {}, {
+          headers: Object.assign({}, this.headers, {
             'Content-Type': 'application/json'
           }),
           url: this.action,
-          body: _objectSpread2(_objectSpread2({}, this.finishBody), {}, {
+          body: Object.assign(this.finishBody, {
             phase: 'finish',
             session_id: this.sessionId
           })
@@ -479,6 +435,38 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
 
           _this4.reject('server');
         });
+      }
+      /**
+       * Sets an interval to calculate and
+       * set upload speed every 3 seconds
+       */
+
+    }, {
+      key: "startSpeedCalc",
+      value: function startSpeedCalc() {
+        var _this5 = this;
+
+        this.file.speed = 0;
+        var lastUploadedBytes = 0;
+
+        if (!this.speedInterval) {
+          this.speedInterval = window.setInterval(function () {
+            var uploadedBytes = _this5.progress / 100 * _this5.fileSize;
+            _this5.file.speed = uploadedBytes - lastUploadedBytes;
+            lastUploadedBytes = uploadedBytes;
+          }, 1000);
+        }
+      }
+      /**
+       * Removes the upload speed interval
+       */
+
+    }, {
+      key: "stopSpeedCalc",
+      value: function stopSpeedCalc() {
+        this.speedInterval && window.clearInterval(this.speedInterval);
+        this.speedInterval = null;
+        this.file.speed = 0;
       }
     }, {
       key: "maxRetries",
@@ -584,11 +572,11 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     }, {
       key: "progress",
       get: function get() {
-        var _this5 = this;
+        var _this6 = this;
 
         var completedProgress = this.chunksUploaded.length / this.chunks.length * 100;
         var uploadingProgress = this.chunksUploading.reduce(function (progress, chunk) {
-          return progress + (chunk.progress | 0) / _this5.chunks.length;
+          return progress + (chunk.progress | 0) / _this6.chunks.length;
         }, 0);
         return Math.min(completedProgress + uploadingProgress, 100);
       }
@@ -599,7 +587,6 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     }, {
       key: "chunksToUpload",
       get: function get() {
-        console.log(this.chunks);
         return this.chunks.filter(function (chunk) {
           return !chunk.active && !chunk.uploaded;
         });
@@ -769,7 +756,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
      * @return {[type]} [description]
      */
     mounted: function mounted() {
-      var _this6 = this;
+      var _this7 = this;
 
       var input = document.createElement('input');
       input.type = 'file';
@@ -803,16 +790,16 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
 
       this.$nextTick(function () {
         // 更新下父级
-        if (_this6.$parent) {
-          _this6.$parent.$forceUpdate(); // 拖拽渲染
+        if (_this7.$parent) {
+          _this7.$parent.$forceUpdate(); // 拖拽渲染
 
 
-          _this6.$parent.$nextTick(function () {
-            _this6.watchDrop(_this6.drop);
+          _this7.$parent.$nextTick(function () {
+            _this7.watchDrop(_this7.drop);
           });
         } else {
           // 拖拽渲染
-          _this6.watchDrop(_this6.drop);
+          _this7.watchDrop(_this7.drop);
         }
       });
     },
@@ -1099,16 +1086,16 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
       },
       // 添加表单文件
       addInputFile: function addInputFile(el) {
-        var _this7 = this;
+        var _this8 = this;
 
         var files = [];
         var maximumValue = this.iMaximum; // @ts-ignore
 
         var entrys = el.webkitEntries || el.entries || undefined;
 
-        if (entrys && entrys.length) {
+        if (entrys !== null && entrys !== void 0 && entrys.length) {
           return this.getFileSystemEntry(entrys).then(function (files) {
-            return _this7.add(files);
+            return _this8.add(files);
           });
         }
 
@@ -1145,7 +1132,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
       // 添加 DataTransfer
       addDataTransfer: function addDataTransfer(dataTransfer) {
         var _dataTransfer$items,
-            _this8 = this;
+            _this9 = this;
 
         // dataTransfer.items 支持
         if (dataTransfer !== null && dataTransfer !== void 0 && (_dataTransfer$items = dataTransfer.items) !== null && _dataTransfer$items !== void 0 && _dataTransfer$items.length) {
@@ -1170,7 +1157,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           }
 
           return this.getFileSystemEntry(entrys).then(function (files) {
-            return _this8.add(files);
+            return _this9.add(files);
           });
         } // dataTransfer.files 支持
 
@@ -1194,14 +1181,15 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
       },
       // 获得 entrys    
       getFileSystemEntry: function getFileSystemEntry(entry) {
-        var _this9 = this;
+        var _this10 = this;
 
         var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
         return new Promise(function (resolve) {
-          var maximumValue = _this9.iMaximum;
+          var maximumValue = _this10.iMaximum;
 
           if (!entry) {
-            return resolve([]);
+            resolve([]);
+            return;
           }
 
           if (entry instanceof Array) {
@@ -1215,7 +1203,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                 return resolve(uploadFiles);
               }
 
-              _this9.getFileSystemEntry(v, path).then(function (results) {
+              _this10.getFileSystemEntry(v, path).then(function (results) {
                 uploadFiles.push.apply(uploadFiles, _toConsumableArray(results));
                 forEach(i + 1);
               });
@@ -1249,10 +1237,10 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
             return;
           }
 
-          if (entry.isDirectory && _this9.dropDirectory) {
+          if (entry.isDirectory && _this10.dropDirectory) {
             var _uploadFiles = []; // 目录也要添加到文件列表
 
-            if (_this9.createDirectory) {
+            if (_this10.createDirectory) {
               _uploadFiles.push({
                 id: '',
                 name: path + entry.name,
@@ -1277,7 +1265,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                     return readEntries();
                   }
 
-                  _this9.getFileSystemEntry(entries[i], path + entry.name + '/').then(function (results) {
+                  _this10.getFileSystemEntry(entries[i], path + entry.name + '/').then(function (results) {
                     _uploadFiles.push.apply(_uploadFiles, _toConsumableArray(results));
 
                     forEach(i + 1);
@@ -1396,7 +1384,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
       // 处理后 事件 分发
       emitFile: function emitFile(newFile, oldFile) {
         var _newFile,
-            _this10 = this;
+            _this11 = this;
 
         this.$emit('input-file', newFile, oldFile);
 
@@ -1406,22 +1394,22 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
 
           this.$nextTick(function () {
             setTimeout(function () {
-              newFile && _this10.upload(newFile).then(function () {
+              newFile && _this11.upload(newFile).then(function () {
                 var _newFile2;
 
                 if (newFile) {
                   // eslint-disable-next-line
-                  newFile = _this10.get(newFile) || undefined;
+                  newFile = _this11.get(newFile) || undefined;
                 }
 
                 if ((_newFile2 = newFile) !== null && _newFile2 !== void 0 && _newFile2.fileObject) {
-                  _this10.update(newFile, {
+                  _this11.update(newFile, {
                     active: false,
                     success: !newFile.error
                   });
                 }
               }).catch(function (e) {
-                newFile && _this10.update(newFile, {
+                newFile && _this11.update(newFile, {
                   active: false,
                   success: false,
                   error: e.code || e.error || e.message || e
@@ -1573,7 +1561,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         return this.uploadXhr(xhr, file, form);
       },
       uploadXhr: function uploadXhr(xhr, ufile, body) {
-        var _this11 = this;
+        var _this12 = this;
 
         var file = ufile;
         var speedTime = 0;
@@ -1585,7 +1573,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
             return;
           }
 
-          file = _this11.get(file);
+          file = _this12.get(file);
 
           if (!e.lengthComputable || !file || !file.fileObject || !file.active) {
             return;
@@ -1599,7 +1587,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           }
 
           speedTime = speedTime2;
-          file = _this11.update(file, {
+          file = _this12.update(file, {
             progress: (e.loaded / e.total * 100).toFixed(2),
             speed: e.loaded - speedLoaded
           });
@@ -1609,12 +1597,12 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
 
         var interval = window.setInterval(function () {
           if (file) {
-            var _file2;
+            if (file = _this12.get(file)) {
+              var _file2;
 
-            file = _this11.get(file);
-
-            if (file && (_file2 = file) !== null && _file2 !== void 0 && _file2.fileObject && !file.success && !file.error && file.active) {
-              return;
+              if ((_file2 = file) !== null && _file2 !== void 0 && _file2.fileObject && !file.success && !file.error && file.active) {
+                return;
+              }
             }
           }
 
@@ -1630,7 +1618,8 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         }, 100);
         return new Promise(function (resolve, reject) {
           if (!file) {
-            return reject(new Error('not_exists'));
+            reject(new Error('not_exists'));
+            return;
           }
 
           var complete;
@@ -1652,7 +1641,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               return reject(new Error('not_exists'));
             }
 
-            file = _this11.get(file); // 不存在直接响应
+            file = _this12.get(file); // 不存在直接响应
 
             if (!file) {
               return reject(new Error('not_exists'));
@@ -1724,7 +1713,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
             // @ts-ignore
 
 
-            file = _this11.update(file, data);
+            file = _this12.update(file, data);
 
             if (!file) {
               return reject(new Error('abort'));
@@ -1760,7 +1749,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           // @ts-ignore
 
 
-          file = _this11.update(file, {
+          file = _this12.update(file, {
             xhr: xhr
           }); // 开始上传
 
@@ -1768,7 +1757,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         });
       },
       uploadHtml4: function uploadHtml4(ufile) {
-        var _this12 = this;
+        var _this13 = this;
 
         var file = ufile;
 
@@ -1845,10 +1834,11 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         return new Promise(function (resolve, reject) {
           setTimeout(function () {
             if (!file) {
-              return reject(new Error('not_exists'));
+              reject(new Error('not_exists'));
+              return;
             }
 
-            file = _this12.update(file, {
+            file = _this13.update(file, {
               iframe: iframe
             }); // 不存在
 
@@ -1859,12 +1849,10 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
 
             var interval = window.setInterval(function () {
               if (file) {
-                var _file3;
-
-                file = _this12.get(file);
-
-                if (file && (_file3 = file) !== null && _file3 !== void 0 && _file3.fileObject && !file.success && !file.error && file.active) {
-                  return;
+                if (file = _this13.get(file)) {
+                  if (file.fileObject && !file.success && !file.error && file.active) {
+                    return;
+                  }
                 }
               }
 
@@ -1881,7 +1869,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
             var complete;
 
             var fn = function fn(e) {
-              var _file4;
+              var _file3;
 
               // 已经处理过了
               if (complete) {
@@ -1902,7 +1890,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                 return reject(new Error('not_exists'));
               }
 
-              file = _this12.get(file); // 不存在直接响应
+              file = _this13.get(file); // 不存在直接响应
 
               if (!file) {
                 return reject(new Error('not_exists'));
@@ -1977,13 +1965,13 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               } // 更新
 
 
-              file = _this12.update(file, data);
+              file = _this13.update(file, data);
 
               if (!file) {
                 return reject(new Error('not_exists'));
               }
 
-              if ((_file4 = file) !== null && _file4 !== void 0 && _file4.error) {
+              if ((_file3 = file) !== null && _file3 !== void 0 && _file3.error) {
                 if (file.error instanceof Error) {
                   return reject(file.error);
                 }
@@ -2134,18 +2122,8 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         e.preventDefault();
         e.dataTransfer && this.addDataTransfer(e.dataTransfer);
       },
-      inputOnChange: function (_inputOnChange) {
-        function inputOnChange(_x) {
-          return _inputOnChange.apply(this, arguments);
-        }
-
-        inputOnChange.toString = function () {
-          return _inputOnChange.toString();
-        };
-
-        return inputOnChange;
-      }(async function (e) {
-        var _this13 = this;
+      inputOnChange: async function inputOnChange(e) {
+        var _this14 = this;
 
         if (!(e.target instanceof HTMLInputElement)) {
           return Promise.reject(new Error("not HTMLInputElement"));
@@ -2165,21 +2143,21 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
             var _oldInput$parentNode;
 
             // ie9 fix #219
-            var oldInput = document.getElementById(_this13.forId);
+            var oldInput = document.getElementById(_this14.forId);
             var newInput = oldInput.cloneNode(true);
             newInput.value = '';
             newInput.type = 'file'; // @ts-ignore
 
-            newInput.onChange = inputOnChange;
+            newInput.onChange = _this14.inputOnChange;
             (_oldInput$parentNode = oldInput.parentNode) === null || _oldInput$parentNode === void 0 ? void 0 : _oldInput$parentNode.replaceChild(newInput, oldInput);
-            _this13.$refs.input = newInput;
+            _this14.$refs.input = newInput;
           }
 
           return res;
         };
 
         return this.addInputFile(e.target).then(reinput).catch(reinput);
-      })
+      }
     }
   });
 

@@ -1,3 +1,4 @@
+import type { PropType } from "vue";
 
 export interface ChunkOptions {
     headers: { [key: string]: any };
@@ -8,7 +9,7 @@ export interface ChunkOptions {
     handler: any;
 }
 
-interface Data {
+export interface Data {
     active: boolean;
     dropActive: boolean;
     files: VueUploadItem[];
@@ -19,7 +20,7 @@ interface Data {
     dropElement: null | HTMLElement;
 }
 
-interface Features {
+export interface Features {
     html5: boolean;
     directory: boolean;
     drop: boolean;
@@ -89,25 +90,126 @@ export interface VueUploadItem {
 }
 
 
+export interface Props{
+    inputId: {
+        type: StringConstructor;
+    };
+    name: {
+        type: StringConstructor;
+        default: string;
+    };
+    accept: {
+        type: StringConstructor;
+    };
+    capture: {
+    };
+    disabled: {
+        default: boolean;
+    };
+    multiple: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    maximum: {
+        type: NumberConstructor;
+    };
+    addIndex: {
+        type: (BooleanConstructor | NumberConstructor)[];
+    };
+    directory: {
+        type: BooleanConstructor;
+    };
+    createDirectory: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    postAction: {
+        type: StringConstructor;
+    };
+    putAction: {
+        type: StringConstructor;
+    };
+    customAction: {
+        type: PropType<(file: VueUploadItem, self: any) => Promise<VueUploadItem>>;
+    };
+    headers: {
+        type: PropType<{
+            [key: string]: any;
+        }>;
+        default: () => {};
+    };
+    data: {
+        type: PropType<{
+            [key: string]: any;
+        }>;
+        default: () => {};
+    };
+    timeout: {
+        type: NumberConstructor;
+        default: number;
+    };
+    drop: {
+        default: boolean;
+    };
+    dropDirectory: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    size: {
+        type: NumberConstructor;
+        default: number;
+    };
+    extensions: {
+        type: PropType<string | RegExp | string[]>;
+        default: () => never[];
+    };
+    modelValue: {
+        type: PropType<VueUploadItem[]>;
+        default: () => never[];
+    };
+    thread: {
+        type: NumberConstructor;
+        default: number;
+    };
+    chunkEnabled: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    chunk: {
+        type: PropType<{
+            headers?: {
+                [key: string]: any;
+            } | undefined;
+            action?: string | undefined;
+            minSize?: number | undefined;
+            maxActive?: number | undefined;
+            maxRetries?: number | undefined;
+            handler?: any;
+        }>;
+        default: () => ChunkOptions;
+    };
+}
 
-interface FileSystemEntry {
+
+
+export interface FileSystemEntry {
     isDirectory: boolean
     isFile: boolean
     name: string
     fullPath: string
     filesystem: string
 }
-interface FileSystemDirectoryReader {
+export interface FileSystemDirectoryReader {
     readEntries: (
         successCallback: (result: Array<FileSystemDirectoryEntry | FileSystemFileEntry>) => void,
         errorCallback?: (error: DOMError) => void,
     ) => void
 }
-interface FileSystemFlags {
+export interface FileSystemFlags {
     create?: boolean
     exclusive?: boolean
 }
-interface FileSystemDirectoryEntry extends FileSystemEntry {
+export interface FileSystemDirectoryEntry extends FileSystemEntry {
     isDirectory: true
     isFile: false
     createReader: () => FileSystemDirectoryReader
@@ -124,7 +226,7 @@ interface FileSystemDirectoryEntry extends FileSystemEntry {
         errorCallback?: (error: DOMError) => void,
     ) => void
 }
-interface FileSystemFileEntry extends FileSystemEntry {
+export interface FileSystemFileEntry extends FileSystemEntry {
     isDirectory: false
     isFile: true
     file: (cb: (file: File) => void) => void

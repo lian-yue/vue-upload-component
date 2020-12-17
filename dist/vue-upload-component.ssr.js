@@ -1,7 +1,7 @@
 /*!
  Name: vue-upload-component 
 Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.0.37 
+Version: 3.0.39 
 Author: LianYue 
 License: Apache-2.0 
 Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
@@ -107,88 +107,89 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
      * @param {File} file
      * @param {Object} options
      */
-    constructor (file, options) {
+    constructor(file, options) {
       this.file = file;
       this.options = options;
       this.chunks = [];
       this.sessionId = null;
       this.chunkSize = null;
-     }
+      this.speedInterval = null;
+    }
 
     /**
      * Gets the max retries from options
      */
-    get maxRetries () {
+    get maxRetries() {
       return parseInt(this.options.maxRetries, 10)
     }
 
     /**
      * Gets the max number of active chunks being uploaded at once from options
      */
-    get maxActiveChunks () {
+    get maxActiveChunks() {
       return parseInt(this.options.maxActive, 10)
     }
 
     /**
      * Gets the file type
      */
-    get fileType () {
+    get fileType() {
       return this.file.type
     }
 
     /**
      * Gets the file size
      */
-    get fileSize () {
+    get fileSize() {
       return this.file.size
     }
 
     /**
      * Gets the file name
      */
-    get fileName () {
+    get fileName() {
       return this.file.name
     }
 
     /**
      * Gets action (url) to upload the file
      */
-    get action () {
+    get action() {
       return this.options.action || null
     }
 
     /**
      * Gets the body to be merged when sending the request in start phase
      */
-    get startBody () {
+    get startBody() {
       return this.options.startBody || {}
     }
 
     /**
      * Gets the body to be merged when sending the request in upload phase
      */
-    get uploadBody () {
+    get uploadBody() {
       return this.options.uploadBody || {}
     }
 
     /**
      * Gets the body to be merged when sending the request in finish phase
      */
-    get finishBody () {
+    get finishBody() {
       return this.options.finishBody || {}
     }
 
     /**
      * Gets the headers of the requests from options
      */
-    get headers () {
+    get headers() {
       return this.options.headers || {}
     }
 
     /**
      * Whether it's ready to upload files or not
      */
-    get readyToUpload () {
+    get readyToUpload() {
       return !!this.chunks
     }
 
@@ -197,7 +198,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
      * - Gets all the completed chunks
      * - Gets the progress of all the chunks that are being uploaded
      */
-    get progress () {
+    get progress() {
       const completedProgress = (this.chunksUploaded.length / this.chunks.length) * 100;
       const uploadingProgress = this.chunksUploading.reduce((progress, chunk) => {
         return progress + ((chunk.progress | 0) / this.chunks.length)
@@ -209,8 +210,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     /**
      * Gets all the chunks that are pending to be uploaded
      */
-    get chunksToUpload () {
-      console.log(this.chunks);
+    get chunksToUpload() {
       return this.chunks.filter(chunk => {
         return !chunk.active && !chunk.uploaded
       })
@@ -219,14 +219,14 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     /**
      * Whether there are chunks to upload or not
      */
-    get hasChunksToUpload () {
+    get hasChunksToUpload() {
       return this.chunksToUpload.length > 0
     }
 
     /**
      * Gets all the chunks that are uploading
      */
-    get chunksUploading () {
+    get chunksUploading() {
       return this.chunks.filter(chunk => {
         return !!chunk.xhr && !!chunk.active
       })
@@ -235,7 +235,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     /**
      * Gets all the chunks that have finished uploading
      */
-    get chunksUploaded () {
+    get chunksUploaded() {
       return this.chunks.filter(chunk => {
         return !!chunk.uploaded
       })
@@ -244,7 +244,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     /**
      * Creates all the chunks in the initial state
      */
-    createChunks () {
+    createChunks() {
       this.chunks = [];
 
       let start = 0;
@@ -264,7 +264,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     /**
      * Updates the progress of the file with the handler's progress
      */
-    updateFileProgress () {
+    updateFileProgress() {
       this.file.progress = this.progress;
     }
 
@@ -273,7 +273,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
      * - Stops all active requests
      * - Sets the file not active
      */
-    pause () {
+    pause() {
       this.file.active = false;
       this.stopChunks();
     }
@@ -281,11 +281,13 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     /**
      * Stops all the current chunks
      */
-    stopChunks () {
+    stopChunks() {
       this.chunksUploading.forEach(chunk => {
         chunk.xhr.abort();
         chunk.active = false;
       });
+
+      this.stopSpeedCalc();
     }
 
     /**
@@ -293,7 +295,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
      * - Sets the file active
      * - Starts the following chunks
      */
-    resume () {
+    resume() {
       this.file.active = true;
       this.startChunking();
     }
@@ -305,7 +307,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
      * - resolve  The file was uploaded
      * - reject   The file upload failed
      */
-    upload () {
+    upload() {
       this.promise = new Promise((resolve, reject) => {
         this.resolve = resolve;
         this.reject = reject;
@@ -319,21 +321,19 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
      * Start phase
      * Sends a request to the backend to initialise the chunks
      */
-    start () {
+    start() {
       request({
         method: 'POST',
-        headers: {
-          ...this.headers, 
+        headers: Object.assign({}, this.headers, {
           'Content-Type': 'application/json'
-        },
+        }),
         url: this.action,
-        body: {
-          ...this.startBody,
+        body: Object.assign(this.startBody, {
           phase: 'start',
           mime_type: this.fileType,
           size: this.fileSize,
           name: this.fileName
-        }
+        })
       }).then(res => {
         if (res.status !== 'success') {
           this.file.response = res;
@@ -354,10 +354,12 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     /**
      * Starts to upload chunks
      */
-    startChunking () {
+    startChunking() {
       for (let i = 0; i < this.maxActiveChunks; i++) {
         this.uploadNextChunk();
       }
+
+      this.startSpeedCalc();
     }
 
     /**
@@ -365,7 +367,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
      * - Won't do anything if the process is paused
      * - Will start finish phase if there are no more chunks to upload
      */
-    uploadNextChunk () {
+    uploadNextChunk() {
       if (this.file.active) {
         if (this.hasChunksToUpload) {
           return this.uploadChunk(this.chunksToUpload[0])
@@ -386,7 +388,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
      *
      * @param {Object} chunk
      */
-    uploadChunk (chunk) {
+    uploadChunk(chunk) {
       chunk.progress = 0;
       chunk.active = true;
       this.updateFileProgress();
@@ -402,13 +404,12 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         }
       }, false);
 
-      sendFormRequest(chunk.xhr, {
-        ...this.uploadBody,
+      sendFormRequest(chunk.xhr, Object.assign(this.uploadBody, {
         phase: 'upload',
         session_id: this.sessionId,
         start_offset: chunk.startOffset,
         chunk: chunk.blob
-      }).then(res => {
+      })).then(res => {
         chunk.active = false;
         if (res.status === 'success') {
           chunk.uploaded = true;
@@ -435,21 +436,20 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
      * Finish phase
      * Sends a request to the backend to finish the process
      */
-    finish () {
+    finish() {
       this.updateFileProgress();
+      this.stopSpeedCalc();
 
       request({
         method: 'POST',
-        headers: {
-          ...this.headers,
+        headers: Object.assign({}, this.headers, {
           'Content-Type': 'application/json'
-        },
+        }),
         url: this.action,
-        body: {
-          ...this.finishBody, 
+        body: Object.assign(this.finishBody, {
           phase: 'finish',
-          session_id: this.sessionId,
-        }
+          session_id: this.sessionId
+        })
       }).then(res => {
         this.file.response = res;
         if (res.status !== 'success') {
@@ -461,6 +461,32 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         this.file.response = res;
         this.reject('server');
       });
+    }
+
+
+    /**
+     * Sets an interval to calculate and
+     * set upload speed every 3 seconds
+     */
+    startSpeedCalc() {
+      this.file.speed = 0;
+      let lastUploadedBytes = 0;
+      if (!this.speedInterval) {
+        this.speedInterval = window.setInterval(() => {
+          let uploadedBytes = (this.progress / 100) * this.fileSize;
+          this.file.speed = (uploadedBytes - lastUploadedBytes);
+          lastUploadedBytes = uploadedBytes;
+        }, 1000);
+      }
+    }
+
+    /**
+     * Removes the upload speed interval
+     */
+    stopSpeedCalc() {
+      this.speedInterval && window.clearInterval(this.speedInterval);
+      this.speedInterval = null;
+      this.file.speed = 0;
     }
   }
 
@@ -899,7 +925,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               const maximumValue = this.iMaximum;
               // @ts-ignore
               const entrys = el.webkitEntries || el.entries || undefined;
-              if (entrys && entrys.length) {
+              if (entrys?.length) {
                   return this.getFileSystemEntry(entrys).then((files) => {
                       return this.add(files);
                   });
@@ -979,7 +1005,8 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               return new Promise((resolve) => {
                   const maximumValue = this.iMaximum;
                   if (!entry) {
-                      return resolve([]);
+                      resolve([]);
+                      return;
                   }
                   if (entry instanceof Array) {
                       // 多个
@@ -1325,9 +1352,10 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               // 检查激活状态
               let interval = window.setInterval(() => {
                   if (file) {
-                      file = this.get(file);
-                      if (file && file?.fileObject && !file.success && !file.error && file.active) {
-                          return;
+                      if ((file = this.get(file))) {
+                          if (file?.fileObject && !file.success && !file.error && file.active) {
+                              return;
+                          }
                       }
                   }
                   if (interval) {
@@ -1343,7 +1371,8 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               }, 100);
               return new Promise((resolve, reject) => {
                   if (!file) {
-                      return reject(new Error('not_exists'));
+                      reject(new Error('not_exists'));
+                      return;
                   }
                   let complete;
                   const fn = (e) => {
@@ -1520,7 +1549,8 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               return new Promise((resolve, reject) => {
                   setTimeout(() => {
                       if (!file) {
-                          return reject(new Error('not_exists'));
+                          reject(new Error('not_exists'));
+                          return;
                       }
                       file = this.update(file, { iframe });
                       // 不存在
@@ -1530,9 +1560,10 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                       // 定时检查
                       let interval = window.setInterval(() => {
                           if (file) {
-                              file = this.get(file);
-                              if (file && file?.fileObject && !file.success && !file.error && file.active) {
-                                  return;
+                              if ((file = this.get(file))) {
+                                  if (file.fileObject && !file.success && !file.error && file.active) {
+                                      return;
+                                  }
                               }
                           }
                           if (interval) {
@@ -1782,7 +1813,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                       newInput.value = '';
                       newInput.type = 'file';
                       // @ts-ignore
-                      newInput.onChange = inputOnChange;
+                      newInput.onChange = this.inputOnChange;
                       oldInput.parentNode?.replaceChild(newInput, oldInput);
                       this.$refs.input = newInput;
                   }

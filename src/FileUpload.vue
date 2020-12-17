@@ -52,7 +52,7 @@
 </style>
 <script lang="ts">
 import {PropType, defineComponent} from "vue";
-import type{ ChunkOptions, Data, Features, VueUploadItem, FileSystemEntry, FileSystemFileEntry, FileSystemDirectoryEntry} from "./types";
+import type{ ChunkOptions, Props, Data, Features, VueUploadItem, FileSystemEntry, FileSystemFileEntry, FileSystemDirectoryEntry} from "./types";
 // @ts-ignore
 import ChunkUploadDefaultHandler from './chunk/ChunkUploadHandler.js'
 const CHUNK_DEFAULT_OPTIONS = {
@@ -159,7 +159,7 @@ export default defineComponent({
     // Chunk upload properties
     chunk: {
       type: Object as PropType<{headers?: {[key:string]: any}; action?: string; minSize?: number; maxActive?: number; maxRetries?: number; handler?: any;}>,
-      default: () => {
+      default: (): ChunkOptions => {
         return CHUNK_DEFAULT_OPTIONS
       }
     }
@@ -492,7 +492,7 @@ export default defineComponent({
       const maximumValue = this.iMaximum
       // @ts-ignore
       const entrys = el.webkitEntries || el.entries || undefined
-      if (entrys && entrys.length) {
+      if (entrys?.length) {
         return this.getFileSystemEntry(entrys).then((files) => {
           return this.add(files) as VueUploadItem[]
         })
@@ -576,7 +576,8 @@ export default defineComponent({
         const maximumValue = this.iMaximum
         
         if (!entry) {
-          return resolve([])
+          resolve([])
+          return
         }
 
         if (entry instanceof Array) {
@@ -936,9 +937,10 @@ export default defineComponent({
       // 检查激活状态
       let interval: number| undefined = window.setInterval(()  => {
         if (file) {
-          file = this.get(file)
-          if (file && file?.fileObject && !file.success && !file.error && file.active) {
-            return
+          if ((file = this.get(file))) {
+            if (file?.fileObject && !file.success && !file.error && file.active) {
+              return
+            }
           }
         }
 
@@ -956,7 +958,8 @@ export default defineComponent({
 
       return new Promise((resolve: (u: VueUploadItem) => void, reject: (e: Error) => void) => {
         if (!file) {
-          return reject(new Error('not_exists'))
+          reject(new Error('not_exists'))
+          return
         }
         let complete: boolean
         const fn = (e: ProgressEvent) => {
@@ -1157,7 +1160,8 @@ export default defineComponent({
       return new Promise((resolve: (u: VueUploadItem) => void, reject: (e: Error) => void) => {
         setTimeout(() => {
           if (!file)   {
-            return reject(new Error('not_exists'))
+            reject(new Error('not_exists'))
+            return
           }
 
           file = this.update(file, { iframe })
@@ -1170,9 +1174,10 @@ export default defineComponent({
           // 定时检查
           let interval: number | undefined = window.setInterval(() => {
             if (file) {
-              file = this.get(file)
-              if (file && file?.fileObject && !file.success && !file.error && file.active) {
-                return
+              if ((file = this.get(file))) {
+                if (file.fileObject && !file.success && !file.error && file.active) {
+                  return
+                }
               }
             }
 
@@ -1441,7 +1446,7 @@ export default defineComponent({
           newInput.value = ''
           newInput.type = 'file'
           // @ts-ignore
-          newInput.onChange = inputOnChange
+          newInput.onChange = this.inputOnChange
           oldInput.parentNode?.replaceChild(newInput, oldInput)
           this.$refs.input = newInput
         }
