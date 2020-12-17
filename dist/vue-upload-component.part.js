@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.20
+ * Version: 2.8.21
  * Author: Marco Lang
  */
 (function (global, factory) {
@@ -120,6 +120,7 @@
       this.chunks = [];
       this.sessionId = null;
       this.chunkSize = null;
+      this.speedInterval = null;
     }
 
     /**
@@ -403,12 +404,13 @@
 
         this.file.speed = 0;
         var lastUploadedBytes = 0;
-
-        window[this.fileName + '_speed'] = window.setInterval(function () {
-          var uploadedBytes = _this5.progress / 100 * _this5.fileSize;
-          _this5.file.speed = uploadedBytes - lastUploadedBytes;
-          lastUploadedBytes = uploadedBytes;
-        }, 1000);
+        if (!this.speedInterval) {
+          this.speedInterval = window.setInterval(function () {
+            var uploadedBytes = _this5.progress / 100 * _this5.fileSize;
+            _this5.file.speed = uploadedBytes - lastUploadedBytes;
+            lastUploadedBytes = uploadedBytes;
+          }, 1000);
+        }
       }
 
       /**
@@ -418,13 +420,14 @@
     }, {
       key: 'stopSpeedCalc',
       value: function stopSpeedCalc() {
-        window.clearInterval(window[this.fileName + '_speed']);
+        this.speedInterval && window.clearInterval(this.speedInterval);
+        this.speedInterval = null;
         this.file.speed = 0;
       }
     }, {
       key: 'maxRetries',
       get: function get() {
-        return parseInt(this.options.maxRetries);
+        return parseInt(this.options.maxRetries, 10);
       }
 
       /**
@@ -434,7 +437,7 @@
     }, {
       key: 'maxActiveChunks',
       get: function get() {
-        return parseInt(this.options.maxActive);
+        return parseInt(this.options.maxActive, 10);
       }
 
       /**

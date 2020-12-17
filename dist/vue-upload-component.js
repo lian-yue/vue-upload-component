@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.20
+ * Version: 2.8.21
  * Author: Marco Lang
  */
 (function (global, factory) {
@@ -120,6 +120,7 @@
       this.chunks = [];
       this.sessionId = null;
       this.chunkSize = null;
+      this.speedInterval = null;
     }
 
     /**
@@ -403,12 +404,13 @@
 
         this.file.speed = 0;
         var lastUploadedBytes = 0;
-
-        window[this.fileName + '_speed'] = window.setInterval(function () {
-          var uploadedBytes = _this5.progress / 100 * _this5.fileSize;
-          _this5.file.speed = uploadedBytes - lastUploadedBytes;
-          lastUploadedBytes = uploadedBytes;
-        }, 1000);
+        if (!this.speedInterval) {
+          this.speedInterval = window.setInterval(function () {
+            var uploadedBytes = _this5.progress / 100 * _this5.fileSize;
+            _this5.file.speed = uploadedBytes - lastUploadedBytes;
+            lastUploadedBytes = uploadedBytes;
+          }, 1000);
+        }
       }
 
       /**
@@ -418,13 +420,14 @@
     }, {
       key: 'stopSpeedCalc',
       value: function stopSpeedCalc() {
-        window.clearInterval(window[this.fileName + '_speed']);
+        this.speedInterval && window.clearInterval(this.speedInterval);
+        this.speedInterval = null;
         this.file.speed = 0;
       }
     }, {
       key: 'maxRetries',
       get: function get() {
-        return parseInt(this.options.maxRetries);
+        return parseInt(this.options.maxRetries, 10);
       }
 
       /**
@@ -434,7 +437,7 @@
     }, {
       key: 'maxActiveChunks',
       get: function get() {
-        return parseInt(this.options.maxActive);
+        return parseInt(this.options.maxActive, 10);
       }
 
       /**
@@ -2076,11 +2079,7 @@
   /* style */
   var __vue_inject_styles__$1 = function __vue_inject_styles__(inject) {
     if (!inject) return;
-<<<<<<< HEAD
-    inject("data-v-76d380b6_0", { source: "\n.file-uploads{overflow:hidden;position:relative;text-align:center;display:inline-block\n}\n.file-uploads.file-uploads-html4 input,.file-uploads.file-uploads-html5 label{background:#fff;opacity:0;font-size:20em;z-index:1;top:0;left:0;right:0;bottom:0;position:absolute;width:100%;height:100%\n}\n.file-uploads.file-uploads-html4 label,.file-uploads.file-uploads-html5 input{background:rgba(255,255,255,0);overflow:hidden;position:fixed;width:1px;height:1px;z-index:-1;opacity:0\n}", map: undefined, media: undefined });
-=======
-    inject("data-v-25fd27ac_0", { source: ".file-uploads{overflow:hidden;position:relative;text-align:center;display:inline-block}.file-uploads.file-uploads-html4 input,.file-uploads.file-uploads-html5 label{background:#fff;opacity:0;font-size:20em;z-index:1;top:0;left:0;right:0;bottom:0;position:absolute;width:100%;height:100%}.file-uploads.file-uploads-html4 label,.file-uploads.file-uploads-html5 input{background:rgba(255,255,255,0);overflow:hidden;position:fixed;width:1px;height:1px;z-index:-1;opacity:0}", map: undefined, media: undefined });
->>>>>>> d8a42ab9c466e71a06202115df727340c9bef3ea
+    inject("data-v-76d380b6_0", { source: ".file-uploads{overflow:hidden;position:relative;text-align:center;display:inline-block}.file-uploads.file-uploads-html4 input,.file-uploads.file-uploads-html5 label{background:#fff;opacity:0;font-size:20em;z-index:1;top:0;left:0;right:0;bottom:0;position:absolute;width:100%;height:100%}.file-uploads.file-uploads-html4 label,.file-uploads.file-uploads-html5 input{background:rgba(255,255,255,0);overflow:hidden;position:fixed;width:1px;height:1px;z-index:-1;opacity:0}", map: undefined, media: undefined });
   };
   /* scoped */
   var __vue_scope_id__$1 = undefined;
