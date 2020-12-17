@@ -11,88 +11,89 @@ export default class ChunkUploadHandler {
    * @param {File} file
    * @param {Object} options
    */
-  constructor (file, options) {
+  constructor(file, options) {
     this.file = file
     this.options = options
     this.chunks = []
     this.sessionId = null
     this.chunkSize = null
+    this.speedInterval = null
   }
 
   /**
    * Gets the max retries from options
    */
-  get maxRetries () {
-    return parseInt(this.options.maxRetries)
+  get maxRetries() {
+    return parseInt(this.options.maxRetries, 10)
   }
 
   /**
    * Gets the max number of active chunks being uploaded at once from options
    */
-  get maxActiveChunks () {
-    return parseInt(this.options.maxActive)
+  get maxActiveChunks() {
+    return parseInt(this.options.maxActive, 10)
   }
 
   /**
    * Gets the file type
    */
-  get fileType () {
+  get fileType() {
     return this.file.type
   }
 
   /**
    * Gets the file size
    */
-  get fileSize () {
+  get fileSize() {
     return this.file.size
   }
 
   /**
    * Gets the file name
    */
-  get fileName () {
+  get fileName() {
     return this.file.name
   }
 
   /**
    * Gets action (url) to upload the file
    */
-  get action () {
+  get action() {
     return this.options.action || null
   }
 
   /**
    * Gets the body to be merged when sending the request in start phase
    */
-  get startBody () {
+  get startBody() {
     return this.options.startBody || {}
   }
 
   /**
    * Gets the body to be merged when sending the request in upload phase
    */
-  get uploadBody () {
+  get uploadBody() {
     return this.options.uploadBody || {}
   }
 
   /**
    * Gets the body to be merged when sending the request in finish phase
    */
-  get finishBody () {
+  get finishBody() {
     return this.options.finishBody || {}
   }
 
   /**
    * Gets the headers of the requests from options
    */
-  get headers () {
+  get headers() {
     return this.options.headers || {}
   }
 
   /**
    * Whether it's ready to upload files or not
    */
-  get readyToUpload () {
+  get readyToUpload() {
     return !!this.chunks
   }
 
@@ -101,7 +102,7 @@ export default class ChunkUploadHandler {
    * - Gets all the completed chunks
    * - Gets the progress of all the chunks that are being uploaded
    */
-  get progress () {
+  get progress() {
     const completedProgress = (this.chunksUploaded.length / this.chunks.length) * 100
     const uploadingProgress = this.chunksUploading.reduce((progress, chunk) => {
       return progress + ((chunk.progress | 0) / this.chunks.length)
@@ -113,7 +114,7 @@ export default class ChunkUploadHandler {
   /**
    * Gets all the chunks that are pending to be uploaded
    */
-  get chunksToUpload () {
+  get chunksToUpload() {
     return this.chunks.filter(chunk => {
       return !chunk.active && !chunk.uploaded
     })
@@ -122,14 +123,14 @@ export default class ChunkUploadHandler {
   /**
    * Whether there are chunks to upload or not
    */
-  get hasChunksToUpload () {
+  get hasChunksToUpload() {
     return this.chunksToUpload.length > 0
   }
 
   /**
    * Gets all the chunks that are uploading
    */
-  get chunksUploading () {
+  get chunksUploading() {
     return this.chunks.filter(chunk => {
       return !!chunk.xhr && !!chunk.active
     })
@@ -138,7 +139,7 @@ export default class ChunkUploadHandler {
   /**
    * Gets all the chunks that have finished uploading
    */
-  get chunksUploaded () {
+  get chunksUploaded() {
     return this.chunks.filter(chunk => {
       return !!chunk.uploaded
     })
@@ -147,7 +148,7 @@ export default class ChunkUploadHandler {
   /**
    * Creates all the chunks in the initial state
    */
-  createChunks () {
+  createChunks() {
     this.chunks = []
 
     let start = 0
@@ -167,7 +168,7 @@ export default class ChunkUploadHandler {
   /**
    * Updates the progress of the file with the handler's progress
    */
-  updateFileProgress () {
+  updateFileProgress() {
     this.file.progress = this.progress
   }
 
@@ -176,7 +177,7 @@ export default class ChunkUploadHandler {
    * - Stops all active requests
    * - Sets the file not active
    */
-  pause () {
+  pause() {
     this.file.active = false
     this.stopChunks()
   }
@@ -184,7 +185,7 @@ export default class ChunkUploadHandler {
   /**
    * Stops all the current chunks
    */
-  stopChunks () {
+  stopChunks() {
     this.chunksUploading.forEach(chunk => {
       chunk.xhr.abort()
       chunk.active = false
@@ -198,7 +199,7 @@ export default class ChunkUploadHandler {
    * - Sets the file active
    * - Starts the following chunks
    */
-  resume () {
+  resume() {
     this.file.active = true
     this.startChunking()
   }
@@ -210,7 +211,7 @@ export default class ChunkUploadHandler {
    * - resolve  The file was uploaded
    * - reject   The file upload failed
    */
-  upload () {
+  upload() {
     this.promise = new Promise((resolve, reject) => {
       this.resolve = resolve
       this.reject = reject
@@ -224,7 +225,7 @@ export default class ChunkUploadHandler {
    * Start phase
    * Sends a request to the backend to initialise the chunks
    */
-  start () {
+  start() {
     request({
       method: 'POST',
       headers: Object.assign({}, this.headers, {
@@ -257,7 +258,7 @@ export default class ChunkUploadHandler {
   /**
    * Starts to upload chunks
    */
-  startChunking () {
+  startChunking() {
     for (let i = 0; i < this.maxActiveChunks; i++) {
       this.uploadNextChunk()
     }
@@ -270,7 +271,7 @@ export default class ChunkUploadHandler {
    * - Won't do anything if the process is paused
    * - Will start finish phase if there are no more chunks to upload
    */
-  uploadNextChunk () {
+  uploadNextChunk() {
     if (this.file.active) {
       if (this.hasChunksToUpload) {
         return this.uploadChunk(this.chunksToUpload[0])
@@ -291,7 +292,7 @@ export default class ChunkUploadHandler {
    *
    * @param {Object} chunk
    */
-  uploadChunk (chunk) {
+  uploadChunk(chunk) {
     chunk.progress = 0
     chunk.active = true
     this.updateFileProgress()
@@ -339,7 +340,7 @@ export default class ChunkUploadHandler {
    * Finish phase
    * Sends a request to the backend to finish the process
    */
-  finish () {
+  finish() {
     this.updateFileProgress()
     this.stopSpeedCalc()
 
@@ -371,22 +372,24 @@ export default class ChunkUploadHandler {
    * Sets an interval to calculate and
    * set upload speed every 3 seconds
    */
-  startSpeedCalc () {
+  startSpeedCalc() {
     this.file.speed = 0
-    var lastUploadedBytes = 0
-
-    window[this.fileName + '_speed'] = window.setInterval(() => {
-      let uploadedBytes = (this.progress / 100)  * this.fileSize
-      this.file.speed = (uploadedBytes - lastUploadedBytes)
-      lastUploadedBytes = uploadedBytes
-    }, 1000)
+    let lastUploadedBytes = 0
+    if (!this.speedInterval) {
+      this.speedInterval = window.setInterval(() => {
+        let uploadedBytes = (this.progress / 100) * this.fileSize
+        this.file.speed = (uploadedBytes - lastUploadedBytes)
+        lastUploadedBytes = uploadedBytes
+      }, 1000)
+    }
   }
 
   /**
    * Removes the upload speed interval
    */
-  stopSpeedCalc () {
-    window.clearInterval(window[this.fileName + '_speed'])
+  stopSpeedCalc() {
+    this.speedInterval && window.clearInterval(this.speedInterval)
+    this.speedInterval = null
     this.file.speed = 0
   }
 }
