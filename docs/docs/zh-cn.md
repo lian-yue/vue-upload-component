@@ -818,13 +818,13 @@ Add, update, remove pre-filter
 
 * **只读:** `true`
 
-* **默认值:** `{ html5: true, directory: false, drag: false }`
+* **默认值:** `{ html5: true, directory: false, drop: false }`
 
 * **示例:**
   ```html
   <app>
     <file-upload ref="upload"></file-upload>
-    <span v-show="$refs.upload && $refs.upload.features.drag">支持拖拽上传</span>
+    <span v-show="$refs.upload && $refs.upload.features.drop">支持拖拽上传</span>
     <span v-show="$refs.upload && $refs.upload.features.directory">支持文件夹上传</span>
     <span v-show="$refs.upload && $refs.upload.features.html5">支持HTML5</span>
   </app>

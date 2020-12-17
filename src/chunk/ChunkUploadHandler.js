@@ -14,6 +14,9 @@ export default class ChunkUploadHandler {
   constructor (file, options) {
     this.file = file
     this.options = options
+    this.chunks = []
+    this.sessionId = null
+    this.chunkSize = null
   }
 
   /**

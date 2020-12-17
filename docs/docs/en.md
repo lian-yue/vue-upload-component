@@ -1064,13 +1064,13 @@ Used to determine the browser support features
 
 * **Read only:** `true`
 
-* **Default:** `{ html5: true, directory: false, drag: false }`
+* **Default:** `{ html5: true, directory: false, drop: false }`
 
 * **Usage:**
   ```html
   <app>
     <file-upload ref="upload"></file-upload>
-    <span v-show="$refs.upload && $refs.upload.features.drag">Support drag and drop upload</span>
+    <span v-show="$refs.upload && $refs.upload.features.drop">Support drag and drop upload</span>
     <span v-show="$refs.upload && $refs.upload.features.directory">Support folder upload</span>
     <span v-show="$refs.upload && $refs.upload.features.html5">Support for HTML5</span>
   </app>

@@ -172,7 +172,7 @@ export default {
       features: {
         html5: true,
         directory: false,
-        drag: false,
+        drop: false,
       },
 
       active: false,
