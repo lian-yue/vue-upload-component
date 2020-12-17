@@ -189,6 +189,8 @@ export default class ChunkUploadHandler {
       chunk.xhr.abort()
       chunk.active = false
     })
+
+    this.stopSpeedCalc()
   }
 
   /**
@@ -259,6 +261,8 @@ export default class ChunkUploadHandler {
     for (let i = 0; i < this.maxActiveChunks; i++) {
       this.uploadNextChunk()
     }
+
+    this.startSpeedCalc()
   }
 
   /**
@@ -337,6 +341,7 @@ export default class ChunkUploadHandler {
    */
   finish () {
     this.updateFileProgress()
+    this.stopSpeedCalc()
 
     request({
       method: 'POST',
@@ -359,5 +364,29 @@ export default class ChunkUploadHandler {
       this.file.response = res
       this.reject('server')
     })
+  }
+
+
+  /**
+   * Sets an interval to calculate and
+   * set upload speed every 3 seconds
+   */
+  startSpeedCalc () {
+    this.file.speed = 0
+    var lastUploadedBytes = 0
+
+    window[this.fileName + '_speed'] = window.setInterval(() => {
+      let uploadedBytes = (this.progress / 100)  * this.fileSize
+      this.file.speed = (uploadedBytes - lastUploadedBytes)
+      lastUploadedBytes = uploadedBytes
+    }, 1000)
+  }
+
+  /**
+   * Removes the upload speed interval
+   */
+  stopSpeedCalc () {
+    window.clearInterval(window[this.fileName + '_speed'])
+    this.file.speed = 0
   }
 }
