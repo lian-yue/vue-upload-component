@@ -1502,7 +1502,7 @@ export default defineComponent({
         // empty
       } else if (typeof newDrop === 'string') {
         // @ts-ignore
-        const el = document.querySelector(newDrop) || this.$root.$el.querySelector(newDrop)
+        el = document.querySelector(newDrop) || this.$root.$el.querySelector(newDrop)
       } else if (newDrop === true) {
         // @ts-ignore
         el = this.$parent.$el

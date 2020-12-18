@@ -1,7 +1,7 @@
 /*!
  Name: vue-upload-component 
 Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.0.41 
+Version: 3.0.42 
 Author: LianYue 
 License: Apache-2.0 
 Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
@@ -2056,7 +2056,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         var el = null;
         if (!newDrop) ;else if (typeof newDrop === 'string') {
           // @ts-ignore
-          var _el = document.querySelector(newDrop) || this.$root.$el.querySelector(newDrop);
+          el = document.querySelector(newDrop) || this.$root.$el.querySelector(newDrop);
         } else if (newDrop === true) {
           // @ts-ignore
           el = this.$parent.$el;
