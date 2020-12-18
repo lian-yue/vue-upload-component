@@ -426,6 +426,9 @@ export default defineComponent({
       if (this.extensions instanceof RegExp) {
         return this.extensions
       }
+      if (!this.extensions.length) {
+        return
+      }
       let exts: string[] = []
       if (typeof this.extensions === 'string') {
         exts = this.extensions.split(',')
