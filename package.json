@@ -1,19 +1,19 @@
 {
   "name": "vue-upload-component",
   "description": "Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter",
-  "version": "3.0.40",
+  "version": "3.0.42",
   "author": "LianYue",
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack serve --hot",
     "build": "npm run build-rollup && npm run build-webpack",
     "build-webpack": "cross-env NODE_ENV=production webpack --progress",
-    "build-rollup": "cross-env NODE_ENV=production rollup --config && mv ./dist/dist/vue-upload-component.part.css ./dist/vue-upload-component.part.css && rmdir ./dist/dist"
+    "build-rollup": "cross-env NODE_ENV=production rollup --config && mv ./dist/dist/vue-upload-component.part.css ./dist/vue-upload-component.part.css && rmdir ./dist/dist && mv ./dist/FileUpload.vue.d.ts ./dist/vue-upload-component.d.ts && rm ./dist/index.d.ts"
   },
   "main": "dist/vue-upload-component.js",
   "module": "dist/vue-upload-component.js",
   "unpkg": "dist/vue-upload-component.js",
   "jsdelivr": "dist/vue-upload-component.js",
-  "typings": "src/types.d.ts",
+  "typings": "dist/vue-upload-component.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lian-yue/vue-upload-component.git"

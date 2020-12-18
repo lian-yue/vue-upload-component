@@ -48,7 +48,7 @@ module.exports = {
       // "vue": "@vue/runtime-dom",
       "@": path.join(__dirname, 'src'),
       "@/": path.join(__dirname, 'src/'),
-      'vue-upload-component': path.join(__dirname, isDev && false ? 'src' : 'dist/vue-upload-component.js'),
+      'vue-upload-component': path.join(__dirname, isDev ? 'src' : 'dist/vue-upload-component.js'),
     },
     extensions: [
       '.js',

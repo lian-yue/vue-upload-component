@@ -32,7 +32,11 @@ app.component('file-upload', VueUploadComponent)
 ### Typescript
 ``` js
 import VueUploadComponent from 'vue-upload-component/src/FileUpload.vue'
-// vue-upload-component/src/types.d.ts
+
+// or
+import VueUploadComponent from 'vue-upload-component'
+// vue-upload-component/dist/vue-upload-component.d.ts
+
 app.component('file-upload', VueUploadComponent)
 ```
 

@@ -1,7 +1,7 @@
 /*!
  Name: vue-upload-component 
 Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.0.39 
+Version: 3.0.41 
 Author: LianYue 
 License: Apache-2.0 
 Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
@@ -622,7 +622,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
        * @return {[type]} [description]
        */
       mounted() {
-          let input = document.createElement('input');
+          const input = document.createElement('input');
           input.type = 'file';
           input.multiple = true;
           // html5 特征
@@ -644,7 +644,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           this.maps = {};
           if (this.files) {
               for (let i = 0; i < this.files.length; i++) {
-                  let file = this.files[i];
+                  const file = this.files[i];
                   this.maps[file.id] = file;
               }
           }
@@ -751,23 +751,23 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                   return;
               }
               this.files = files;
-              let oldMaps = this.maps;
+              const oldMaps = this.maps;
               // 重写 maps 缓存
               this.maps = {};
               for (let i = 0; i < this.files.length; i++) {
-                  let file = this.files[i];
+                  const file = this.files[i];
                   this.maps[file.id] = file;
               }
               // add, update
-              for (let key in this.maps) {
-                  let newFile = this.maps[key];
-                  let oldFile = oldMaps[key];
+              for (const key in this.maps) {
+                  const newFile = this.maps[key];
+                  const oldFile = oldMaps[key];
                   if (newFile !== oldFile) {
                       this.emitFile(newFile, oldFile);
                   }
               }
               // delete
-              for (let key in oldMaps) {
+              for (const key in oldMaps) {
                   if (!this.maps[key]) {
                       this.emitFile(undefined, oldMaps[key]);
                   }
@@ -781,7 +781,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           // 清空
           clear() {
               if (this.files.length) {
-                  let files = this.files;
+                  const files = this.files;
                   this.files = [];
                   // 定位
                   this.maps = {};
@@ -818,7 +818,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                   index = this.addIndex;
               }
               // 遍历规范对象
-              let addFiles = [];
+              const addFiles = [];
               for (let i = 0; i < files.length; i++) {
                   let file = files[i];
                   if (this.features.html5 && file instanceof Blob) {
@@ -909,7 +909,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               this.files = newFiles;
               // 定位
               for (let i = 0; i < addFiles.length; i++) {
-                  let file = addFiles[i];
+                  const file = addFiles[i];
                   this.maps[file.id] = file;
               }
               // 事件
@@ -932,7 +932,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               }
               if (el.files) {
                   for (let i = 0; i < el.files.length; i++) {
-                      let file = el.files[i];
+                      const file = el.files[i];
                       files.push({
                           id: '',
                           size: file.size,
@@ -1088,14 +1088,14 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           },
           // 替换
           replace(id1, id2) {
-              let file1 = this.get(id1);
-              let file2 = this.get(id2);
+              const file1 = this.get(id1);
+              const file2 = this.get(id2);
               if (!file1 || !file2 || file1 === file2) {
                   return false;
               }
-              let files = this.files.concat([]);
-              let index1 = files.indexOf(file1);
-              let index2 = files.indexOf(file2);
+              const files = this.files.concat([]);
+              const index1 = files.indexOf(file1);
+              const index2 = files.indexOf(file2);
               if (index1 === -1 || index2 === -1) {
                   return false;
               }
@@ -1107,13 +1107,13 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           },
           // 移除
           remove(id) {
-              let file = this.get(id);
+              const file = this.get(id);
               if (file) {
                   if (this.emitFilter(undefined, file)) {
                       return false;
                   }
-                  let files = this.files.concat([]);
-                  let index = files.indexOf(file);
+                  const files = this.files.concat([]);
+                  const index = files.indexOf(file);
                   if (index === -1) {
                       console.error('remove', file);
                       return false;
@@ -1130,9 +1130,9 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           },
           // 更新
           update(id, data) {
-              let file = this.get(id);
+              const file = this.get(id);
               if (file) {
-                  let newFile = {
+                  const newFile = {
                       ...file,
                       ...data
                   };
@@ -1143,8 +1143,8 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                   if (this.emitFilter(newFile, file)) {
                       return false;
                   }
-                  let files = this.files.concat([]);
-                  let index = files.indexOf(file);
+                  const files = this.files.concat([]);
+                  const index = files.indexOf(file);
                   if (index === -1) {
                       console.error('update', file);
                       return false;
@@ -1215,7 +1215,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           },
           // 上传
           upload(id) {
-              let file = this.get(id);
+              const file = this.get(id);
               // 被删除
               if (!file) {
                   return Promise.reject(new Error('not_exists'));
@@ -1236,7 +1236,6 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                   return Promise.resolve(file);
               }
               // 后缀
-              let extensions = this.extensions;
               if (file.name && this.iExtensions) {
                   if (file.name.search(this.iExtensions) === -1) {
                       return Promise.reject(new Error('extension'));
@@ -1301,9 +1300,9 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               return this.uploadXhr(xhr, file, file.file);
           },
           uploadHtml5(file) {
-              let form = new window.FormData();
+              const form = new window.FormData();
               let value;
-              for (let key in file.data) {
+              for (const key in file.data) {
                   value = file.data[key];
                   if (value && typeof value === 'object' && typeof value.toString !== 'function') {
                       if (value instanceof File) {
@@ -1319,7 +1318,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               }
               // @ts-ignore
               form.append(this.name, file.file, file.file.name || file.file.filename || file.name);
-              let xhr = new XMLHttpRequest();
+              const xhr = new XMLHttpRequest();
               xhr.open('POST', file.postAction || '');
               return this.uploadXhr(xhr, file, form);
           },
@@ -1758,7 +1757,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               if (!e.dataTransfer) {
                   return;
               }
-              let dt = e.dataTransfer;
+              const dt = e.dataTransfer;
               if (dt?.files?.length) {
                   this.dropActive = true;
               }

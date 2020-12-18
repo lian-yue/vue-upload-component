@@ -52,7 +52,7 @@
 </style>
 <script lang="ts">
 import {PropType, defineComponent} from "vue";
-import type{ ChunkOptions, Props, Data, Features, VueUploadItem, FileSystemEntry, FileSystemFileEntry, FileSystemDirectoryEntry} from "./types";
+
 // @ts-ignore
 import ChunkUploadDefaultHandler from './chunk/ChunkUploadHandler.js'
 const CHUNK_DEFAULT_OPTIONS = {
@@ -63,6 +63,141 @@ const CHUNK_DEFAULT_OPTIONS = {
   maxRetries: 5,
   handler: ChunkUploadDefaultHandler
 }
+
+export interface ChunkOptions {
+    headers: { [key: string]: any };
+    action: string;
+    minSize: number;
+    maxActive: number;
+    maxRetries: number;
+    handler: any;
+}
+
+export interface Data {
+    active: boolean;
+    dropActive: boolean;
+    files: VueUploadItem[];
+    maps: { [key: string]: VueUploadItem };
+    destroy: boolean;
+    uploading: number;
+    features: Features;
+    dropElement: null | HTMLElement;
+}
+
+export interface Features {
+    html5: boolean;
+    directory: boolean;
+    drop: boolean;
+}
+
+
+
+export interface VueUploadItem {
+    id: string;
+
+    // 是否是文件对象
+    readonly fileObject?: boolean,
+
+    // 文件名
+    name?: string;
+
+    // 文件字节
+    size?: number,
+
+    // 文件 mime 类型
+    type?: string,
+
+    // 是否激活中
+    active?: boolean,
+
+    // 错误消息
+    error?: Error | string,
+
+    // 是否成功
+    success?: boolean,
+
+    // post 地址
+    postAction?: string;
+
+    // putAction 地址
+    putAction?: string;
+
+    // timeout
+    timeout?: number;
+
+    // 请求 data
+    data?: { [key: string]: any }
+
+    // 请求 headers
+    headers?: { [key: string]: any }
+
+    // 响应信息
+    response?: { [key: string]: any };
+
+    // 进度
+    progress?: string;          // 只读
+
+    // 速度
+    speed?: 0; // 只读
+
+    // xhr 信息
+    file?: Blob; // 只读
+    xhr?: XMLHttpRequest; // 只读
+
+    // el 信息  仅有 html4 使用
+    el?: HTMLInputElement;
+
+    // iframe 信息 仅有 html4 使用
+    iframe?: HTMLElement;             // 只读
+
+    [key: string]: any;
+}
+
+
+
+
+export interface FileSystemEntry {
+    isDirectory: boolean
+    isFile: boolean
+    name: string
+    fullPath: string
+    filesystem: string
+}
+export interface FileSystemDirectoryReader {
+    readEntries: (
+        successCallback: (result: Array<FileSystemDirectoryEntry | FileSystemFileEntry>) => void,
+        errorCallback?: (error: DOMError) => void,
+    ) => void
+}
+export interface FileSystemFlags {
+    create?: boolean
+    exclusive?: boolean
+}
+export interface FileSystemDirectoryEntry extends FileSystemEntry {
+    isDirectory: true
+    isFile: false
+    createReader: () => FileSystemDirectoryReader
+    getFile: (
+        path?: string,
+        options?: FileSystemFlags,
+        successCallback?: (result: FileSystemFileEntry) => void,
+        errorCallback?: (error: DOMError) => void,
+    ) => void
+    getDirectory: (
+        path?: string,
+        options?: FileSystemFlags,
+        successCallback?: (result: FileSystemDirectoryEntry) => void,
+        errorCallback?: (error: DOMError) => void,
+    ) => void
+}
+export interface FileSystemFileEntry extends FileSystemEntry {
+    isDirectory: false
+    isFile: true
+    file: (cb: (file: File) => void) => void
+}
+
+
+
 
 export default defineComponent({
   props: {
@@ -190,7 +325,7 @@ export default defineComponent({
    * @return {[type]} [description]
    */
   mounted() {
-    let input = document.createElement('input')
+    const input = document.createElement('input')
     input.type = 'file'
     input.multiple = true
     // html5 特征
@@ -211,7 +346,7 @@ export default defineComponent({
     this.maps = {}
     if (this.files) {
       for (let i = 0; i < this.files.length; i++) {
-        let file = this.files[i]
+        const file = this.files[i]
         this.maps[file.id] = file
       }
     }
@@ -318,23 +453,23 @@ export default defineComponent({
         return
       }
       this.files = files
-      let oldMaps = this.maps
+      const oldMaps = this.maps
       // 重写 maps 缓存
       this.maps = {}
       for (let i = 0; i < this.files.length; i++) {
-        let file = this.files[i]
+        const file = this.files[i]
         this.maps[file.id] = file
       }
       // add, update
-      for (let key in this.maps) {
-        let newFile = this.maps[key]
-        let oldFile = oldMaps[key]
+      for (const key in this.maps) {
+        const newFile = this.maps[key]
+        const oldFile = oldMaps[key]
         if (newFile !== oldFile) {
           this.emitFile(newFile, oldFile)
         }
       }
       // delete
-      for (let key in oldMaps) {
+      for (const key in oldMaps) {
         if (!this.maps[key]) {
           this.emitFile(undefined, oldMaps[key])
         }
@@ -348,7 +483,7 @@ export default defineComponent({
     // 清空
     clear() {
       if (this.files.length) {
-        let files = this.files
+        const files = this.files
         this.files = []
         // 定位
         this.maps = {}
@@ -384,7 +519,7 @@ export default defineComponent({
         index = this.addIndex
       }
       // 遍历规范对象
-      let addFiles = []
+      const addFiles: VueUploadItem[] = []
       for (let i = 0; i < files.length; i++) {
         let file: VueUploadItem | Blob = files[i]
         if (this.features.html5 && file instanceof Blob) {
@@ -476,7 +611,7 @@ export default defineComponent({
       this.files = newFiles
       // 定位
       for (let i = 0; i < addFiles.length; i++) {
-        let file = addFiles[i]
+        const file = addFiles[i]
         this.maps[file.id] = file
       }
       // 事件
@@ -500,7 +635,7 @@ export default defineComponent({
       
       if (el.files) {
         for (let i = 0; i < el.files.length; i++) {
-          let file: File = el.files[i]
+          const file: File = el.files[i]
           files.push({
             id: '',
             size: file.size,
@@ -667,14 +802,14 @@ export default defineComponent({
     },
     // 替换
     replace(id1:VueUploadItem | string, id2: VueUploadItem | string): boolean {
-      let file1 = this.get(id1)
-      let file2 = this.get(id2)
+      const file1 = this.get(id1)
+      const file2 = this.get(id2)
       if (!file1 || !file2 || file1 === file2) {
         return false
       }
-      let files = this.files.concat([])
-      let index1 = files.indexOf(file1)
-      let index2 = files.indexOf(file2)
+      const files = this.files.concat([])
+      const index1 = files.indexOf(file1)
+      const index2 = files.indexOf(file2)
       if (index1 === -1 || index2 === -1) {
         return false
       }
@@ -686,13 +821,13 @@ export default defineComponent({
     },
     // 移除
     remove(id: VueUploadItem | string): VueUploadItem | false {
-      let file = this.get(id)
+      const file = this.get(id)
       if (file) {
         if (this.emitFilter(undefined, file)) {
           return false
         }
-        let files = this.files.concat([])
-        let index = files.indexOf(file)
+        const files = this.files.concat([])
+        const index = files.indexOf(file)
         if (index === -1) {
           console.error('remove', file)
           return false
@@ -709,9 +844,9 @@ export default defineComponent({
     },
     // 更新
     update(id: VueUploadItem | string, data: {[key:string]: any}): VueUploadItem | false {
-      let file = this.get(id)
+      const file = this.get(id)
       if (file) {
-        let newFile = {
+        const newFile = {
           ...file,
           ...data
         }
@@ -722,8 +857,8 @@ export default defineComponent({
         if (this.emitFilter(newFile, file)) {
           return false
         }
-        let files = this.files.concat([])
-        let index = files.indexOf(file)
+        const files = this.files.concat([])
+        const index = files.indexOf(file)
         if (index === -1) {
           console.error('update', file)
           return false
@@ -794,7 +929,7 @@ export default defineComponent({
     },
     // 上传
     upload(id: VueUploadItem | string): Promise<VueUploadItem> {
-      let file = this.get(id)
+      const file = this.get(id)
       // 被删除
       if (!file) {
         return Promise.reject(new Error('not_exists'))
@@ -815,7 +950,6 @@ export default defineComponent({
         return Promise.resolve(file)
       }
       // 后缀
-      let extensions = this.extensions
       if (file.name && this.iExtensions) {
         if (file.name.search(this.iExtensions) === -1) {
           return Promise.reject(new Error('extension'))
@@ -882,9 +1016,9 @@ export default defineComponent({
       return this.uploadXhr(xhr, file, file.file as File)
     },
     uploadHtml5(file: VueUploadItem): Promise<VueUploadItem> {
-      let form = new window.FormData()
+      const form = new window.FormData()
       let value
-      for (let key in file.data) {
+      for (const key in file.data) {
         value = file.data[key]
         if (value && typeof value === 'object' && typeof value.toString !== 'function') {
           if (value instanceof File) {
@@ -898,7 +1032,7 @@ export default defineComponent({
       }
       // @ts-ignore
       form.append(this.name, file.file, file.file.name || file.file.filename  || file.name)
-      let xhr = new XMLHttpRequest()
+      const xhr = new XMLHttpRequest()
       xhr.open('POST', file.postAction || '')
       return this.uploadXhr(xhr, file, form)
     },
@@ -1394,7 +1528,7 @@ export default defineComponent({
       if (!e.dataTransfer) {
         return
       }
-      let dt = e.dataTransfer
+      const dt = e.dataTransfer
       if (dt?.files?.length) {
         this.dropActive = true
       } else if (!dt.types) {

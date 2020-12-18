@@ -37,6 +37,7 @@ function baseConfig(css, ssr, umd, min) {
         target: ssr ? 'node' : 'browser',
       }),
       typescript({
+        declaration: true,
         check: true,
         tsconfig: path.resolve(__dirname, 'tsconfig.json'),
         cacheRoot: path.resolve(__dirname, 'node_modules/.rts2_cache'),
