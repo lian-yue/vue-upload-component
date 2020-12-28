@@ -12,6 +12,7 @@ import DragExampleComponent from './views/examples/Drag'
 import MultipleExampleComponent from './views/examples/Multiple'
 import ChunkExampleComponent from './views/examples/Chunk'
 import VuexExampleComponent from './views/examples/Vuex'
+import TypescriptExampleComponent from './views/examples/Typescript'
 
 
 // console.log(i18n)
@@ -53,6 +54,10 @@ let examples = [
   {
     path: 'vuex',
     component: VuexExampleComponent,
+  },
+  {
+    path: 'typescript',
+    component: TypescriptExampleComponent,
   },
 ]
 

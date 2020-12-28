@@ -1,6 +1,6 @@
 <template>
-  <div class="example-simple">
-    <h1 id="example-title" class="example-title">Simple Example</h1>
+  <div class="example-typescript">
+    <h1 id="example-title" class="example-title">Typescript Example</h1>
     <div class="upload">
       <ul>
         <li v-for="file in files" :key="file.id">
@@ -39,50 +39,53 @@
       </div>
     </div>
     <div class="pt-5 source-code">
-      Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Simple.vue">/docs/views/examples/Simple.vue</a>
+      Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Typescript.vue">/docs/views/examples/Typescript.vue</a>
     </div>
   </div>
 </template>
 <style>
-.example-simple label.btn {
+.example-typescript label.btn {
   margin-bottom: 0;
   margin-right: 1rem;
 }
 </style>
 
-<script>
-import {ref} from 'vue'
-import FileUpload from 'vue-upload-component'
+
+<script lang="ts">
+import {ref, SetupContext} from 'vue'
+import  FileUpload from '../../../src/FileUpload.vue'
+import type  { VueUploadItem } from '../../../src/FileUpload.vue'
 export default {
   components: {
     FileUpload,
   },
 
-  setup(props, context) {
-    const upload = ref(null)
+  setup(props: unknown, context: SetupContext) {
+    const upload = ref<InstanceType<typeof FileUpload> | null>(null)
     
     const files = ref([])
 
-    function inputFilter(newFile, oldFile, prevent) {
+    function inputFilter(newFile: VueUploadItem | undefined, oldFile: VueUploadItem | undefined, prevent: (prevent?: boolean) => boolean) {
       if (newFile && !oldFile) {
         // Before adding a file
         // 添加文件前
 
         // Filter system files or hide files
         // 过滤系统文件 和隐藏文件
-        if (/(\/|^)(Thumbs\.db|desktop\.ini|\..+)$/.test(newFile.name)) {
+    
+        if (newFile.name && /(\/|^)(Thumbs\.db|desktop\.ini|\..+)$/.test(newFile.name)) {
           return prevent()
         }
         
         // Filter php html js file
         // 过滤 php html js 文件
-        if (/\.(php5?|html?|jsx?)$/i.test(newFile.name)) {
+        if (newFile.name && /\.(php5?|html?|jsx?)$/i.test(newFile.name)) {
           return prevent()
         }
       }
     }
 
-    function inputFile(newFile, oldFile) {
+    function inputFile(newFile: VueUploadItem | undefined, oldFile: VueUploadItem | undefined) {
       if (newFile && !oldFile) {
         // add
         console.log('add', newFile)
@@ -107,3 +110,4 @@ export default {
   }
 }
 </script>
+

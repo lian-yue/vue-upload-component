@@ -152,6 +152,11 @@ pre {
   display: block;
   z-index: 1072;
 }
+.source-code {
+  font-size: 2em;
+  font-weight: bold;
+  color: #f00;
+}
 </style>
 <script>
 export default {

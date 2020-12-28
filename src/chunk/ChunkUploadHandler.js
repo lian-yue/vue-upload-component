@@ -228,9 +228,7 @@ export default class ChunkUploadHandler {
   start() {
     request({
       method: 'POST',
-      headers: Object.assign({}, this.headers, {
-        'Content-Type': 'application/json'
-      }),
+      headers: { ...this.headers, 'Content-Type': 'application/json'},
       url: this.action,
       body: Object.assign(this.startBody, {
         phase: 'start',
@@ -346,9 +344,7 @@ export default class ChunkUploadHandler {
 
     request({
       method: 'POST',
-      headers: Object.assign({}, this.headers, {
-        'Content-Type': 'application/json'
-      }),
+      headers: { ...this.headers, 'Content-Type': 'application/json' },
       url: this.action,
       body: Object.assign(this.finishBody, {
         phase: 'finish',

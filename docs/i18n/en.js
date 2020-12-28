@@ -27,5 +27,6 @@ export default {
     multiple: 'Multiple instances',
     chunk: 'Chunk upload',
     vuex: 'Vuex',
+    typescript: 'Typescript',
   }
 }

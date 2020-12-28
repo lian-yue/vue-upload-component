@@ -36,7 +36,7 @@
         </button>
       </div>
     </div>
-    <div class="pt-5">
+    <div class="pt-5 source-code">
       Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Vuex.vue">/docs/views/examples/Vuex.vue</a>, <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/store.js">/docs/store.js</a>
     </div>
   </div>

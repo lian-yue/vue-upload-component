@@ -27,5 +27,6 @@ export default {
     drag: '拖拽上传',
     multiple: '多个实例',
     vuex: 'Vuex',
+    typescript: 'Typescript',
   }
 }

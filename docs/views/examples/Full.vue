@@ -306,7 +306,7 @@
     </div>
   </div>
 
-  <div class="pt-5">
+  <div class="pt-5 source-code">
     Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Full.vue">/docs/views/examples/Full.vue</a>
   </div>
 

@@ -36,7 +36,7 @@
         <button type="submit" class="btn btn-primary" @click.prevent="editSave">Save</button>
       </div>
     </div>
-    <div class="pt-5">
+    <div class="pt-5 source-code">
       Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Avatar.vue">/docs/views/examples/Avatar.vue</a>
     </div>
   </div>

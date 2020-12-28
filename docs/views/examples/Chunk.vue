@@ -149,7 +149,7 @@
         </file-upload>
       </div>
     </div>
-    <div class="pt-5">
+    <div class="pt-5 source-code">
       Source code: <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Chunk.vue">/docs/views/examples/Chunk.vue</a>
     </div>
   </div>
