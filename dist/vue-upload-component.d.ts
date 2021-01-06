@@ -20,6 +20,7 @@ export interface Data {
     uploading: number;
     features: Features;
     dropElement: null | HTMLElement;
+    reload: boolean;
 }
 export interface Features {
     html5: boolean;

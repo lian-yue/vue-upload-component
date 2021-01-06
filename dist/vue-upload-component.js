@@ -1,7 +1,7 @@
 /*!
  Name: vue-upload-component 
 Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.0.45 
+Version: 3.0.46 
 Author: LianYue 
 License: Apache-2.0 
 Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
@@ -796,7 +796,8 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         uploading: 0,
         destroy: false,
         maps: {},
-        dropElement: null
+        dropElement: null,
+        reload: false
       };
     },
 
@@ -2183,26 +2184,11 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         var target = e.target;
 
         var reinput = function reinput(res) {
-          if (target.files) {
-            target.value = '';
+          _this14.reload = true; // @ts-ignore
 
-            if (target.files.length && !/safari/i.test(navigator.userAgent)) {
-              target.type = '';
-              target.type = 'file';
-            }
-          } else {
-            var _oldInput$parentNode;
-
-            // ie9 fix #219
-            var oldInput = document.getElementById(_this14.forId);
-            var newInput = oldInput.cloneNode(true);
-            newInput.value = '';
-            newInput.type = 'file'; // @ts-ignore
-
-            newInput.onChange = _this14.inputOnChange;
-            (_oldInput$parentNode = oldInput.parentNode) === null || _oldInput$parentNode === void 0 ? void 0 : _oldInput$parentNode.replaceChild(newInput, oldInput);
-            _this14.$refs.input = newInput;
-          }
+          _this14.$nextTick(function () {
+            _this14.reload = false;
+          });
 
           return res;
         };
@@ -2217,7 +2203,8 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
       class: _ctx.className
     }, [vue.renderSlot(_ctx.$slots, "default"), vue.createVNode("label", {
       for: _ctx.forId
-    }, null, 8, ["for"]), vue.createVNode("input", {
+    }, null, 8, ["for"]), !_ctx.reload ? (vue.openBlock(), vue.createBlock("input", {
+      key: 0,
       ref: "input",
       type: "file",
       name: _ctx.name,
@@ -2232,7 +2219,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
       onChange: _cache[1] || (_cache[1] = function () {
         return _ctx.inputOnChange && _ctx.inputOnChange.apply(_ctx, arguments);
       })
-    }, null, 40, ["name", "id", "accept", "capture", "disabled", "webkitdirectory", "allowdirs", "directory", "multiple"])], 2);
+    }, null, 40, ["name", "id", "accept", "capture", "disabled", "webkitdirectory", "allowdirs", "directory", "multiple"])) : vue.createCommentVNode("", true)], 2);
   }
 
   function styleInject(css, ref) {

@@ -1,7 +1,7 @@
 /*!
  Name: vue-upload-component 
 Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.0.45 
+Version: 3.0.46 
 Author: LianYue 
 License: Apache-2.0 
 Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
@@ -611,6 +611,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               destroy: false,
               maps: {},
               dropElement: null,
+              reload: false,
           };
       },
       /**
@@ -1797,24 +1798,11 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               }
               const target = e.target;
               const reinput = (res) => {
-                  if (target.files) {
-                      target.value = '';
-                      if (target.files.length && !/safari/i.test(navigator.userAgent)) {
-                          target.type = '';
-                          target.type = 'file';
-                      }
-                  }
-                  else {
-                      // ie9 fix #219
-                      const oldInput = document.getElementById(this.forId);
-                      const newInput = oldInput.cloneNode(true);
-                      newInput.value = '';
-                      newInput.type = 'file';
-                      // @ts-ignore
-                      newInput.onChange = this.inputOnChange;
-                      oldInput.parentNode?.replaceChild(newInput, oldInput);
-                      this.$refs.input = newInput;
-                  }
+                  this.reload = true;
+                  // @ts-ignore
+                  this.$nextTick(() => {
+                      this.reload = false;
+                  });
                   return res;
               };
               return this.addInputFile(e.target).then(reinput).catch(reinput);
@@ -1825,27 +1813,31 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
   function ssrRender(_ctx, _push, _parent, _attrs, $props, $setup, $data, $options) {
     _push(`<span${serverRenderer.ssrRenderAttrs(vue.mergeProps({ class: _ctx.className }, _attrs))}>`);
     serverRenderer.ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
-    _push(`<label${
-    serverRenderer.ssrRenderAttr("for", _ctx.forId)
-  }></label><input type="file"${
-    serverRenderer.ssrRenderAttr("name", _ctx.name)
-  }${
-    serverRenderer.ssrRenderAttr("id", _ctx.forId)
-  }${
-    serverRenderer.ssrRenderAttr("accept", _ctx.accept)
-  }${
-    serverRenderer.ssrRenderAttr("capture", _ctx.capture)
-  }${
-    (_ctx.disabled) ? " disabled" : ""
-  }${
-    serverRenderer.ssrRenderAttr("webkitdirectory", _ctx.directory && _ctx.features.directory)
-  }${
-    serverRenderer.ssrRenderAttr("allowdirs", _ctx.directory && _ctx.features.directory)
-  }${
-    serverRenderer.ssrRenderAttr("directory", _ctx.directory && _ctx.features.directory)
-  }${
-    (_ctx.multiple && _ctx.features.html5) ? " multiple" : ""
-  }></span>`);
+    _push(`<label${serverRenderer.ssrRenderAttr("for", _ctx.forId)}></label>`);
+    if (!_ctx.reload) {
+      _push(`<input type="file"${
+      serverRenderer.ssrRenderAttr("name", _ctx.name)
+    }${
+      serverRenderer.ssrRenderAttr("id", _ctx.forId)
+    }${
+      serverRenderer.ssrRenderAttr("accept", _ctx.accept)
+    }${
+      serverRenderer.ssrRenderAttr("capture", _ctx.capture)
+    }${
+      (_ctx.disabled) ? " disabled" : ""
+    }${
+      serverRenderer.ssrRenderAttr("webkitdirectory", _ctx.directory && _ctx.features.directory)
+    }${
+      serverRenderer.ssrRenderAttr("allowdirs", _ctx.directory && _ctx.features.directory)
+    }${
+      serverRenderer.ssrRenderAttr("directory", _ctx.directory && _ctx.features.directory)
+    }${
+      (_ctx.multiple && _ctx.features.html5) ? " multiple" : ""
+    }>`);
+    } else {
+      _push(`<!---->`);
+    }
+    _push(`</span>`);
   }
 
   function styleInject(css, ref) {
