@@ -1,21 +1,22 @@
 <template>
   <span :class="className">
     <slot></slot>
-    <label :for="forId"></label>
+    <label :for="forId"></label>    
     <input
-        ref="input"
-        type="file"
-        :name="name"
-        :id="forId"
-        :accept="accept"
-        :capture="capture"
-        :disabled="disabled"
-        :webkitdirectory="directory && features.directory"
-        :allowdirs="directory && features.directory"
-        :directory="directory && features.directory"
-        :multiple="multiple && features.html5"
-        @change="inputOnChange"
-      />
+      v-if="!reload"
+      ref="input"
+      type="file"
+      :name="name"
+      :id="forId"
+      :accept="accept"
+      :capture="capture"
+      :disabled="disabled"
+      :webkitdirectory="directory && features.directory"
+      :allowdirs="directory && features.directory"
+      :directory="directory && features.directory"
+      :multiple="multiple && features.html5"
+      @change="inputOnChange"
+    />
   </span>
 </template>
 <style>
@@ -51,7 +52,7 @@
 }
 </style>
 <script lang="ts">
-import {PropType, defineComponent} from "vue";
+import {PropType, defineComponent, h} from "vue";
 
 // @ts-ignore
 import ChunkUploadDefaultHandler from './chunk/ChunkUploadHandler.js'
@@ -82,6 +83,7 @@ export interface Data {
     uploading: number;
     features: Features;
     dropElement: null | HTMLElement;
+    reload: boolean;
 }
 
 export interface Features {
@@ -318,6 +320,7 @@ export default defineComponent({
       destroy: false,
       maps: {},
       dropElement: null,
+      reload: false,
     }
   },
   /**
@@ -1570,23 +1573,11 @@ export default defineComponent({
       }
       const target = e.target
       const reinput = (res: any) => {
-        if (target.files) {
-          target.value = ''
-          if (target.files.length && !/safari/i.test(navigator.userAgent)) {
-            target.type = ''
-            target.type = 'file'
-          }
-        } else {
-          // ie9 fix #219
-          const oldInput = document.getElementById(this.forId) as HTMLInputElement
-          const newInput = oldInput.cloneNode(true) as HTMLInputElement
-          newInput.value = ''
-          newInput.type = 'file'
-          // @ts-ignore
-          newInput.onChange = this.inputOnChange
-          oldInput.parentNode?.replaceChild(newInput, oldInput)
-          this.$refs.input = newInput
-        }
+        this.reload = true
+        // @ts-ignore
+        this.$nextTick(() => {
+          this.reload = false
+        })
         return res
       }
 
