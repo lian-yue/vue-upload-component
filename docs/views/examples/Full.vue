@@ -17,6 +17,8 @@
             <th>#</th>
             <th>Thumb</th>
             <th>Name</th>
+            <th>Width</th>
+            <th>Height</th>
             <th>Size</th>
             <th>Speed</th>
             <th>Status</th>
@@ -25,7 +27,7 @@
         </thead>
         <tbody>
           <tr v-if="!files.length">
-            <td colspan="7">
+            <td colspan="9">
               <div class="text-center p-5">
                 <h4>Drop files anywhere to upload<br/>or</h4>
                 <label :for="name" class="btn btn-lg btn-primary">Select Files</label>
@@ -46,6 +48,8 @@
                 <div :class="{'progress-bar': true, 'progress-bar-striped': true, 'bg-danger': file.error, 'progress-bar-animated': file.active}" role="progressbar" :style="{width: file.progress + '%'}">{{file.progress}}%</div>
               </div>
             </td>
+            <td>{{file.width || 0}}</td>
+            <td>{{file.height || 0}}</td>
             <td>{{$formatSize(file.size)}}</td>
             <td>{{$formatSize(file.speed)}}</td>
 
@@ -59,12 +63,12 @@
                   Action
                 </button>
                 <div class="dropdown-menu">
-                  <a :class="{'dropdown-item': true, disabled: file.active || file.success || file.error === 'compressing'}" href="#" @click.prevent="file.active || file.success || file.error === 'compressing' ? false :  onEditFileShow(file)">Edit</a>
+                  <a :class="{'dropdown-item': true, disabled: file.active || file.success || file.error === 'compressing' || file.error === 'image parsing'}" href="#" @click.prevent="file.active || file.success || file.error === 'compressing' ? false :  onEditFileShow(file)">Edit</a>
                   <a :class="{'dropdown-item': true, disabled: !file.active}" href="#" @click.prevent="file.active ? $refs.upload.update(file, {error: 'cancel'}) : false">Cancel</a>
 
                   <a class="dropdown-item" href="#" v-if="file.active" @click.prevent="$refs.upload.update(file, {active: false})">Abort</a>
-                  <a class="dropdown-item" href="#" v-else-if="file.error && file.error !== 'compressing' && $refs.upload.features.html5" @click.prevent="$refs.upload.update(file, {active: true, error: '', progress: '0.00'})">Retry upload</a>
-                  <a :class="{'dropdown-item': true, disabled: file.success || file.error === 'compressing'}" href="#" v-else @click.prevent="file.success || file.error === 'compressing' ? false : $refs.upload.update(file, {active: true})">Upload</a>
+                  <a class="dropdown-item" href="#" v-else-if="file.error && file.error !== 'compressing' && file.error !== 'image parsing' && $refs.upload.features.html5" @click.prevent="$refs.upload.update(file, {active: true, error: '', progress: '0.00'})">Retry upload</a>
+                  <a :class="{'dropdown-item': true, disabled: file.success || file.error === 'compressing' || file.error === 'image parsing'}" href="#" v-else @click.prevent="file.success || file.error === 'compressing' || file.error === 'image parsing' ? false : $refs.upload.update(file, {active: true})">Upload</a>
 
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="#" @click.prevent="$refs.upload.remove(file)">Remove</a>
@@ -454,7 +458,7 @@ export default {
       }
 
       if (newValue) {
-        this.$nextTick(function () {
+        this.$nextTick( () => {
           if (!this.$refs.editImage) {
             return
           }
@@ -498,10 +502,10 @@ export default {
 
         // Automatic compression
         // 自动压缩
-        if (newFile.file && newFile.type.substr(0, 6) === 'image/' && this.autoCompress > 0 && this.autoCompress < newFile.size) {
+        if (newFile.file && newFile.error === "" && newFile.type.substr(0, 6) === 'image/' && this.autoCompress > 0 && this.autoCompress < newFile.size) {
           newFile.error = 'compressing'
           const imageCompressor = new ImageCompressor(null, {
-            convertSize: Infinity,
+            convertSize: 1024 * 1024,
             maxWidth: 512,
             maxHeight: 512,
           })
@@ -516,13 +520,12 @@ export default {
       }
 
 
-      if (newFile && (!oldFile || newFile.file !== oldFile.file)) {
-
+      if (newFile && newFile.error === "" && newFile.file && (!oldFile || newFile.file !== oldFile.file)) {
         // Create a blob field
         // 创建 blob 字段
         newFile.blob = ''
-        let URL = window.URL || window.webkitURL
-        if (URL && URL.createObjectURL) {
+        let URL = (window.URL || window.webkitURL)
+        if (URL) {
           newFile.blob = URL.createObjectURL(newFile.file)
         }
 
@@ -532,6 +535,20 @@ export default {
         if (newFile.blob && newFile.type.substr(0, 6) === 'image/') {
           newFile.thumb = newFile.blob
         }
+      }
+
+      // image size
+      // image 尺寸
+      if (newFile && newFile.error === '' && newFile.type.substr(0, 6) === "image/" && newFile.blob && (!oldFile || newFile.blob !== oldFile.blob)) {
+        newFile.error = 'image parsing'
+        let img = new Image();
+        img.onload = () => {
+          this.$refs.upload.update(newFile, {error: '', height: img.height, width: img.width})
+        } 
+        img.οnerrοr = (e) => {
+          this.$refs.upload.update(newFile, { error: 'parsing image size'}) 
+        }
+        img.src = newFile.blob
       }
     },
 
@@ -602,6 +619,7 @@ export default {
 
       let data = {
         name: this.editFile.name,
+        error: '',
       }
       if (this.editFile.cropper) {
         let binStr = atob(this.editFile.cropper.getCroppedCanvas().toDataURL(this.editFile.type).split(',')[1])
