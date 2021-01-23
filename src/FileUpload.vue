@@ -380,6 +380,8 @@ export default defineComponent({
     this.active = false
     // 销毁拖拽事件
     this.watchDrop(false)
+    // 销毁不激活
+    this.watchActive(false)
   },
 
   computed: {
