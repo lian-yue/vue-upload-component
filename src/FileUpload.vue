@@ -123,6 +123,7 @@ export default {
 
 
     drop: {
+      type: Boolean,
       default: false,
     },
 
