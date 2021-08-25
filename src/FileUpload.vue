@@ -1,7 +1,7 @@
 <template>
   <span :class="className">
     <slot></slot>
-    <label :for="forId"></label>    
+    <label :for="forId"></label>
     <input
       v-if="!reload"
       ref="input"
@@ -262,6 +262,7 @@ export default defineComponent({
       default: 0,
     },
     drop: {
+      type: Boolean,
       default: false,
     },
     dropDirectory: {
@@ -640,7 +641,7 @@ export default defineComponent({
           return this.add(files) as VueUploadItem[]
         })
       }
-      
+
       if (el.files) {
         for (let i = 0; i < el.files.length; i++) {
           const file: File = el.files[i]
@@ -712,12 +713,12 @@ export default defineComponent({
       return Promise.resolve([])
     },
 
-     
-    // 获得 entrys    
+
+    // 获得 entrys
     getFileSystemEntry(entry: Array<File | FileSystemFileEntry | FileSystemDirectoryEntry> | File | FileSystemFileEntry | FileSystemDirectoryEntry, path = ''): Promise<VueUploadItem[]> {
       return new Promise((resolve) => {
         const maximumValue = this.iMaximum
-        
+
         if (!entry) {
           resolve([])
           return
@@ -737,7 +738,7 @@ export default defineComponent({
             })
           }
           forEach(0)
-          return 
+          return
         }
 
         if (entry instanceof Blob) {
@@ -753,8 +754,8 @@ export default defineComponent({
           return
         }
 
-        
-        
+
+
         if (entry.isFile) {
           entry.file(function (file) {
             resolve([
@@ -769,7 +770,7 @@ export default defineComponent({
           })
           return
         }
-        
+
         if (entry.isDirectory && this.dropDirectory) {
           const uploadFiles: VueUploadItem[] = []
           // 目录也要添加到文件列表
@@ -1068,7 +1069,7 @@ export default defineComponent({
         }
         speedTime = speedTime2
 
-        
+
         file = this.update(file, {
           progress: (e.loaded / e.total * 100).toFixed(2),
           speed: e.loaded - speedLoaded,
@@ -1186,7 +1187,7 @@ export default defineComponent({
           // 更新
           // @ts-ignore
           file = this.update(file, data)
-          
+
           if (!file) {
             return reject(new Error('abort'))
           }
@@ -1208,7 +1209,7 @@ export default defineComponent({
         xhr.onerror = fn
         xhr.onabort = fn
         xhr.ontimeout = fn
-        
+
 
         // 超时
         if (file.timeout) {
