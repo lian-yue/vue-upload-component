@@ -4,13 +4,14 @@ const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin');
 const chunkUpload = require('./src/utils/chunkUpload')
 const bodyParser = require('webpack-body-parser')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const packageInfo = require('./package.json')
 const { VueLoaderPlugin } = require('vue-loader')
 const isDev = process.env.NODE_ENV === 'development'
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 const IsCssExtract = !isDev
 
@@ -69,20 +70,25 @@ module.exports = {
     'cropperjs': 'Cropper',
     '@xkeshi/image-compressor': 'ImageCompressor',
   },
+
   // cache: false,
   devServer: {
-    inline: true,
     hot: true,
     liveReload: true,
-    overlay: true,
-    disableHostCheck: true,
-    watchOptions: {
-      poll: true
+    allowedHosts: "all",
+    client: {
+      logging: 'error',
+      overlay: true,
     },
-    before(app) {
+
+
+    setupMiddlewares(middlewares, devServer) {
+      if (!devServer) {
+        throw new Error('webpack-dev-server is not defined');
+      }
       let id = 1000000
-      let put = function (req, res) {
-        setTimeout(function () {
+      let put = function(req, res) {
+        setTimeout(function() {
           let rand = Math.random()
           if (rand <= 0.1) {
             res.status(500)
@@ -95,93 +101,90 @@ module.exports = {
           }
         }, 200 + parseInt(Math.random() * 4000, 10))
       }
-      let del = function (req, res) {
+      let del = function(req, res) {
         res.json({ success: true })
       }
 
       // Chunk upload
-      app.post('/upload/chunk', bodyParser.json(), chunkUpload)
+      devServer.app.post('/upload/chunk', bodyParser.json(), chunkUpload)
 
-      app.post('/upload/post', put)
-      app.put('/upload/put', put)
-      app.post('/upload/delete', del)
-      app.delete('/upload/delete', del)
+      devServer.app.post('/upload/post', put)
+      devServer.app.put('/upload/put', put)
+      devServer.app.post('/upload/delete', del)
+      devServer.app.delete('/upload/delete', del)
+
+      return middlewares
     },
-    // host: '0.0.0.0',
-    contentBase: __dirname,
-    clientLogLevel: 'error',
-    noInfo: true,
-    publicPath: '/',
+    host: '127.0.0.1',
+    static: {
+      directory: __dirname,
+    },
+
+    compress: true,
+
+    devMiddleware: {
+      index: true,
+      mimeTypes: { phtml: 'text/html' },
+      publicPath: '/',
+      serverSideRender: true,
+      writeToDisk: false,
+    },
+
+
+    // noInfo: true,
     historyApiFallback: true,
   },
 
   target: 'web',
 
   module: {
-    rules: [
-      {
+    rules: [{
         test: /\.vue$/,
-        use: [
-          {
-            loader: 'vue-loader',
-            options: {
-              compilerOptions: {
-                whitespace: 'condense',
-              },
-              transpileOptions: {
-                transforms: {
-                  dangerousTaggedTemplateString: true
-                }
-              },
+        use: [{
+          loader: 'vue-loader',
+          options: {
+            compilerOptions: {
+              whitespace: 'condense',
             },
-          }
-        ],
+            transpileOptions: {
+              transforms: {
+                dangerousTaggedTemplateString: true
+              }
+            },
+          },
+        }],
       },
       {
         test: /\.html?$/,
-        use: [
-          {
-            loader: 'html-loader',
-          }
-        ]
+        use: [{
+          loader: 'html-loader',
+        }]
       },
       {
         test: /\.(js|jsx)$/,
-        use: [
-          {
-            loader: 'babel-loader',
-          },
-          {
-            loader: 'eslint-loader',
-          },
-        ],
+        use: [{
+          loader: 'babel-loader',
+        }, ],
       },
       {
         test: /\.(md|txt)$/,
-        use: [
-          {
-            loader: 'raw-loader',
-          },
-        ]
+        use: [{
+          loader: 'raw-loader',
+        }, ]
       },
       {
         test: /\.tsx?$/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              appendTsSuffixTo: [/\.(vue|tsx?)$/],
-            }
-          },
-          {
-            loader: 'eslint-loader',
+        use: [{
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.(vue|tsx?)$/],
+            transpileOnly: true,
           }
-        ],
+        }],
       },
       {
         test: /(\.css)$/,
-        use: [
-          {
+        use: [{
             loader: 'style-loader',
           },
           {
@@ -210,9 +213,10 @@ module.exports = {
     //   filename: 'assets/[name].css',
     //   chunkFilename: 'assets/[name].[id].css',
     // }),
+    new ESLintPlugin(),
     new VueLoaderPlugin(),
 
-    new OptimizeCssAssetsPlugin(),
+    new CssMinimizerWebpackPlugin(),
 
     new HtmlWebpackPlugin({
       filename: 'index.html',
@@ -232,4 +236,3 @@ module.exports = {
     }),
   ],
 };
-

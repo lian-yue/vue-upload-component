@@ -144,6 +144,7 @@ export interface VueUploadItem {
 
     // xhr 信息
     file?: Blob; // 只读
+    
     xhr?: XMLHttpRequest; // 只读
 
     // el 信息  仅有 html4 使用
@@ -158,45 +159,6 @@ export interface VueUploadItem {
 
 
 
-export interface FileSystemEntry {
-    isDirectory: boolean
-    isFile: boolean
-    name: string
-    fullPath: string
-    filesystem: string
-}
-export interface FileSystemDirectoryReader {
-    readEntries: (
-        successCallback: (result: Array<FileSystemDirectoryEntry | FileSystemFileEntry>) => void,
-        errorCallback?: (error: DOMError) => void,
-    ) => void
-}
-export interface FileSystemFlags {
-    create?: boolean
-    exclusive?: boolean
-}
-export interface FileSystemDirectoryEntry extends FileSystemEntry {
-    isDirectory: true
-    isFile: false
-    createReader: () => FileSystemDirectoryReader
-    getFile: (
-        path?: string,
-        options?: FileSystemFlags,
-        successCallback?: (result: FileSystemFileEntry) => void,
-        errorCallback?: (error: DOMError) => void,
-    ) => void
-    getDirectory: (
-        path?: string,
-        options?: FileSystemFlags,
-        successCallback?: (result: FileSystemDirectoryEntry) => void,
-        errorCallback?: (error: DOMError) => void,
-    ) => void
-}
-export interface FileSystemFileEntry extends FileSystemEntry {
-    isDirectory: false
-    isFile: true
-    file: (cb: (file: File) => void) => void
-}
 
 
 
@@ -307,6 +269,7 @@ export default defineComponent({
     'input-file',
   ],
   data(): Data {
+
     return {
       files: this.modelValue,
       features: {
@@ -633,8 +596,10 @@ export default defineComponent({
     addInputFile(el: HTMLInputElement): Promise<VueUploadItem[]> {
       const files: Array<VueUploadItem | File> = []
       const maximumValue = this.iMaximum
+
+      
       // @ts-ignore
-      const entrys = el.webkitEntries || el.entries || undefined
+      const entrys: any = el.webkitEntries || el.entries || undefined
       if (entrys?.length) {
         return this.getFileSystemEntry(entrys).then((files) => {
           return this.add(files) as VueUploadItem[]
@@ -673,11 +638,11 @@ export default defineComponent({
     addDataTransfer(dataTransfer: DataTransfer):Promise<VueUploadItem[] | undefined> {
       // dataTransfer.items 支持
       if (dataTransfer?.items?.length) {
-        const entrys: Array<File| FileSystemFileEntry | FileSystemDirectoryEntry> = []
+        const entrys: Array<File | FileSystemEntry> = []
         // 遍历出所有 dataTransferVueUploadItem
         for (let i = 0; i < dataTransfer.items.length; i++) {
           const dataTransferTtem = dataTransfer.items[i]
-          let entry: File| FileSystemFileEntry | FileSystemDirectoryEntry | null
+          let entry: File| FileSystemEntry | null
           // @ts-ignore
           if (dataTransferTtem.getAsEntry) {
             // @ts-ignore
@@ -714,7 +679,8 @@ export default defineComponent({
 
      
     // 获得 entrys    
-    getFileSystemEntry(entry: Array<File | FileSystemFileEntry | FileSystemDirectoryEntry> | File | FileSystemFileEntry | FileSystemDirectoryEntry, path = ''): Promise<VueUploadItem[]> {
+    getFileSystemEntry(entry: Array<File | FileSystemEntry> | File | FileSystemEntry, path = ''): Promise<VueUploadItem[]> {
+    // getFileSystemEntry(entry: any, path = ''): Promise<VueUploadItem[]> {
       return new Promise((resolve) => {
         const maximumValue = this.iMaximum
         
@@ -745,6 +711,7 @@ export default defineComponent({
             {
               id: '',
               size: entry.size,
+              // @ts-ignore
               name: path + entry.name,
               type: entry.type,
               file: entry,
@@ -756,7 +723,8 @@ export default defineComponent({
         
         
         if (entry.isFile) {
-          entry.file(function (file) {
+          let fileEntry = entry as FileSystemFileEntry
+          fileEntry.file(function (file: File) {
             resolve([
               {
                 id:'',
@@ -771,21 +739,22 @@ export default defineComponent({
         }
         
         if (entry.isDirectory && this.dropDirectory) {
+          let directoryEntry = entry as FileSystemDirectoryEntry
           const uploadFiles: VueUploadItem[] = []
           // 目录也要添加到文件列表
           if (this.createDirectory) {
             uploadFiles.push({
               id: '',
-              name: path + entry.name,
+              name: path + directoryEntry.name,
               size: 0,
               type: 'text/directory',
-              file: new File([], path + entry.name, {type: 'text/directory'}),
+              file: new File([], path + directoryEntry.name, {type: 'text/directory'}),
             })
           }
 
-          const dirReader = entry.createReader()
+          const dirReader = directoryEntry.createReader()
           const readEntries = () => {
-            dirReader.readEntries((entries) => {
+            dirReader.readEntries((entries : any) => {
               const forEach = (i:number) => {
                 if ((!entries[i] && i === 0) || (maximumValue > 0 && uploadFiles.length >= maximumValue)) {
                   return resolve(uploadFiles)
@@ -793,7 +762,7 @@ export default defineComponent({
                 if (!entries[i]) {
                   return readEntries()
                 }
-                this.getFileSystemEntry(entries[i], path + entry.name + '/').then(function(results) {
+                this.getFileSystemEntry(entries[i], path + directoryEntry.name + '/').then(function(results) {
                   uploadFiles.push(...results)
                   forEach(i + 1)
                 })

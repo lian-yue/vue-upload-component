@@ -1,16 +1,16 @@
 /*!
  Name: vue-upload-component 
 Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.0.49 
+Version: 3.1.0 
 Author: LianYue 
 License: Apache-2.0 
 Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
  */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('vue'), require('@vue/server-renderer')) :
-  typeof define === 'function' && define.amd ? define(['vue', '@vue/server-renderer'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.VueUploadComponent = factory(global.Vue, global.serverRenderer));
-}(this, (function (vue, serverRenderer) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('vue')) :
+  typeof define === 'function' && define.amd ? define(['vue'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.VueUploadComponent = factory(global.Vue));
+})(this, (function (vue) { 'use strict';
 
   /**
    * Creates a XHR request
@@ -860,7 +860,11 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                           ...file,
                           response: {},
                           progress: '0.00',
-                          speed: 0,
+                          speed: 0, // 只读
+                          // file: undefined,
+                          // xhr: undefined,
+                          // el: undefined,
+                          // iframe: undefined,
                       };
                       file.data = {
                           ...this.data,
@@ -924,7 +928,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           // 添加表单文件
           addInputFile(el) {
               const files = [];
-              const maximumValue = this.iMaximum;
+              this.iMaximum;
               // @ts-ignore
               const entrys = el.webkitEntries || el.entries || undefined;
               if (entrys?.length) {
@@ -1004,6 +1008,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           },
           // 获得 entrys    
           getFileSystemEntry(entry, path = '') {
+              // getFileSystemEntry(entry: any, path = ''): Promise<VueUploadItem[]> {
               return new Promise((resolve) => {
                   const maximumValue = this.iMaximum;
                   if (!entry) {
@@ -1031,6 +1036,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                           {
                               id: '',
                               size: entry.size,
+                              // @ts-ignore
                               name: path + entry.name,
                               type: entry.type,
                               file: entry,
@@ -1039,7 +1045,8 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                       return;
                   }
                   if (entry.isFile) {
-                      entry.file(function (file) {
+                      let fileEntry = entry;
+                      fileEntry.file(function (file) {
                           resolve([
                               {
                                   id: '',
@@ -1053,18 +1060,19 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                       return;
                   }
                   if (entry.isDirectory && this.dropDirectory) {
+                      let directoryEntry = entry;
                       const uploadFiles = [];
                       // 目录也要添加到文件列表
                       if (this.createDirectory) {
                           uploadFiles.push({
                               id: '',
-                              name: path + entry.name,
+                              name: path + directoryEntry.name,
                               size: 0,
                               type: 'text/directory',
-                              file: new File([], path + entry.name, { type: 'text/directory' }),
+                              file: new File([], path + directoryEntry.name, { type: 'text/directory' }),
                           });
                       }
-                      const dirReader = entry.createReader();
+                      const dirReader = directoryEntry.createReader();
                       const readEntries = () => {
                           dirReader.readEntries((entries) => {
                               const forEach = (i) => {
@@ -1074,7 +1082,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                                   if (!entries[i]) {
                                       return readEntries();
                                   }
-                                  this.getFileSystemEntry(entries[i], path + entry.name + '/').then(function (results) {
+                                  this.getFileSystemEntry(entries[i], path + directoryEntry.name + '/').then(function (results) {
                                       uploadFiles.push(...results);
                                       forEach(i + 1);
                                   });
@@ -1798,7 +1806,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               if (!(e.target instanceof HTMLInputElement)) {
                   return Promise.reject(new Error("not HTMLInputElement"));
               }
-              const target = e.target;
+              e.target;
               const reinput = (res) => {
                   this.reload = true;
                   // @ts-ignore
@@ -1812,29 +1820,652 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
       },
   });
 
+  /**
+   * Make a map and return a function for checking if a key
+   * is in that map.
+   * IMPORTANT: all calls of this function must be prefixed with
+   * \/\*#\_\_PURE\_\_\*\/
+   * So that rollup can tree-shake them if necessary.
+   */
+  function makeMap(str, expectsLowerCase) {
+      const map = Object.create(null);
+      const list = str.split(',');
+      for (let i = 0; i < list.length; i++) {
+          map[list[i]] = true;
+      }
+      return expectsLowerCase ? val => !!map[val.toLowerCase()] : val => !!map[val];
+  }
+
+  /**
+   * On the client we only need to offer special cases for boolean attributes that
+   * have different names from their corresponding dom properties:
+   * - itemscope -> N/A
+   * - allowfullscreen -> allowFullscreen
+   * - formnovalidate -> formNoValidate
+   * - ismap -> isMap
+   * - nomodule -> noModule
+   * - novalidate -> noValidate
+   * - readonly -> readOnly
+   */
+  const specialBooleanAttrs = `itemscope,allowfullscreen,formnovalidate,ismap,nomodule,novalidate,readonly`;
+  /**
+   * The full list is needed during SSR to produce the correct initial markup.
+   */
+  const isBooleanAttr = /*#__PURE__*/ makeMap(specialBooleanAttrs +
+      `,async,autofocus,autoplay,controls,default,defer,disabled,hidden,` +
+      `loop,open,required,reversed,scoped,seamless,` +
+      `checked,muted,multiple,selected`);
+  /**
+   * Boolean attributes should be included if the value is truthy or ''.
+   * e.g. `<select multiple>` compiles to `{ multiple: '' }`
+   */
+  function includeBooleanAttr(value) {
+      return !!value || value === '';
+  }
+  const unsafeAttrCharRE = /[>/="'\u0009\u000a\u000c\u0020]/;
+  const attrValidationCache = {};
+  function isSSRSafeAttrName(name) {
+      if (attrValidationCache.hasOwnProperty(name)) {
+          return attrValidationCache[name];
+      }
+      const isUnsafe = unsafeAttrCharRE.test(name);
+      if (isUnsafe) {
+          console.error(`unsafe attribute name: ${name}`);
+      }
+      return (attrValidationCache[name] = !isUnsafe);
+  }
+  const propsToAttrMap = {
+      acceptCharset: 'accept-charset',
+      className: 'class',
+      htmlFor: 'for',
+      httpEquiv: 'http-equiv'
+  };
+  /**
+   * CSS properties that accept plain numbers
+   */
+  const isNoUnitNumericStyleProp = /*#__PURE__*/ makeMap(`animation-iteration-count,border-image-outset,border-image-slice,` +
+      `border-image-width,box-flex,box-flex-group,box-ordinal-group,column-count,` +
+      `columns,flex,flex-grow,flex-positive,flex-shrink,flex-negative,flex-order,` +
+      `grid-row,grid-row-end,grid-row-span,grid-row-start,grid-column,` +
+      `grid-column-end,grid-column-span,grid-column-start,font-weight,line-clamp,` +
+      `line-height,opacity,order,orphans,tab-size,widows,z-index,zoom,` +
+      // SVG
+      `fill-opacity,flood-opacity,stop-opacity,stroke-dasharray,stroke-dashoffset,` +
+      `stroke-miterlimit,stroke-opacity,stroke-width`);
+
+  function normalizeStyle(value) {
+      if (isArray(value)) {
+          const res = {};
+          for (let i = 0; i < value.length; i++) {
+              const item = value[i];
+              const normalized = isString(item)
+                  ? parseStringStyle(item)
+                  : normalizeStyle(item);
+              if (normalized) {
+                  for (const key in normalized) {
+                      res[key] = normalized[key];
+                  }
+              }
+          }
+          return res;
+      }
+      else if (isString(value)) {
+          return value;
+      }
+      else if (isObject(value)) {
+          return value;
+      }
+  }
+  const listDelimiterRE = /;(?![^(]*\))/g;
+  const propertyDelimiterRE = /:(.+)/;
+  function parseStringStyle(cssText) {
+      const ret = {};
+      cssText.split(listDelimiterRE).forEach(item => {
+          if (item) {
+              const tmp = item.split(propertyDelimiterRE);
+              tmp.length > 1 && (ret[tmp[0].trim()] = tmp[1].trim());
+          }
+      });
+      return ret;
+  }
+  function stringifyStyle(styles) {
+      let ret = '';
+      if (!styles || isString(styles)) {
+          return ret;
+      }
+      for (const key in styles) {
+          const value = styles[key];
+          const normalizedKey = key.startsWith(`--`) ? key : hyphenate(key);
+          if (isString(value) ||
+              (typeof value === 'number' && isNoUnitNumericStyleProp(normalizedKey))) {
+              // only render valid values
+              ret += `${normalizedKey}:${value};`;
+          }
+      }
+      return ret;
+  }
+  function normalizeClass(value) {
+      let res = '';
+      if (isString(value)) {
+          res = value;
+      }
+      else if (isArray(value)) {
+          for (let i = 0; i < value.length; i++) {
+              const normalized = normalizeClass(value[i]);
+              if (normalized) {
+                  res += normalized + ' ';
+              }
+          }
+      }
+      else if (isObject(value)) {
+          for (const name in value) {
+              if (value[name]) {
+                  res += name + ' ';
+              }
+          }
+      }
+      return res.trim();
+  }
+  const VOID_TAGS = 'area,base,br,col,embed,hr,img,input,link,meta,param,source,track,wbr';
+  /**
+   * Compiler only.
+   * Do NOT use in runtime code paths unless behind `(process.env.NODE_ENV !== 'production')` flag.
+   */
+  const isVoidTag = /*#__PURE__*/ makeMap(VOID_TAGS);
+
+  const escapeRE = /["'&<>]/;
+  function escapeHtml(string) {
+      const str = '' + string;
+      const match = escapeRE.exec(str);
+      if (!match) {
+          return str;
+      }
+      let html = '';
+      let escaped;
+      let index;
+      let lastIndex = 0;
+      for (index = match.index; index < str.length; index++) {
+          switch (str.charCodeAt(index)) {
+              case 34: // "
+                  escaped = '&quot;';
+                  break;
+              case 38: // &
+                  escaped = '&amp;';
+                  break;
+              case 39: // '
+                  escaped = '&#39;';
+                  break;
+              case 60: // <
+                  escaped = '&lt;';
+                  break;
+              case 62: // >
+                  escaped = '&gt;';
+                  break;
+              default:
+                  continue;
+          }
+          if (lastIndex !== index) {
+              html += str.slice(lastIndex, index);
+          }
+          lastIndex = index + 1;
+          html += escaped;
+      }
+      return lastIndex !== index ? html + str.slice(lastIndex, index) : html;
+  }
+  // https://www.w3.org/TR/html52/syntax.html#comments
+  const commentStripRE = /^-?>|<!--|-->|--!>|<!-$/g;
+  function escapeHtmlComment(src) {
+      return src.replace(commentStripRE, '');
+  }
+
+  (process.env.NODE_ENV !== 'production')
+      ? Object.freeze({})
+      : {};
+  (process.env.NODE_ENV !== 'production') ? Object.freeze([]) : [];
+  const NOOP = () => { };
+  const onRE = /^on[^a-z]/;
+  const isOn = (key) => onRE.test(key);
+  const isArray = Array.isArray;
+  const isFunction = (val) => typeof val === 'function';
+  const isString = (val) => typeof val === 'string';
+  const isObject = (val) => val !== null && typeof val === 'object';
+  const isPromise = (val) => {
+      return isObject(val) && isFunction(val.then) && isFunction(val.catch);
+  };
+  const cacheStringFunction = (fn) => {
+      const cache = Object.create(null);
+      return ((str) => {
+          const hit = cache[str];
+          return hit || (cache[str] = fn(str));
+      });
+  };
+  const hyphenateRE = /\B([A-Z])/g;
+  /**
+   * @private
+   */
+  const hyphenate = cacheStringFunction((str) => str.replace(hyphenateRE, '-$1').toLowerCase());
+
+  // leading comma for empty string ""
+  const shouldIgnoreProp = makeMap(`,key,ref,innerHTML,textContent`);
+  function ssrRenderAttrs(props, tag) {
+      let ret = '';
+      for (const key in props) {
+          if (shouldIgnoreProp(key) ||
+              isOn(key) ||
+              (tag === 'textarea' && key === 'value')) {
+              continue;
+          }
+          const value = props[key];
+          if (key === 'class') {
+              ret += ` class="${ssrRenderClass(value)}"`;
+          }
+          else if (key === 'style') {
+              ret += ` style="${ssrRenderStyle(value)}"`;
+          }
+          else {
+              ret += ssrRenderDynamicAttr(key, value, tag);
+          }
+      }
+      return ret;
+  }
+  // render an attr with dynamic (unknown) key.
+  function ssrRenderDynamicAttr(key, value, tag) {
+      if (!isRenderableValue(value)) {
+          return ``;
+      }
+      const attrKey = tag && tag.indexOf('-') > 0
+          ? key // preserve raw name on custom elements
+          : propsToAttrMap[key] || key.toLowerCase();
+      if (isBooleanAttr(attrKey)) {
+          return includeBooleanAttr(value) ? ` ${attrKey}` : ``;
+      }
+      else if (isSSRSafeAttrName(attrKey)) {
+          return value === '' ? ` ${attrKey}` : ` ${attrKey}="${escapeHtml(value)}"`;
+      }
+      else {
+          console.warn(`[@vue/server-renderer] Skipped rendering unsafe attribute name: ${attrKey}`);
+          return ``;
+      }
+  }
+  // Render a v-bind attr with static key. The key is pre-processed at compile
+  // time and we only need to check and escape value.
+  function ssrRenderAttr(key, value) {
+      if (!isRenderableValue(value)) {
+          return ``;
+      }
+      return ` ${key}="${escapeHtml(value)}"`;
+  }
+  function isRenderableValue(value) {
+      if (value == null) {
+          return false;
+      }
+      const type = typeof value;
+      return type === 'string' || type === 'number' || type === 'boolean';
+  }
+  function ssrRenderClass(raw) {
+      return escapeHtml(normalizeClass(raw));
+  }
+  function ssrRenderStyle(raw) {
+      if (!raw) {
+          return '';
+      }
+      if (isString(raw)) {
+          return escapeHtml(raw);
+      }
+      const styles = normalizeStyle(raw);
+      return escapeHtml(stringifyStyle(styles));
+  }
+
+  function ssrCompile(template, instance) {
+      {
+          throw new Error(`On-the-fly template compilation is not supported in the ESM build of ` +
+              `@vue/server-renderer. All templates must be pre-compiled into ` +
+              `render functions.`);
+      }
+  }
+
+  function ssrRenderTeleport(parentPush, contentRenderFn, target, disabled, parentComponent) {
+      parentPush('<!--teleport start-->');
+      let teleportContent;
+      if (disabled) {
+          contentRenderFn(parentPush);
+          teleportContent = `<!---->`;
+      }
+      else {
+          const { getBuffer, push } = createBuffer();
+          contentRenderFn(push);
+          push(`<!---->`); // teleport end anchor
+          teleportContent = getBuffer();
+      }
+      const context = parentComponent.appContext.provides[vue.ssrContextKey];
+      const teleportBuffers = context.__teleportBuffers || (context.__teleportBuffers = {});
+      if (teleportBuffers[target]) {
+          teleportBuffers[target].push(teleportContent);
+      }
+      else {
+          teleportBuffers[target] = [teleportContent];
+      }
+      parentPush('<!--teleport end-->');
+  }
+
+  const { createComponentInstance, setCurrentRenderingInstance, setupComponent, renderComponentRoot, normalizeVNode } = vue.ssrUtils;
+  // Each component has a buffer array.
+  // A buffer array can contain one of the following:
+  // - plain string
+  // - A resolved buffer (recursive arrays of strings that can be unrolled
+  //   synchronously)
+  // - An async buffer (a Promise that resolves to a resolved buffer)
+  function createBuffer() {
+      let appendable = false;
+      const buffer = [];
+      return {
+          getBuffer() {
+              // Return static buffer and await on items during unroll stage
+              return buffer;
+          },
+          push(item) {
+              const isStringItem = isString(item);
+              if (appendable && isStringItem) {
+                  buffer[buffer.length - 1] += item;
+              }
+              else {
+                  buffer.push(item);
+              }
+              appendable = isStringItem;
+              if (isPromise(item) || (isArray(item) && item.hasAsync)) {
+                  // promise, or child buffer with async, mark as async.
+                  // this allows skipping unnecessary await ticks during unroll stage
+                  buffer.hasAsync = true;
+              }
+          }
+      };
+  }
+  function renderComponentVNode(vnode, parentComponent = null, slotScopeId) {
+      const instance = createComponentInstance(vnode, parentComponent, null);
+      const res = setupComponent(instance, true /* isSSR */);
+      const hasAsyncSetup = isPromise(res);
+      const prefetches = instance.sp; /* LifecycleHooks.SERVER_PREFETCH */
+      if (hasAsyncSetup || prefetches) {
+          let p = hasAsyncSetup
+              ? res
+              : Promise.resolve();
+          if (prefetches) {
+              p = p
+                  .then(() => Promise.all(prefetches.map(prefetch => prefetch.call(instance.proxy))))
+                  // Note: error display is already done by the wrapped lifecycle hook function.
+                  .catch(() => { });
+          }
+          return p.then(() => renderComponentSubTree(instance, slotScopeId));
+      }
+      else {
+          return renderComponentSubTree(instance, slotScopeId);
+      }
+  }
+  function renderComponentSubTree(instance, slotScopeId) {
+      const comp = instance.type;
+      const { getBuffer, push } = createBuffer();
+      if (isFunction(comp)) {
+          renderVNode(push, (instance.subTree = renderComponentRoot(instance)), instance, slotScopeId);
+      }
+      else {
+          if ((!instance.render || instance.render === NOOP) &&
+              !instance.ssrRender &&
+              !comp.ssrRender &&
+              isString(comp.template)) {
+              comp.ssrRender = ssrCompile(comp.template);
+          }
+          // perf: enable caching of computed getters during render
+          // since there cannot be state mutations during render.
+          for (const e of instance.scope.effects) {
+              if (e.computed)
+                  e.computed._cacheable = true;
+          }
+          const ssrRender = instance.ssrRender || comp.ssrRender;
+          if (ssrRender) {
+              // optimized
+              // resolve fallthrough attrs
+              let attrs = instance.inheritAttrs !== false ? instance.attrs : undefined;
+              let hasCloned = false;
+              let cur = instance;
+              while (true) {
+                  const scopeId = cur.vnode.scopeId;
+                  if (scopeId) {
+                      if (!hasCloned) {
+                          attrs = Object.assign({}, attrs);
+                          hasCloned = true;
+                      }
+                      attrs[scopeId] = '';
+                  }
+                  const parent = cur.parent;
+                  if (parent && parent.subTree && parent.subTree === cur.vnode) {
+                      // parent is a non-SSR compiled component and is rendering this
+                      // component as root. inherit its scopeId if present.
+                      cur = parent;
+                  }
+                  else {
+                      break;
+                  }
+              }
+              if (slotScopeId) {
+                  if (!hasCloned)
+                      attrs = Object.assign({}, attrs);
+                  attrs[slotScopeId.trim()] = '';
+              }
+              // set current rendering instance for asset resolution
+              const prev = setCurrentRenderingInstance(instance);
+              ssrRender(instance.proxy, push, instance, attrs, 
+              // compiler-optimized bindings
+              instance.props, instance.setupState, instance.data, instance.ctx);
+              setCurrentRenderingInstance(prev);
+          }
+          else if (instance.render && instance.render !== NOOP) {
+              renderVNode(push, (instance.subTree = renderComponentRoot(instance)), instance, slotScopeId);
+          }
+          else {
+              vue.warn(`Component ${comp.name ? `${comp.name} ` : ``} is missing template or render function.`);
+              push(`<!---->`);
+          }
+      }
+      return getBuffer();
+  }
+  function renderVNode(push, vnode, parentComponent, slotScopeId) {
+      const { type, shapeFlag, children } = vnode;
+      switch (type) {
+          case vue.Text:
+              push(escapeHtml(children));
+              break;
+          case vue.Comment:
+              push(children ? `<!--${escapeHtmlComment(children)}-->` : `<!---->`);
+              break;
+          case vue.Static:
+              push(children);
+              break;
+          case vue.Fragment:
+              if (vnode.slotScopeIds) {
+                  slotScopeId =
+                      (slotScopeId ? slotScopeId + ' ' : '') + vnode.slotScopeIds.join(' ');
+              }
+              push(`<!--[-->`); // open
+              renderVNodeChildren(push, children, parentComponent, slotScopeId);
+              push(`<!--]-->`); // close
+              break;
+          default:
+              if (shapeFlag & 1 /* ELEMENT */) {
+                  renderElementVNode(push, vnode, parentComponent, slotScopeId);
+              }
+              else if (shapeFlag & 6 /* COMPONENT */) {
+                  push(renderComponentVNode(vnode, parentComponent, slotScopeId));
+              }
+              else if (shapeFlag & 64 /* TELEPORT */) {
+                  renderTeleportVNode(push, vnode, parentComponent, slotScopeId);
+              }
+              else if (shapeFlag & 128 /* SUSPENSE */) {
+                  renderVNode(push, vnode.ssContent, parentComponent, slotScopeId);
+              }
+              else {
+                  vue.warn('[@vue/server-renderer] Invalid VNode type:', type, `(${typeof type})`);
+              }
+      }
+  }
+  function renderVNodeChildren(push, children, parentComponent, slotScopeId) {
+      for (let i = 0; i < children.length; i++) {
+          renderVNode(push, normalizeVNode(children[i]), parentComponent, slotScopeId);
+      }
+  }
+  function renderElementVNode(push, vnode, parentComponent, slotScopeId) {
+      const tag = vnode.type;
+      let { props, children, shapeFlag, scopeId, dirs } = vnode;
+      let openTag = `<${tag}`;
+      if (dirs) {
+          props = applySSRDirectives(vnode, props, dirs);
+      }
+      if (props) {
+          openTag += ssrRenderAttrs(props, tag);
+      }
+      if (scopeId) {
+          openTag += ` ${scopeId}`;
+      }
+      // inherit parent chain scope id if this is the root node
+      let curParent = parentComponent;
+      let curVnode = vnode;
+      while (curParent && curVnode === curParent.subTree) {
+          curVnode = curParent.vnode;
+          if (curVnode.scopeId) {
+              openTag += ` ${curVnode.scopeId}`;
+          }
+          curParent = curParent.parent;
+      }
+      if (slotScopeId) {
+          openTag += ` ${slotScopeId}`;
+      }
+      push(openTag + `>`);
+      if (!isVoidTag(tag)) {
+          let hasChildrenOverride = false;
+          if (props) {
+              if (props.innerHTML) {
+                  hasChildrenOverride = true;
+                  push(props.innerHTML);
+              }
+              else if (props.textContent) {
+                  hasChildrenOverride = true;
+                  push(escapeHtml(props.textContent));
+              }
+              else if (tag === 'textarea' && props.value) {
+                  hasChildrenOverride = true;
+                  push(escapeHtml(props.value));
+              }
+          }
+          if (!hasChildrenOverride) {
+              if (shapeFlag & 8 /* TEXT_CHILDREN */) {
+                  push(escapeHtml(children));
+              }
+              else if (shapeFlag & 16 /* ARRAY_CHILDREN */) {
+                  renderVNodeChildren(push, children, parentComponent, slotScopeId);
+              }
+          }
+          push(`</${tag}>`);
+      }
+  }
+  function applySSRDirectives(vnode, rawProps, dirs) {
+      const toMerge = [];
+      for (let i = 0; i < dirs.length; i++) {
+          const binding = dirs[i];
+          const { dir: { getSSRProps } } = binding;
+          if (getSSRProps) {
+              const props = getSSRProps(binding, vnode);
+              if (props)
+                  toMerge.push(props);
+          }
+      }
+      return vue.mergeProps(rawProps || {}, ...toMerge);
+  }
+  function renderTeleportVNode(push, vnode, parentComponent, slotScopeId) {
+      const target = vnode.props && vnode.props.to;
+      const disabled = vnode.props && vnode.props.disabled;
+      if (!target) {
+          vue.warn(`[@vue/server-renderer] Teleport is missing target prop.`);
+          return [];
+      }
+      if (!isString(target)) {
+          vue.warn(`[@vue/server-renderer] Teleport target must be a query selector string.`);
+          return [];
+      }
+      ssrRenderTeleport(push, push => {
+          renderVNodeChildren(push, vnode.children, parentComponent, slotScopeId);
+      }, target, disabled || disabled === '', parentComponent);
+  }
+
+  function ssrRenderSlot(slots, slotName, slotProps, fallbackRenderFn, push, parentComponent, slotScopeId) {
+      // template-compiled slots are always rendered as fragments
+      push(`<!--[-->`);
+      const slotFn = slots[slotName];
+      if (slotFn) {
+          const slotBuffer = [];
+          const bufferedPush = (item) => {
+              slotBuffer.push(item);
+          };
+          const ret = slotFn(slotProps, bufferedPush, parentComponent, slotScopeId ? ' ' + slotScopeId : '');
+          if (isArray(ret)) {
+              // normal slot
+              renderVNodeChildren(push, ret, parentComponent, slotScopeId);
+          }
+          else {
+              // ssr slot.
+              // check if the slot renders all comments, in which case use the fallback
+              let isEmptySlot = true;
+              for (let i = 0; i < slotBuffer.length; i++) {
+                  if (!isComment(slotBuffer[i])) {
+                      isEmptySlot = false;
+                      break;
+                  }
+              }
+              if (isEmptySlot) {
+                  if (fallbackRenderFn) {
+                      fallbackRenderFn();
+                  }
+              }
+              else {
+                  for (let i = 0; i < slotBuffer.length; i++) {
+                      push(slotBuffer[i]);
+                  }
+              }
+          }
+      }
+      else if (fallbackRenderFn) {
+          fallbackRenderFn();
+      }
+      push(`<!--]-->`);
+  }
+  const commentRE = /^<!--.*-->$/;
+  function isComment(item) {
+      return typeof item === 'string' && commentRE.test(item);
+  }
+
+  vue.initDirectivesForSSR();
+
   function ssrRender(_ctx, _push, _parent, _attrs, $props, $setup, $data, $options) {
-    _push(`<span${serverRenderer.ssrRenderAttrs(vue.mergeProps({ class: _ctx.className }, _attrs))}>`);
-    serverRenderer.ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
-    _push(`<label${serverRenderer.ssrRenderAttr("for", _ctx.forId)}></label>`);
+    _push(`<span${ssrRenderAttrs(vue.mergeProps({ class: _ctx.className }, _attrs))}>`);
+    ssrRenderSlot(_ctx.$slots, "default", {}, null, _push, _parent);
+    _push(`<label${ssrRenderAttr("for", _ctx.forId)}></label>`);
     if (!_ctx.reload) {
       _push(`<input type="file"${
-      serverRenderer.ssrRenderAttr("name", _ctx.name)
+      ssrRenderAttr("name", _ctx.name)
     }${
-      serverRenderer.ssrRenderAttr("id", _ctx.forId)
+      ssrRenderAttr("id", _ctx.forId)
     }${
-      serverRenderer.ssrRenderAttr("accept", _ctx.accept)
+      ssrRenderAttr("accept", _ctx.accept)
     }${
-      serverRenderer.ssrRenderAttr("capture", _ctx.capture)
+      ssrRenderAttr("capture", _ctx.capture)
     }${
-      (_ctx.disabled) ? " disabled" : ""
+      (includeBooleanAttr(_ctx.disabled)) ? " disabled" : ""
     }${
-      serverRenderer.ssrRenderAttr("webkitdirectory", _ctx.directory && _ctx.features.directory)
+      ssrRenderAttr("webkitdirectory", _ctx.directory && _ctx.features.directory)
     }${
-      serverRenderer.ssrRenderAttr("allowdirs", _ctx.directory && _ctx.features.directory)
+      ssrRenderAttr("allowdirs", _ctx.directory && _ctx.features.directory)
     }${
-      serverRenderer.ssrRenderAttr("directory", _ctx.directory && _ctx.features.directory)
+      ssrRenderAttr("directory", _ctx.directory && _ctx.features.directory)
     }${
-      (_ctx.multiple && _ctx.features.html5) ? " multiple" : ""
+      (includeBooleanAttr(_ctx.multiple && _ctx.features.html5)) ? " multiple" : ""
     }>`);
     } else {
       _push(`<!---->`);
@@ -1876,5 +2507,5 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
 
   return script;
 
-})));
+}));
 //# sourceMappingURL=vue-upload-component.ssr.js.map

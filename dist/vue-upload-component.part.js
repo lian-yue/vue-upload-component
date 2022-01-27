@@ -1,7 +1,7 @@
 /*!
  Name: vue-upload-component 
 Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.0.49 
+Version: 3.1.0 
 Author: LianYue 
 License: Apache-2.0 
 Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
@@ -10,7 +10,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('vue')) :
   typeof define === 'function' && define.amd ? define(['vue'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.VueUploadComponent = factory(global.Vue));
-}(this, (function (vue) { 'use strict';
+})(this, (function (vue) { 'use strict';
 
   function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
@@ -18,19 +18,45 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
 
   function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-  function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+  function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 
   function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
   function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-  function _ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+  function _ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 
-  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { _ownKeys(Object(source), true).forEach(function (key) { _defineProperty2(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { _ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+  function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? _ownKeys(Object(source), !0).forEach(function (key) { _defineProperty2(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : _ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 
   function _defineProperty2(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-  function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+  function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+
+  function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      enumerableOnly && (symbols = symbols.filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      })), keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread2(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = null != arguments[i] ? arguments[i] : {};
+      i % 2 ? ownKeys(Object(source), !0).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+
+    return target;
+  }
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -51,6 +77,9 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
   function _createClass(Constructor, protoProps, staticProps) {
     if (protoProps) _defineProperties(Constructor.prototype, protoProps);
     if (staticProps) _defineProperties(Constructor, staticProps);
+    Object.defineProperty(Constructor, "prototype", {
+      writable: false
+    });
     return Constructor;
   }
 
@@ -67,40 +96,6 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     }
 
     return obj;
-  }
-
-  function ownKeys(object, enumerableOnly) {
-    var keys = Object.keys(object);
-
-    if (Object.getOwnPropertySymbols) {
-      var symbols = Object.getOwnPropertySymbols(object);
-      if (enumerableOnly) symbols = symbols.filter(function (sym) {
-        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-      });
-      keys.push.apply(keys, symbols);
-    }
-
-    return keys;
-  }
-
-  function _objectSpread2(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i] != null ? arguments[i] : {};
-
-      if (i % 2) {
-        ownKeys(Object(source), true).forEach(function (key) {
-          _defineProperty(target, key, source[key]);
-        });
-      } else if (Object.getOwnPropertyDescriptors) {
-        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-      } else {
-        ownKeys(Object(source)).forEach(function (key) {
-          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-        });
-      }
-    }
-
-    return target;
   }
   /**
    * Creates a XHR request
@@ -231,293 +226,6 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
 
 
     _createClass(ChunkUploadHandler, [{
-      key: "createChunks",
-
-      /**
-       * Creates all the chunks in the initial state
-       */
-      value: function createChunks() {
-        this.chunks = [];
-        var start = 0;
-        var end = this.chunkSize;
-
-        while (start < this.fileSize) {
-          this.chunks.push({
-            blob: this.file.file.slice(start, end),
-            startOffset: start,
-            active: false,
-            retries: this.maxRetries
-          });
-          start = end;
-          end = start + this.chunkSize;
-        }
-      }
-      /**
-       * Updates the progress of the file with the handler's progress
-       */
-
-    }, {
-      key: "updateFileProgress",
-      value: function updateFileProgress() {
-        this.file.progress = this.progress;
-      }
-      /**
-       * Paues the upload process
-       * - Stops all active requests
-       * - Sets the file not active
-       */
-
-    }, {
-      key: "pause",
-      value: function pause() {
-        this.file.active = false;
-        this.stopChunks();
-      }
-      /**
-       * Stops all the current chunks
-       */
-
-    }, {
-      key: "stopChunks",
-      value: function stopChunks() {
-        this.chunksUploading.forEach(function (chunk) {
-          chunk.xhr.abort();
-          chunk.active = false;
-        });
-        this.stopSpeedCalc();
-      }
-      /**
-       * Resumes the file upload
-       * - Sets the file active
-       * - Starts the following chunks
-       */
-
-    }, {
-      key: "resume",
-      value: function resume() {
-        this.file.active = true;
-        this.startChunking();
-      }
-      /**
-       * Starts the file upload
-       *
-       * @returns Promise
-       * - resolve  The file was uploaded
-       * - reject   The file upload failed
-       */
-
-    }, {
-      key: "upload",
-      value: function upload() {
-        var _this = this;
-
-        this.promise = new Promise(function (resolve, reject) {
-          _this.resolve = resolve;
-          _this.reject = reject;
-        });
-        this.start();
-        return this.promise;
-      }
-      /**
-       * Start phase
-       * Sends a request to the backend to initialise the chunks
-       */
-
-    }, {
-      key: "start",
-      value: function start() {
-        var _this2 = this;
-
-        request({
-          method: 'POST',
-          headers: _objectSpread2(_objectSpread2({}, this.headers), {}, {
-            'Content-Type': 'application/json'
-          }),
-          url: this.action,
-          body: Object.assign(this.startBody, {
-            phase: 'start',
-            mime_type: this.fileType,
-            size: this.fileSize,
-            name: this.fileName
-          })
-        }).then(function (res) {
-          if (res.status !== 'success') {
-            _this2.file.response = res;
-            return _this2.reject('server');
-          }
-
-          _this2.sessionId = res.data.session_id;
-          _this2.chunkSize = res.data.end_offset;
-
-          _this2.createChunks();
-
-          _this2.startChunking();
-        }).catch(function (res) {
-          _this2.file.response = res;
-
-          _this2.reject('server');
-        });
-      }
-      /**
-       * Starts to upload chunks
-       */
-
-    }, {
-      key: "startChunking",
-      value: function startChunking() {
-        for (var i = 0; i < this.maxActiveChunks; i++) {
-          this.uploadNextChunk();
-        }
-
-        this.startSpeedCalc();
-      }
-      /**
-       * Uploads the next chunk
-       * - Won't do anything if the process is paused
-       * - Will start finish phase if there are no more chunks to upload
-       */
-
-    }, {
-      key: "uploadNextChunk",
-      value: function uploadNextChunk() {
-        if (this.file.active) {
-          if (this.hasChunksToUpload) {
-            return this.uploadChunk(this.chunksToUpload[0]);
-          }
-
-          if (this.chunksUploading.length === 0) {
-            return this.finish();
-          }
-        }
-      }
-      /**
-       * Uploads a chunk
-       * - Sends the chunk to the backend
-       * - Sets the chunk as uploaded if everything went well
-       * - Decreases the number of retries if anything went wrong
-       * - Fails if there are no more retries
-       *
-       * @param {Object} chunk
-       */
-
-    }, {
-      key: "uploadChunk",
-      value: function uploadChunk(chunk) {
-        var _this3 = this;
-
-        chunk.progress = 0;
-        chunk.active = true;
-        this.updateFileProgress();
-        chunk.xhr = createRequest({
-          method: 'POST',
-          headers: this.headers,
-          url: this.action
-        });
-        chunk.xhr.upload.addEventListener('progress', function (evt) {
-          if (evt.lengthComputable) {
-            chunk.progress = Math.round(evt.loaded / evt.total * 100);
-          }
-        }, false);
-        sendFormRequest(chunk.xhr, Object.assign(this.uploadBody, {
-          phase: 'upload',
-          session_id: this.sessionId,
-          start_offset: chunk.startOffset,
-          chunk: chunk.blob
-        })).then(function (res) {
-          chunk.active = false;
-
-          if (res.status === 'success') {
-            chunk.uploaded = true;
-          } else {
-            if (chunk.retries-- <= 0) {
-              _this3.stopChunks();
-
-              return _this3.reject('upload');
-            }
-          }
-
-          _this3.uploadNextChunk();
-        }).catch(function () {
-          chunk.active = false;
-
-          if (chunk.retries-- <= 0) {
-            _this3.stopChunks();
-
-            return _this3.reject('upload');
-          }
-
-          _this3.uploadNextChunk();
-        });
-      }
-      /**
-       * Finish phase
-       * Sends a request to the backend to finish the process
-       */
-
-    }, {
-      key: "finish",
-      value: function finish() {
-        var _this4 = this;
-
-        this.updateFileProgress();
-        this.stopSpeedCalc();
-        request({
-          method: 'POST',
-          headers: _objectSpread2(_objectSpread2({}, this.headers), {}, {
-            'Content-Type': 'application/json'
-          }),
-          url: this.action,
-          body: Object.assign(this.finishBody, {
-            phase: 'finish',
-            session_id: this.sessionId
-          })
-        }).then(function (res) {
-          _this4.file.response = res;
-
-          if (res.status !== 'success') {
-            return _this4.reject('server');
-          }
-
-          _this4.resolve(res);
-        }).catch(function (res) {
-          _this4.file.response = res;
-
-          _this4.reject('server');
-        });
-      }
-      /**
-       * Sets an interval to calculate and
-       * set upload speed every 3 seconds
-       */
-
-    }, {
-      key: "startSpeedCalc",
-      value: function startSpeedCalc() {
-        var _this5 = this;
-
-        this.file.speed = 0;
-        var lastUploadedBytes = 0;
-
-        if (!this.speedInterval) {
-          this.speedInterval = window.setInterval(function () {
-            var uploadedBytes = _this5.progress / 100 * _this5.fileSize;
-            _this5.file.speed = uploadedBytes - lastUploadedBytes;
-            lastUploadedBytes = uploadedBytes;
-          }, 1000);
-        }
-      }
-      /**
-       * Removes the upload speed interval
-       */
-
-    }, {
-      key: "stopSpeedCalc",
-      value: function stopSpeedCalc() {
-        this.speedInterval && window.clearInterval(this.speedInterval);
-        this.speedInterval = null;
-        this.file.speed = 0;
-      }
-    }, {
       key: "maxRetries",
       get: function get() {
         return parseInt(this.options.maxRetries, 10);
@@ -621,11 +329,11 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     }, {
       key: "progress",
       get: function get() {
-        var _this6 = this;
+        var _this = this;
 
         var completedProgress = this.chunksUploaded.length / this.chunks.length * 100;
         var uploadingProgress = this.chunksUploading.reduce(function (progress, chunk) {
-          return progress + (chunk.progress | 0) / _this6.chunks.length;
+          return progress + (chunk.progress | 0) / _this.chunks.length;
         }, 0);
         return Math.min(completedProgress + uploadingProgress, 100);
       }
@@ -670,6 +378,293 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         return this.chunks.filter(function (chunk) {
           return !!chunk.uploaded;
         });
+      }
+      /**
+       * Creates all the chunks in the initial state
+       */
+
+    }, {
+      key: "createChunks",
+      value: function createChunks() {
+        this.chunks = [];
+        var start = 0;
+        var end = this.chunkSize;
+
+        while (start < this.fileSize) {
+          this.chunks.push({
+            blob: this.file.file.slice(start, end),
+            startOffset: start,
+            active: false,
+            retries: this.maxRetries
+          });
+          start = end;
+          end = start + this.chunkSize;
+        }
+      }
+      /**
+       * Updates the progress of the file with the handler's progress
+       */
+
+    }, {
+      key: "updateFileProgress",
+      value: function updateFileProgress() {
+        this.file.progress = this.progress;
+      }
+      /**
+       * Paues the upload process
+       * - Stops all active requests
+       * - Sets the file not active
+       */
+
+    }, {
+      key: "pause",
+      value: function pause() {
+        this.file.active = false;
+        this.stopChunks();
+      }
+      /**
+       * Stops all the current chunks
+       */
+
+    }, {
+      key: "stopChunks",
+      value: function stopChunks() {
+        this.chunksUploading.forEach(function (chunk) {
+          chunk.xhr.abort();
+          chunk.active = false;
+        });
+        this.stopSpeedCalc();
+      }
+      /**
+       * Resumes the file upload
+       * - Sets the file active
+       * - Starts the following chunks
+       */
+
+    }, {
+      key: "resume",
+      value: function resume() {
+        this.file.active = true;
+        this.startChunking();
+      }
+      /**
+       * Starts the file upload
+       *
+       * @returns Promise
+       * - resolve  The file was uploaded
+       * - reject   The file upload failed
+       */
+
+    }, {
+      key: "upload",
+      value: function upload() {
+        var _this2 = this;
+
+        this.promise = new Promise(function (resolve, reject) {
+          _this2.resolve = resolve;
+          _this2.reject = reject;
+        });
+        this.start();
+        return this.promise;
+      }
+      /**
+       * Start phase
+       * Sends a request to the backend to initialise the chunks
+       */
+
+    }, {
+      key: "start",
+      value: function start() {
+        var _this3 = this;
+
+        request({
+          method: 'POST',
+          headers: _objectSpread2(_objectSpread2({}, this.headers), {}, {
+            'Content-Type': 'application/json'
+          }),
+          url: this.action,
+          body: Object.assign(this.startBody, {
+            phase: 'start',
+            mime_type: this.fileType,
+            size: this.fileSize,
+            name: this.fileName
+          })
+        }).then(function (res) {
+          if (res.status !== 'success') {
+            _this3.file.response = res;
+            return _this3.reject('server');
+          }
+
+          _this3.sessionId = res.data.session_id;
+          _this3.chunkSize = res.data.end_offset;
+
+          _this3.createChunks();
+
+          _this3.startChunking();
+        }).catch(function (res) {
+          _this3.file.response = res;
+
+          _this3.reject('server');
+        });
+      }
+      /**
+       * Starts to upload chunks
+       */
+
+    }, {
+      key: "startChunking",
+      value: function startChunking() {
+        for (var i = 0; i < this.maxActiveChunks; i++) {
+          this.uploadNextChunk();
+        }
+
+        this.startSpeedCalc();
+      }
+      /**
+       * Uploads the next chunk
+       * - Won't do anything if the process is paused
+       * - Will start finish phase if there are no more chunks to upload
+       */
+
+    }, {
+      key: "uploadNextChunk",
+      value: function uploadNextChunk() {
+        if (this.file.active) {
+          if (this.hasChunksToUpload) {
+            return this.uploadChunk(this.chunksToUpload[0]);
+          }
+
+          if (this.chunksUploading.length === 0) {
+            return this.finish();
+          }
+        }
+      }
+      /**
+       * Uploads a chunk
+       * - Sends the chunk to the backend
+       * - Sets the chunk as uploaded if everything went well
+       * - Decreases the number of retries if anything went wrong
+       * - Fails if there are no more retries
+       *
+       * @param {Object} chunk
+       */
+
+    }, {
+      key: "uploadChunk",
+      value: function uploadChunk(chunk) {
+        var _this4 = this;
+
+        chunk.progress = 0;
+        chunk.active = true;
+        this.updateFileProgress();
+        chunk.xhr = createRequest({
+          method: 'POST',
+          headers: this.headers,
+          url: this.action
+        });
+        chunk.xhr.upload.addEventListener('progress', function (evt) {
+          if (evt.lengthComputable) {
+            chunk.progress = Math.round(evt.loaded / evt.total * 100);
+          }
+        }, false);
+        sendFormRequest(chunk.xhr, Object.assign(this.uploadBody, {
+          phase: 'upload',
+          session_id: this.sessionId,
+          start_offset: chunk.startOffset,
+          chunk: chunk.blob
+        })).then(function (res) {
+          chunk.active = false;
+
+          if (res.status === 'success') {
+            chunk.uploaded = true;
+          } else {
+            if (chunk.retries-- <= 0) {
+              _this4.stopChunks();
+
+              return _this4.reject('upload');
+            }
+          }
+
+          _this4.uploadNextChunk();
+        }).catch(function () {
+          chunk.active = false;
+
+          if (chunk.retries-- <= 0) {
+            _this4.stopChunks();
+
+            return _this4.reject('upload');
+          }
+
+          _this4.uploadNextChunk();
+        });
+      }
+      /**
+       * Finish phase
+       * Sends a request to the backend to finish the process
+       */
+
+    }, {
+      key: "finish",
+      value: function finish() {
+        var _this5 = this;
+
+        this.updateFileProgress();
+        this.stopSpeedCalc();
+        request({
+          method: 'POST',
+          headers: _objectSpread2(_objectSpread2({}, this.headers), {}, {
+            'Content-Type': 'application/json'
+          }),
+          url: this.action,
+          body: Object.assign(this.finishBody, {
+            phase: 'finish',
+            session_id: this.sessionId
+          })
+        }).then(function (res) {
+          _this5.file.response = res;
+
+          if (res.status !== 'success') {
+            return _this5.reject('server');
+          }
+
+          _this5.resolve(res);
+        }).catch(function (res) {
+          _this5.file.response = res;
+
+          _this5.reject('server');
+        });
+      }
+      /**
+       * Sets an interval to calculate and
+       * set upload speed every 3 seconds
+       */
+
+    }, {
+      key: "startSpeedCalc",
+      value: function startSpeedCalc() {
+        var _this6 = this;
+
+        this.file.speed = 0;
+        var lastUploadedBytes = 0;
+
+        if (!this.speedInterval) {
+          this.speedInterval = window.setInterval(function () {
+            var uploadedBytes = _this6.progress / 100 * _this6.fileSize;
+            _this6.file.speed = uploadedBytes - lastUploadedBytes;
+            lastUploadedBytes = uploadedBytes;
+          }, 1000);
+        }
+      }
+      /**
+       * Removes the upload speed interval
+       */
+
+    }, {
+      key: "stopSpeedCalc",
+      value: function stopSpeedCalc() {
+        this.speedInterval && window.clearInterval(this.speedInterval);
+        this.speedInterval = null;
+        this.file.speed = 0;
       }
     }]);
 
@@ -1072,7 +1067,12 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
             }, file), {}, {
               response: {},
               progress: '0.00',
-              speed: 0
+              speed: 0 // 只读
+              // file: undefined,
+              // xhr: undefined,
+              // el: undefined,
+              // iframe: undefined,
+
             });
             file.data = _objectSpread(_objectSpread({}, this.data), file.data ? file.data : {});
             file.headers = _objectSpread(_objectSpread({}, this.headers), file.headers ? file.headers : {});
@@ -1145,7 +1145,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         var _this8 = this;
 
         var files = [];
-        var maximumValue = this.iMaximum; // @ts-ignore
+        this.iMaximum; // @ts-ignore
 
         var entrys = el.webkitEntries || el.entries || undefined;
 
@@ -1240,6 +1240,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         var _this10 = this;
 
         var path = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+        // getFileSystemEntry(entry: any, path = ''): Promise<VueUploadItem[]> {
         return new Promise(function (resolve) {
           var maximumValue = _this10.iMaximum;
 
@@ -1273,6 +1274,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
             resolve([{
               id: '',
               size: entry.size,
+              // @ts-ignore
               name: path + entry.name,
               type: entry.type,
               file: entry
@@ -1281,7 +1283,8 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           }
 
           if (entry.isFile) {
-            entry.file(function (file) {
+            var fileEntry = entry;
+            fileEntry.file(function (file) {
               resolve([{
                 id: '',
                 size: file.size,
@@ -1294,21 +1297,22 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           }
 
           if (entry.isDirectory && _this10.dropDirectory) {
+            var directoryEntry = entry;
             var _uploadFiles = []; // 目录也要添加到文件列表
 
             if (_this10.createDirectory) {
               _uploadFiles.push({
                 id: '',
-                name: path + entry.name,
+                name: path + directoryEntry.name,
                 size: 0,
                 type: 'text/directory',
-                file: new File([], path + entry.name, {
+                file: new File([], path + directoryEntry.name, {
                   type: 'text/directory'
                 })
               });
             }
 
-            var dirReader = entry.createReader();
+            var dirReader = directoryEntry.createReader();
 
             var readEntries = function readEntries() {
               dirReader.readEntries(function (entries) {
@@ -1321,7 +1325,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                     return readEntries();
                   }
 
-                  _this10.getFileSystemEntry(entries[i], path + entry.name + '/').then(function (results) {
+                  _this10.getFileSystemEntry(entries[i], path + directoryEntry.name + '/').then(function (results) {
                     _uploadFiles.push.apply(_uploadFiles, _toConsumableArray(results));
 
                     forEach(i + 1);
@@ -2183,7 +2187,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           return Promise.reject(new Error("not HTMLInputElement"));
         }
 
-        var target = e.target;
+        e.target;
 
         var reinput = function reinput(res) {
           _this14.reload = true; // @ts-ignore
@@ -2199,13 +2203,15 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
       }
     }
   });
+  var _hoisted_1 = ["for"];
+  var _hoisted_2 = ["name", "id", "accept", "capture", "disabled", "webkitdirectory", "allowdirs", "directory", "multiple"];
 
   function render(_ctx, _cache, $props, $setup, $data, $options) {
-    return vue.openBlock(), vue.createBlock("span", {
-      class: _ctx.className
-    }, [vue.renderSlot(_ctx.$slots, "default"), vue.createVNode("label", {
+    return vue.openBlock(), vue.createElementBlock("span", {
+      class: vue.normalizeClass(_ctx.className)
+    }, [vue.renderSlot(_ctx.$slots, "default"), vue.createElementVNode("label", {
       for: _ctx.forId
-    }, null, 8, ["for"]), !_ctx.reload ? (vue.openBlock(), vue.createBlock("input", {
+    }, null, 8, _hoisted_1), !_ctx.reload ? (vue.openBlock(), vue.createElementBlock("input", {
       key: 0,
       ref: "input",
       type: "file",
@@ -2218,10 +2224,10 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
       allowdirs: _ctx.directory && _ctx.features.directory,
       directory: _ctx.directory && _ctx.features.directory,
       multiple: _ctx.multiple && _ctx.features.html5,
-      onChange: _cache[1] || (_cache[1] = function () {
+      onChange: _cache[0] || (_cache[0] = function () {
         return _ctx.inputOnChange && _ctx.inputOnChange.apply(_ctx, arguments);
       })
-    }, null, 40, ["name", "id", "accept", "capture", "disabled", "webkitdirectory", "allowdirs", "directory", "multiple"])) : vue.createCommentVNode("", true)], 2);
+    }, null, 40, _hoisted_2)) : vue.createCommentVNode("", true)], 2);
   }
 
   function styleInject(css, ref) {
@@ -2259,5 +2265,5 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
 
   return script;
 
-})));
+}));
 //# sourceMappingURL=vue-upload-component.part.js.map

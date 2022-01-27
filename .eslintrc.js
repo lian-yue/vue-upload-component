@@ -11,8 +11,6 @@ module.exports = {
 
     'prettier',
     'plugin:prettier/recommended',
-    'prettier/react',
-    'prettier/standard',
   ],
   rules: {
     'no-console': 'off',
@@ -28,8 +26,7 @@ module.exports = {
     parser: '@typescript-eslint/parser'
   },
   plugins: ['@typescript-eslint', 'prettier'],
-  overrides: [
-    {
+  overrides: [{
       files: [
         '**/__tests__/*.{j,t}s?(x)',
         '**/tests/unit/**/*.spec.{j,t}s?(x)'
@@ -53,6 +50,3 @@ module.exports = {
     },
   ]
 }
-
-
-

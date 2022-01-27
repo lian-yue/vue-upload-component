@@ -2,12 +2,12 @@ import path from 'path'
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import { babel, getBabelOutputPlugin } from '@rollup/plugin-babel';
-import { uglify } from 'rollup-plugin-uglify'
+import { terser } from 'rollup-plugin-terser'
 import postcss from 'rollup-plugin-postcss'
 import vue from 'rollup-plugin-vue'
 import packageInfo from './package.json'
 import typescript from 'rollup-plugin-typescript2';
-const pluginCSS = require('rollup-plugin-css-only')
+import pluginCSS from 'rollup-plugin-css-only';
 
 
 function baseConfig(css, ssr, umd, min) {
@@ -55,11 +55,11 @@ function baseConfig(css, ssr, umd, min) {
           ["@babel/plugin-transform-runtime", { "helpers": false, "corejs": false, "regenerator": false, "useESModules": false, "absoluteRuntime": false }]
         ],
       }),
-      min ? uglify({
+      min ? terser({
         output: {
           comments: /^!/,
         }
-      }): false,
+      }) : false,
       commonjs({
         extensions: [
           '.js',

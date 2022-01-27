@@ -56,32 +56,6 @@ export interface VueUploadItem {
     iframe?: HTMLElement;
     [key: string]: any;
 }
-export interface FileSystemEntry {
-    isDirectory: boolean;
-    isFile: boolean;
-    name: string;
-    fullPath: string;
-    filesystem: string;
-}
-export interface FileSystemDirectoryReader {
-    readEntries: (successCallback: (result: Array<FileSystemDirectoryEntry | FileSystemFileEntry>) => void, errorCallback?: (error: DOMError) => void) => void;
-}
-export interface FileSystemFlags {
-    create?: boolean;
-    exclusive?: boolean;
-}
-export interface FileSystemDirectoryEntry extends FileSystemEntry {
-    isDirectory: true;
-    isFile: false;
-    createReader: () => FileSystemDirectoryReader;
-    getFile: (path?: string, options?: FileSystemFlags, successCallback?: (result: FileSystemFileEntry) => void, errorCallback?: (error: DOMError) => void) => void;
-    getDirectory: (path?: string, options?: FileSystemFlags, successCallback?: (result: FileSystemDirectoryEntry) => void, errorCallback?: (error: DOMError) => void) => void;
-}
-export interface FileSystemFileEntry extends FileSystemEntry {
-    isDirectory: false;
-    isFile: true;
-    file: (cb: (file: File) => void) => void;
-}
 declare const _default: import("vue").DefineComponent<{
     inputId: {
         type: StringConstructor;
@@ -201,7 +175,7 @@ declare const _default: import("vue").DefineComponent<{
     add(_files: VueUploadItem | Blob | Array<VueUploadItem | Blob>, index?: number | boolean | undefined): VueUploadItem | VueUploadItem[] | undefined;
     addInputFile(el: HTMLInputElement): Promise<VueUploadItem[]>;
     addDataTransfer(dataTransfer: DataTransfer): Promise<VueUploadItem[] | undefined>;
-    getFileSystemEntry(entry: Array<File | FileSystemFileEntry | FileSystemDirectoryEntry> | File | FileSystemFileEntry | FileSystemDirectoryEntry, path?: string): Promise<VueUploadItem[]>;
+    getFileSystemEntry(entry: any, path?: string): Promise<VueUploadItem[]>;
     replace(id1: VueUploadItem | string, id2: VueUploadItem | string): boolean;
     remove(id: VueUploadItem | string): VueUploadItem | false;
     update(id: VueUploadItem | string, data: {
@@ -235,63 +209,125 @@ declare const _default: import("vue").DefineComponent<{
     onDocumentDrop(): void;
     onDrop(e: DragEvent): void;
     inputOnChange(e: Event): Promise<any>;
-}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:modelValue" | "input-filter" | "input-file")[], "update:modelValue" | "input-filter" | "input-file", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<{
-    name: string;
-    disabled: boolean;
-    multiple: boolean;
-    directory: boolean;
-    createDirectory: boolean;
+}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:modelValue" | "input-filter" | "input-file")[], "update:modelValue" | "input-filter" | "input-file", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+    inputId: {
+        type: StringConstructor;
+    };
+    name: {
+        type: StringConstructor;
+        default: string;
+    };
+    accept: {
+        type: StringConstructor;
+    };
+    capture: {};
+    disabled: {
+        default: boolean;
+    };
+    multiple: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    maximum: {
+        type: NumberConstructor;
+    };
+    addIndex: {
+        type: (BooleanConstructor | NumberConstructor)[];
+    };
+    directory: {
+        type: BooleanConstructor;
+    };
+    createDirectory: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    postAction: {
+        type: StringConstructor;
+    };
+    putAction: {
+        type: StringConstructor;
+    };
+    customAction: {
+        type: PropType<(file: VueUploadItem, self: any) => Promise<VueUploadItem>>;
+    };
     headers: {
-        [key: string]: any;
-    };
-    data: {
-        [key: string]: any;
-    };
-    timeout: number;
-    drop: boolean;
-    dropDirectory: boolean;
-    size: number;
-    extensions: string | RegExp | string[];
-    modelValue: VueUploadItem[];
-    thread: number;
-    chunkEnabled: boolean;
-    chunk: {
-        headers?: {
+        type: PropType<{
             [key: string]: any;
-        } | undefined;
-        action?: string | undefined;
-        minSize?: number | undefined;
-        maxActive?: number | undefined;
-        maxRetries?: number | undefined;
-        handler?: any;
+        }>;
+        default: () => {};
     };
-} & {
-    inputId?: string | undefined;
-    accept?: string | undefined;
-    capture?: unknown;
-    maximum?: number | undefined;
-    addIndex?: number | boolean | undefined;
-    postAction?: string | undefined;
-    putAction?: string | undefined;
-    customAction?: ((file: VueUploadItem, self: any) => Promise<VueUploadItem>) | undefined;
-}>, {
+    data: {
+        type: PropType<{
+            [key: string]: any;
+        }>;
+        default: () => {};
+    };
+    timeout: {
+        type: NumberConstructor;
+        default: number;
+    };
+    drop: {
+        default: boolean;
+    };
+    dropDirectory: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    size: {
+        type: NumberConstructor;
+        default: number;
+    };
+    extensions: {
+        type: PropType<string | RegExp | string[]>;
+        default: () => never[];
+    };
+    modelValue: {
+        type: PropType<VueUploadItem[]>;
+        default: () => never[];
+    };
+    thread: {
+        type: NumberConstructor;
+        default: number;
+    };
+    chunkEnabled: {
+        type: BooleanConstructor;
+        default: boolean;
+    };
+    chunk: {
+        type: PropType<{
+            headers?: {
+                [key: string]: any;
+            } | undefined;
+            action?: string | undefined;
+            minSize?: number | undefined;
+            maxActive?: number | undefined;
+            maxRetries?: number | undefined;
+            handler?: any;
+        }>;
+        default: () => ChunkOptions;
+    };
+}>> & {
+    "onUpdate:modelValue"?: ((...args: any[]) => any) | undefined;
+    "onInput-filter"?: ((...args: any[]) => any) | undefined;
+    "onInput-file"?: ((...args: any[]) => any) | undefined;
+}, {
     name: string;
+    size: number;
+    timeout: number;
+    data: {
+        [key: string]: any;
+    };
+    headers: {
+        [key: string]: any;
+    };
+    drop: boolean;
+    modelValue: VueUploadItem[];
     disabled: boolean;
     multiple: boolean;
     directory: boolean;
     createDirectory: boolean;
-    headers: {
-        [key: string]: any;
-    };
-    data: {
-        [key: string]: any;
-    };
-    timeout: number;
-    drop: boolean;
     dropDirectory: boolean;
-    size: number;
     extensions: string | RegExp | string[];
-    modelValue: VueUploadItem[];
     thread: number;
     chunkEnabled: boolean;
     chunk: {
