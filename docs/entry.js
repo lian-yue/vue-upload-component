@@ -88,17 +88,20 @@ app.directive('markdown', {
     if (!el.className || !/vue-markdown/.test(el.className)) {
       el.className += ' vue-markdown'
     }
+
     let text = ''
     if (typeof vnode.children === 'string') {
       text = vnode.children
     } else {
       for (let i = 0; i < vnode.children.length; i++) {
-        text += vnode.children[i].text || ''
+        text += vnode.children[i].text || vnode.children[i].children || ''
       }
     }
+
     if (el.markdown === text) {
       return
     }
+    console.log(text)
 
     el.markdown = text
     el.innerHTML = marked(text)
@@ -147,7 +150,7 @@ app.directive('markdown', {
       text = vnode.children
     } else {
       for (let i = 0; i < vnode.children.length; i++) {
-        text += vnode.children[i].text || ''
+        text += vnode.children[i].text || vnode.children[i].children || ''
       }
     }
     if (el.markdown === text) {
