@@ -145,6 +145,11 @@ module.exports = {
           options: {
             compilerOptions: {
               whitespace: 'condense',
+              compatConfig: {
+                FEATURE_ID_A: false,
+                FEATURE_ID_B: false
+
+              },
             },
             transpileOptions: {
               transforms: {

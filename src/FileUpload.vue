@@ -490,7 +490,7 @@ export default defineComponent({
         index = this.addIndex
       }
       // 遍历规范对象
-      const addFiles: VueUploadItem[] = []
+      let addFiles: VueUploadItem[] = []
       for (let i = 0; i < files.length; i++) {
         let file: VueUploadItem | Blob = files[i]
         if (this.features.html5 && file instanceof Blob) {
@@ -580,6 +580,33 @@ export default defineComponent({
         newFiles = this.files.concat(addFiles)
       }
       this.files = newFiles
+
+      
+
+      // 读取代理后的数据
+      let index2 = 0
+      if (index === true || index === 0) {
+        index2 = 0
+      } else if (index) {
+        if (index >= 0) {
+          if ((index + addFiles.length) > this.files.length) {
+            index2 = this.files.length - addFiles.length
+          } else {
+            index2 = index
+          }
+        } else {
+          index2 = this.files.length - addFiles.length + index
+          if (index2 < 0) {
+            index2 = 0
+          }
+        }
+      } else {
+        index2 = this.files.length - addFiles.length
+      }
+
+      addFiles = this.files.slice(index2, index2 + addFiles.length)
+
+      
       // 定位
       for (let i = 0; i < addFiles.length; i++) {
         const file = addFiles[i]
@@ -823,7 +850,7 @@ export default defineComponent({
     update(id: VueUploadItem | string, data: {[key:string]: any}): VueUploadItem | false {
       const file = this.get(id)
       if (file) {
-        const newFile = {
+        let newFile = {
           ...file,
           ...data
         }
@@ -842,6 +869,8 @@ export default defineComponent({
         }
         files.splice(index, 1, newFile)
         this.files = files
+        newFile = this.files[index]
+
         // 删除  旧定位 写入 新定位 （已便支持修改id)
         delete this.maps[file.id]
         this.maps[newFile.id] = newFile

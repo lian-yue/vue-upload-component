@@ -1,7 +1,7 @@
 /*!
  Name: vue-upload-component 
 Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.1.0 
+Version: 3.1.1 
 Author: LianYue 
 License: Apache-2.0 
 Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
@@ -820,7 +820,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                   index = this.addIndex;
               }
               // 遍历规范对象
-              const addFiles = [];
+              let addFiles = [];
               for (let i = 0; i < files.length; i++) {
                   let file = files[i];
                   if (this.features.html5 && file instanceof Blob) {
@@ -913,6 +913,31 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                   newFiles = this.files.concat(addFiles);
               }
               this.files = newFiles;
+              // 读取代理后的数据
+              let index2 = 0;
+              if (index === true || index === 0) {
+                  index2 = 0;
+              }
+              else if (index) {
+                  if (index >= 0) {
+                      if ((index + addFiles.length) > this.files.length) {
+                          index2 = this.files.length - addFiles.length;
+                      }
+                      else {
+                          index2 = index;
+                      }
+                  }
+                  else {
+                      index2 = this.files.length - addFiles.length + index;
+                      if (index2 < 0) {
+                          index2 = 0;
+                      }
+                  }
+              }
+              else {
+                  index2 = this.files.length - addFiles.length;
+              }
+              addFiles = this.files.slice(index2, index2 + addFiles.length);
               // 定位
               for (let i = 0; i < addFiles.length; i++) {
                   const file = addFiles[i];
@@ -1142,7 +1167,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           update(id, data) {
               const file = this.get(id);
               if (file) {
-                  const newFile = {
+                  let newFile = {
                       ...file,
                       ...data
                   };
@@ -1161,6 +1186,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                   }
                   files.splice(index, 1, newFile);
                   this.files = files;
+                  newFile = this.files[index];
                   // 删除  旧定位 写入 新定位 （已便支持修改id)
                   delete this.maps[file.id];
                   this.maps[newFile.id] = newFile;

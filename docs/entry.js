@@ -25,17 +25,17 @@ class Renderer extends marked.Renderer {
       this.options.headers.push('')
     }
     this.options.headers.push(rawName)
-    return '<h'
-    + level
-    + ' id="'
-    + this.options.headerPrefix
-    + parent
-    + rawName
-    + '">'
-    + text
-    + '</h'
-    + level
-    + '>\n'
+    return '<h' +
+      level +
+      ' id="' +
+      this.options.headerPrefix +
+      parent +
+      rawName +
+      '">' +
+      text +
+      '</h' +
+      level +
+      '>\n'
   }
 }
 
@@ -78,7 +78,7 @@ app.use(router)
 router.push(window.location.hash ? window.location.hash.substr(1) : '')
 
 // 载入
-router.isReady().then(function () {
+router.isReady().then(function() {
   app.mount('#app')
 })
 
@@ -104,7 +104,7 @@ app.directive('markdown', {
     el.innerHTML = marked(text)
     let selectorList = el.querySelectorAll('a')
     for (let i = 0; i < selectorList.length; i++) {
-      selectorList[i].onclick = function (e) {
+      selectorList[i].onclick = function(e) {
         if (e.metaKey || e.ctrlKey || e.shiftKey) {
           return
         }
@@ -158,7 +158,7 @@ app.directive('markdown', {
     el.innerHTML = marked(text)
     let selectorList = el.querySelectorAll('a')
     for (let i = 0; i < selectorList.length; i++) {
-      selectorList[i].onclick = function (e) {
+      selectorList[i].onclick = function(e) {
         if (e.metaKey || e.ctrlKey || e.shiftKey) {
           return
         }

@@ -1,7 +1,7 @@
 /*!
  Name: vue-upload-component 
 Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.1.0 
+Version: 3.1.1 
 Author: LianYue 
 License: Apache-2.0 
 Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
@@ -1119,12 +1119,36 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
 
           newFiles = this.files.concat([]);
 
-          (_newFiles = newFiles).splice.apply(_newFiles, [index, 0].concat(addFiles));
+          (_newFiles = newFiles).splice.apply(_newFiles, [index, 0].concat(_toConsumableArray(addFiles)));
         } else {
           newFiles = this.files.concat(addFiles);
         }
 
-        this.files = newFiles; // 定位
+        this.files = newFiles; // 读取代理后的数据
+
+        var index2 = 0;
+
+        if (index === true || index === 0) {
+          index2 = 0;
+        } else if (index) {
+          if (index >= 0) {
+            if (index + addFiles.length > this.files.length) {
+              index2 = this.files.length - addFiles.length;
+            } else {
+              index2 = index;
+            }
+          } else {
+            index2 = this.files.length - addFiles.length + index;
+
+            if (index2 < 0) {
+              index2 = 0;
+            }
+          }
+        } else {
+          index2 = this.files.length - addFiles.length;
+        }
+
+        addFiles = this.files.slice(index2, index2 + addFiles.length); // 定位
 
         for (var _i = 0; _i < addFiles.length; _i++) {
           var _file = addFiles[_i];
@@ -1419,7 +1443,8 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           }
 
           files.splice(index, 1, newFile);
-          this.files = files; // 删除  旧定位 写入 新定位 （已便支持修改id)
+          this.files = files;
+          newFile = this.files[index]; // 删除  旧定位 写入 新定位 （已便支持修改id)
 
           delete this.maps[file.id];
           this.maps[newFile.id] = newFile; // 事件
