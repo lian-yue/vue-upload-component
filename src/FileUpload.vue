@@ -11,9 +11,9 @@
       :accept="accept"
       :capture="capture"
       :disabled="disabled"
-      :webkitdirectory="directory && features.directory"
-      :allowdirs="directory && features.directory"
-      :directory="directory && features.directory"
+      :webkitdirectory="iDirectory"
+      :allowdirs="iDirectory"
+      :directory="iDirectory"
       :multiple="multiple && features.html5"
       @change="inputOnChange"
     />
@@ -406,6 +406,12 @@ export default defineComponent({
       exts = exts.map(function(value) { return value.trim() }).filter(function(value) { return value })
       return new RegExp('\\.(' + exts.join('|').replace(/\./g, '\\.') + ')$', 'i')
     },
+    iDirectory() :any {
+      if (this.directory && this.features.directory) {
+        return true
+      }
+      return undefined
+    }
   },
   watch: {
     active(active: boolean) {
@@ -625,6 +631,8 @@ export default defineComponent({
       const maximumValue = this.iMaximum
 
       
+
+      
       // @ts-ignore
       const entrys: any = el.webkitEntries || el.entries || undefined
       if (entrys?.length) {
@@ -632,6 +640,7 @@ export default defineComponent({
           return this.add(files) as VueUploadItem[]
         })
       }
+
       
       if (el.files) {
         for (let i = 0; i < el.files.length; i++) {
@@ -956,14 +965,14 @@ export default defineComponent({
         return Promise.resolve(file)
       }
       // 后缀
-      if (file.name && this.iExtensions) {
+      if (file.name && this.iExtensions && file.type !== "text/directory") {
         if (file.name.search(this.iExtensions) === -1) {
           return Promise.reject(new Error('extension'))
         }
       }
 
       // 大小
-      if (this.size > 0 && file.size !== undefined && file.size >= 0 && file.size > this.size) {
+      if (this.size > 0 && file.size !== undefined && file.size >= 0 && file.size > this.size && file.type !== "text/directory") {
         return Promise.reject(new Error('size'))
       }
 
@@ -1036,7 +1045,7 @@ export default defineComponent({
           form.append(key, value)
         }
       }
-      // @ts-ignore
+
       // Moved file.name as the first option to set the filename of the uploaded file, since file.name
       // contains the full (relative) path of the file not just the filename as in file.file.filename
       // @ts-ignore
