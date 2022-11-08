@@ -1,7 +1,7 @@
 /*!
  Name: vue-upload-component 
 Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.1.2 
+Version: 3.1.4 
 Author: LianYue 
 License: Apache-2.0 
 Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
@@ -735,6 +735,12 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               exts = exts.map(function (value) { return value.trim(); }).filter(function (value) { return value; });
               return new RegExp('\\.(' + exts.join('|').replace(/\./g, '\\.') + ')$', 'i');
           },
+          iDirectory() {
+              if (this.directory && this.features.directory) {
+                  return true;
+              }
+              return undefined;
+          }
       },
       watch: {
           active(active) {
@@ -1272,13 +1278,13 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                   return Promise.resolve(file);
               }
               // 后缀
-              if (file.name && this.iExtensions) {
+              if (file.name && this.iExtensions && file.type !== "text/directory") {
                   if (file.name.search(this.iExtensions) === -1) {
                       return Promise.reject(new Error('extension'));
                   }
               }
               // 大小
-              if (this.size > 0 && file.size !== undefined && file.size >= 0 && file.size > this.size) {
+              if (this.size > 0 && file.size !== undefined && file.size >= 0 && file.size > this.size && file.type !== "text/directory") {
                   return Promise.reject(new Error('size'));
               }
               if (this.customAction) {
@@ -1352,8 +1358,10 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
                       form.append(key, value);
                   }
               }
+              // Moved file.name as the first option to set the filename of the uploaded file, since file.name
+              // contains the full (relative) path of the file not just the filename as in file.file.filename
               // @ts-ignore
-              form.append(this.name, file.file, file.file.name || file.file.filename || file.name);
+              form.append(this.name, file.file, file.name || file.file.name || file.file.filename);
               const xhr = new XMLHttpRequest();
               xhr.open('POST', file.postAction || '');
               return this.uploadXhr(xhr, file, form);
@@ -2485,11 +2493,11 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     }${
       (includeBooleanAttr(_ctx.disabled)) ? " disabled" : ""
     }${
-      ssrRenderAttr("webkitdirectory", _ctx.directory && _ctx.features.directory)
+      ssrRenderAttr("webkitdirectory", _ctx.iDirectory)
     }${
-      ssrRenderAttr("allowdirs", _ctx.directory && _ctx.features.directory)
+      ssrRenderAttr("allowdirs", _ctx.iDirectory)
     }${
-      ssrRenderAttr("directory", _ctx.directory && _ctx.features.directory)
+      ssrRenderAttr("directory", _ctx.iDirectory)
     }${
       (includeBooleanAttr(_ctx.multiple && _ctx.features.html5)) ? " multiple" : ""
     }>`);

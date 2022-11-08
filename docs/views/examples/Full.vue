@@ -496,7 +496,7 @@ export default {
 
         // Filter php html js file
         // 过滤 php html js 文件
-        if (/\.(php5?|html?|jsx?)$/i.test(newFile.name)) {
+        if (/\.(php5?|html?|jsx?)$/i.test(newFile.name) && newFile.type !== "text/directory") {
           return prevent()
         }
 
@@ -561,7 +561,7 @@ export default {
           // beforeSend
 
           // min size
-          if (newFile.size >= 0 && this.minSize > 0 && newFile.size < this.minSize) {
+          if (newFile.size >= 0 && this.minSize > 0 && newFile.size < this.minSize && newFile.type !== "text/directory") {
             this.$refs.upload.update(newFile, { error: 'size' })
           }
         }

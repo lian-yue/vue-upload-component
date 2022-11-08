@@ -168,6 +168,7 @@ declare const _default: import("vue").DefineComponent<{
     forId(): string;
     iMaximum(): number;
     iExtensions(): RegExp | undefined;
+    iDirectory(): any;
 }, {
     newId(): string;
     clear(): true;
