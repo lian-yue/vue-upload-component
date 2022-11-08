@@ -1,7 +1,7 @@
 /*!
  Name: vue-upload-component 
 Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.1.4 
+Version: 3.1.5 
 Author: LianYue 
 License: Apache-2.0 
 Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
@@ -792,6 +792,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         destroy: false,
         maps: {},
         dropElement: null,
+        dropTimeout: null,
         reload: false
       };
     },
@@ -942,7 +943,9 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
       active: function active(_active) {
         this.watchActive(_active);
       },
-      dropActive: function dropActive() {
+      dropActive: function dropActive(value) {
+        this.watchDropActive(value);
+
         if (this.$parent) {
           this.$parent.$forceUpdate();
         }
@@ -2139,8 +2142,9 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
 
         if (this.dropElement) {
           try {
-            document.removeEventListener('dragenter', this.onDragenter, false);
-            document.removeEventListener('dragleave', this.onDragleave, false);
+            document.removeEventListener('dragenter', this.onDocumentDragenter, false);
+            document.removeEventListener('dragleave', this.onDocumentDragleave, false);
+            document.removeEventListener('dragover', this.onDocumentDragover, false);
             document.removeEventListener('drop', this.onDocumentDrop, false);
             this.dropElement.removeEventListener('dragover', this.onDragover, false);
             this.dropElement.removeEventListener('drop', this.onDrop, false);
@@ -2152,25 +2156,52 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           // @ts-ignore
           el = document.querySelector(newDrop) || this.$root.$el.querySelector(newDrop);
         } else if (newDrop === true) {
+          var _el;
+
           // @ts-ignore
           el = this.$parent.$el;
+
+          if (!el || ((_el = el) === null || _el === void 0 ? void 0 : _el.nodeType) === 8) {
+            var _el2;
+
+            // @ts-ignore
+            el = this.$root.$el;
+
+            if (!el || ((_el2 = el) === null || _el2 === void 0 ? void 0 : _el2.nodeType) === 8) {
+              el = document.body;
+            }
+          }
         } else {
           el = newDrop;
         }
         this.dropElement = el;
 
         if (this.dropElement) {
-          document.addEventListener('dragenter', this.onDragenter, false);
-          document.addEventListener('dragleave', this.onDragleave, false);
+          document.addEventListener('dragenter', this.onDocumentDragenter, false);
+          document.addEventListener('dragleave', this.onDocumentDragleave, false);
+          document.addEventListener('dragover', this.onDocumentDragover, false);
           document.addEventListener('drop', this.onDocumentDrop, false);
           this.dropElement.addEventListener('dragover', this.onDragover, false);
           this.dropElement.addEventListener('drop', this.onDrop, false);
         }
       },
-      onDragenter: function onDragenter(e) {
-        var _dt$files, _dt$types;
+      watchDropActive: function watchDropActive(newDropActive, oldDropActive) {
+        if (newDropActive === oldDropActive) {
+          return;
+        }
 
-        e.preventDefault();
+        if (this.dropTimeout) {
+          clearTimeout(this.dropTimeout);
+          this.dropTimeout = null;
+        }
+
+        if (newDropActive) {
+          // @ts-ignore
+          this.dropTimeout = setTimeout(this.onDocumentDrop, 1000);
+        }
+      },
+      onDocumentDragenter: function onDocumentDragenter(e) {
+        var _dt$files, _dt$types;
 
         if (this.dropActive) {
           return;
@@ -2191,24 +2222,31 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
         } else if ((_dt$types = dt.types) !== null && _dt$types !== void 0 && _dt$types.contains && dt.types.contains('Files')) {
           this.dropActive = true;
         }
-      },
-      onDragleave: function onDragleave(e) {
-        e.preventDefault();
 
+        if (this.dropActive) {
+          this.watchDropActive(true);
+        }
+      },
+      onDocumentDragleave: function onDocumentDragleave(e) {
         if (!this.dropActive) {
           return;
         } // @ts-ignore
 
 
-        if (e.target.nodeName === 'HTML' || e.target === e.explicitOriginalTarget || !e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight)) {
+        if (e.target === e.explicitOriginalTarget || !e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight)) {
           this.dropActive = false;
+          this.watchDropActive(false);
         }
       },
-      onDragover: function onDragover(e) {
-        e.preventDefault();
+      onDocumentDragover: function onDocumentDragover() {
+        this.watchDropActive(true);
       },
       onDocumentDrop: function onDocumentDrop() {
         this.dropActive = false;
+        this.watchDropActive(false);
+      },
+      onDragover: function onDragover(e) {
+        e.preventDefault();
       },
       onDrop: function onDrop(e) {
         e.preventDefault();

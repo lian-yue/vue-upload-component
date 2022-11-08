@@ -1,7 +1,7 @@
 /*!
  Name: vue-upload-component 
 Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.1.4 
+Version: 3.1.5 
 Author: LianYue 
 License: Apache-2.0 
 Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
@@ -611,6 +611,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               destroy: false,
               maps: {},
               dropElement: null,
+              dropTimeout: null,
               reload: false,
           };
       },
@@ -746,7 +747,8 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
           active(active) {
               this.watchActive(active);
           },
-          dropActive() {
+          dropActive(value) {
+              this.watchDropActive(value);
               if (this.$parent) {
                   this.$parent.$forceUpdate();
               }
@@ -1762,8 +1764,9 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               // 移除挂载
               if (this.dropElement) {
                   try {
-                      document.removeEventListener('dragenter', this.onDragenter, false);
-                      document.removeEventListener('dragleave', this.onDragleave, false);
+                      document.removeEventListener('dragenter', this.onDocumentDragenter, false);
+                      document.removeEventListener('dragleave', this.onDocumentDragleave, false);
+                      document.removeEventListener('dragover', this.onDocumentDragover, false);
                       document.removeEventListener('drop', this.onDocumentDrop, false);
                       this.dropElement.removeEventListener('dragover', this.onDragover, false);
                       this.dropElement.removeEventListener('drop', this.onDrop, false);
@@ -1780,21 +1783,41 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               else if (newDrop === true) {
                   // @ts-ignore
                   el = this.$parent.$el;
+                  if (!el || el?.nodeType === 8) {
+                      // @ts-ignore
+                      el = this.$root.$el;
+                      if (!el || el?.nodeType === 8) {
+                          el = document.body;
+                      }
+                  }
               }
               else {
                   el = newDrop;
               }
               this.dropElement = el;
               if (this.dropElement) {
-                  document.addEventListener('dragenter', this.onDragenter, false);
-                  document.addEventListener('dragleave', this.onDragleave, false);
+                  document.addEventListener('dragenter', this.onDocumentDragenter, false);
+                  document.addEventListener('dragleave', this.onDocumentDragleave, false);
+                  document.addEventListener('dragover', this.onDocumentDragover, false);
                   document.addEventListener('drop', this.onDocumentDrop, false);
                   this.dropElement.addEventListener('dragover', this.onDragover, false);
                   this.dropElement.addEventListener('drop', this.onDrop, false);
               }
           },
-          onDragenter(e) {
-              e.preventDefault();
+          watchDropActive(newDropActive, oldDropActive) {
+              if (newDropActive === oldDropActive) {
+                  return;
+              }
+              if (this.dropTimeout) {
+                  clearTimeout(this.dropTimeout);
+                  this.dropTimeout = null;
+              }
+              if (newDropActive) {
+                  // @ts-ignore
+                  this.dropTimeout = setTimeout(this.onDocumentDrop, 1000);
+              }
+          },
+          onDocumentDragenter(e) {
               if (this.dropActive) {
                   return;
               }
@@ -1815,22 +1838,29 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
               else if (dt.types?.contains && dt.types.contains('Files')) {
                   this.dropActive = true;
               }
+              if (this.dropActive) {
+                  this.watchDropActive(true);
+              }
           },
-          onDragleave(e) {
-              e.preventDefault();
+          onDocumentDragleave(e) {
               if (!this.dropActive) {
                   return;
               }
               // @ts-ignore
-              if (e.target.nodeName === 'HTML' || e.target === e.explicitOriginalTarget || (!e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight))) {
+              if (e.target === e.explicitOriginalTarget || (!e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight))) {
                   this.dropActive = false;
+                  this.watchDropActive(false);
               }
           },
-          onDragover(e) {
-              e.preventDefault();
+          onDocumentDragover() {
+              this.watchDropActive(true);
           },
           onDocumentDrop() {
               this.dropActive = false;
+              this.watchDropActive(false);
+          },
+          onDragover(e) {
+              e.preventDefault();
           },
           onDrop(e) {
               e.preventDefault();
@@ -2534,7 +2564,7 @@ Description: Vue.js file upload component, Multi-file upload, Upload directory, 
     }
   }
 
-  var css_248z = "\n.file-uploads {\n  overflow: hidden;\n  position: relative;\n  text-align: center;\n  display: inline-block;\n}\n.file-uploads.file-uploads-html4 input, .file-uploads.file-uploads-html5 label {\n  /* background fix ie  click */\n  background: #fff;\n  opacity: 0;\n  font-size: 20em;\n  z-index: 1;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n}\n.file-uploads.file-uploads-html5 input, .file-uploads.file-uploads-html4 label {\n  /* background fix ie  click */\n  background: rgba(255, 255, 255, 0);\n  overflow: hidden;\n  position: fixed;\n  width: 1px;\n  height: 1px;\n  z-index: -1;\n  opacity: 0;\n}\n";
+  var css_248z = "\n.file-uploads {\n  overflow: hidden;\n  position: relative;\n  text-align: center;\n  display: inline-block;\n}\n.file-uploads.file-uploads-html4 input,\n.file-uploads.file-uploads-html5 label {\n  /* background fix ie  click */\n  background: #fff;\n  opacity: 0;\n  font-size: 20em;\n  z-index: 1;\n  top: 0;\n  left: 0;\n  right: 0;\n  bottom: 0;\n  position: absolute;\n  width: 100%;\n  height: 100%;\n}\n.file-uploads.file-uploads-html5 input,\n.file-uploads.file-uploads-html4 label {\n  /* background fix ie  click */\n  background: rgba(255, 255, 255, 0);\n  overflow: hidden;\n  position: fixed;\n  width: 1px;\n  height: 1px;\n  z-index: -1;\n  opacity: 0;\n}\n";
   styleInject(css_248z);
 
   script.ssrRender = ssrRender;

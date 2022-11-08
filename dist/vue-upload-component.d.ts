@@ -20,6 +20,7 @@ export interface Data {
     uploading: number;
     features: Features;
     dropElement: null | HTMLElement;
+    dropTimeout: null | number;
     reload: boolean;
 }
 export interface Features {
@@ -204,10 +205,12 @@ declare const _default: import("vue").DefineComponent<{
     uploadHtml4(ufile: VueUploadItem | undefined | false): Promise<VueUploadItem>;
     watchActive(active: boolean): void;
     watchDrop(newDrop: boolean | string | HTMLElement | null, oldDrop?: boolean | string | HTMLElement | undefined): void;
-    onDragenter(e: DragEvent): void;
-    onDragleave(e: DragEvent): void;
-    onDragover(e: DragEvent): void;
+    watchDropActive(newDropActive: boolean, oldDropActive?: boolean | undefined): void;
+    onDocumentDragenter(e: DragEvent): void;
+    onDocumentDragleave(e: DragEvent): void;
+    onDocumentDragover(): void;
     onDocumentDrop(): void;
+    onDragover(e: DragEvent): void;
     onDrop(e: DragEvent): void;
     inputOnChange(e: Event): Promise<any>;
 }, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:modelValue" | "input-filter" | "input-file")[], "update:modelValue" | "input-filter" | "input-file", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{

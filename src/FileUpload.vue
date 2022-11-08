@@ -75,7 +75,7 @@ export interface Data {
   uploading: number;
   features: Features;
   dropElement: null | HTMLElement;
-  dropTimeout: null | Number,
+  dropTimeout: null | number,
   reload: boolean;
 }
 
@@ -1542,7 +1542,7 @@ export default defineComponent({
       }
     },
 
-    watchDropActive(newDropActive: boolean, oldDropActive: boolean) {
+    watchDropActive(newDropActive: boolean, oldDropActive?: boolean) {
       if (newDropActive === oldDropActive) {
         return
       }
@@ -1553,6 +1553,7 @@ export default defineComponent({
       }
 
       if (newDropActive) {
+        // @ts-ignore
         this.dropTimeout = setTimeout(this.onDocumentDrop, 1000);
       }
 
