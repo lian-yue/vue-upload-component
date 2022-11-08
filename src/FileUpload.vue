@@ -1,22 +1,10 @@
 <template>
   <span :class="className">
     <slot></slot>
-    <label :for="forId"></label>    
-    <input
-      v-if="!reload"
-      ref="input"
-      type="file"
-      :name="name"
-      :id="forId"
-      :accept="accept"
-      :capture="capture"
-      :disabled="disabled"
-      :webkitdirectory="iDirectory"
-      :allowdirs="iDirectory"
-      :directory="iDirectory"
-      :multiple="multiple && features.html5"
-      @change="inputOnChange"
-    />
+    <label :for="forId"></label>
+    <input v-if="!reload" ref="input" type="file" :name="name" :id="forId" :accept="accept" :capture="capture"
+      :disabled="disabled" :webkitdirectory="iDirectory" :allowdirs="iDirectory" :directory="iDirectory"
+      :multiple="multiple && features.html5" @change="inputOnChange" />
   </span>
 </template>
 <style>
@@ -26,7 +14,9 @@
   text-align: center;
   display: inline-block;
 }
-.file-uploads.file-uploads-html4 input, .file-uploads.file-uploads-html5 label {
+
+.file-uploads.file-uploads-html4 input,
+.file-uploads.file-uploads-html5 label {
   /* background fix ie  click */
   background: #fff;
   opacity: 0;
@@ -40,7 +30,9 @@
   width: 100%;
   height: 100%;
 }
-.file-uploads.file-uploads-html5 input, .file-uploads.file-uploads-html4 label {
+
+.file-uploads.file-uploads-html5 input,
+.file-uploads.file-uploads-html4 label {
   /* background fix ie  click */
   background: rgba(255, 255, 255, 0);
   overflow: hidden;
@@ -52,7 +44,7 @@
 }
 </style>
 <script lang="ts">
-import {PropType, defineComponent, h} from "vue";
+import { PropType, defineComponent, h } from "vue";
 
 // @ts-ignore
 import ChunkUploadDefaultHandler from './chunk/ChunkUploadHandler.js'
@@ -66,94 +58,95 @@ const CHUNK_DEFAULT_OPTIONS = {
 }
 
 export interface ChunkOptions {
-    headers: { [key: string]: any };
-    action: string;
-    minSize: number;
-    maxActive: number;
-    maxRetries: number;
-    handler: any;
+  headers: { [key: string]: any };
+  action: string;
+  minSize: number;
+  maxActive: number;
+  maxRetries: number;
+  handler: any;
 }
 
 export interface Data {
-    active: boolean;
-    dropActive: boolean;
-    files: VueUploadItem[];
-    maps: { [key: string]: VueUploadItem };
-    destroy: boolean;
-    uploading: number;
-    features: Features;
-    dropElement: null | HTMLElement;
-    reload: boolean;
+  active: boolean;
+  dropActive: boolean;
+  files: VueUploadItem[];
+  maps: { [key: string]: VueUploadItem };
+  destroy: boolean;
+  uploading: number;
+  features: Features;
+  dropElement: null | HTMLElement;
+  dropTimeout: null | Number,
+  reload: boolean;
 }
 
 export interface Features {
-    html5: boolean;
-    directory: boolean;
-    drop: boolean;
+  html5: boolean;
+  directory: boolean;
+  drop: boolean;
 }
 
 
 
 export interface VueUploadItem {
-    id: string;
+  id: string;
 
-    // 是否是文件对象
-    readonly fileObject?: boolean,
+  // 是否是文件对象
+  readonly fileObject?: boolean,
 
-    // 文件名
-    name?: string;
+  // 文件名
+  name?: string;
 
-    // 文件字节
-    size?: number,
+  // 文件字节
+  size?: number,
 
-    // 文件 mime 类型
-    type?: string,
+  // 文件 mime 类型
+  type?: string,
 
-    // 是否激活中
-    active?: boolean,
+  // 是否激活中
+  active?: boolean,
 
-    // 错误消息
-    error?: Error | string,
+  // 错误消息
+  error?: Error | string,
 
-    // 是否成功
-    success?: boolean,
+  // 是否成功
+  success?: boolean,
 
-    // post 地址
-    postAction?: string;
+  // post 地址
+  postAction?: string;
 
-    // putAction 地址
-    putAction?: string;
+  // putAction 地址
+  putAction?: string;
 
-    // timeout
-    timeout?: number;
+  // timeout
+  timeout?: number;
 
-    // 请求 data
-    data?: { [key: string]: any }
+  // 请求 data
+  data?: { [key: string]: any }
 
-    // 请求 headers
-    headers?: { [key: string]: any }
+  // 请求 headers
+  headers?: { [key: string]: any }
 
-    // 响应信息
-    response?: { [key: string]: any };
+  // 响应信息
+  response?: { [key: string]: any };
 
-    // 进度
-    progress?: string;          // 只读
+  // 进度
+  progress?: string;          // 只读
 
-    // 速度
-    speed?: 0; // 只读
+  // 速度
+  speed?: 0; // 只读
 
-    // xhr 信息
-    file?: Blob; // 只读
-    
-    xhr?: XMLHttpRequest; // 只读
+  // xhr 信息
+  file?: Blob; // 只读
 
-    // el 信息  仅有 html4 使用
-    el?: HTMLInputElement;
+  xhr?: XMLHttpRequest; // 只读
 
-    // iframe 信息 仅有 html4 使用
-    iframe?: HTMLElement;             // 只读
+  // el 信息  仅有 html4 使用
+  el?: HTMLInputElement;
 
-    [key: string]: any;
+  // iframe 信息 仅有 html4 使用
+  iframe?: HTMLElement;             // 只读
+
+  [key: string]: any;
 }
 
 
@@ -207,15 +200,15 @@ export default defineComponent({
       type: Function as PropType<(file: VueUploadItem, self: any) => Promise<VueUploadItem>>
     },
     headers: {
-      type: Object as PropType<{[key:string]: any}>,
-      default:() => {
+      type: Object as PropType<{ [key: string]: any }>,
+      default: () => {
         return {}
       },
     },
 
     data: {
-      type: Object as PropType<{[key:string]: any}>,
-      default:() => {
+      type: Object as PropType<{ [key: string]: any }>,
+      default: () => {
         return {}
       },
     },
@@ -235,14 +228,14 @@ export default defineComponent({
       default: 0,
     },
     extensions: {
-      type: [RegExp, String, Array] as PropType<RegExp| string| string[]>,
+      type: [RegExp, String, Array] as PropType<RegExp | string | string[]>,
       default: () => {
         return []
       },
     },
     modelValue: {
       type: Array as PropType<VueUploadItem[]>,
-      default:() => {
+      default: () => {
         return []
       },
     },
@@ -257,7 +250,7 @@ export default defineComponent({
     },
     // Chunk upload properties
     chunk: {
-      type: Object as PropType<{headers?: {[key:string]: any}; action?: string; minSize?: number; maxActive?: number; maxRetries?: number; handler?: any;}>,
+      type: Object as PropType<{ headers?: { [key: string]: any }; action?: string; minSize?: number; maxActive?: number; maxRetries?: number; handler?: any; }>,
       default: (): ChunkOptions => {
         return CHUNK_DEFAULT_OPTIONS
       }
@@ -283,6 +276,7 @@ export default defineComponent({
       destroy: false,
       maps: {},
       dropElement: null,
+      dropTimeout: null,
       reload: false,
     }
   },
@@ -318,7 +312,7 @@ export default defineComponent({
     }
 
     // @ts-ignore
-    this.$nextTick( () => {
+    this.$nextTick(() => {
       // 更新下父级
       if (this.$parent) {
         this.$parent.$forceUpdate()
@@ -403,10 +397,10 @@ export default defineComponent({
       } else {
         exts = this.extensions
       }
-      exts = exts.map(function(value) { return value.trim() }).filter(function(value) { return value })
+      exts = exts.map(function (value) { return value.trim() }).filter(function (value) { return value })
       return new RegExp('\\.(' + exts.join('|').replace(/\./g, '\\.') + ')$', 'i')
     },
-    iDirectory() :any {
+    iDirectory(): any {
       if (this.directory && this.features.directory) {
         return true
       }
@@ -417,7 +411,8 @@ export default defineComponent({
     active(active: boolean) {
       this.watchActive(active)
     },
-    dropActive() {
+    dropActive(value: boolean) {
+      this.watchDropActive(value)
       if (this.$parent) {
         this.$parent.$forceUpdate()
       }
@@ -478,7 +473,7 @@ export default defineComponent({
         return false
       }
       if (typeof id === 'object') {
-        return this.maps[id.id|| ''] || false
+        return this.maps[id.id || ''] || false
       }
       return this.maps[id] || false
     },
@@ -587,7 +582,7 @@ export default defineComponent({
       }
       this.files = newFiles
 
-      
+
 
       // 读取代理后的数据
       let index2 = 0
@@ -612,7 +607,7 @@ export default defineComponent({
 
       addFiles = this.files.slice(index2, index2 + addFiles.length)
 
-      
+
       // 定位
       for (let i = 0; i < addFiles.length; i++) {
         const file = addFiles[i]
@@ -630,9 +625,9 @@ export default defineComponent({
       const files: Array<VueUploadItem | File> = []
       const maximumValue = this.iMaximum
 
-      
 
-      
+
+
       // @ts-ignore
       const entrys: any = el.webkitEntries || el.entries || undefined
       if (entrys?.length) {
@@ -641,7 +636,7 @@ export default defineComponent({
         })
       }
 
-      
+
       if (el.files) {
         for (let i = 0; i < el.files.length; i++) {
           const file: File = el.files[i]
@@ -671,14 +666,14 @@ export default defineComponent({
     },
 
     // 添加 DataTransfer
-    addDataTransfer(dataTransfer: DataTransfer):Promise<VueUploadItem[] | undefined> {
+    addDataTransfer(dataTransfer: DataTransfer): Promise<VueUploadItem[] | undefined> {
       // dataTransfer.items 支持
       if (dataTransfer?.items?.length) {
         const entrys: Array<File | FileSystemEntry> = []
         // 遍历出所有 dataTransferVueUploadItem
         for (let i = 0; i < dataTransfer.items.length; i++) {
           const dataTransferTtem = dataTransfer.items[i]
-          let entry: File| FileSystemEntry | null
+          let entry: File | FileSystemEntry | null
           // @ts-ignore
           if (dataTransferTtem.getAsEntry) {
             // @ts-ignore
@@ -713,13 +708,13 @@ export default defineComponent({
       return Promise.resolve([])
     },
 
-     
+
     // 获得 entrys    
     getFileSystemEntry(entry: Array<File | FileSystemEntry> | File | FileSystemEntry, path = ''): Promise<VueUploadItem[]> {
-    // getFileSystemEntry(entry: any, path = ''): Promise<VueUploadItem[]> {
+      // getFileSystemEntry(entry: any, path = ''): Promise<VueUploadItem[]> {
       return new Promise((resolve) => {
         const maximumValue = this.iMaximum
-        
+
         if (!entry) {
           resolve([])
           return
@@ -728,18 +723,18 @@ export default defineComponent({
         if (entry instanceof Array) {
           // 多个
           const uploadFiles: VueUploadItem[] = []
-          const forEach = (i:number) => {
+          const forEach = (i: number) => {
             const v = entry[i]
             if (!v || (maximumValue > 0 && uploadFiles.length >= maximumValue)) {
               return resolve(uploadFiles)
             }
-            this.getFileSystemEntry(v, path).then(function(results) {
+            this.getFileSystemEntry(v, path).then(function (results) {
               uploadFiles.push(...results)
               forEach(i + 1)
             })
           }
           forEach(0)
-          return 
+          return
         }
 
         if (entry instanceof Blob) {
@@ -756,14 +751,14 @@ export default defineComponent({
           return
         }
 
-        
-        
+
+
         if (entry.isFile) {
           let fileEntry = entry as FileSystemFileEntry
           fileEntry.file(function (file: File) {
             resolve([
               {
-                id:'',
+                id: '',
                 size: file.size,
                 name: path + file.name,
                 type: file.type,
@@ -773,7 +768,7 @@ export default defineComponent({
           })
           return
         }
-        
+
         if (entry.isDirectory && this.dropDirectory) {
           let directoryEntry = entry as FileSystemDirectoryEntry
           const uploadFiles: VueUploadItem[] = []
@@ -784,21 +779,21 @@ export default defineComponent({
               name: path + directoryEntry.name,
               size: 0,
               type: 'text/directory',
-              file: new File([], path + directoryEntry.name, {type: 'text/directory'}),
+              file: new File([], path + directoryEntry.name, { type: 'text/directory' }),
             })
           }
 
           const dirReader = directoryEntry.createReader()
           const readEntries = () => {
-            dirReader.readEntries((entries : any) => {
-              const forEach = (i:number) => {
+            dirReader.readEntries((entries: any) => {
+              const forEach = (i: number) => {
                 if ((!entries[i] && i === 0) || (maximumValue > 0 && uploadFiles.length >= maximumValue)) {
                   return resolve(uploadFiles)
                 }
                 if (!entries[i]) {
                   return readEntries()
                 }
-                this.getFileSystemEntry(entries[i], path + directoryEntry.name + '/').then(function(results) {
+                this.getFileSystemEntry(entries[i], path + directoryEntry.name + '/').then(function (results) {
                   uploadFiles.push(...results)
                   forEach(i + 1)
                 })
@@ -814,7 +809,7 @@ export default defineComponent({
       })
     },
     // 替换
-    replace(id1:VueUploadItem | string, id2: VueUploadItem | string): boolean {
+    replace(id1: VueUploadItem | string, id2: VueUploadItem | string): boolean {
       const file1 = this.get(id1)
       const file2 = this.get(id2)
       if (!file1 || !file2 || file1 === file2) {
@@ -856,7 +851,7 @@ export default defineComponent({
       return file
     },
     // 更新
-    update(id: VueUploadItem | string, data: {[key:string]: any}): VueUploadItem | false {
+    update(id: VueUploadItem | string, data: { [key: string]: any }): VueUploadItem | false {
       const file = this.get(id)
       if (file) {
         let newFile = {
@@ -893,7 +888,7 @@ export default defineComponent({
     // 预处理 事件 过滤器
     emitFilter(newFile: VueUploadItem | undefined, oldFile: VueUploadItem | undefined): boolean {
       let isPrevent = false
-      this.$emit('input-filter', newFile, oldFile, function(prevent = true): boolean {
+      this.$emit('input-filter', newFile, oldFile, function (prevent = true): boolean {
         isPrevent = prevent
         return isPrevent
       })
@@ -1000,7 +995,7 @@ export default defineComponent({
      *
      * @param Object file
      */
-    shouldUseChunkUpload (file: VueUploadItem) {
+    shouldUseChunkUpload(file: VueUploadItem) {
       return this.chunkEnabled &&
         !!this.chunkOptions.handler &&
         file.size && file.size > this.chunkOptions.minSize
@@ -1055,7 +1050,7 @@ export default defineComponent({
       return this.uploadXhr(xhr, file, form)
     },
 
-    uploadXhr(xhr:XMLHttpRequest, ufile: VueUploadItem | undefined | false, body: FormData | Blob): Promise<VueUploadItem> {
+    uploadXhr(xhr: XMLHttpRequest, ufile: VueUploadItem | undefined | false, body: FormData | Blob): Promise<VueUploadItem> {
       let file = ufile
       let speedTime = 0
       let speedLoaded = 0
@@ -1078,7 +1073,7 @@ export default defineComponent({
         }
         speedTime = speedTime2
 
-        
+
         file = this.update(file, {
           progress: (e.loaded / e.total * 100).toFixed(2),
           speed: e.loaded - speedLoaded,
@@ -1087,7 +1082,7 @@ export default defineComponent({
       }
 
       // 检查激活状态
-      let interval: number| undefined = window.setInterval(()  => {
+      let interval: number | undefined = window.setInterval(() => {
         if (file) {
           if ((file = this.get(file))) {
             if (file?.fileObject && !file.success && !file.error && file.active) {
@@ -1158,7 +1153,7 @@ export default defineComponent({
             return resolve(file)
           }
 
-          const data: {[key: string]: any} = {}
+          const data: { [key: string]: any } = {}
 
           switch (e.type) {
             case 'timeout':
@@ -1196,7 +1191,7 @@ export default defineComponent({
           // 更新
           // @ts-ignore
           file = this.update(file, data)
-          
+
           if (!file) {
             return reject(new Error('abort'))
           }
@@ -1218,7 +1213,7 @@ export default defineComponent({
         xhr.onerror = fn
         xhr.onabort = fn
         xhr.ontimeout = fn
-        
+
 
         // 超时
         if (file.timeout) {
@@ -1311,7 +1306,7 @@ export default defineComponent({
 
       return new Promise((resolve: (u: VueUploadItem) => void, reject: (e: Error) => void) => {
         setTimeout(() => {
-          if (!file)   {
+          if (!file) {
             reject(new Error('not_exists'))
             return
           }
@@ -1393,9 +1388,9 @@ export default defineComponent({
             }
 
             let response: any = getResponseData()
-            const data: {[key: string]: any} = {}
+            const data: { [key: string]: any } = {}
             if (typeof e === 'string') {
-               return reject(new Error(e))
+              return reject(new Error(e))
             }
             switch (e.type) {
               case 'abort':
@@ -1505,8 +1500,9 @@ export default defineComponent({
       // 移除挂载
       if (this.dropElement) {
         try {
-          document.removeEventListener('dragenter', this.onDragenter, false)
-          document.removeEventListener('dragleave', this.onDragleave, false)
+          document.removeEventListener('dragenter', this.onDocumentDragenter, false)
+          document.removeEventListener('dragleave', this.onDocumentDragleave, false)
+          document.removeEventListener('dragover', this.onDocumentDragover, false)
           document.removeEventListener('drop', this.onDocumentDrop, false)
           this.dropElement.removeEventListener('dragover', this.onDragover, false)
           this.dropElement.removeEventListener('drop', this.onDrop, false)
@@ -1524,22 +1520,45 @@ export default defineComponent({
       } else if (newDrop === true) {
         // @ts-ignore
         el = this.$parent.$el
+        if (!el || el?.nodeType === 8) {
+          // @ts-ignore
+          el = this.$root.$el
+          if (!el || el?.nodeType === 8) {
+            el = document.body
+          }
+        }
       } else {
         el = newDrop
       }
       this.dropElement = el
 
       if (this.dropElement) {
-        document.addEventListener('dragenter', this.onDragenter, false)
-        document.addEventListener('dragleave', this.onDragleave, false)
+        document.addEventListener('dragenter', this.onDocumentDragenter, false)
+        document.addEventListener('dragleave', this.onDocumentDragleave, false)
+        document.addEventListener('dragover', this.onDocumentDragover, false)
         document.addEventListener('drop', this.onDocumentDrop, false)
         this.dropElement.addEventListener('dragover', this.onDragover, false)
         this.dropElement.addEventListener('drop', this.onDrop, false)
       }
     },
 
-    onDragenter(e: DragEvent) {
-      e.preventDefault()
+    watchDropActive(newDropActive: boolean, oldDropActive: boolean) {
+      if (newDropActive === oldDropActive) {
+        return
+      }
+
+      if (this.dropTimeout) {
+        clearTimeout(this.dropTimeout)
+        this.dropTimeout = null
+      }
+
+      if (newDropActive) {
+        this.dropTimeout = setTimeout(this.onDocumentDrop, 1000);
+      }
+
+    },
+
+    onDocumentDragenter(e: DragEvent) {
       if (this.dropActive) {
         return
       }
@@ -1557,23 +1576,30 @@ export default defineComponent({
       } else if (dt.types?.contains && dt.types.contains('Files')) {
         this.dropActive = true
       }
+      if (this.dropActive) {
+        this.watchDropActive(true)
+      }
     },
-    onDragleave(e: DragEvent) {
-      e.preventDefault()
+    onDocumentDragleave(e: DragEvent) {
       if (!this.dropActive) {
         return
       }
 
       // @ts-ignore
-      if (e.target.nodeName === 'HTML' || e.target === e.explicitOriginalTarget || (!e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight))) {
+      if (e.target === e.explicitOriginalTarget || (!e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight))) {
         this.dropActive = false
+        this.watchDropActive(false)
       }
     },
-    onDragover(e: DragEvent) {
-      e.preventDefault()
+    onDocumentDragover() {
+      this.watchDropActive(true)
     },
     onDocumentDrop() {
       this.dropActive = false
+      this.watchDropActive(false)
+    },
+    onDragover(e: DragEvent) {
+      e.preventDefault()
     },
     onDrop(e: DragEvent) {
       e.preventDefault()
