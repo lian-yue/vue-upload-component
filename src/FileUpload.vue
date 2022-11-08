@@ -1037,7 +1037,10 @@ export default defineComponent({
         }
       }
       // @ts-ignore
-      form.append(this.name, file.file, file.file.name || file.file.filename  || file.name)
+      // Moved file.name as the first option to set the filename of the uploaded file, since file.name
+      // contains the full (relative) path of the file not just the filename as in file.file.filename
+      // @ts-ignore
+      form.append(this.name, file.file, file.name || file.file.name || file.file.filename)
       const xhr = new XMLHttpRequest()
       xhr.open('POST', file.postAction || '')
       return this.uploadXhr(xhr, file, form)
