@@ -7,8 +7,8 @@
     :capture="$parent.capture"
     :disabled="$parent.disabled"
     @change="change"
-    :webkitdirectory="$parent.directory && $parent.features.directory"
-    :directory="$parent.directory && $parent.features.directory"
+    :webkitdirectory="$parent.directory && $parent.features.directory ? true : undefined"
+    :directory="$parent.directory && $parent.features.directory ? true : undefined"
     :multiple="$parent.multiple && $parent.features.html5"
   />
 </template>

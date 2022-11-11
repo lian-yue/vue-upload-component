@@ -291,11 +291,13 @@ export default {
       this.watchActive(active)
     },
 
-    dropActive() {
+    dropActive(value) {
+      this.watchDropActive(value)
       if (this.$parent) {
         this.$parent.$forceUpdate()
       }
     },
+    
 
     drop(value) {
       this.watchDrop(value)
@@ -1275,8 +1277,9 @@ export default {
       // 移除挂载
       if (this.dropElement) {
         try {
-          document.removeEventListener('dragenter', this.onDragenter, false)
-          document.removeEventListener('dragleave', this.onDragleave, false)
+          document.removeEventListener('dragenter', this.onDocumentDragenter, false)
+          document.removeEventListener('dragleave', this.onDocumentDragleave, false)
+          document.removeEventListener('dragover', this.onDocumentDragover, false)
           document.removeEventListener('drop', this.onDocumentDrop, false)
           this.dropElement.removeEventListener('dragover', this.onDragover, false)
           this.dropElement.removeEventListener('drop', this.onDrop, false)
@@ -1295,17 +1298,30 @@ export default {
       this.dropElement = el
 
       if (this.dropElement) {
-        document.addEventListener('dragenter', this.onDragenter, false)
-        document.addEventListener('dragleave', this.onDragleave, false)
+        document.addEventListener('dragenter', this.onDocumentDragenter, false)
+        document.addEventListener('dragleave', this.onDocumentDragleave, false)
+        document.addEventListener('dragover', this.onDocumentDragover, false)
         document.addEventListener('drop', this.onDocumentDrop, false)
         this.dropElement.addEventListener('dragover', this.onDragover, false)
         this.dropElement.addEventListener('drop', this.onDrop, false)
       }
     },
 
+    watchDropActive(newDropActive, oldDropActive) {
+      if (newDropActive === oldDropActive) {
+        return
+      }
+      if (this.dropTimeout) {
+        clearTimeout(this.dropTimeout)
+        this.dropTimeout = null
+      }
+      if (newDropActive) {
+        this.dropTimeout = setTimeout(this.onDocumentDrop, 1000);
+      }
+    },
 
-    onDragenter(e) {
-      e.preventDefault()
+
+    onDocumentDragenter(e) {
       if (this.dropActive) {
         return
       }
@@ -1322,29 +1338,38 @@ export default {
       } else if (dt.types.contains && dt.types.contains('Files')) {
         this.dropActive = true
       }
+      if (this.dropActive) {
+        this.watchDropActive(true)
+      }
     },
 
-    onDragleave(e) {
-      e.preventDefault()
+    onDocumentDragleave(e) {
       if (!this.dropActive) {
         return
       }
-      if (e.target.nodeName === 'HTML' || e.target === e.explicitOriginalTarget || (!e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight))) {
+      if (e.target === e.explicitOriginalTarget || (!e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight))) {
         this.dropActive = false
+        this.watchDropActive(false)
       }
+    },
+
+    onDocumentDragover() {
+      this.watchDropActive(true)
+    },
+
+    onDocumentDrop() {
+      this.dropActive = false
+      this.watchDropActive(false)
     },
 
     onDragover(e) {
       e.preventDefault()
     },
 
-    onDocumentDrop() {
-      this.dropActive = false
-    },
 
     onDrop(e) {
       e.preventDefault()
-      this.addDataTransfer(e.dataTransfer)
+      e.dataTransfer && this.addDataTransfer(e.dataTransfer)
     },
   }
 }

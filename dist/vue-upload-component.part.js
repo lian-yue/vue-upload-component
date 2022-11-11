@@ -1,7 +1,7 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.21
- * Author: Marco Lang
+ * Version: 2.8.22
+ * Author: LianYue
  */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -727,7 +727,7 @@
 
   /* template */
   var __vue_render__ = function __vue_render__() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('input', { attrs: { "type": "file", "name": _vm.$parent.name, "id": _vm.$parent.inputId || _vm.$parent.name, "accept": _vm.$parent.accept, "capture": _vm.$parent.capture, "disabled": _vm.$parent.disabled, "webkitdirectory": _vm.$parent.directory && _vm.$parent.features.directory, "directory": _vm.$parent.directory && _vm.$parent.features.directory, "multiple": _vm.$parent.multiple && _vm.$parent.features.html5 }, on: { "change": _vm.change } });
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('input', { attrs: { "type": "file", "name": _vm.$parent.name, "id": _vm.$parent.inputId || _vm.$parent.name, "accept": _vm.$parent.accept, "capture": _vm.$parent.capture, "disabled": _vm.$parent.disabled, "webkitdirectory": _vm.$parent.directory && _vm.$parent.features.directory ? true : undefined, "directory": _vm.$parent.directory && _vm.$parent.features.directory ? true : undefined, "multiple": _vm.$parent.multiple && _vm.$parent.features.html5 }, on: { "change": _vm.change } });
   };
   var __vue_staticRenderFns__ = [];
 
@@ -990,7 +990,8 @@
       active: function active(_active) {
         this.watchActive(_active);
       },
-      dropActive: function dropActive() {
+      dropActive: function dropActive(value) {
+        this.watchDropActive(value);
         if (this.$parent) {
           this.$parent.$forceUpdate();
         }
@@ -1950,8 +1951,9 @@
         // 移除挂载
         if (this.dropElement) {
           try {
-            document.removeEventListener('dragenter', this.onDragenter, false);
-            document.removeEventListener('dragleave', this.onDragleave, false);
+            document.removeEventListener('dragenter', this.onDocumentDragenter, false);
+            document.removeEventListener('dragleave', this.onDocumentDragleave, false);
+            document.removeEventListener('dragover', this.onDocumentDragover, false);
             document.removeEventListener('drop', this.onDocumentDrop, false);
             this.dropElement.removeEventListener('dragover', this.onDragover, false);
             this.dropElement.removeEventListener('drop', this.onDrop, false);
@@ -1969,15 +1971,27 @@
         this.dropElement = el;
 
         if (this.dropElement) {
-          document.addEventListener('dragenter', this.onDragenter, false);
-          document.addEventListener('dragleave', this.onDragleave, false);
+          document.addEventListener('dragenter', this.onDocumentDragenter, false);
+          document.addEventListener('dragleave', this.onDocumentDragleave, false);
+          document.addEventListener('dragover', this.onDocumentDragover, false);
           document.addEventListener('drop', this.onDocumentDrop, false);
           this.dropElement.addEventListener('dragover', this.onDragover, false);
           this.dropElement.addEventListener('drop', this.onDrop, false);
         }
       },
-      onDragenter: function onDragenter(e) {
-        e.preventDefault();
+      watchDropActive: function watchDropActive(newDropActive, oldDropActive) {
+        if (newDropActive === oldDropActive) {
+          return;
+        }
+        if (this.dropTimeout) {
+          clearTimeout(this.dropTimeout);
+          this.dropTimeout = null;
+        }
+        if (newDropActive) {
+          this.dropTimeout = setTimeout(this.onDocumentDrop, 1000);
+        }
+      },
+      onDocumentDragenter: function onDocumentDragenter(e) {
         if (this.dropActive) {
           return;
         }
@@ -1994,25 +2008,32 @@
         } else if (dt.types.contains && dt.types.contains('Files')) {
           this.dropActive = true;
         }
+        if (this.dropActive) {
+          this.watchDropActive(true);
+        }
       },
-      onDragleave: function onDragleave(e) {
-        e.preventDefault();
+      onDocumentDragleave: function onDocumentDragleave(e) {
         if (!this.dropActive) {
           return;
         }
-        if (e.target.nodeName === 'HTML' || e.target === e.explicitOriginalTarget || !e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight)) {
+        if (e.target === e.explicitOriginalTarget || !e.fromElement && (e.clientX <= 0 || e.clientY <= 0 || e.clientX >= window.innerWidth || e.clientY >= window.innerHeight)) {
           this.dropActive = false;
+          this.watchDropActive(false);
         }
+      },
+      onDocumentDragover: function onDocumentDragover() {
+        this.watchDropActive(true);
+      },
+      onDocumentDrop: function onDocumentDrop() {
+        this.dropActive = false;
+        this.watchDropActive(false);
       },
       onDragover: function onDragover(e) {
         e.preventDefault();
       },
-      onDocumentDrop: function onDocumentDrop() {
-        this.dropActive = false;
-      },
       onDrop: function onDrop(e) {
         e.preventDefault();
-        this.addDataTransfer(e.dataTransfer);
+        e.dataTransfer && this.addDataTransfer(e.dataTransfer);
       }
     }
   };
