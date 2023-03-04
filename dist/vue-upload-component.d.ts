@@ -115,7 +115,8 @@ declare const _default: import("vue").DefineComponent<{
         default: number;
     };
     drop: {
-        default: boolean;
+        type: PropType<string | boolean | HTMLElement | null>;
+        default: () => boolean;
     };
     dropDirectory: {
         type: BooleanConstructor;
@@ -271,7 +272,8 @@ declare const _default: import("vue").DefineComponent<{
         default: number;
     };
     drop: {
-        default: boolean;
+        type: PropType<string | boolean | HTMLElement | null>;
+        default: () => boolean;
     };
     dropDirectory: {
         type: BooleanConstructor;
@@ -324,7 +326,7 @@ declare const _default: import("vue").DefineComponent<{
     headers: {
         [key: string]: any;
     };
-    drop: boolean;
+    drop: string | boolean | HTMLElement | null;
     modelValue: VueUploadItem[];
     disabled: boolean;
     multiple: boolean;

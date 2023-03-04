@@ -101,7 +101,7 @@ app.directive('markdown', {
     if (el.markdown === text) {
       return
     }
-    console.log(text)
+
 
     el.markdown = text
     el.innerHTML = marked(text)

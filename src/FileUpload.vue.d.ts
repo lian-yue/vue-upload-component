@@ -20,6 +20,7 @@ export interface Data {
     uploading: number;
     features: Features;
     dropElement: null | HTMLElement;
+    dropTimeout: null | number;
     reload: boolean;
 }
 export interface Features {
@@ -114,7 +115,8 @@ declare const _default: import("vue").DefineComponent<{
         default: number;
     };
     drop: {
-        default: boolean;
+        type: PropType<string | boolean | HTMLElement | null>;
+        default: () => boolean;
     };
     dropDirectory: {
         type: BooleanConstructor;
@@ -168,6 +170,7 @@ declare const _default: import("vue").DefineComponent<{
     forId(): string;
     iMaximum(): number;
     iExtensions(): RegExp | undefined;
+    iDirectory(): any;
 }, {
     newId(): string;
     clear(): true;
@@ -175,7 +178,7 @@ declare const _default: import("vue").DefineComponent<{
     add(_files: VueUploadItem | Blob | Array<VueUploadItem | Blob>, index?: number | boolean | undefined): VueUploadItem | VueUploadItem[] | undefined;
     addInputFile(el: HTMLInputElement): Promise<VueUploadItem[]>;
     addDataTransfer(dataTransfer: DataTransfer): Promise<VueUploadItem[] | undefined>;
-    getFileSystemEntry(entry: any, path?: string): Promise<VueUploadItem[]>;
+    getFileSystemEntry(entry: Array<File | FileSystemEntry> | File | FileSystemEntry, path?: string): Promise<VueUploadItem[]>;
     replace(id1: VueUploadItem | string, id2: VueUploadItem | string): boolean;
     remove(id: VueUploadItem | string): VueUploadItem | false;
     update(id: VueUploadItem | string, data: {
@@ -203,10 +206,12 @@ declare const _default: import("vue").DefineComponent<{
     uploadHtml4(ufile: VueUploadItem | undefined | false): Promise<VueUploadItem>;
     watchActive(active: boolean): void;
     watchDrop(newDrop: boolean | string | HTMLElement | null, oldDrop?: boolean | string | HTMLElement | undefined): void;
-    onDragenter(e: DragEvent): void;
-    onDragleave(e: DragEvent): void;
-    onDragover(e: DragEvent): void;
+    watchDropActive(newDropActive: boolean, oldDropActive?: boolean | undefined): void;
+    onDocumentDragenter(e: DragEvent): void;
+    onDocumentDragleave(e: DragEvent): void;
+    onDocumentDragover(): void;
     onDocumentDrop(): void;
+    onDragover(e: DragEvent): void;
     onDrop(e: DragEvent): void;
     inputOnChange(e: Event): Promise<any>;
 }, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:modelValue" | "input-filter" | "input-file")[], "update:modelValue" | "input-filter" | "input-file", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
@@ -267,7 +272,8 @@ declare const _default: import("vue").DefineComponent<{
         default: number;
     };
     drop: {
-        default: boolean;
+        type: PropType<string | boolean | HTMLElement | null>;
+        default: () => boolean;
     };
     dropDirectory: {
         type: BooleanConstructor;
@@ -320,7 +326,7 @@ declare const _default: import("vue").DefineComponent<{
     headers: {
         [key: string]: any;
     };
-    drop: boolean;
+    drop: string | boolean | HTMLElement | null;
     modelValue: VueUploadItem[];
     disabled: boolean;
     multiple: boolean;

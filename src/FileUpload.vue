@@ -217,7 +217,10 @@ export default defineComponent({
       default: 0,
     },
     drop: {
-      default: false,
+      type: [Boolean, String, HTMLElement] as PropType<boolean | string | HTMLElement | null>,
+      default: () => {
+        return false
+      },
     },
     dropDirectory: {
       type: Boolean,
