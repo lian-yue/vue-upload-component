@@ -516,7 +516,7 @@ Custom upload method
 
 * **Default:** `undefined`
 
-* **Details:**  
+* **Details:**
 
   `custom-action` priority than `put-action, post-action`
 
@@ -799,7 +799,22 @@ Drag and drop upload
   <file-upload :drop="true"></file-upload>
   ```
 
+### drop-auto-hide-time
 
+Specify the seconds to automatically set `dropActive` to false.
+
+* **Type:** `Number`
+
+* **Default:** `1000`
+
+* **Details:**
+
+  If this property is set to `0` the `dropActive` will keep `true` until the user drop the file or leave the drop area. If set to a positive number then the `dropActive` will be set to `false` after the time specified in this property in seconds.
+
+* **Usage:**
+  ```html
+  <file-upload :drop-auto-hide-time="0"></file-upload>
+  ```
 
 
 

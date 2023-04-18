@@ -126,6 +126,11 @@ export default {
       default: false,
     },
 
+    dropAutoHideTime: {
+      type: Number,
+      default: 1000
+    },
+
     dropDirectory: {
       type: Boolean,
       default: true,
@@ -297,7 +302,7 @@ export default {
         this.$parent.$forceUpdate()
       }
     },
-    
+
 
     drop(value) {
       this.watchDrop(value)
@@ -1308,6 +1313,10 @@ export default {
     },
 
     watchDropActive(newDropActive, oldDropActive) {
+      if (this.dropAutoHideTime === 0) {
+        return
+      }
+
       if (newDropActive === oldDropActive) {
         return
       }
@@ -1316,7 +1325,7 @@ export default {
         this.dropTimeout = null
       }
       if (newDropActive) {
-        this.dropTimeout = setTimeout(this.onDocumentDrop, 1000);
+        this.dropTimeout = setTimeout(this.onDocumentDrop, this.dropAutoHide)
       }
     },
 
