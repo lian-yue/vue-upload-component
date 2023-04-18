@@ -764,21 +764,21 @@ All the options to handle chunk uploads
 * **Type:** `Object`
 
 * **Default:**
-```js
-{
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    action: '',
-    minSize: 1048576,
-    maxActive: 3,
-    maxRetries: 5,
+  ```js
+  {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      action: '',
+      minSize: 1048576,
+      maxActive: 3,
+      maxRetries: 5,
 
-    // This is the default Handler implemented in this package
-    // you can use your own handler if your protocol is different
-    handler: ChunkUploadDefaultHandler
-}
-```
+      // This is the default Handler implemented in this package
+      // you can use your own handler if your protocol is different
+      handler: ChunkUploadDefaultHandler
+  }
+  ```
 
 ### drop
 
