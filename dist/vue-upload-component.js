@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.22
+ * Version: 2.8.23
  * Author: LianYue
  */
 (function (global, factory) {
@@ -831,6 +831,11 @@
 
       drop: {
         default: false
+      },
+
+      dropAutoHideTime: {
+        type: Number,
+        default: 1000
       },
 
       dropDirectory: {
@@ -1980,6 +1985,10 @@
         }
       },
       watchDropActive: function watchDropActive(newDropActive, oldDropActive) {
+        if (this.dropAutoHideTime === 0) {
+          return;
+        }
+
         if (newDropActive === oldDropActive) {
           return;
         }
@@ -1988,7 +1997,7 @@
           this.dropTimeout = null;
         }
         if (newDropActive) {
-          this.dropTimeout = setTimeout(this.onDocumentDrop, 1000);
+          this.dropTimeout = setTimeout(this.onDocumentDrop, this.dropAutoHide);
         }
       },
       onDocumentDragenter: function onDocumentDragenter(e) {
@@ -2100,7 +2109,7 @@
   /* style */
   var __vue_inject_styles__$1 = function __vue_inject_styles__(inject) {
     if (!inject) return;
-    inject("data-v-939ffe40_0", { source: ".file-uploads{overflow:hidden;position:relative;text-align:center;display:inline-block}.file-uploads.file-uploads-html4 input,.file-uploads.file-uploads-html5 label{background:#fff;opacity:0;font-size:20em;z-index:1;top:0;left:0;right:0;bottom:0;position:absolute;width:100%;height:100%}.file-uploads.file-uploads-html4 label,.file-uploads.file-uploads-html5 input{background:rgba(255,255,255,0);overflow:hidden;position:fixed;width:1px;height:1px;z-index:-1;opacity:0}", map: undefined, media: undefined });
+    inject("data-v-03c451a0_0", { source: ".file-uploads{overflow:hidden;position:relative;text-align:center;display:inline-block}.file-uploads.file-uploads-html4 input,.file-uploads.file-uploads-html5 label{background:#fff;opacity:0;font-size:20em;z-index:1;top:0;left:0;right:0;bottom:0;position:absolute;width:100%;height:100%}.file-uploads.file-uploads-html4 label,.file-uploads.file-uploads-html5 input{background:rgba(255,255,255,0);overflow:hidden;position:fixed;width:1px;height:1px;z-index:-1;opacity:0}", map: undefined, media: undefined });
   };
   /* scoped */
   var __vue_scope_id__$1 = undefined;

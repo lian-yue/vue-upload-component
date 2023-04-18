@@ -1,6 +1,6 @@
 /*!
  * Name: vue-upload-component
- * Version: 2.8.22
+ * Version: 2.8.23
  * Author: LianYue
  */
 (function (global, factory) {
@@ -831,6 +831,11 @@
 
       drop: {
         default: false
+      },
+
+      dropAutoHideTime: {
+        type: Number,
+        default: 1000
       },
 
       dropDirectory: {
@@ -1980,6 +1985,10 @@
         }
       },
       watchDropActive: function watchDropActive(newDropActive, oldDropActive) {
+        if (this.dropAutoHideTime === 0) {
+          return;
+        }
+
         if (newDropActive === oldDropActive) {
           return;
         }
@@ -1988,7 +1997,7 @@
           this.dropTimeout = null;
         }
         if (newDropActive) {
-          this.dropTimeout = setTimeout(this.onDocumentDrop, 1000);
+          this.dropTimeout = setTimeout(this.onDocumentDrop, this.dropAutoHide);
         }
       },
       onDocumentDragenter: function onDocumentDragenter(e) {

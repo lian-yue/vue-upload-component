@@ -96,6 +96,7 @@
           :headers="headers"
           :data="data"
           :drop="drop"
+          :drop-auto-hide-time="dropAutoHideTime"
           :drop-directory="dropDirectory"
           :add-index="addIndex"
           v-model="files"
@@ -401,6 +402,7 @@ export default {
       multiple: true,
       directory: false,
       drop: true,
+      dropAutoHideTime: 2000,
       dropDirectory: true,
       addIndex: false,
       thread: 3,

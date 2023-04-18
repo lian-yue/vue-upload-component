@@ -516,7 +516,7 @@ Custom upload method
 
 * **Default:** `undefined`
 
-* **Details:**  
+* **Details:**
 
   `custom-action` priority than `put-action, post-action`
 
@@ -764,21 +764,21 @@ All the options to handle chunk uploads
 * **Type:** `Object`
 
 * **Default:**
-```js
-{
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    action: '',
-    minSize: 1048576,
-    maxActive: 3,
-    maxRetries: 5,
+  ```js
+  {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      action: '',
+      minSize: 1048576,
+      maxActive: 3,
+      maxRetries: 5,
 
-    // This is the default Handler implemented in this package
-    // you can use your own handler if your protocol is different
-    handler: ChunkUploadDefaultHandler
-}
-```
+      // This is the default Handler implemented in this package
+      // you can use your own handler if your protocol is different
+      handler: ChunkUploadDefaultHandler
+  }
+  ```
 
 ### drop
 
@@ -799,7 +799,22 @@ Drag and drop upload
   <file-upload :drop="true"></file-upload>
   ```
 
+### drop-auto-hide-time
 
+Specify the seconds to automatically set `dropActive` to false.
+
+* **Type:** `Number`
+
+* **Default:** `1000`
+
+* **Details:**
+
+  If this property is set to `0` the `dropActive` will keep `true` until the user drop the file or leave the drop area. If set to a positive number then the `dropActive` will be set to `false` after the time specified in this property in seconds.
+
+* **Usage:**
+  ```html
+  <file-upload :drop-auto-hide-time="0"></file-upload>
+  ```
 
 
 
