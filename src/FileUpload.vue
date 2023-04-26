@@ -34,6 +34,7 @@
 .file-uploads.file-uploads-html5 input,
 .file-uploads.file-uploads-html4 label {
   /* background fix ie  click */
+  position: absolute;
   background: rgba(255, 255, 255, 0);
   overflow: hidden;
   position: fixed;
