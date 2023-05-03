@@ -1504,10 +1504,11 @@ export default defineComponent({
       // 移除挂载
       if (this.dropElement) {
         try {
-          document.removeEventListener('dragenter', this.onDocumentDragenter, false)
-          document.removeEventListener('dragleave', this.onDocumentDragleave, false)
-          document.removeEventListener('dragover', this.onDocumentDragover, false)
-          document.removeEventListener('drop', this.onDocumentDrop, false)
+          this.dropElement.removeEventListener('dragenter', this.onDocumentDragenter, false)
+          this.dropElement.removeEventListener('dragleave', this.onDocumentDragleave, false)
+          this.dropElement.removeEventListener('dragover', this.onDocumentDragover, false)
+          this.dropElement.removeEventListener('drop', this.onDocumentDrop, false)
+          
           this.dropElement.removeEventListener('dragover', this.onDragover, false)
           this.dropElement.removeEventListener('drop', this.onDrop, false)
         } catch (e) {
@@ -1537,10 +1538,11 @@ export default defineComponent({
       this.dropElement = el
 
       if (this.dropElement) {
-        document.addEventListener('dragenter', this.onDocumentDragenter, false)
-        document.addEventListener('dragleave', this.onDocumentDragleave, false)
-        document.addEventListener('dragover', this.onDocumentDragover, false)
-        document.addEventListener('drop', this.onDocumentDrop, false)
+        this.dropElement.addEventListener('dragenter', this.onDocumentDragenter, false)
+        this.dropElement.addEventListener('dragleave', this.onDocumentDragleave, false)
+        this.dropElement.addEventListener('dragover', this.onDocumentDragover, false)
+        this.dropElement.addEventListener('drop', this.onDocumentDrop, false)
+        
         this.dropElement.addEventListener('dragover', this.onDragover, false)
         this.dropElement.addEventListener('drop', this.onDrop, false)
       }
