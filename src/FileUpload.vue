@@ -158,6 +158,9 @@ export interface VueUploadItem {
 
 
 export default defineComponent({
+  compatConfig: {
+    MODE: 3,
+  },
   props: {
     inputId: {
       type: String,
