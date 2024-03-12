@@ -99,6 +99,34 @@ configMin.output.file = 'dist/vue-upload-component.min.js'
 
 
 
+
+
+
+
+let configEsm = baseConfig(false, false, false)
+configEsm.output.file = 'dist/vue-upload-component.esm.js'
+
+let configEsmPart = baseConfig(true, false, false)
+configEsmPart.output.file = 'dist/vue-upload-component.esm.part.js'
+
+let configEsmSSR = baseConfig(false, true, false)
+configEsmSSR.output.file = 'dist/vue-upload-component.esm.ssr.js'
+
+let configEsmUmd = baseConfig(false, false, false)
+configEsmUmd.input = configEsm.output.file
+configEsmUmd.output.file = configEsm.output.file
+
+let configEsmPartUmd = baseConfig(false, false, false)
+configEsmPartUmd.input = configEsmPart.output.file
+configEsmPartUmd.output.file = configEsmPart.output.file
+
+
+let configEsmMin = baseConfig(false, false, false, true)
+configEsmMin.input = configEsm.output.file
+configEsmMin.output.file = 'dist/vue-upload-component.esm.min.js'
+
+
+
 module.exports = [
   config,
   configPart,
@@ -106,4 +134,11 @@ module.exports = [
   configUmd,
   configPartUmd,
   configMin,
+
+  configEsm,
+  configEsmPart,
+  configEsmSSR,
+  configEsmUmd,
+  configEsmPartUmd,
+  configEsmMin,
 ]
