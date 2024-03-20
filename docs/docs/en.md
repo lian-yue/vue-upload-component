@@ -612,7 +612,7 @@ File List
 
 * **Usage:**
   ```html
-  <file-upload :value="files" @input="updatetValue"></file-upload>
+  <file-upload :value="files" @input="updatedValue"></file-upload>
   <!--or-->
   <file-upload v-model="files"></file-upload>
   ```
@@ -882,7 +882,7 @@ Default for `v-model` binding
 * **Usage:**
   ```html
   <template>
-    <file-upload :value="files" @input="updatetValue"></file-upload>
+    <file-upload :value="files" @input="updatedValue"></file-upload>
     <!--or-->
     <file-upload v-model="files"></file-upload>
   </template>
@@ -894,7 +894,7 @@ Default for `v-model` binding
       }
     },
     methods: {
-      updatetValue(value) {
+      updatedValue(value) {
         this.files = value
       }
     }
