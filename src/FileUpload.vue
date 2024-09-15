@@ -700,8 +700,8 @@ export default {
     // 预处理 事件 过滤器
     emitFilter(newFile, oldFile) {
       let isPrevent = false
-      this.$emit('input-filter', newFile, oldFile, function () {
-        isPrevent = true
+      this.$emit('input-filter', newFile, oldFile, function (prevent) {
+        isPrevent = typeof prevent === 'undefined' || !!prevent
         return isPrevent
       })
       return isPrevent
