@@ -34,7 +34,7 @@ export default withVueTs(
       'guard-for-in': 'off',
       'max-params': ['error', 10],
       'no-console': 'off',
-      'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+      'no-debugger': 'error',
       'vue/multi-word-component-names': 'off',
       '@typescript-eslint/explicit-member-accessibility': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',

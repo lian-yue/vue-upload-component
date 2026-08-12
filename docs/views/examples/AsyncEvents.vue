@@ -1,6 +1,6 @@
 <template>
     <div class="example-simple">
-        <h1 id="example-title" class="example-title">Simple Example</h1>
+        <h1 id="example-title" class="example-title">Async Events Example</h1>
         <div class="upload">
             <ul>
                 <li v-for="file in files" :key="file.id">
@@ -48,7 +48,7 @@
 <script>
 import { ref } from "vue";
 import FileUpload from "vue-upload-component";
-import CryptoJS from "crypto-js";
+import SparkMD5 from "spark-md5";
 import { fileTypeFromBuffer } from "file-type";
 
 export default {
@@ -140,13 +140,9 @@ export default {
                 const reader = new FileReader();
 
                 // 读取完成后处理
-                reader.onloadend = function () {
-                    // 将结果转换为 WordArray
-                    const wordArray = CryptoJS.lib.WordArray.create(reader.result);
-
+                reader.onload = function () {
                     // 计算 MD5
-                    const md5 = CryptoJS.MD5(wordArray).toString();
-                    resolve(md5);
+                    resolve(SparkMD5.ArrayBuffer.hash(reader.result));
                 };
 
                 // 读取错误处理

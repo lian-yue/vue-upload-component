@@ -421,7 +421,7 @@ input标签的 `name` 属性
 
 
 
-### value, v-model
+### model-value, v-model
 
 文件列表
 
@@ -436,7 +436,7 @@ input标签的 `name` 属性
 
 * **示例:**
   ```html
-  <file-upload :value="files" @input="updatetValue"></file-upload>
+  <file-upload :model-value="files" @update:model-value="updateValue"></file-upload>
   <!--或-->
   <file-upload v-model="files"></file-upload>
   ```
@@ -664,7 +664,7 @@ input标签的 `name` 属性
 文件被改变触发的方法  
 默认用于`v-model`绑定
 
-### @input
+### @update:model-value
 * **参数:**
 
   * `files: Array<File | Object>`
@@ -673,7 +673,7 @@ input标签的 `name` 属性
 * **示例:**
   ```html
   <template>
-    <file-upload :value="files" @input="updatetValue"></file-upload>
+    <file-upload :model-value="files" @update:model-value="updateValue"></file-upload>
     <!--或者-->
     <file-upload v-model="files"></file-upload>
   </template>
@@ -685,7 +685,7 @@ input标签的 `name` 属性
       }
     },
     methods: {
-      updatetValue(value) {
+      updateValue(value) {
         this.files = value
       }
     }
@@ -728,7 +728,7 @@ Add, update, remove pre-filter
         <img :src="file.blob" width="50" height="50" />
       </li>
     </ul>
-    <file-upload :value="files" @input-filter="inputFilter"></file-upload>
+    <file-upload :model-value="files" @input-filter="inputFilter"></file-upload>
   </template>
   <script>
   export default {

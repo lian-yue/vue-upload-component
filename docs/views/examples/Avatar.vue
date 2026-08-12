@@ -52,7 +52,14 @@
 }
 .example-avatar .avatar-edit-image {
   max-width: 100%;
-  max-height: 80vh;
+  height: 80vh;
+}
+.example-avatar .avatar-edit-image img {
+  max-width: 100%;
+  max-height: 100%;
+}
+.example-avatar .avatar-edit-image cropper-canvas {
+  height: 100%;
 }
 
 
@@ -107,10 +114,26 @@ export default {
           if (!this.$refs.editImage) {
             return
           }
-          let cropper = new Cropper(this.$refs.editImage, {
-            aspectRatio: 1 / 1,
-            viewMode: 1,
-          })
+          const cropper = new Cropper(this.$refs.editImage)
+          const selection = cropper.getCropperSelection()
+          const cropperImage = cropper.getCropperImage()
+          if (selection) {
+            selection.aspectRatio = 1
+            selection.initialAspectRatio = 1
+            const setSquareSelection = () => {
+              const size = Math.min(selection.width, selection.height)
+              if (size > 0) {
+                selection.$change(
+                  selection.x + (selection.width - size) / 2,
+                  selection.y + (selection.height - size) / 2,
+                  size,
+                  size,
+                  1,
+                )
+              }
+            }
+            cropperImage ? cropperImage.$ready(setSquareSelection) : setSquareSelection()
+          }
           this.cropper = cropper
         })
       } else {
@@ -123,25 +146,32 @@ export default {
   },
 
   methods: {
-    editSave() {
-      this.edit = false
-
-      let oldFile = this.files[0]
-
-      let binStr = atob(this.cropper.getCroppedCanvas().toDataURL(oldFile.type).split(',')[1])
-      let arr = new Uint8Array(binStr.length)
-      for (let i = 0; i < binStr.length; i++) {
-        arr[i] = binStr.charCodeAt(i)
+    async editSave() {
+      const oldFile = this.files[0]
+      const selection = this.cropper && this.cropper.getCropperSelection()
+      if (!oldFile || !selection) {
+        return
       }
 
-      let file = new File([arr], oldFile.name, { type: oldFile.type })
+      try {
+        const canvas = await selection.$toCanvas()
+        const blob = await new Promise((resolve, reject) => {
+          canvas.toBlob((result) => {
+            result ? resolve(result) : reject(new Error('crop'))
+          }, oldFile.type)
+        })
+        const file = new File([blob], oldFile.name, { type: blob.type || oldFile.type })
 
-      this.$refs.upload.update(oldFile.id, {
-        file,
-        type: file.type,
-        size: file.size,
-        active: true,
-      })
+        this.$refs.upload.update(oldFile.id, {
+          file,
+          type: file.type,
+          size: file.size,
+          active: true,
+        })
+        this.edit = false
+      } catch (error) {
+        this.alert(error.message || 'crop')
+      }
     },
 
     alert(message) {

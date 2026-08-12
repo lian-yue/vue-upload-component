@@ -9,9 +9,6 @@
 .*
 *.dev.js
 !.gitignore
-!.eslintrc*
-!.eslintrc.js
-!.eslintignore
 !.babelrc
 !.flowconfig
 !.vscode

@@ -108,14 +108,16 @@ class ChunkUploadHandler {
    * Gets the max retries from options
    */
   get maxRetries() {
-    return parseInt(this.options.maxRetries, 10)
+    const value = parseInt(this.options.maxRetries, 10);
+    return Number.isFinite(value) && value >= 0 ? value : 0
   }
 
   /**
    * Gets the max number of active chunks being uploaded at once from options
    */
   get maxActiveChunks() {
-    return parseInt(this.options.maxActive, 10)
+    const value = parseInt(this.options.maxActive, 10);
+    return Number.isFinite(value) && value > 0 ? value : 1
   }
 
   /**
@@ -178,7 +180,7 @@ class ChunkUploadHandler {
    * Whether it's ready to upload files or not
    */
   get readyToUpload() {
-    return !!this.chunks
+    return this.chunks.length > 0
   }
 
   /**
@@ -300,7 +302,11 @@ class ChunkUploadHandler {
       this.resolve = resolve;
       this.reject = reject;
     });
-    this.start();
+    try {
+      this.start();
+    } catch (error) {
+      this.reject(error);
+    }
 
     return this.promise
   }
@@ -310,24 +316,35 @@ class ChunkUploadHandler {
    * Sends a request to the backend to initialise the chunks
    */
   start() {
+    if (!this.action) {
+      return this.reject('action')
+    }
+
     request({
       method: 'POST',
       headers: { ...this.headers, 'Content-Type': 'application/json'},
       url: this.action,
-      body: Object.assign(this.startBody, {
+      body: {
+        ...this.startBody,
         phase: 'start',
         mime_type: this.fileType,
         size: this.fileSize,
         name: this.fileName
-      })
+      }
     }).then(res => {
       if (res.status !== 'success') {
         this.file.response = res;
         return this.reject('server')
       }
 
+      const chunkSize = Number(res.data?.end_offset);
+      if (!Number.isFinite(chunkSize) || chunkSize <= 0) {
+        this.file.response = res;
+        return this.reject('server')
+      }
+
       this.sessionId = res.data.session_id;
-      this.chunkSize = res.data.end_offset;
+      this.chunkSize = chunkSize;
 
       this.createChunks();
       this.startChunking();
@@ -390,12 +407,13 @@ class ChunkUploadHandler {
       }
     }, false);
 
-    sendFormRequest(chunk.xhr, Object.assign(this.uploadBody, {
+    sendFormRequest(chunk.xhr, {
+      ...this.uploadBody,
       phase: 'upload',
       session_id: this.sessionId,
       start_offset: chunk.startOffset,
       chunk: chunk.blob
-    })).then(res => {
+    }).then(res => {
       chunk.active = false;
       if (res.status === 'success') {
         chunk.uploaded = true;
@@ -430,10 +448,11 @@ class ChunkUploadHandler {
       method: 'POST',
       headers: { ...this.headers, 'Content-Type': 'application/json' },
       url: this.action,
-      body: Object.assign(this.finishBody, {
+      body: {
+        ...this.finishBody,
         phase: 'finish',
         session_id: this.sessionId
-      })
+      }
     }).then(res => {
       this.file.response = res;
       if (res.status !== 'success') {
@@ -584,7 +603,7 @@ var script = defineComponent({
         chunk: {
             type: Object,
             default: () => {
-                return CHUNK_DEFAULT_OPTIONS;
+                return { ...CHUNK_DEFAULT_OPTIONS, headers: {} };
             }
         }
     },
@@ -693,7 +712,7 @@ var script = defineComponent({
             return true;
         },
         chunkOptions() {
-            return Object.assign(CHUNK_DEFAULT_OPTIONS, this.chunk);
+            return { ...CHUNK_DEFAULT_OPTIONS, ...this.chunk };
         },
         className() {
             return [
@@ -957,7 +976,6 @@ var script = defineComponent({
         // 添加表单文件
         addInputFile(el) {
             const files = [];
-            this.iMaximum;
             // @ts-ignore
             const entrys = el.webkitEntries || el.entries || undefined;
             if (entrys?.length) {
@@ -1321,7 +1339,7 @@ var script = defineComponent({
         uploadChunk(file) {
             const HandlerClass = this.chunkOptions.handler;
             file.chunk = new HandlerClass(file, this.chunkOptions);
-            return file.chunk.upload().then((res) => { return file; });
+            return file.chunk.upload().then(() => file);
         },
         uploadPut(file) {
             const querys = [];
@@ -1483,7 +1501,12 @@ var script = defineComponent({
                     if (xhr.responseText) {
                         const contentType = xhr.getResponseHeader('Content-Type');
                         if (contentType && contentType.indexOf('/json') !== -1) {
-                            data.response = JSON.parse(xhr.responseText);
+                            try {
+                                data.response = JSON.parse(xhr.responseText);
+                            }
+                            catch {
+                                data.response = xhr.responseText;
+                            }
                         }
                         else {
                             data.response = xhr.responseText;
@@ -1862,7 +1885,7 @@ var script = defineComponent({
             this.dropActive = false;
             this.watchDropActive(false);
         },
-        onDragenter(e) {
+        onDragenter() {
             if (!this.dropActive || this.dropElementActive) {
                 return;
             }
@@ -1906,7 +1929,6 @@ var script = defineComponent({
             if (!(e.target instanceof HTMLInputElement)) {
                 return Promise.reject(new Error("not HTMLInputElement"));
             }
-            e.target;
             const reinput = (res) => {
                 this.reload = true;
                 // @ts-ignore

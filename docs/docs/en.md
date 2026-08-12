@@ -597,7 +597,7 @@ Attach `header` data
 
 
 
-### value, v-model
+### model-value, v-model
 
 File List
 
@@ -612,7 +612,7 @@ File List
 
 * **Usage:**
   ```html
-  <file-upload :value="files" @input="updatetValue"></file-upload>
+  <file-upload :model-value="files" @update:model-value="updateValue"></file-upload>
   <!--or-->
   <file-upload v-model="files"></file-upload>
   ```
@@ -873,7 +873,7 @@ Whether to open the drag directory
 The files is changed to trigger the method
 Default for `v-model` binding
 
-### @input
+### @update:model-value
 * **Arguments:**
 
   * `files: Array<File | Object>`
@@ -882,7 +882,7 @@ Default for `v-model` binding
 * **Usage:**
   ```html
   <template>
-    <file-upload :value="files" @input="updatetValue"></file-upload>
+    <file-upload :model-value="files" @update:model-value="updateValue"></file-upload>
     <!--or-->
     <file-upload v-model="files"></file-upload>
   </template>
@@ -894,7 +894,7 @@ Default for `v-model` binding
       }
     },
     methods: {
-      updatetValue(value) {
+      updateValue(value) {
         this.files = value
       }
     }
@@ -936,7 +936,7 @@ Add, update, remove pre-filter
         <img :src="file.blob" width="50" height="50" />
       </li>
     </ul>
-    <file-upload :value="files" @input-filter="inputFilter"></file-upload>
+    <file-upload :model-value="files" @input-filter="inputFilter"></file-upload>
   </template>
   <script>
   export default {

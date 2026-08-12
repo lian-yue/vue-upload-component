@@ -48,17 +48,6 @@ module.exports = {
       '.md',
     ],
   },
-  externals: {
-    // vue: 'Vue',
-    // vuex: 'Vuex',
-    // 'vue-router': 'VueRouter',
-    // 'vue-i18n': 'VueI18n',
-    'marked': 'marked',
-    'highlight.js': 'hljs',
-    'cropperjs': 'Cropper',
-    'crypto-js': 'CryptoJS',
-  },
-
   // cache: false,
   devServer: {
     hot: true,

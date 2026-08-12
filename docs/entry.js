@@ -1,68 +1,66 @@
 import { createApp, h } from 'vue'
-import marked from 'marked'
+import { marked, Renderer as MarkedRenderer } from 'marked'
 import highlightjs from 'highlight.js'
+import 'highlight.js/styles/atom-one-light.css'
 import store from './store'
 import router from './router'
 import i18n from './i18n'
 import App from './views/App'
-import { stringifyQuery } from 'vue-router'
 
-class Renderer extends marked.Renderer {
-  heading(text, level, raw) {
-    let rawName = raw.toLowerCase().replace(/([\u0000-\u002F\u003A-\u0060\u007B-\u007F]+)/g, '-').replace(/^\-+|\-+$/, '')
+class Renderer extends MarkedRenderer {
+  constructor() {
+    super()
+    this.headers = []
+  }
 
-    if (!this.options.headers) {
-      this.options.headers = []
+  heading({ text, tokens, depth }) {
+    const rawName = text.toLowerCase().replace(/([\u0000-\u002F\u003A-\u0060\u007B-\u007F]+)/g, '-').replace(/^-+|-+$/g, '')
+
+    while (this.headers.length >= depth) {
+      this.headers.pop()
     }
-    while (this.options.headers.length >= level) {
-      this.options.headers.pop()
-    }
-    let parent = this.options.headers.filter(value => !!value).join('-')
+    let parent = this.headers.filter(value => !!value).join('-')
     if (parent) {
       parent = parent + '-'
     }
-    while (this.options.headers.length < (level - 1)) {
-      this.options.headers.push('')
+    while (this.headers.length < (depth - 1)) {
+      this.headers.push('')
     }
-    this.options.headers.push(rawName)
+    this.headers.push(rawName)
+    const content = this.parser.parseInline(tokens)
     return '<h' +
-      level +
+      depth +
       ' id="' +
-      this.options.headerPrefix +
       parent +
       rawName +
       '">' +
-      text +
+      content +
       '</h' +
-      level +
+      depth +
       '>\n'
+  }
+
+  code({ text, lang }) {
+    const language = lang && highlightjs.getLanguage(lang) ? lang : ''
+    const code = language
+      ? highlightjs.highlight(text, { language }).value
+      : highlightjs.highlightAuto(text).value
+    const languageClass = language ? ' language-' + language : ''
+    return '<pre><code class="hljs' + languageClass + '">' + code + '</code></pre>\n'
   }
 }
 
+const renderer = new Renderer()
 marked.setOptions({
-  renderer: new Renderer(),
+  renderer,
   gfm: true,
-  tables: true,
   breaks: false,
-  pedantic: false,
-  sanitize: false,
-  smartLists: true,
-  smartypants: false,
-  highlight(code, lang) {
-    if (lang) {
-      return highlightjs.highlight(lang, code).value
-    } else {
-      return highlightjs.highlightAuto(code).value
-    }
-  }
 })
 
-
-
-
-
-
-
+function renderMarkdown(text) {
+  renderer.headers = []
+  return marked.parse(text)
+}
 const app = createApp({
   render() {
     return h(App)
@@ -104,7 +102,7 @@ app.directive('markdown', {
 
 
     el.markdown = text
-    el.innerHTML = marked(text)
+    el.innerHTML = renderMarkdown(text)
     let selectorList = el.querySelectorAll('a')
     for (let i = 0; i < selectorList.length; i++) {
       selectorList[i].onclick = function(e) {
@@ -158,7 +156,7 @@ app.directive('markdown', {
     }
 
     el.markdown = text
-    el.innerHTML = marked(text)
+    el.innerHTML = renderMarkdown(text)
     let selectorList = el.querySelectorAll('a')
     for (let i = 0; i < selectorList.length; i++) {
       selectorList[i].onclick = function(e) {

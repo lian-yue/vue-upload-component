@@ -302,16 +302,16 @@
 
                 <div class="edit-image-tool">
                   <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-primary" @click="editFile.cropper.rotate(-90)"
-                      title="cropper.rotate(-90)"><i class="fa fa-undo" aria-hidden="true"></i></button>
-                    <button type="button" class="btn btn-primary" @click="editFile.cropper.rotate(90)"
-                      title="cropper.rotate(90)"><i class="fa fa-repeat" aria-hidden="true"></i></button>
+                    <button type="button" class="btn btn-primary" @click="onEditFileRotate(-90)"
+                      title="cropperImage.$rotate('-90deg')"><i class="fa fa-undo" aria-hidden="true"></i></button>
+                    <button type="button" class="btn btn-primary" @click="onEditFileRotate(90)"
+                      title="cropperImage.$rotate('90deg')"><i class="fa fa-repeat" aria-hidden="true"></i></button>
                   </div>
                   <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-primary" @click="editFile.cropper.crop()"
-                      title="cropper.crop()"><i class="fa fa-check" aria-hidden="true"></i></button>
-                    <button type="button" class="btn btn-primary" @click="editFile.cropper.clear()"
-                      title="cropper.clear()"><i class="fa fa-remove" aria-hidden="true"></i></button>
+                    <button type="button" class="btn btn-primary" @click="onEditFileCrop(true)"
+                      title="cropperSelection.$reset()"><i class="fa fa-check" aria-hidden="true"></i></button>
+                    <button type="button" class="btn btn-primary" @click="onEditFileCrop(false)"
+                      title="cropperSelection.hidden = true"><i class="fa fa-remove" aria-hidden="true"></i></button>
                   </div>
                 </div>
               </div>
@@ -371,8 +371,17 @@
 }
 
 
+.example-full .edit-image {
+  height: 60vh;
+}
+
 .example-full .edit-image img {
   max-width: 100%;
+  max-height: 100%;
+}
+
+.example-full .edit-image cropper-canvas {
+  height: 100%;
 }
 
 .example-full .edit-image-tool {
@@ -481,6 +490,10 @@ export default {
       // 关闭了 自动删除 error
       if (!newValue && oldValue) {
         this.$refs.upload.update(this.editFile.id, { error: this.editFile.error || '' })
+        if (this.editFile.cropper) {
+          this.editFile.cropper.destroy()
+          this.editFile.cropper = null
+        }
       }
 
       if (newValue) {
@@ -488,9 +501,13 @@ export default {
           if (!this.$refs.editImage) {
             return
           }
-          let cropper = new Cropper(this.$refs.editImage, {
-            autoCrop: false,
-          })
+          const cropper = new Cropper(this.$refs.editImage)
+          const selection = cropper.getCropperSelection()
+          const cropperImage = cropper.getCropperImage()
+          if (selection) {
+            const clearSelection = () => selection.$clear()
+            cropperImage ? cropperImage.$ready(clearSelection) : clearSelection()
+          }
           this.editFile = {
             ...this.editFile,
             cropper
@@ -539,6 +556,7 @@ export default {
                 newFile.magic = newFile.magic || {}
                 this.$refs.upload.add(newFile);
               } catch (e) {
+                newFile.magic = {}
                 newFile.error = e.code || e.error || e.message || e
                 this.$refs.upload.add(newFile);
               }
@@ -590,7 +608,7 @@ export default {
         img.onload = () => {
           this.$refs.upload.update(newFile, { error: '', height: img.height, width: img.width })
         }
-        img.οnerrοr = (e) => {
+        img.onerror = () => {
           this.$refs.upload.update(newFile, { error: 'parsing image size' })
         }
         img.src = newFile.blob
@@ -655,7 +673,7 @@ export default {
       this.$refs.upload.update(file, { error: 'edit' })
     },
 
-    onEditorFile() {
+    async onEditorFile() {
       if (!this.$refs.upload.features.html5) {
         this.alert('Your browser does not support')
         this.editFile.show = false
@@ -666,18 +684,39 @@ export default {
         name: this.editFile.name,
         error: '',
       }
-      if (this.editFile.cropper) {
-        let binStr = atob(this.editFile.cropper.getCroppedCanvas().toDataURL(this.editFile.type).split(',')[1])
-        let arr = new Uint8Array(binStr.length)
-        for (let i = 0; i < binStr.length; i++) {
-          arr[i] = binStr.charCodeAt(i)
+      const selection = this.editFile.cropper && this.editFile.cropper.getCropperSelection()
+      if (selection && !selection.hidden) {
+        try {
+          const canvas = await selection.$toCanvas()
+          const blob = await new Promise((resolve, reject) => {
+            canvas.toBlob((result) => {
+              result ? resolve(result) : reject(new Error('crop'))
+            }, this.editFile.type)
+          })
+          data.file = new File([blob], data.name, { type: blob.type || this.editFile.type })
+          data.size = data.file.size
+        } catch (error) {
+          this.alert(error.message || 'crop')
+          return
         }
-        data.file = new File([arr], data.name, { type: this.editFile.type })
-        data.size = data.file.size
       }
       this.$refs.upload.update(this.editFile.id, data)
       this.editFile.error = ''
       this.editFile.show = false
+    },
+
+    onEditFileRotate(angle) {
+      const cropperImage = this.editFile.cropper && this.editFile.cropper.getCropperImage()
+      if (cropperImage) {
+        cropperImage.$rotate(angle + 'deg')
+      }
+    },
+
+    onEditFileCrop(show) {
+      const selection = this.editFile.cropper && this.editFile.cropper.getCropperSelection()
+      if (selection) {
+        show ? selection.$reset() : selection.$clear()
+      }
     },
 
     // add folder

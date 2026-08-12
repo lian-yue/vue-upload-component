@@ -45,7 +45,7 @@
 }
 </style>
 <script lang="ts">
-import { PropType, defineComponent, h } from "vue";
+import { PropType, defineComponent } from "vue";
 
 // @ts-ignore
 import ChunkUploadDefaultHandler from './chunk/ChunkUploadHandler.js'
@@ -66,6 +66,9 @@ export interface ChunkOptions {
   maxActive: number;
   maxRetries: number;
   handler: any;
+  startBody?: { [key: string]: any };
+  uploadBody?: { [key: string]: any };
+  finishBody?: { [key: string]: any };
 }
 
 export interface Data {
@@ -134,13 +137,13 @@ export interface VueUploadItem {
   headers?: { [key: string]: any }
 
   // 响应信息
-  response?: { [key: string]: any };
+  response?: { [key: string]: any } | string;
 
   // 进度
   progress?: string;          // 只读
 
   // 速度
-  speed?: 0; // 只读
+  speed?: number; // 只读
 
   // xhr 信息
   file?: Blob; // 只读
@@ -261,9 +264,9 @@ export default defineComponent({
     },
     // Chunk upload properties
     chunk: {
-      type: Object as PropType<{ headers?: { [key: string]: any }; action?: string; minSize?: number; maxActive?: number; maxRetries?: number; handler?: any; }>,
+      type: Object as PropType<Partial<ChunkOptions>>,
       default: (): ChunkOptions => {
-        return CHUNK_DEFAULT_OPTIONS
+        return { ...CHUNK_DEFAULT_OPTIONS, headers: {} }
       }
     }
   },
@@ -374,7 +377,7 @@ export default defineComponent({
       return true
     },
     chunkOptions(): ChunkOptions {
-      return Object.assign(CHUNK_DEFAULT_OPTIONS, this.chunk)
+      return { ...CHUNK_DEFAULT_OPTIONS, ...this.chunk }
     },
     className(): Array<string | undefined> {
       return [
@@ -635,7 +638,6 @@ export default defineComponent({
     // 添加表单文件
     addInputFile(el: HTMLInputElement): Promise<VueUploadItem[]> {
       const files: Array<VueUploadItem | File> = []
-      const maximumValue = this.iMaximum
 
 
 
@@ -1019,7 +1021,7 @@ export default defineComponent({
     uploadChunk(file: VueUploadItem): Promise<VueUploadItem> {
       const HandlerClass = this.chunkOptions.handler
       file.chunk = new HandlerClass(file, this.chunkOptions)
-      return file.chunk.upload().then((res: any) => { return file })
+      return file.chunk.upload().then(() => file)
     },
     uploadPut(file: VueUploadItem): Promise<VueUploadItem> {
       const querys = []
@@ -1193,7 +1195,11 @@ export default defineComponent({
           if (xhr.responseText) {
             const contentType = xhr.getResponseHeader('Content-Type')
             if (contentType && contentType.indexOf('/json') !== -1) {
-              data.response = JSON.parse(xhr.responseText)
+              try {
+                data.response = JSON.parse(xhr.responseText)
+              } catch {
+                data.response = xhr.responseText
+              }
             } else {
               data.response = xhr.responseText
             }
@@ -1625,7 +1631,7 @@ export default defineComponent({
       this.watchDropActive(false)
     },
 
-    onDragenter(e: DragEvent) {
+    onDragenter() {
       if (!this.dropActive || this.dropElementActive) {
         return
       }
@@ -1675,7 +1681,6 @@ export default defineComponent({
       if (!(e.target instanceof HTMLInputElement)) {
         return Promise.reject(new Error("not HTMLInputElement"))
       }
-      const target = e.target
       const reinput = (res: any) => {
         this.reload = true
         // @ts-ignore

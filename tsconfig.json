@@ -3,6 +3,8 @@
         "target": "es2020",
         "module": "esnext",
         "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
         "jsx": "preserve",
         "importHelpers": true,
         "moduleResolution": "bundler",

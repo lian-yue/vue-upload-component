@@ -28,10 +28,6 @@ let examples = [{
     component: FullExampleComponent,
   },
   {
-    path: '',
-    component: SimpleExampleComponent,
-  },
-  {
     path: 'simple',
     component: SimpleExampleComponent,
   },
@@ -74,7 +70,7 @@ const router = createRouter({
     } else if (to.hash) {
       return { el: to.hash, top: document.querySelector('#header').offsetHeight }
     } else {
-      return { x: 0, y: 0 }
+      return { left: 0, top: 0 }
     }
   },
   routes: [{

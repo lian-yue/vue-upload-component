@@ -8,6 +8,15 @@ export interface ChunkOptions {
     maxActive: number;
     maxRetries: number;
     handler: any;
+    startBody?: {
+        [key: string]: any;
+    };
+    uploadBody?: {
+        [key: string]: any;
+    };
+    finishBody?: {
+        [key: string]: any;
+    };
 }
 export interface Data {
     active: boolean;
@@ -49,9 +58,9 @@ export interface VueUploadItem {
     };
     response?: {
         [key: string]: any;
-    };
+    } | string;
     progress?: string;
-    speed?: 0;
+    speed?: number;
     file?: Blob;
     xhr?: XMLHttpRequest;
     el?: HTMLInputElement;
@@ -146,16 +155,7 @@ declare const _default: import("vue").DefineComponent<import("vue").ExtractPropT
         default: boolean;
     };
     chunk: {
-        type: PropType<{
-            headers?: {
-                [key: string]: any;
-            };
-            action?: string;
-            minSize?: number;
-            maxActive?: number;
-            maxRetries?: number;
-            handler?: any;
-        }>;
+        type: PropType<Partial<ChunkOptions>>;
         default: () => ChunkOptions;
     };
 }>, {}, Data, {
@@ -214,7 +214,7 @@ declare const _default: import("vue").DefineComponent<import("vue").ExtractPropT
     onDocumentDragleave(e: DragEvent): void;
     onDocumentDragover(): void;
     onDocumentDrop(): void;
-    onDragenter(e: DragEvent): void;
+    onDragenter(): void;
     onDragleave(e: DragEvent): void;
     onDragover(e: DragEvent): void;
     onDrop(e: DragEvent): void;
@@ -308,16 +308,7 @@ declare const _default: import("vue").DefineComponent<import("vue").ExtractPropT
         default: boolean;
     };
     chunk: {
-        type: PropType<{
-            headers?: {
-                [key: string]: any;
-            };
-            action?: string;
-            minSize?: number;
-            maxActive?: number;
-            maxRetries?: number;
-            handler?: any;
-        }>;
+        type: PropType<Partial<ChunkOptions>>;
         default: () => ChunkOptions;
     };
 }>> & Readonly<{
@@ -344,15 +335,6 @@ declare const _default: import("vue").DefineComponent<import("vue").ExtractPropT
     modelValue: VueUploadItem[];
     thread: number;
     chunkEnabled: boolean;
-    chunk: {
-        headers?: {
-            [key: string]: any;
-        };
-        action?: string;
-        minSize?: number;
-        maxActive?: number;
-        maxRetries?: number;
-        handler?: any;
-    };
+    chunk: Partial<ChunkOptions>;
 }, {}, {}, {}, string, import("vue").ComponentProvideOptions, true, {}, any>;
 export default _default;

@@ -20,7 +20,7 @@
           accept="image/png,image/gif,image/jpeg,image/webp"
           :multiple="true"
           :size="1024 * 1024 * 10"
-          :value="files"
+          :model-value="files"
           @update:modelValue="inputUpdate"
           ref="upload">
           <i class="fa fa-plus"></i>

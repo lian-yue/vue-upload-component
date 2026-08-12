@@ -53,7 +53,7 @@
 
 </style>
 <script>
-import marked from 'marked'
+import { marked } from 'marked'
 import i18n from '../i18n'
 import enDocument from '../docs/en.md'
 import zhCnDocument from '../docs/zh-cn.md'
