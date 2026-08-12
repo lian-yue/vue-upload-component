@@ -370,9 +370,39 @@
   border-bottom: 1px solid #e9ecef;
 }
 
+.example-full #modal-edit-file {
+  overflow-y: auto;
+}
+
+.example-full #modal-edit-file .modal-dialog {
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+}
+
+.example-full #modal-edit-file .modal-content {
+  max-height: calc(100vh - 1rem);
+  overflow: hidden;
+}
+
+.example-full #modal-edit-file form {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.example-full #modal-edit-file .modal-body {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.example-full #modal-edit-file .modal-footer {
+  flex: 0 0 auto;
+}
 
 .example-full .edit-image {
-  height: 60vh;
+  height: 50vh;
+  max-height: 32rem;
 }
 
 .example-full .edit-image img {
@@ -382,6 +412,12 @@
 
 .example-full .edit-image cropper-canvas {
   height: 100%;
+}
+
+@media (max-height: 640px) {
+  .example-full .edit-image {
+    height: 35vh;
+  }
 }
 
 .example-full .edit-image-tool {
