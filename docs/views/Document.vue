@@ -54,6 +54,15 @@
 </style>
 <script>
 import marked from 'marked'
+import i18n from '../i18n'
+import enDocument from '../docs/en.md'
+import zhCnDocument from '../docs/zh-cn.md'
+
+const documents = {
+  en: enDocument,
+  'zh-cn': zhCnDocument,
+}
+
 export default {
 
   mounted() {
@@ -68,7 +77,7 @@ export default {
 
   computed: {
     document() {
-      return require('../docs/' + this.$i18n.locale + '.md').default
+      return documents[i18n.global.locale.value]
     },
 
     navs() {

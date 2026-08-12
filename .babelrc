@@ -5,17 +5,9 @@
       {
         "modules": false,
         "useBuiltIns": false,
-        "targets": "ie >= 9",
-        "exclude": [
-          "transform-async-to-generator",
-          "proposal-async-generator-functions",
-          "transform-regenerator"
-        ]
+        "targets": "> 0.5%, last 2 versions, not dead"
       }
     ]
   ],
-  "sourceType": "unambiguous",
-  "plugins": [
-    ["@babel/plugin-transform-runtime", {"helpers": false, "corejs": false, "regenerator": false, "useESModules": false, "absoluteRuntime": false}]
-  ]
+  "sourceType": "unambiguous"
 }

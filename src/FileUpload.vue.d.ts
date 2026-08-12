@@ -58,7 +58,7 @@ export interface VueUploadItem {
     iframe?: HTMLElement;
     [key: string]: any;
 }
-declare const _default: import("vue").DefineComponent<{
+declare const _default: import("vue").DefineComponent<import("vue").ExtractPropTypes<{
     inputId: {
         type: StringConstructor;
     };
@@ -69,7 +69,9 @@ declare const _default: import("vue").DefineComponent<{
     accept: {
         type: StringConstructor;
     };
-    capture: {};
+    capture: {
+        type: PropType<boolean | "environment" | "user">;
+    };
     disabled: {
         default: boolean;
     };
@@ -116,7 +118,7 @@ declare const _default: import("vue").DefineComponent<{
         default: number;
     };
     drop: {
-        type: PropType<string | boolean | HTMLElement | null>;
+        type: PropType<boolean | string | HTMLElement | null>;
         default: () => boolean;
     };
     dropDirectory: {
@@ -128,7 +130,7 @@ declare const _default: import("vue").DefineComponent<{
         default: number;
     };
     extensions: {
-        type: PropType<string | RegExp | string[]>;
+        type: PropType<RegExp | string | string[]>;
         default: () => never[];
     };
     modelValue: {
@@ -147,16 +149,16 @@ declare const _default: import("vue").DefineComponent<{
         type: PropType<{
             headers?: {
                 [key: string]: any;
-            } | undefined;
-            action?: string | undefined;
-            minSize?: number | undefined;
-            maxActive?: number | undefined;
-            maxRetries?: number | undefined;
+            };
+            action?: string;
+            minSize?: number;
+            maxActive?: number;
+            maxRetries?: number;
             handler?: any;
         }>;
         default: () => ChunkOptions;
     };
-}, unknown, Data, {
+}>, {}, Data, {
     /**
      * uploading 正在上传的线程
      * @return {[type]} [description]
@@ -176,7 +178,7 @@ declare const _default: import("vue").DefineComponent<{
     newId(): string;
     clear(): true;
     get(id: string | VueUploadItem): VueUploadItem | false;
-    add(_files: VueUploadItem | Blob | Array<VueUploadItem | Blob>, index?: number | boolean | undefined): VueUploadItem | VueUploadItem[] | undefined;
+    add(_files: VueUploadItem | Blob | Array<VueUploadItem | Blob>, index?: number | boolean): VueUploadItem | VueUploadItem[] | undefined;
     addInputFile(el: HTMLInputElement): Promise<VueUploadItem[]>;
     addDataTransfer(dataTransfer: DataTransfer): Promise<VueUploadItem[] | undefined>;
     getFileSystemEntry(entry: Array<File | FileSystemEntry> | File | FileSystemEntry, path?: string): Promise<VueUploadItem[]>;
@@ -207,7 +209,7 @@ declare const _default: import("vue").DefineComponent<{
     uploadHtml4(ufile: VueUploadItem | undefined | false): Promise<VueUploadItem>;
     watchActive(active: boolean): void;
     watchDrop(newDrop: boolean | string | HTMLElement | null, oldDrop?: boolean | string | HTMLElement | undefined): void;
-    watchDropActive(newDropActive: boolean, oldDropActive?: boolean | undefined): void;
+    watchDropActive(newDropActive: boolean, oldDropActive?: boolean): void;
     onDocumentDragenter(e: DragEvent): void;
     onDocumentDragleave(e: DragEvent): void;
     onDocumentDragover(): void;
@@ -218,7 +220,7 @@ declare const _default: import("vue").DefineComponent<{
     onDrop(e: DragEvent): void;
     inputOnChange(e: Event): Promise<any>;
     isRelatedTargetSupported(): boolean;
-}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:modelValue" | "input-filter" | "input-file")[], "update:modelValue" | "input-filter" | "input-file", import("vue").VNodeProps & import("vue").AllowedComponentProps & import("vue").ComponentCustomProps, Readonly<import("vue").ExtractPropTypes<{
+}, import("vue").ComponentOptionsMixin, import("vue").ComponentOptionsMixin, ("update:modelValue" | "input-filter" | "input-file")[], "update:modelValue" | "input-filter" | "input-file", import("vue").PublicProps, Readonly<import("vue").ExtractPropTypes<{
     inputId: {
         type: StringConstructor;
     };
@@ -229,7 +231,9 @@ declare const _default: import("vue").DefineComponent<{
     accept: {
         type: StringConstructor;
     };
-    capture: {};
+    capture: {
+        type: PropType<boolean | "environment" | "user">;
+    };
     disabled: {
         default: boolean;
     };
@@ -276,7 +280,7 @@ declare const _default: import("vue").DefineComponent<{
         default: number;
     };
     drop: {
-        type: PropType<string | boolean | HTMLElement | null>;
+        type: PropType<boolean | string | HTMLElement | null>;
         default: () => boolean;
     };
     dropDirectory: {
@@ -288,7 +292,7 @@ declare const _default: import("vue").DefineComponent<{
         default: number;
     };
     extensions: {
-        type: PropType<string | RegExp | string[]>;
+        type: PropType<RegExp | string | string[]>;
         default: () => never[];
     };
     modelValue: {
@@ -307,20 +311,20 @@ declare const _default: import("vue").DefineComponent<{
         type: PropType<{
             headers?: {
                 [key: string]: any;
-            } | undefined;
-            action?: string | undefined;
-            minSize?: number | undefined;
-            maxActive?: number | undefined;
-            maxRetries?: number | undefined;
+            };
+            action?: string;
+            minSize?: number;
+            maxActive?: number;
+            maxRetries?: number;
             handler?: any;
         }>;
         default: () => ChunkOptions;
     };
-}>> & {
+}>> & Readonly<{
     "onUpdate:modelValue"?: ((...args: any[]) => any) | undefined;
     "onInput-filter"?: ((...args: any[]) => any) | undefined;
     "onInput-file"?: ((...args: any[]) => any) | undefined;
-}, {
+}>, {
     name: string;
     size: number;
     timeout: number;
@@ -330,25 +334,25 @@ declare const _default: import("vue").DefineComponent<{
     headers: {
         [key: string]: any;
     };
-    drop: string | boolean | HTMLElement | null;
-    modelValue: VueUploadItem[];
     disabled: boolean;
     multiple: boolean;
     directory: boolean;
     createDirectory: boolean;
+    drop: string | boolean | HTMLElement | null;
     dropDirectory: boolean;
     extensions: string | RegExp | string[];
+    modelValue: VueUploadItem[];
     thread: number;
     chunkEnabled: boolean;
     chunk: {
         headers?: {
             [key: string]: any;
-        } | undefined;
-        action?: string | undefined;
-        minSize?: number | undefined;
-        maxActive?: number | undefined;
-        maxRetries?: number | undefined;
+        };
+        action?: string;
+        minSize?: number;
+        maxActive?: number;
+        maxRetries?: number;
         handler?: any;
     };
-}>;
+}, {}, {}, {}, string, import("vue").ComponentProvideOptions, true, {}, any>;
 export default _default;

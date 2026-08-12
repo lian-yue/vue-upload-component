@@ -195,7 +195,7 @@ app.directive('markdown', {
 
 
 app.config.globalProperties.$toLocale = function(to) {
-  return '/' + i18n.global.locale + to
+  return '/' + i18n.global.locale.value + to
 }
 
 app.config.globalProperties.$formatSize = function(size) {

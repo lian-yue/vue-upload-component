@@ -1,27 +1,15 @@
 /* eslint @typescript-eslint/no-require-imports: 0 */
 
-const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin');
 const chunkUpload = require('./src/utils/chunkUpload')
-const bodyParser = require('webpack-body-parser')
+const express = require('express')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const packageInfo = require('./package.json')
 const { VueLoaderPlugin } = require('vue-loader')
 const isDev = process.env.NODE_ENV === 'development'
 const ESLintPlugin = require('eslint-webpack-plugin');
-
-const IsCssExtract = !isDev
-
-if (!isDev) {
-  let version = packageInfo.version.split('.');
-  version[version.length - 1] = parseInt(version[version.length - 1], 10) + 1;
-  packageInfo.version = version.join('.');
-  fs.writeFileSync('./package.json', JSON.stringify(packageInfo, null, 2), { flags: 'utf8' })
-}
-
 
 module.exports = {
   mode: process.env.NODE_ENV,
@@ -69,7 +57,6 @@ module.exports = {
     'highlight.js': 'hljs',
     'cropperjs': 'Cropper',
     'crypto-js': 'CryptoJS',
-    '@xkeshi/image-compressor': 'ImageCompressor',
   },
 
   // cache: false,
@@ -107,7 +94,7 @@ module.exports = {
       }
 
       // Chunk upload
-      devServer.app.post('/upload/chunk', bodyParser.json(), chunkUpload)
+      devServer.app.post('/upload/chunk', express.json(), chunkUpload)
 
       devServer.app.post('/upload/post', put)
       devServer.app.put('/upload/put', put)
@@ -119,6 +106,7 @@ module.exports = {
     host: '127.0.0.1',
     static: {
       directory: __dirname,
+      watch: false,
     },
 
     compress: true,
@@ -138,7 +126,13 @@ module.exports = {
 
   target: 'web',
 
+  watchOptions: {
+    ignored: /node_modules/,
+    poll: 1000,
+  },
+
   module: {
+    exprContextCritical: false,
     rules: [{
         test: /\.vue$/,
         use: [{
@@ -174,9 +168,7 @@ module.exports = {
       },
       {
         test: /\.(md|txt)$/,
-        use: [{
-          loader: 'raw-loader',
-        }, ]
+        type: 'asset/source',
       },
       {
         test: /\.tsx?$/,
@@ -212,6 +204,7 @@ module.exports = {
       'process.version': JSON.stringify(packageInfo.version),
       __VUE_OPTIONS_API__: true,
       __VUE_PROD_DEVTOOLS__: true,
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
     }),
 
 

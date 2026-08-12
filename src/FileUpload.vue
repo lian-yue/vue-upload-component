@@ -176,6 +176,7 @@ export default defineComponent({
       type: String,
     },
     capture: {
+      type: [Boolean, String] as PropType<boolean | 'environment' | 'user'>,
     },
     disabled: {
       default: false,
@@ -499,7 +500,6 @@ export default defineComponent({
         files = [_files]
       }
       if (index === undefined) {
-        // eslint-disable-next-line
         index = this.addIndex
       }
       // 遍历规范对象
@@ -721,7 +721,7 @@ export default defineComponent({
     },
 
 
-    // 获得 entrys    
+    // 获得 entrys
     getFileSystemEntry(entry: Array<File | FileSystemEntry> | File | FileSystemEntry, path = ''): Promise<VueUploadItem[]> {
       // getFileSystemEntry(entry: any, path = ''): Promise<VueUploadItem[]> {
       return new Promise((resolve) => {
@@ -918,7 +918,6 @@ export default defineComponent({
           setTimeout(() => {
             newFile && this.upload(newFile).then(() => {
               if (newFile) {
-                // eslint-disable-next-line
                 newFile = this.get(newFile) || undefined
               }
               if (newFile?.fileObject) {

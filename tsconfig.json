@@ -5,22 +5,16 @@
         "strict": true,
         "jsx": "preserve",
         "importHelpers": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "experimentalDecorators": true,
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "sourceMap": true,
         "declaration": true,
-        "baseUrl": ".",
         "types": [
             "node",
             "webpack-env"
         ],
-        "paths": {
-            "@/*": [
-                "./src/*"
-            ],
-        },
         "lib": [
             "esnext",
             "dom",

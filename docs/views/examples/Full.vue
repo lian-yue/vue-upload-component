@@ -416,11 +416,17 @@
 
 <script>
 import Cropper from 'cropperjs'
-import ImageCompressor from '@xkeshi/image-compressor'
+import Compressor from 'compressorjs'
 import { fileTypeFromBuffer } from "file-type";
 
 import FileUpload from 'vue-upload-component'
+
+function compressImage(file, options) {
+  return new Compressor(file, options)
+}
+
 export default {
+  name: 'FullExample',
   components: {
     FileUpload,
   },
@@ -544,18 +550,17 @@ export default {
         // 自动压缩
         if (newFile.file && newFile.error === "" && newFile.type.substr(0, 6) === 'image/' && this.autoCompress > 0 && this.autoCompress < newFile.size) {
           newFile.error = 'compressing'
-          const imageCompressor = new ImageCompressor(null, {
+          compressImage(newFile.file, {
             convertSize: 1024 * 1024,
             maxWidth: 512,
             maxHeight: 512,
-          })
-          imageCompressor.compress(newFile.file)
-            .then((file) => {
+            success: (file) => {
               this.$refs.upload.update(newFile, { error: '', file, size: file.size, type: file.type })
-            })
-            .catch((err) => {
+            },
+            error: (err) => {
               this.$refs.upload.update(newFile, { error: err.message || 'compress' })
-            })
+            },
+          })
         }
       }
 

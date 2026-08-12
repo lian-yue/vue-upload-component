@@ -42,7 +42,7 @@ const chunkUploadFinish = (req, res) => {
 }
 
 module.exports = (req, res) => {
-  if (!req.body.phase) {
+  if (!req.body?.phase) {
     return chunkUploadPart(req, res)
   }
 

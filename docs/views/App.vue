@@ -159,6 +159,8 @@ pre {
 }
 </style>
 <script>
+import i18n from '../i18n'
+
 export default {
   data() {
     return {
@@ -167,19 +169,20 @@ export default {
     }
   },
   beforeCreate() {
-    if (this.$route.params.locale && this.$route.params.locale !== this.$i18n.locale) {
-      this.$i18n.locale = this.$route.params.locale
+    const locale = this.$route.params.locale || 'en'
+    if (locale !== i18n.global.locale.value) {
+      i18n.global.locale.value = locale
     }
   },
   beforeUpdate() {
-    if (this.$route.params.locale && this.$route.params.locale !== this.$i18n.locale) {
-      this.$i18n.locale = this.$route.params.locale
+    const locale = this.$route.params.locale || 'en'
+    if (locale !== i18n.global.locale.value) {
+      i18n.global.locale.value = locale
     }
   },
   computed: {
     locale() {
-      let i18n = this.$i18n
-      return i18n.messages[i18n.locale].locale
+      return i18n.global.tm('locale')
     },
   },
   methods: {

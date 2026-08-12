@@ -1,20 +1,12 @@
 /*!
-  * devtools-if v9.2.0-beta.30
-  * (c) 2022 kazuya kawaguchi
-  * Released under the MIT License.
-  */
-
-/*!
-  * message-compiler v9.2.0-beta.30
-  * (c) 2022 kazuya kawaguchi
-  * Released under the MIT License.
-  */
-
-/*!
-  * vue-devtools v9.2.0-beta.30
-  * (c) 2022 kazuya kawaguchi
-  * Released under the MIT License.
-  */
+ * Compressor.js v1.3.0
+ * https://fengyuanchen.github.io/compressorjs
+ *
+ * Copyright 2018-present Chen Fengyuan
+ * Released under the MIT license
+ *
+ * Date: 2026-04-06T07:12:45.816Z
+ */
 
 /*!
  * Name: vue-upload-component
@@ -26,12 +18,52 @@
  */
 
 /*!
- Name: vue-upload-component 
-Component URI: https://github.com/lian-yue/vue-upload-component#readme 
-Version: 3.1.16 
-Author: LianYue 
-License: Apache-2.0 
-Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter 
+ Name: vue-upload-component
+ Component URI: https://github.com/lian-yue/vue-upload-component#readme
+ Version: 3.1.17
+ Author: LianYue
+ License: Apache-2.0
+ Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter
  */
 
-/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
+/*!
+* vue-router v5.2.0
+* (c) 2026 Eduardo San Martin Morote
+* @license MIT
+*/
+
+/**
+* @vue/compiler-core v3.5.41
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/reactivity v3.5.41
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/runtime-core v3.5.41
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/runtime-dom v3.5.41
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/shared v3.5.41
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* vue v3.5.41
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/

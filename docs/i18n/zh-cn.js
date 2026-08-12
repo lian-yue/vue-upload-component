@@ -26,6 +26,7 @@ export default {
     avatar: '上传头像',
     drag: '拖拽上传',
     multiple: '多个实例',
+    chunk: '分块上传',
     vuex: 'Vuex',
     typescript: 'Typescript',
     asyncevents: '异步事件',
