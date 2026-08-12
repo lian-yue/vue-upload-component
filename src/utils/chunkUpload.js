@@ -55,5 +55,8 @@ module.exports = (req, res) => {
 
     case 'finish':
       return chunkUploadFinish(req, res)
+
+    default:
+      return res.status(400).json({ status: 'error', error: 'phase' })
   }
 }

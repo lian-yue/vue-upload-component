@@ -59,6 +59,13 @@ const CHUNK_DEFAULT_OPTIONS = {
   handler: ChunkUploadDefaultHandler
 }
 
+let fileId = 0
+let uploadTokenId = 0
+
+function createFileMap(): { [key: string]: VueUploadItem } {
+  return Object.create(null)
+}
+
 export interface ChunkOptions {
   headers: { [key: string]: any };
   action: string;
@@ -82,6 +89,8 @@ export interface Data {
   maps: { [key: string]: VueUploadItem };
   destroy: boolean;
   uploading: number;
+  activeUploadIds: Set<string>;
+  activeUploadTokens: Map<string, number>;
   features: Features;
   dropElement: null | HTMLElement;
   dropTimeout: null | number,
@@ -182,6 +191,7 @@ export default defineComponent({
       type: [Boolean, String] as PropType<boolean | 'environment' | 'user'>,
     },
     disabled: {
+      type: Boolean,
       default: false,
     },
     multiple: {
@@ -228,7 +238,7 @@ export default defineComponent({
       default: 0,
     },
     drop: {
-      type: [Boolean, String, HTMLElement] as PropType<boolean | string | HTMLElement | null>,
+      type: [Boolean, String, Object] as PropType<boolean | string | HTMLElement | null>,
       default: () => {
         return false
       },
@@ -288,8 +298,10 @@ export default defineComponent({
       dropActive: false,
       dropElementActive: false,
       uploading: 0,
+      activeUploadIds: new Set(),
+      activeUploadTokens: new Map(),
       destroy: false,
-      maps: {},
+      maps: createFileMap(),
       dropElement: null,
       dropTimeout: null,
       reload: false,
@@ -318,7 +330,7 @@ export default defineComponent({
       this.features.html5 = false
     }
     // files 定位缓存
-    this.maps = {}
+    this.maps = createFileMap()
     if (this.files) {
       for (let i = 0; i < this.files.length; i++) {
         const file = this.files[i]
@@ -395,7 +407,12 @@ export default defineComponent({
       if (this.maximum === undefined) {
         return this.multiple ? 0 : 1
       }
-      return this.maximum
+      const maximum = Math.floor(this.maximum)
+      return Number.isFinite(maximum) && maximum > 0 ? maximum : 0
+    },
+    iThread(): number {
+      const thread = Math.floor(this.thread)
+      return Number.isFinite(thread) && thread > 0 ? thread : 1
     },
     iExtensions(): RegExp | undefined {
       if (!this.extensions) {
@@ -413,8 +430,12 @@ export default defineComponent({
       } else {
         exts = this.extensions
       }
-      exts = exts.map(function (value) { return value.trim() }).filter(function (value) { return value })
-      return new RegExp('\\.(' + exts.join('|').replace(/\./g, '\\.') + ')$', 'i')
+      exts = exts.filter(function (value) { return typeof value === 'string' }).map(function (value) { return value.trim() }).filter(function (value) { return value })
+      const pattern = exts.map(value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')
+      if (!pattern) {
+        return
+      }
+      return new RegExp('\\.(' + pattern + ')$', 'i')
     },
     iDirectory(): any {
       if (this.directory && this.features.directory) {
@@ -433,8 +454,15 @@ export default defineComponent({
         this.$parent.$forceUpdate()
       }
     },
-    drop(value: boolean) {
+    drop(value: boolean | string | HTMLElement | null) {
       this.watchDrop(value)
+    },
+    disabled(value: boolean) {
+      if (value) {
+        this.dropActive = false
+        this.dropElementActive = false
+        this.watchDropActive(false)
+      }
     },
     modelValue(files: VueUploadItem[]) {
       if (this.files === files) {
@@ -443,7 +471,7 @@ export default defineComponent({
       this.files = files
       const oldMaps = this.maps
       // 重写 maps 缓存
-      this.maps = {}
+      this.maps = createFileMap()
       for (let i = 0; i < this.files.length; i++) {
         const file = this.files[i]
         this.maps[file.id] = file
@@ -466,7 +494,16 @@ export default defineComponent({
   },
   methods: {
     newId(): string {
-      return Math.random().toString(36).substr(2)
+      fileId++
+      return Math.random().toString(36).slice(2) + Date.now().toString(36) + fileId.toString(36)
+    },
+    ensureUniqueId(file: VueUploadItem, addFiles: VueUploadItem[]) {
+      if (file.id && !this.maps[file.id] && !addFiles.some(value => value.id === file.id)) {
+        return
+      }
+      do {
+        file.id = this.newId()
+      } while (this.maps[file.id] || addFiles.some(value => value.id === file.id))
     },
     // 清空
     clear() {
@@ -474,7 +511,7 @@ export default defineComponent({
         const files = this.files
         this.files = []
         // 定位
-        this.maps = {}
+        this.maps = createFileMap()
         // 事件
         this.emitInput()
         for (let i = 0; i < files.length; i++) {
@@ -509,7 +546,10 @@ export default defineComponent({
       let addFiles: VueUploadItem[] = []
       for (let i = 0; i < files.length; i++) {
         let file: VueUploadItem | Blob = files[i]
-        if (this.features.html5 && file instanceof Blob) {
+        if (!file || typeof file !== 'object') {
+          continue
+        }
+        if (this.features.html5 && typeof Blob !== 'undefined' && file instanceof Blob) {
           file = {
             id: '',
             file,
@@ -525,7 +565,7 @@ export default defineComponent({
           // false
         } else if (file.fileObject) {
           fileObject = true
-        } else if (typeof Element !== 'undefined' && file.el instanceof HTMLInputElement) {
+        } else if (typeof HTMLInputElement !== 'undefined' && file.el instanceof HTMLInputElement) {
           fileObject = true
         } else if (typeof Blob !== 'undefined' && file.file instanceof Blob) {
           fileObject = true
@@ -561,12 +601,11 @@ export default defineComponent({
           }
         }
         // 必须包含 id
-        if (!file.id) {
-          file.id = this.newId();
-        }
+        this.ensureUniqueId(file, addFiles)
         if (this.emitFilter(file, undefined)) {
           continue
         }
+        this.ensureUniqueId(file, addFiles)
         // 最大数量限制
         if (this.iMaximum > 1 && (addFiles.length + this.files.length) >= this.iMaximum) {
           break
@@ -646,7 +685,7 @@ export default defineComponent({
       const entrys: any = el.webkitEntries || el.entries || undefined
       if (entrys?.length) {
         return this.getFileSystemEntry(entrys).then((files) => {
-          return this.add(files) as VueUploadItem[]
+          return this.add(files) as VueUploadItem[] || []
         })
       }
 
@@ -676,7 +715,7 @@ export default defineComponent({
           el,
         })
       }
-      return Promise.resolve(this.add(files) as VueUploadItem[])
+      return Promise.resolve(this.add(files) as VueUploadItem[] || [])
     },
 
     // 添加 DataTransfer
@@ -701,9 +740,11 @@ export default defineComponent({
             entrys.push(entry)
           }
         }
-        return this.getFileSystemEntry(entrys).then((files) => {
-          return this.add(files) as VueUploadItem[]
-        })
+        if (entrys.length) {
+          return this.getFileSystemEntry(entrys).then((files) => {
+            return this.add(files) as VueUploadItem[] || []
+          })
+        }
       }
 
       // dataTransfer.files 支持
@@ -716,7 +757,7 @@ export default defineComponent({
             break
           }
         }
-        return Promise.resolve(this.add(files) as VueUploadItem[])
+        return Promise.resolve(this.add(files) as VueUploadItem[] || [])
       }
 
       return Promise.resolve([])
@@ -743,7 +784,8 @@ export default defineComponent({
               return resolve(uploadFiles)
             }
             this.getFileSystemEntry(v, path).then(function (results) {
-              uploadFiles.push(...results)
+              const remaining = maximumValue > 0 ? maximumValue - uploadFiles.length : results.length
+              uploadFiles.push(...results.slice(0, Math.max(remaining, 0)))
               forEach(i + 1)
             })
           }
@@ -779,6 +821,8 @@ export default defineComponent({
                 file,
               }
             ])
+          }, function () {
+            resolve([])
           })
           return
         }
@@ -808,11 +852,14 @@ export default defineComponent({
                   return readEntries()
                 }
                 this.getFileSystemEntry(entries[i], path + directoryEntry.name + '/').then(function (results) {
-                  uploadFiles.push(...results)
+                  const remaining = maximumValue > 0 ? maximumValue - uploadFiles.length : results.length
+                  uploadFiles.push(...results.slice(0, Math.max(remaining, 0)))
                   forEach(i + 1)
                 })
               }
               forEach(0)
+            }, function () {
+              resolve(uploadFiles)
             })
           }
           readEntries()
@@ -872,11 +919,17 @@ export default defineComponent({
           ...file,
           ...data
         }
+        if (newFile.id !== file.id && (file.active || this.activeUploadTokens.has(file.id) || (this.maps[newFile.id] && this.maps[newFile.id] !== file))) {
+          return false
+        }
         // 停用必须加上错误
-        if (file.fileObject && file.active && !newFile.active && !newFile.error && !newFile.success) {
+        if (file.fileObject && file.active && !newFile.active && !newFile.error && !newFile.success && !newFile.chunk?.paused) {
           newFile.error = 'abort'
         }
         if (this.emitFilter(newFile, file)) {
+          return false
+        }
+        if (!newFile.id || (newFile.id !== file.id && (file.active || this.maps[newFile.id]))) {
           return false
         }
         const files = this.files.concat([])
@@ -909,37 +962,93 @@ export default defineComponent({
       return isPrevent
     },
 
+    resumeChunkUpload(file: VueUploadItem): boolean {
+      if (!this.activeUploadTokens.has(file.id) || !file.chunk?.resume || file.chunk.settled) {
+        return false
+      }
+      if (!this.activeUploadIds.has(file.id)) {
+        this.activeUploadIds.add(file.id)
+        this.uploading++
+      }
+      file.chunk.file = file
+      if (!file.chunk.resuming) {
+        file.chunk.resume()
+      }
+      return true
+    },
+
     // 处理后 事件 分发
     emitFile(newFile: VueUploadItem | undefined, oldFile: VueUploadItem | undefined) {
       this.$emit('input-file', newFile, oldFile)
+      if (!newFile && oldFile) {
+        this.activeUploadTokens.delete(oldFile.id)
+      } else if (newFile && !newFile.active && (newFile.error || newFile.success || !newFile.fileObject)) {
+        this.activeUploadTokens.delete(newFile.id)
+      }
       if (newFile?.fileObject && newFile.active && (!oldFile || !oldFile.active)) {
-        this.uploading++
-        // 激活
-        // @ts-ignore
-        this.$nextTick(() => {
-          setTimeout(() => {
-            newFile && this.upload(newFile).then(() => {
-              if (newFile) {
-                newFile = this.get(newFile) || undefined
-              }
-              if (newFile?.fileObject) {
-                this.update(newFile, {
+        if (this.resumeChunkUpload(newFile)) {
+          // resumed existing chunk session
+        } else if (this.activeUploadIds.has(newFile.id)) {
+          if (newFile.chunk?.resume) {
+            newFile.chunk.file = newFile
+            newFile.chunk.resume()
+          }
+        } else {
+          const uploadId = newFile.id
+          const uploadToken = ++uploadTokenId
+          this.activeUploadIds.add(newFile.id)
+          this.activeUploadTokens.set(uploadId, uploadToken)
+          this.uploading++
+          // 激活
+          // @ts-ignore
+          this.$nextTick(() => {
+            setTimeout(() => {
+              Promise.resolve().then(() => {
+                if (this.activeUploadTokens.get(uploadId) !== uploadToken) {
+                  return
+                }
+                const currentFile = this.get(uploadId)
+                if (!currentFile || !currentFile.active) {
+                  throw new Error('abort')
+                }
+                newFile = currentFile
+                return this.upload(currentFile)
+              }).then(() => {
+                if (this.activeUploadTokens.get(uploadId) !== uploadToken) {
+                  return
+                }
+                newFile = this.get(uploadId) || undefined
+                if (newFile?.fileObject) {
+                  this.update(newFile, {
+                    active: false,
+                    success: !newFile.error
+                  })
+                }
+              }).catch((e: any) => {
+                if (this.activeUploadTokens.get(uploadId) !== uploadToken) {
+                  return
+                }
+                const currentFile = this.get(uploadId)
+                currentFile && this.update(currentFile, {
                   active: false,
-                  success: !newFile.error
+                  success: false,
+                  error: e.code || e.error || e.message || e
                 })
-              }
-            }).catch((e: any) => {
-              newFile && this.update(newFile, {
-                active: false,
-                success: false,
-                error: e.code || e.error || e.message || e
               })
-            })
-          }, Math.ceil(Math.random() * 50 + 50))
-        })
-      } else if ((!newFile || !newFile.fileObject || !newFile.active) && oldFile && oldFile.fileObject && oldFile.active) {
+            }, Math.ceil(Math.random() * 50 + 50))
+          })
+        }
+      } else if ((!newFile || !newFile.fileObject || !newFile.active) && oldFile?.fileObject && this.activeUploadIds.has(oldFile.id)) {
         // 停止
-        this.uploading--
+        this.activeUploadIds.delete(oldFile.id)
+        const pausedChunk = Boolean(newFile && !newFile.error && !newFile.success && newFile.chunk?.paused)
+        if (!pausedChunk) {
+          this.activeUploadTokens.delete(oldFile.id)
+        }
+        if (!newFile?.success && oldFile.chunk?.pause && !oldFile.chunk.paused) {
+          oldFile.chunk.pause()
+        }
+        this.uploading = Math.max(0, this.uploading - 1)
       }
       // 自动延续激活
       // @ts-ignore
@@ -984,22 +1093,26 @@ export default defineComponent({
         return Promise.reject(new Error('size'))
       }
 
-      if (this.customAction) {
-        return this.customAction(file, this)
-      }
-      if (this.features.html5) {
-        if (this.shouldUseChunkUpload(file)) {
-          return this.uploadChunk(file)
+      try {
+        if (this.customAction) {
+          return Promise.resolve(this.customAction(file, this))
         }
-        if (file.putAction) {
-          return this.uploadPut(file)
+        if (this.features.html5) {
+          if (this.shouldUseChunkUpload(file)) {
+            return this.uploadChunk(file)
+          }
+          if (file.putAction) {
+            return this.uploadPut(file)
+          }
+          if (file.postAction) {
+            return this.uploadHtml5(file)
+          }
         }
         if (file.postAction) {
-          return this.uploadHtml5(file)
+          return this.uploadHtml4(file)
         }
-      }
-      if (file.postAction) {
-        return this.uploadHtml4(file)
+      } catch (error) {
+        return Promise.reject(error instanceof Error ? error : new Error(String(error)))
       }
       return Promise.reject(new Error('No action configured'))
     },
@@ -1009,9 +1122,9 @@ export default defineComponent({
      * @param Object file
      */
     shouldUseChunkUpload(file: VueUploadItem) {
-      return this.chunkEnabled &&
+      return Boolean(this.chunkEnabled &&
         !!this.chunkOptions.handler &&
-        file.size && file.size > this.chunkOptions.minSize
+        file.size && file.size > this.chunkOptions.minSize)
     },
     /**
      * Upload a file using Chunk method
@@ -1020,7 +1133,25 @@ export default defineComponent({
      */
     uploadChunk(file: VueUploadItem): Promise<VueUploadItem> {
       const HandlerClass = this.chunkOptions.handler
-      file.chunk = new HandlerClass(file, this.chunkOptions)
+      const fileId = file.id
+      const handlerOptions = {
+        ...this.chunkOptions,
+        onPause: (handlerFile: VueUploadItem) => {
+          const currentFile = this.get(fileId)
+          if (currentFile && currentFile.active) {
+            return this.update(currentFile, { active: false }) || handlerFile
+          }
+          return currentFile || handlerFile
+        },
+        onResume: (handlerFile: VueUploadItem) => {
+          const currentFile = this.get(fileId)
+          if (currentFile && !currentFile.active && !currentFile.error && !currentFile.success) {
+            return this.update(currentFile, { active: true }) || handlerFile
+          }
+          return currentFile || handlerFile
+        },
+      }
+      file.chunk = new HandlerClass(file, handlerOptions)
       return file.chunk.upload().then(() => file)
     },
     uploadPut(file: VueUploadItem): Promise<VueUploadItem> {
@@ -1029,6 +1160,9 @@ export default defineComponent({
       for (const key in file.data) {
         value = file.data[key]
         if (value !== null && value !== undefined) {
+          if (typeof value === 'object') {
+            value = JSON.stringify(value)
+          }
           querys.push(encodeURIComponent(key) + '=' + encodeURIComponent(value))
         }
       }
@@ -1043,9 +1177,11 @@ export default defineComponent({
       let value
       for (const key in file.data) {
         value = file.data[key]
-        if (value && typeof value === 'object' && typeof value.toString !== 'function') {
-          if (value instanceof File) {
+        if (value && typeof value === 'object') {
+          if (typeof File !== 'undefined' && value instanceof File) {
             form.append(key, value, value.name)
+          } else if (typeof Blob !== 'undefined' && value instanceof Blob) {
+            form.append(key, value)
           } else {
             form.append(key, JSON.stringify(value))
           }
@@ -1117,7 +1253,14 @@ export default defineComponent({
       }, 100)
 
       return new Promise((resolve: (u: VueUploadItem) => void, reject: (e: Error) => void) => {
+        const stopInterval = () => {
+          if (interval) {
+            clearInterval(interval)
+            interval = undefined
+          }
+        }
         if (!file) {
+          stopInterval()
           reject(new Error('not_exists'))
           return
         }
@@ -1128,10 +1271,7 @@ export default defineComponent({
             return
           }
           complete = true
-          if (interval) {
-            clearInterval(interval)
-            interval = undefined
-          }
+          stopInterval()
           if (!file) {
             return reject(new Error('not_exists'))
           }
@@ -1180,13 +1320,19 @@ export default defineComponent({
                 data.error = 'server'
               } else if (xhr.status >= 400) {
                 data.error = 'denied'
+              } else {
+                data.error = 'server'
               }
               break
             default:
-              if (xhr.status >= 500) {
+              if (!xhr.status) {
+                data.error = 'network'
+              } else if (xhr.status >= 500) {
                 data.error = 'server'
               } else if (xhr.status >= 400) {
                 data.error = 'denied'
+              } else if (xhr.status < 200 || xhr.status >= 300) {
+                data.error = 'server'
               } else {
                 data.progress = '100.00'
               }
@@ -1194,7 +1340,7 @@ export default defineComponent({
 
           if (xhr.responseText) {
             const contentType = xhr.getResponseHeader('Content-Type')
-            if (contentType && contentType.indexOf('/json') !== -1) {
+            if (contentType && /(?:\/|\+)json(?:;|$)/i.test(contentType)) {
               try {
                 data.response = JSON.parse(xhr.responseText)
               } catch {
@@ -1238,16 +1384,26 @@ export default defineComponent({
         }
 
         // headers
-        for (const key in file.headers) {
-          xhr.setRequestHeader(key, file.headers[key])
+        try {
+          for (const key in file.headers) {
+            xhr.setRequestHeader(key, file.headers[key])
+          }
+
+          // 更新 xhr
+          // @ts-ignore
+          file = this.update(file, { xhr })
+
+          // 开始上传
+          if (!file) {
+            stopInterval()
+            reject(new Error('abort'))
+            return
+          }
+          xhr.send(body)
+        } catch (error) {
+          stopInterval()
+          reject(error instanceof Error ? error : new Error(String(error)))
         }
-
-        // 更新 xhr
-        // @ts-ignore
-        file = this.update(file, { xhr })
-
-        // 开始上传
-        file && xhr.send(body)
       })
     },
     uploadHtml4(ufile: VueUploadItem | undefined | false): Promise<VueUploadItem> {
@@ -1489,7 +1645,7 @@ export default defineComponent({
         if (!file.fileObject) {
           // 不是文件对象
         } else if (active && !this.destroy) {
-          if (this.uploading >= this.thread || (this.uploading && !this.features.html5)) {
+          if (this.uploading >= this.iThread || (this.uploading && !this.features.html5)) {
             break
           }
           if (!file.active && !file.error && !file.success) {
@@ -1535,11 +1691,15 @@ export default defineComponent({
       if (!newDrop) {
         // empty
       } else if (typeof newDrop === 'string') {
-        // @ts-ignore
-        el = document.querySelector(newDrop) || this.$root.$el.querySelector(newDrop)
+        try {
+          // @ts-ignore
+          el = document.querySelector(newDrop) || this.$root.$el?.querySelector(newDrop)
+        } catch (error) {
+          el = null
+        }
       } else if (newDrop === true) {
         // @ts-ignore
-        el = this.$parent.$el
+        el = this.$parent?.$el
         if (!el || el?.nodeType === 8) {
           // @ts-ignore
           el = this.$root.$el
@@ -1551,6 +1711,12 @@ export default defineComponent({
         el = newDrop
       }
       this.dropElement = el
+
+      if (!this.dropElement) {
+        this.dropActive = false
+        this.dropElementActive = false
+        this.watchDropActive(false)
+      }
 
       if (this.dropElement) {
         document.addEventListener('dragenter', this.onDocumentDragenter, false)
@@ -1588,7 +1754,7 @@ export default defineComponent({
     },
 
     onDocumentDragenter(e: DragEvent) {
-      if (this.dropActive) {
+      if (this.disabled || this.dropActive) {
         return
       }
       if (!e.dataTransfer) {
@@ -1623,7 +1789,9 @@ export default defineComponent({
     },
 
     onDocumentDragover() {
-      this.watchDropActive(true)
+      if (!this.disabled && this.dropActive) {
+        this.watchDropActive(true)
+      }
     },
 
     onDocumentDrop() {
@@ -1632,7 +1800,7 @@ export default defineComponent({
     },
 
     onDragenter() {
-      if (!this.dropActive || this.dropElementActive) {
+      if (this.disabled || !this.dropActive || this.dropElementActive) {
         return
       }
       this.dropElementActive = true
@@ -1668,12 +1836,17 @@ export default defineComponent({
     },
 
     onDragover(e: DragEvent) {
+      if (this.disabled) {
+        return
+      }
       e.preventDefault()
     },
 
     onDrop(e: DragEvent) {
       e.preventDefault()
-      e.dataTransfer && this.addDataTransfer(e.dataTransfer)
+      if (!this.disabled) {
+        e.dataTransfer && this.addDataTransfer(e.dataTransfer)
+      }
     },
 
 

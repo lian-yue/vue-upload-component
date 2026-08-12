@@ -40,6 +40,8 @@ const sendRequest = (xhr, body) => {
       }
     };
     xhr.onerror = () => reject(xhr.response);
+    xhr.onabort = () => reject(new Error('abort'));
+    xhr.ontimeout = () => reject(new Error('timeout'));
     xhr.send(JSON.stringify(body));
   })
 };
@@ -51,12 +53,16 @@ const sendRequest = (xhr, body) => {
  * @param {Object} data
  */
 const sendFormRequest = (xhr, data) => {
-  const body = new FormData();
-  for (let name in data) {
-    body.append(name, data[name]);
-  }
-
   return new Promise((resolve, reject) => {
+    const body = new FormData();
+    for (const name in data) {
+      const value = data[name];
+      if (value && typeof value === 'object' && !(typeof Blob !== 'undefined' && value instanceof Blob)) {
+        body.append(name, JSON.stringify(value));
+      } else if (value !== null && value !== undefined) {
+        body.append(name, value);
+      }
+    }
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         let response;
@@ -71,6 +77,8 @@ const sendFormRequest = (xhr, data) => {
       }
     };
     xhr.onerror = () => reject(xhr.response);
+    xhr.onabort = () => reject(new Error('abort'));
+    xhr.ontimeout = () => reject(new Error('timeout'));
     xhr.send(body);
   })
 };
@@ -102,6 +110,10 @@ class ChunkUploadHandler {
     this.sessionId = null;
     this.chunkSize = null;
     this.speedInterval = null;
+    this.finishing = false;
+    this.settled = false;
+    this.paused = false;
+    this.resuming = false;
   }
 
   /**
@@ -189,6 +201,9 @@ class ChunkUploadHandler {
    * - Gets the progress of all the chunks that are being uploaded
    */
   get progress() {
+    if (!this.chunks.length) {
+      return 0
+    }
     const completedProgress = (this.chunksUploaded.length / this.chunks.length) * 100;
     const uploadingProgress = this.chunksUploading.reduce((progress, chunk) => {
       return progress + ((chunk.progress | 0) / this.chunks.length)
@@ -264,7 +279,13 @@ class ChunkUploadHandler {
    * - Sets the file not active
    */
   pause() {
-    this.file.active = false;
+    this.paused = true;
+    const file = this.options.onPause?.(this.file);
+    if (file) {
+      this.file = file;
+    } else {
+      this.file.active = false;
+    }
     this.stopChunks();
   }
 
@@ -286,7 +307,18 @@ class ChunkUploadHandler {
    * - Starts the following chunks
    */
   resume() {
-    this.file.active = true;
+    if (this.settled) {
+      return
+    }
+    this.resuming = true;
+    this.paused = false;
+    const file = this.options.onResume?.(this.file);
+    if (file) {
+      this.file = file;
+    } else {
+      this.file.active = true;
+    }
+    this.resuming = false;
     this.startChunking();
   }
 
@@ -298,9 +330,26 @@ class ChunkUploadHandler {
    * - reject   The file upload failed
    */
   upload() {
+    if (this.promise) {
+      return this.promise
+    }
     this.promise = new Promise((resolve, reject) => {
-      this.resolve = resolve;
-      this.reject = reject;
+      this.resolve = value => {
+        if (this.settled) {
+          return
+        }
+        this.settled = true;
+        this.stopSpeedCalc();
+        resolve(value);
+      };
+      this.reject = error => {
+        if (this.settled) {
+          return
+        }
+        this.settled = true;
+        this.stopChunks();
+        reject(error);
+      };
     });
     try {
       this.start();
@@ -332,23 +381,32 @@ class ChunkUploadHandler {
         name: this.fileName
       }
     }).then(res => {
+      if (this.settled) {
+        return
+      }
       if (res.status !== 'success') {
         this.file.response = res;
         return this.reject('server')
       }
 
       const chunkSize = Number(res.data?.end_offset);
-      if (!Number.isFinite(chunkSize) || chunkSize <= 0) {
+      const sessionId = res.data?.session_id;
+      if (!Number.isFinite(chunkSize) || chunkSize <= 0 || sessionId === null || sessionId === undefined || sessionId === '') {
         this.file.response = res;
         return this.reject('server')
       }
 
-      this.sessionId = res.data.session_id;
+      this.sessionId = sessionId;
       this.chunkSize = chunkSize;
 
       this.createChunks();
-      this.startChunking();
+      if (this.file.active) {
+        this.startChunking();
+      }
     }).catch(res => {
+      if (this.settled) {
+        return
+      }
       this.file.response = res;
       this.reject('server');
     });
@@ -358,6 +416,9 @@ class ChunkUploadHandler {
    * Starts to upload chunks
    */
   startChunking() {
+    if (this.settled || !this.file.active || !this.readyToUpload) {
+      return
+    }
     for (let i = 0; i < this.maxActiveChunks; i++) {
       this.uploadNextChunk();
     }
@@ -371,7 +432,7 @@ class ChunkUploadHandler {
    * - Will start finish phase if there are no more chunks to upload
    */
   uploadNextChunk() {
-    if (this.file.active) {
+    if (!this.settled && !this.finishing && this.file.active) {
       if (this.hasChunksToUpload) {
         return this.uploadChunk(this.chunksToUpload[0])
       }
@@ -395,15 +456,22 @@ class ChunkUploadHandler {
     chunk.progress = 0;
     chunk.active = true;
     this.updateFileProgress();
-    chunk.xhr = createRequest({
-      method: 'POST',
-      headers: this.headers,
-      url: this.action
-    });
+    try {
+      chunk.xhr = createRequest({
+        method: 'POST',
+        headers: this.headers,
+        url: this.action
+      });
+    } catch (error) {
+      chunk.active = false;
+      this.reject(error);
+      return
+    }
 
-    chunk.xhr.upload.addEventListener('progress', function (evt) {
+    chunk.xhr.upload.addEventListener('progress', (evt) => {
       if (evt.lengthComputable) {
         chunk.progress = Math.round(evt.loaded / evt.total * 100);
+        this.updateFileProgress();
       }
     }, false);
 
@@ -415,6 +483,9 @@ class ChunkUploadHandler {
       chunk: chunk.blob
     }).then(res => {
       chunk.active = false;
+      if (this.settled) {
+        return
+      }
       if (res.status === 'success') {
         chunk.uploaded = true;
       } else {
@@ -427,6 +498,9 @@ class ChunkUploadHandler {
       this.uploadNextChunk();
     }).catch(() => {
       chunk.active = false;
+      if (this.settled || !this.file.active) {
+        return
+      }
       if (chunk.retries-- <= 0) {
         this.stopChunks();
         return this.reject('upload')
@@ -441,19 +515,37 @@ class ChunkUploadHandler {
    * Sends a request to the backend to finish the process
    */
   finish() {
+    if (this.settled || this.finishing || !this.file.active) {
+      return
+    }
+    this.finishing = true;
     this.updateFileProgress();
     this.stopSpeedCalc();
 
-    request({
-      method: 'POST',
-      headers: { ...this.headers, 'Content-Type': 'application/json' },
-      url: this.action,
-      body: {
-        ...this.finishBody,
-        phase: 'finish',
-        session_id: this.sessionId
+    let finishRequest;
+    try {
+      finishRequest = request({
+        method: 'POST',
+        headers: { ...this.headers, 'Content-Type': 'application/json' },
+        url: this.action,
+        body: {
+          ...this.finishBody,
+          phase: 'finish',
+          session_id: this.sessionId
+        }
+      });
+    } catch (error) {
+      this.finishing = false;
+      this.file.response = error;
+      this.reject('server');
+      return
+    }
+
+    finishRequest.then(res => {
+      this.finishing = false;
+      if (this.settled || !this.file.active) {
+        return
       }
-    }).then(res => {
       this.file.response = res;
       if (res.status !== 'success') {
         return this.reject('server')
@@ -461,6 +553,10 @@ class ChunkUploadHandler {
 
       this.resolve(res);
     }).catch(res => {
+      this.finishing = false;
+      if (this.settled || !this.file.active) {
+        return
+      }
       this.file.response = res;
       this.reject('server');
     });
@@ -501,6 +597,11 @@ const CHUNK_DEFAULT_OPTIONS = {
     maxRetries: 5,
     handler: ChunkUploadHandler
 };
+let fileId = 0;
+let uploadTokenId = 0;
+function createFileMap() {
+    return Object.create(null);
+}
 var script = defineComponent({
     compatConfig: {
         MODE: 3,
@@ -520,6 +621,7 @@ var script = defineComponent({
             type: [Boolean, String],
         },
         disabled: {
+            type: Boolean,
             default: false,
         },
         multiple: {
@@ -565,7 +667,7 @@ var script = defineComponent({
             default: 0,
         },
         drop: {
-            type: [Boolean, String, HTMLElement],
+            type: [Boolean, String, Object],
             default: () => {
                 return false;
             },
@@ -624,8 +726,10 @@ var script = defineComponent({
             dropActive: false,
             dropElementActive: false,
             uploading: 0,
+            activeUploadIds: new Set(),
+            activeUploadTokens: new Map(),
             destroy: false,
-            maps: {},
+            maps: createFileMap(),
             dropElement: null,
             dropTimeout: null,
             reload: false,
@@ -655,7 +759,7 @@ var script = defineComponent({
             this.features.html5 = false;
         }
         // files 定位缓存
-        this.maps = {};
+        this.maps = createFileMap();
         if (this.files) {
             for (let i = 0; i < this.files.length; i++) {
                 const file = this.files[i];
@@ -730,7 +834,12 @@ var script = defineComponent({
             if (this.maximum === undefined) {
                 return this.multiple ? 0 : 1;
             }
-            return this.maximum;
+            const maximum = Math.floor(this.maximum);
+            return Number.isFinite(maximum) && maximum > 0 ? maximum : 0;
+        },
+        iThread() {
+            const thread = Math.floor(this.thread);
+            return Number.isFinite(thread) && thread > 0 ? thread : 1;
         },
         iExtensions() {
             if (!this.extensions) {
@@ -749,8 +858,12 @@ var script = defineComponent({
             else {
                 exts = this.extensions;
             }
-            exts = exts.map(function (value) { return value.trim(); }).filter(function (value) { return value; });
-            return new RegExp('\\.(' + exts.join('|').replace(/\./g, '\\.') + ')$', 'i');
+            exts = exts.filter(function (value) { return typeof value === 'string'; }).map(function (value) { return value.trim(); }).filter(function (value) { return value; });
+            const pattern = exts.map(value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+            if (!pattern) {
+                return;
+            }
+            return new RegExp('\\.(' + pattern + ')$', 'i');
         },
         iDirectory() {
             if (this.directory && this.features.directory) {
@@ -772,6 +885,13 @@ var script = defineComponent({
         drop(value) {
             this.watchDrop(value);
         },
+        disabled(value) {
+            if (value) {
+                this.dropActive = false;
+                this.dropElementActive = false;
+                this.watchDropActive(false);
+            }
+        },
         modelValue(files) {
             if (this.files === files) {
                 return;
@@ -779,7 +899,7 @@ var script = defineComponent({
             this.files = files;
             const oldMaps = this.maps;
             // 重写 maps 缓存
-            this.maps = {};
+            this.maps = createFileMap();
             for (let i = 0; i < this.files.length; i++) {
                 const file = this.files[i];
                 this.maps[file.id] = file;
@@ -802,7 +922,16 @@ var script = defineComponent({
     },
     methods: {
         newId() {
-            return Math.random().toString(36).substr(2);
+            fileId++;
+            return Math.random().toString(36).slice(2) + Date.now().toString(36) + fileId.toString(36);
+        },
+        ensureUniqueId(file, addFiles) {
+            if (file.id && !this.maps[file.id] && !addFiles.some(value => value.id === file.id)) {
+                return;
+            }
+            do {
+                file.id = this.newId();
+            } while (this.maps[file.id] || addFiles.some(value => value.id === file.id));
         },
         // 清空
         clear() {
@@ -810,7 +939,7 @@ var script = defineComponent({
                 const files = this.files;
                 this.files = [];
                 // 定位
-                this.maps = {};
+                this.maps = createFileMap();
                 // 事件
                 this.emitInput();
                 for (let i = 0; i < files.length; i++) {
@@ -846,7 +975,10 @@ var script = defineComponent({
             let addFiles = [];
             for (let i = 0; i < files.length; i++) {
                 let file = files[i];
-                if (this.features.html5 && file instanceof Blob) {
+                if (!file || typeof file !== 'object') {
+                    continue;
+                }
+                if (this.features.html5 && typeof Blob !== 'undefined' && file instanceof Blob) {
                     file = {
                         id: '',
                         file,
@@ -862,7 +994,7 @@ var script = defineComponent({
                 else if (file.fileObject) {
                     fileObject = true;
                 }
-                else if (typeof Element !== 'undefined' && file.el instanceof HTMLInputElement) {
+                else if (typeof HTMLInputElement !== 'undefined' && file.el instanceof HTMLInputElement) {
                     fileObject = true;
                 }
                 else if (typeof Blob !== 'undefined' && file.file instanceof Blob) {
@@ -899,12 +1031,11 @@ var script = defineComponent({
                     };
                 }
                 // 必须包含 id
-                if (!file.id) {
-                    file.id = this.newId();
-                }
+                this.ensureUniqueId(file, addFiles);
                 if (this.emitFilter(file, undefined)) {
                     continue;
                 }
+                this.ensureUniqueId(file, addFiles);
                 // 最大数量限制
                 if (this.iMaximum > 1 && (addFiles.length + this.files.length) >= this.iMaximum) {
                     break;
@@ -980,7 +1111,7 @@ var script = defineComponent({
             const entrys = el.webkitEntries || el.entries || undefined;
             if (entrys?.length) {
                 return this.getFileSystemEntry(entrys).then((files) => {
-                    return this.add(files);
+                    return this.add(files) || [];
                 });
             }
             if (el.files) {
@@ -1009,7 +1140,7 @@ var script = defineComponent({
                     el,
                 });
             }
-            return Promise.resolve(this.add(files));
+            return Promise.resolve(this.add(files) || []);
         },
         // 添加 DataTransfer
         addDataTransfer(dataTransfer) {
@@ -1035,9 +1166,11 @@ var script = defineComponent({
                         entrys.push(entry);
                     }
                 }
-                return this.getFileSystemEntry(entrys).then((files) => {
-                    return this.add(files);
-                });
+                if (entrys.length) {
+                    return this.getFileSystemEntry(entrys).then((files) => {
+                        return this.add(files) || [];
+                    });
+                }
             }
             // dataTransfer.files 支持
             const maximumValue = this.iMaximum;
@@ -1049,7 +1182,7 @@ var script = defineComponent({
                         break;
                     }
                 }
-                return Promise.resolve(this.add(files));
+                return Promise.resolve(this.add(files) || []);
             }
             return Promise.resolve([]);
         },
@@ -1071,7 +1204,8 @@ var script = defineComponent({
                             return resolve(uploadFiles);
                         }
                         this.getFileSystemEntry(v, path).then(function (results) {
-                            uploadFiles.push(...results);
+                            const remaining = maximumValue > 0 ? maximumValue - uploadFiles.length : results.length;
+                            uploadFiles.push(...results.slice(0, Math.max(remaining, 0)));
                             forEach(i + 1);
                         });
                     };
@@ -1103,6 +1237,8 @@ var script = defineComponent({
                                 file,
                             }
                         ]);
+                    }, function () {
+                        resolve([]);
                     });
                     return;
                 }
@@ -1130,11 +1266,14 @@ var script = defineComponent({
                                     return readEntries();
                                 }
                                 this.getFileSystemEntry(entries[i], path + directoryEntry.name + '/').then(function (results) {
-                                    uploadFiles.push(...results);
+                                    const remaining = maximumValue > 0 ? maximumValue - uploadFiles.length : results.length;
+                                    uploadFiles.push(...results.slice(0, Math.max(remaining, 0)));
                                     forEach(i + 1);
                                 });
                             };
                             forEach(0);
+                        }, function () {
+                            resolve(uploadFiles);
                         });
                     };
                     readEntries();
@@ -1193,11 +1332,17 @@ var script = defineComponent({
                     ...file,
                     ...data
                 };
+                if (newFile.id !== file.id && (file.active || this.activeUploadTokens.has(file.id) || (this.maps[newFile.id] && this.maps[newFile.id] !== file))) {
+                    return false;
+                }
                 // 停用必须加上错误
-                if (file.fileObject && file.active && !newFile.active && !newFile.error && !newFile.success) {
+                if (file.fileObject && file.active && !newFile.active && !newFile.error && !newFile.success && !newFile.chunk?.paused) {
                     newFile.error = 'abort';
                 }
                 if (this.emitFilter(newFile, file)) {
+                    return false;
+                }
+                if (!newFile.id || (newFile.id !== file.id && (file.active || this.maps[newFile.id]))) {
                     return false;
                 }
                 const files = this.files.concat([]);
@@ -1228,38 +1373,94 @@ var script = defineComponent({
             });
             return isPrevent;
         },
+        resumeChunkUpload(file) {
+            if (!this.activeUploadTokens.has(file.id) || !file.chunk?.resume || file.chunk.settled) {
+                return false;
+            }
+            if (!this.activeUploadIds.has(file.id)) {
+                this.activeUploadIds.add(file.id);
+                this.uploading++;
+            }
+            file.chunk.file = file;
+            if (!file.chunk.resuming) {
+                file.chunk.resume();
+            }
+            return true;
+        },
         // 处理后 事件 分发
         emitFile(newFile, oldFile) {
             this.$emit('input-file', newFile, oldFile);
-            if (newFile?.fileObject && newFile.active && (!oldFile || !oldFile.active)) {
-                this.uploading++;
-                // 激活
-                // @ts-ignore
-                this.$nextTick(() => {
-                    setTimeout(() => {
-                        newFile && this.upload(newFile).then(() => {
-                            if (newFile) {
-                                newFile = this.get(newFile) || undefined;
-                            }
-                            if (newFile?.fileObject) {
-                                this.update(newFile, {
-                                    active: false,
-                                    success: !newFile.error
-                                });
-                            }
-                        }).catch((e) => {
-                            newFile && this.update(newFile, {
-                                active: false,
-                                success: false,
-                                error: e.code || e.error || e.message || e
-                            });
-                        });
-                    }, Math.ceil(Math.random() * 50 + 50));
-                });
+            if (!newFile && oldFile) {
+                this.activeUploadTokens.delete(oldFile.id);
             }
-            else if ((!newFile || !newFile.fileObject || !newFile.active) && oldFile && oldFile.fileObject && oldFile.active) {
+            else if (newFile && !newFile.active && (newFile.error || newFile.success || !newFile.fileObject)) {
+                this.activeUploadTokens.delete(newFile.id);
+            }
+            if (newFile?.fileObject && newFile.active && (!oldFile || !oldFile.active)) {
+                if (this.resumeChunkUpload(newFile)) ;
+                else if (this.activeUploadIds.has(newFile.id)) {
+                    if (newFile.chunk?.resume) {
+                        newFile.chunk.file = newFile;
+                        newFile.chunk.resume();
+                    }
+                }
+                else {
+                    const uploadId = newFile.id;
+                    const uploadToken = ++uploadTokenId;
+                    this.activeUploadIds.add(newFile.id);
+                    this.activeUploadTokens.set(uploadId, uploadToken);
+                    this.uploading++;
+                    // 激活
+                    // @ts-ignore
+                    this.$nextTick(() => {
+                        setTimeout(() => {
+                            Promise.resolve().then(() => {
+                                if (this.activeUploadTokens.get(uploadId) !== uploadToken) {
+                                    return;
+                                }
+                                const currentFile = this.get(uploadId);
+                                if (!currentFile || !currentFile.active) {
+                                    throw new Error('abort');
+                                }
+                                newFile = currentFile;
+                                return this.upload(currentFile);
+                            }).then(() => {
+                                if (this.activeUploadTokens.get(uploadId) !== uploadToken) {
+                                    return;
+                                }
+                                newFile = this.get(uploadId) || undefined;
+                                if (newFile?.fileObject) {
+                                    this.update(newFile, {
+                                        active: false,
+                                        success: !newFile.error
+                                    });
+                                }
+                            }).catch((e) => {
+                                if (this.activeUploadTokens.get(uploadId) !== uploadToken) {
+                                    return;
+                                }
+                                const currentFile = this.get(uploadId);
+                                currentFile && this.update(currentFile, {
+                                    active: false,
+                                    success: false,
+                                    error: e.code || e.error || e.message || e
+                                });
+                            });
+                        }, Math.ceil(Math.random() * 50 + 50));
+                    });
+                }
+            }
+            else if ((!newFile || !newFile.fileObject || !newFile.active) && oldFile?.fileObject && this.activeUploadIds.has(oldFile.id)) {
                 // 停止
-                this.uploading--;
+                this.activeUploadIds.delete(oldFile.id);
+                const pausedChunk = Boolean(newFile && !newFile.error && !newFile.success && newFile.chunk?.paused);
+                if (!pausedChunk) {
+                    this.activeUploadTokens.delete(oldFile.id);
+                }
+                if (!newFile?.success && oldFile.chunk?.pause && !oldFile.chunk.paused) {
+                    oldFile.chunk.pause();
+                }
+                this.uploading = Math.max(0, this.uploading - 1);
             }
             // 自动延续激活
             // @ts-ignore
@@ -1302,22 +1503,27 @@ var script = defineComponent({
             if (this.size > 0 && file.size !== undefined && file.size >= 0 && file.size > this.size && file.type !== "text/directory") {
                 return Promise.reject(new Error('size'));
             }
-            if (this.customAction) {
-                return this.customAction(file, this);
-            }
-            if (this.features.html5) {
-                if (this.shouldUseChunkUpload(file)) {
-                    return this.uploadChunk(file);
+            try {
+                if (this.customAction) {
+                    return Promise.resolve(this.customAction(file, this));
                 }
-                if (file.putAction) {
-                    return this.uploadPut(file);
+                if (this.features.html5) {
+                    if (this.shouldUseChunkUpload(file)) {
+                        return this.uploadChunk(file);
+                    }
+                    if (file.putAction) {
+                        return this.uploadPut(file);
+                    }
+                    if (file.postAction) {
+                        return this.uploadHtml5(file);
+                    }
                 }
                 if (file.postAction) {
-                    return this.uploadHtml5(file);
+                    return this.uploadHtml4(file);
                 }
             }
-            if (file.postAction) {
-                return this.uploadHtml4(file);
+            catch (error) {
+                return Promise.reject(error instanceof Error ? error : new Error(String(error)));
             }
             return Promise.reject(new Error('No action configured'));
         },
@@ -1327,9 +1533,9 @@ var script = defineComponent({
          * @param Object file
          */
         shouldUseChunkUpload(file) {
-            return this.chunkEnabled &&
+            return Boolean(this.chunkEnabled &&
                 !!this.chunkOptions.handler &&
-                file.size && file.size > this.chunkOptions.minSize;
+                file.size && file.size > this.chunkOptions.minSize);
         },
         /**
          * Upload a file using Chunk method
@@ -1338,7 +1544,25 @@ var script = defineComponent({
          */
         uploadChunk(file) {
             const HandlerClass = this.chunkOptions.handler;
-            file.chunk = new HandlerClass(file, this.chunkOptions);
+            const fileId = file.id;
+            const handlerOptions = {
+                ...this.chunkOptions,
+                onPause: (handlerFile) => {
+                    const currentFile = this.get(fileId);
+                    if (currentFile && currentFile.active) {
+                        return this.update(currentFile, { active: false }) || handlerFile;
+                    }
+                    return currentFile || handlerFile;
+                },
+                onResume: (handlerFile) => {
+                    const currentFile = this.get(fileId);
+                    if (currentFile && !currentFile.active && !currentFile.error && !currentFile.success) {
+                        return this.update(currentFile, { active: true }) || handlerFile;
+                    }
+                    return currentFile || handlerFile;
+                },
+            };
+            file.chunk = new HandlerClass(file, handlerOptions);
             return file.chunk.upload().then(() => file);
         },
         uploadPut(file) {
@@ -1347,6 +1571,9 @@ var script = defineComponent({
             for (const key in file.data) {
                 value = file.data[key];
                 if (value !== null && value !== undefined) {
+                    if (typeof value === 'object') {
+                        value = JSON.stringify(value);
+                    }
                     querys.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
                 }
             }
@@ -1361,9 +1588,12 @@ var script = defineComponent({
             let value;
             for (const key in file.data) {
                 value = file.data[key];
-                if (value && typeof value === 'object' && typeof value.toString !== 'function') {
-                    if (value instanceof File) {
+                if (value && typeof value === 'object') {
+                    if (typeof File !== 'undefined' && value instanceof File) {
                         form.append(key, value, value.name);
+                    }
+                    else if (typeof Blob !== 'undefined' && value instanceof Blob) {
+                        form.append(key, value);
                     }
                     else {
                         form.append(key, JSON.stringify(value));
@@ -1428,7 +1658,14 @@ var script = defineComponent({
                 }
             }, 100);
             return new Promise((resolve, reject) => {
+                const stopInterval = () => {
+                    if (interval) {
+                        clearInterval(interval);
+                        interval = undefined;
+                    }
+                };
                 if (!file) {
+                    stopInterval();
                     reject(new Error('not_exists'));
                     return;
                 }
@@ -1439,10 +1676,7 @@ var script = defineComponent({
                         return;
                     }
                     complete = true;
-                    if (interval) {
-                        clearInterval(interval);
-                        interval = undefined;
-                    }
+                    stopInterval();
                     if (!file) {
                         return reject(new Error('not_exists'));
                     }
@@ -1486,13 +1720,22 @@ var script = defineComponent({
                             else if (xhr.status >= 400) {
                                 data.error = 'denied';
                             }
+                            else {
+                                data.error = 'server';
+                            }
                             break;
                         default:
-                            if (xhr.status >= 500) {
+                            if (!xhr.status) {
+                                data.error = 'network';
+                            }
+                            else if (xhr.status >= 500) {
                                 data.error = 'server';
                             }
                             else if (xhr.status >= 400) {
                                 data.error = 'denied';
+                            }
+                            else if (xhr.status < 200 || xhr.status >= 300) {
+                                data.error = 'server';
                             }
                             else {
                                 data.progress = '100.00';
@@ -1500,7 +1743,7 @@ var script = defineComponent({
                     }
                     if (xhr.responseText) {
                         const contentType = xhr.getResponseHeader('Content-Type');
-                        if (contentType && contentType.indexOf('/json') !== -1) {
+                        if (contentType && /(?:\/|\+)json(?:;|$)/i.test(contentType)) {
                             try {
                                 data.response = JSON.parse(xhr.responseText);
                             }
@@ -1538,14 +1781,25 @@ var script = defineComponent({
                     xhr.timeout = file.timeout;
                 }
                 // headers
-                for (const key in file.headers) {
-                    xhr.setRequestHeader(key, file.headers[key]);
+                try {
+                    for (const key in file.headers) {
+                        xhr.setRequestHeader(key, file.headers[key]);
+                    }
+                    // 更新 xhr
+                    // @ts-ignore
+                    file = this.update(file, { xhr });
+                    // 开始上传
+                    if (!file) {
+                        stopInterval();
+                        reject(new Error('abort'));
+                        return;
+                    }
+                    xhr.send(body);
                 }
-                // 更新 xhr
-                // @ts-ignore
-                file = this.update(file, { xhr });
-                // 开始上传
-                file && xhr.send(body);
+                catch (error) {
+                    stopInterval();
+                    reject(error instanceof Error ? error : new Error(String(error)));
+                }
             });
         },
         uploadHtml4(ufile) {
@@ -1755,7 +2009,7 @@ var script = defineComponent({
                 index++;
                 if (!file.fileObject) ;
                 else if (active && !this.destroy) {
-                    if (this.uploading >= this.thread || (this.uploading && !this.features.html5)) {
+                    if (this.uploading >= this.iThread || (this.uploading && !this.features.html5)) {
                         break;
                     }
                     if (!file.active && !file.error && !file.success) {
@@ -1797,12 +2051,17 @@ var script = defineComponent({
             let el = null;
             if (!newDrop) ;
             else if (typeof newDrop === 'string') {
-                // @ts-ignore
-                el = document.querySelector(newDrop) || this.$root.$el.querySelector(newDrop);
+                try {
+                    // @ts-ignore
+                    el = document.querySelector(newDrop) || this.$root.$el?.querySelector(newDrop);
+                }
+                catch (error) {
+                    el = null;
+                }
             }
             else if (newDrop === true) {
                 // @ts-ignore
-                el = this.$parent.$el;
+                el = this.$parent?.$el;
                 if (!el || el?.nodeType === 8) {
                     // @ts-ignore
                     el = this.$root.$el;
@@ -1815,6 +2074,11 @@ var script = defineComponent({
                 el = newDrop;
             }
             this.dropElement = el;
+            if (!this.dropElement) {
+                this.dropActive = false;
+                this.dropElementActive = false;
+                this.watchDropActive(false);
+            }
             if (this.dropElement) {
                 document.addEventListener('dragenter', this.onDocumentDragenter, false);
                 document.addEventListener('dragleave', this.onDocumentDragleave, false);
@@ -1844,7 +2108,7 @@ var script = defineComponent({
             }
         },
         onDocumentDragenter(e) {
-            if (this.dropActive) {
+            if (this.disabled || this.dropActive) {
                 return;
             }
             if (!e.dataTransfer) {
@@ -1879,14 +2143,16 @@ var script = defineComponent({
             }
         },
         onDocumentDragover() {
-            this.watchDropActive(true);
+            if (!this.disabled && this.dropActive) {
+                this.watchDropActive(true);
+            }
         },
         onDocumentDrop() {
             this.dropActive = false;
             this.watchDropActive(false);
         },
         onDragenter() {
-            if (!this.dropActive || this.dropElementActive) {
+            if (this.disabled || !this.dropActive || this.dropElementActive) {
                 return;
             }
             this.dropElementActive = true;
@@ -1919,11 +2185,16 @@ var script = defineComponent({
             }
         },
         onDragover(e) {
+            if (this.disabled) {
+                return;
+            }
             e.preventDefault();
         },
         onDrop(e) {
             e.preventDefault();
-            e.dataTransfer && this.addDataTransfer(e.dataTransfer);
+            if (!this.disabled) {
+                e.dataTransfer && this.addDataTransfer(e.dataTransfer);
+            }
         },
         async inputOnChange(e) {
             if (!(e.target instanceof HTMLInputElement)) {

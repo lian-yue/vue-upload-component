@@ -7,65 +7,66 @@
     <p>You can also pause / resume the upload process.</p>
 
     <div class="upload">
-      <div class="form-horizontal">
-        <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-10">
-            <div class="checkbox">
-              <label>
-                <input v-model="chunkEnabled" type="checkbox"> Use chunk upload
+      <div>
+        <div class="mb-3">
+          <div class="col-sm-10 offset-sm-2">
+            <div class="form-check">
+              <label class="form-check-label">
+                <input class="form-check-input" v-model="chunkEnabled" type="checkbox"> Use chunk upload
               </label>
             </div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="inputMinSize" class="col-sm-2 control-label">Min Size</label>
+        <div class="row mb-3">
+          <label for="inputMinSize" class="col-sm-2 col-form-label">Min Size</label>
           <div class="col-sm-10">
             <div class="input-group">
               <input id="inputMinSize" v-model="chunkMinSize" type="number" class="form-control">
-              <span class="input-group-addon">MB</span>
+              <span class="input-group-text">MB</span>
             </div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="inputMaxActive" class="col-sm-2 control-label">Max Active Chunks</label>
+        <div class="row mb-3">
+          <label for="inputMaxActive" class="col-sm-2 col-form-label">Max Active Chunks</label>
           <div class="col-sm-10">
             <input id="inputMaxActive" v-model="chunkMaxActive" type="number" class="form-control">
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="inputMaxRetries" class="col-sm-2 control-label">Max Chunk Retries</label>
+        <div class="row mb-3">
+          <label for="inputMaxRetries" class="col-sm-2 col-form-label">Max Chunk Retries</label>
           <div class="col-sm-10">
             <input id="inputMaxRetries" v-model="chunkMaxRetries" type="number" class="form-control">
           </div>
         </div>
       </div>
 
-      <table class="table table-striped table-condensed">
-        <thead class="thead-dark">
+      <div class="table-responsive">
+      <table class="table table-striped table-sm">
+        <thead class="table-dark">
           <tr>
             <th>Name</th>
-            <th class="text-right">Size</th>
-            <th class="text-right">Progress</th>
+            <th class="text-end">Size</th>
+            <th class="text-end">Progress</th>
             <th>Status</th>
             <th>Pause</th>
             <th colspan="3" class="text-center">Chunks</th>
           </tr>
           <tr>
             <th colspan="5"></th>
-            <th class="text-right">Total</th>
-            <th class="text-right">Active</th>
-            <th class="text-right">Completed</th>
+            <th class="text-end">Total</th>
+            <th class="text-end">Active</th>
+            <th class="text-end">Completed</th>
           </tr>
         </thead>
         <tbody>
           <template v-for="file in files" :key="file.id">
             <tr>
               <td>{{ file.name }}</td>
-              <td class="text-right">{{ $formatSize(file.size) }}</td>
-              <td class="text-right">{{ file.progress }}%</td>
+              <td class="text-end">{{ $formatSize(file.size) }}</td>
+              <td class="text-end">{{ file.progress }}%</td>
 
               <td v-if="file.error">{{ file.error }}</td>
               <td v-else-if="file.success">Success</td>
@@ -79,27 +80,27 @@
                     v-if="file.active"
                     @click="file.chunk.pause()"
                   >
-                    <i class="fa fa-pause"/>
+                    <i class="fa-solid fa-pause"/>
                   </button>
                   <button
                     class="btn btn-sm btn-primary"
                     v-if="!file.active && file.chunk.hasChunksToUpload"
                     @click="file.chunk.resume()"
                   >
-                    <i class="fa fa-play"/>
+                    <i class="fa-solid fa-play"/>
                   </button>
                 </template>
               </td>
 
               <template v-if="file.chunk">
-                <td class="text-right">{{ file.chunk.chunks.length }}</td>
-                <td class="text-right">{{ file.chunk.chunksUploading.length }}</td>
-                <td class="text-right">{{ file.chunk.chunksUploaded.length }}</td>
+                <td class="text-end">{{ file.chunk.chunks.length }}</td>
+                <td class="text-end">{{ file.chunk.chunksUploading.length }}</td>
+                <td class="text-end">{{ file.chunk.chunksUploaded.length }}</td>
               </template>
               <template v-else>
-                <td class="text-right"> - </td>
-                <td class="text-right"> - </td>
-                <td class="text-right"> - </td>
+                <td class="text-end"> - </td>
+                <td class="text-end"> - </td>
+                <td class="text-end"> - </td>
               </template>
             </tr>
 
@@ -122,6 +123,7 @@
           </template>
         </tbody>
       </table>
+      </div>
 
       <div class="example-btn">
         <file-upload
@@ -144,7 +146,7 @@
           @input-filter="inputFilter"
           @input-file="inputFile"
           ref="upload">
-          <i class="fa fa-plus"></i>
+          <i class="fa-solid fa-plus"></i>
           Select files
         </file-upload>
       </div>
@@ -242,4 +244,3 @@ export default {
     background: #28A745;
   }
 </style>
-

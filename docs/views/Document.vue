@@ -15,7 +15,7 @@
         </ul>
       </nav>
     </div>
-    <main class="col-12 col-md-9 col-xl-10 py-md-3 pr-md-5 pl-md-5" id="main" role="main">
+    <main class="col-12 col-md-9 col-xl-10 py-md-3 pe-md-5 ps-md-5" id="main" role="main">
       <h1 class="document-title" id="document-title">{{$t('document.title')}}</h1>
     <div class="document-content" v-markdown>{{document}}</div>
     </main>
@@ -68,9 +68,13 @@ export default {
   mounted() {
     // auto scrollTo hash
     if (this.$route.hash) {
-      let el = document.querySelector(decodeURIComponent(this.$route.hash))
-      if (el) {
-        window.scrollTo(0, el.offsetTop)
+      try {
+        const el = document.getElementById(decodeURIComponent(this.$route.hash.slice(1)))
+        if (el) {
+          window.scrollTo(0, el.offsetTop)
+        }
+      } catch (error) {
+        window.scrollTo(0, 0)
       }
     }
   },

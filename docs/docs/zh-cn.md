@@ -6,26 +6,15 @@
 npm install vue-upload-component --save
 ```
 
-#### Vue3
-``` bash
-npm install vue-upload-component@next --save
-```
-
 ``` js
-const VueUploadComponent = require('vue-upload-component')
-app.component('file-upload', VueUploadComponent)
-// or 
 import VueUploadComponent from 'vue-upload-component'
 app.component('file-upload', VueUploadComponent)
 ```
 
 ### Typescript
 ``` js
-import VueUploadComponent from 'vue-upload-component/src/FileUpload.vue'
-
-// or
 import VueUploadComponent from 'vue-upload-component'
-// vue-upload-component/dist/vue-upload-component.d.ts
+app.component('file-upload', VueUploadComponent)
 ```
 
 
@@ -40,20 +29,24 @@ import VueUploadComponent from 'vue-upload-component'
 unpkg
 
 ``` html
-<script src="https://unpkg.com/vue"></script>
-<script src="https://unpkg.com/vue-upload-component"></script>
+<script src="https://unpkg.com/vue@3.5.41/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/vue-upload-component@3.1.17/dist/vue-upload-component.js"></script>
 <script>
-Vue.component('file-upload', VueUploadComponent)
+const app = Vue.createApp({})
+app.component('file-upload', VueUploadComponent)
+app.mount('#app')
 </script>
 ```
 
 jsDelivr
 
 ``` html
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue-upload-component"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.5.41/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-upload-component@3.1.17/dist/vue-upload-component.js"></script>
 <script>
-Vue.component('file-upload', VueUploadComponent)
+const app = Vue.createApp({})
+app.component('file-upload', VueUploadComponent)
+app.mount('#app')
 </script>
 ```
 
@@ -68,8 +61,8 @@ Vue.component('file-upload', VueUploadComponent)
 <head>
   <meta charset="utf-8">
   <title>Vue-upload-component Test</title>
-  <script src="https://unpkg.com/vue"></script>
-  <script src="https://unpkg.com/vue-upload-component"></script>
+  <script src="https://unpkg.com/vue@3.5.41/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/vue-upload-component@3.1.17/dist/vue-upload-component.js"></script>
 </head>
 <body>
 <div id="app">
@@ -90,9 +83,8 @@ Vue.component('file-upload', VueUploadComponent)
   <button v-show="$refs.upload && $refs.upload.active" @click.prevent="$refs.upload.active = false" type="button">停止上传</button>
 </div>
 <script>
-new Vue({
-  el: '#app',
-  data: function () {
+const app = Vue.createApp({
+  data() {
     return {
       files: []
     }
@@ -132,15 +124,21 @@ new Vue({
         }
       }
 
-      // 创建 blob 字段 用于图片预览
-      newFile.blob = ''
-      let URL = window.URL || window.webkitURL
-      if (URL && URL.createObjectURL) {
-        newFile.blob = URL.createObjectURL(newFile.file)
+      const URLApi = window.URL || window.webkitURL
+      if (URLApi && !newFile && oldFile && oldFile.blob && oldFile.blob.startsWith('blob:')) {
+        URLApi.revokeObjectURL(oldFile.blob)
+      }
+      if (URLApi && newFile && newFile.file && (!oldFile || newFile.file !== oldFile.file)) {
+        if (oldFile && oldFile.blob && oldFile.blob.startsWith('blob:')) {
+          URLApi.revokeObjectURL(oldFile.blob)
+        }
+        newFile.blob = URLApi.createObjectURL(newFile.file)
       }
     }
-  }
-});
+  },
+})
+app.component('file-upload', VueUploadComponent)
+app.mount('#app')
 </script>
 </body>
 </html>
@@ -193,7 +191,7 @@ import '~vue-upload-component/dist/vue-upload-component.part.css'
 }
 </style>
 <script>
-import FileUpload from 'vue-upload-component/dist/vue-upload-component.part.js'
+import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.ssr.js'
 export default {
   components: {
     FileUpload,
@@ -206,34 +204,6 @@ export default {
 }
 </script>
 ```
-
-
-** 或者 **
-
-
-```js
-import FileUpload from 'vue-upload-component/src'
-```
-
-webpack.config.js
-
-```js
-const nodeExternals = require('webpack-node-externals');
-{
-  //...
-  externals: [
-    nodeExternals({whitelist:[/^vue-upload-component\/src/]})
-  ]
-  //...
-}
-```
-
-* [https://github.com/liady/webpack-node-externals](https://github.com/liady/webpack-node-externals)  
-
-* [**`vue-hackernews` 演示**](https://github.com/lian-yue/vue-hackernews-2.0/)  
-
-* [**浏览修改文件**](https://github.com/lian-yue/vue-hackernews-2.0/commit/bd6c58a30cc6b8ba6c0148e737b3ce9336b99cf8)
-
 
 
 ### 扩展分片上传
@@ -466,6 +436,34 @@ input标签的 `name` 属性
 
 
 
+### capture
+
+input 标签的 `capture` 属性。受支持的设备可用 `user` 调用前置摄像头，或用 `environment` 调用后置摄像头。
+
+* **类型:** `Boolean | 'user' | 'environment'`
+
+* **默认值:** `undefined`
+
+* **示例:**
+  ```html
+  <file-upload accept="image/*" capture="environment"></file-upload>
+  ```
+
+
+### disabled
+
+禁用文件选择和拖拽处理。
+
+* **类型:** `Boolean`
+
+* **默认值:** `false`
+
+* **示例:**
+  ```html
+  <file-upload :disabled="true"></file-upload>
+  ```
+
+
 ### multiple
 
 文件表单的 `multiple` 属性  
@@ -506,13 +504,27 @@ input标签的 `name` 属性
 
 
 
+### create-directory
+
+读取拖入或选择的目录时，把目录本身作为 MIME 类型为 `text/directory` 的零字节文件加入列表。
+
+* **类型:** `Boolean`
+
+* **默认值:** `false`
+
+* **示例:**
+  ```html
+  <file-upload directory multiple create-directory></file-upload>
+  ```
+
+
 ### extensions
 
 允许上传的文件后缀
 
 * **类型:** `Array | String | RegExp`
 
-* **默认值:** `undefined`
+* **默认值:** `[]`
 
 * **示例:**
   ```html
@@ -597,6 +609,41 @@ input标签的 `name` 属性
 
 
 
+
+
+### chunk-enabled
+
+是否启用分片上传。
+
+* **类型:** `Boolean`
+
+* **默认值:** `false`
+
+* **示例:**
+  ```html
+  <file-upload chunk-enabled></file-upload>
+  ```
+
+
+### chunk
+
+分片上传选项。
+
+* **类型:** `Object`
+
+* **默认值:**
+  ```js
+  {
+    headers: {},
+    action: '',
+    minSize: 1048576,
+    maxActive: 3,
+    maxRetries: 5,
+    handler: ChunkUploadDefaultHandler
+  }
+  ```
+
+可通过 `startBody`、`uploadBody` 和 `finishBody` 分别附加各阶段的请求字段。
 
 
 ### drop
@@ -749,10 +796,9 @@ Add, update, remove pre-filter
           }
 
           // 创建 `blob` 字段 用于缩略图预览
-          newFile.blob = ''
-          let URL = window.URL || window.webkitURL
-          if (URL && URL.createObjectURL) {
-            newFile.blob = URL.createObjectURL(newFile.file)
+          const URLApi = window.URL || window.webkitURL
+          if (URLApi) {
+            newFile.blob = URLApi.createObjectURL(newFile.file)
           }
         }
 
@@ -771,6 +817,10 @@ Add, update, remove pre-filter
 
           // 拒绝删除文件
           // return prevent()
+          const URLApi = window.URL || window.webkitURL
+          if (URLApi && oldFile.blob && oldFile.blob.startsWith('blob:')) {
+            URLApi.revokeObjectURL(oldFile.blob)
+          }
         }
       }
     }

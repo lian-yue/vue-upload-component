@@ -1,11 +1,15 @@
 import { createApp, h } from 'vue'
 import { marked, Renderer as MarkedRenderer } from 'marked'
-import highlightjs from 'highlight.js'
-import 'highlight.js/styles/atom-one-light.css'
 import store from './store'
 import router from './router'
 import i18n from './i18n'
 import App from './views/App'
+
+const highlightjs = window.hljs
+
+function escapeHtml(text) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
 
 class Renderer extends MarkedRenderer {
   constructor() {
@@ -41,10 +45,12 @@ class Renderer extends MarkedRenderer {
   }
 
   code({ text, lang }) {
-    const language = lang && highlightjs.getLanguage(lang) ? lang : ''
-    const code = language
-      ? highlightjs.highlight(text, { language }).value
-      : highlightjs.highlightAuto(text).value
+    const language = lang && highlightjs?.getLanguage(lang) ? lang : ''
+    const code = highlightjs
+      ? (language
+          ? highlightjs.highlight(text, { language }).value
+          : highlightjs.highlightAuto(text).value)
+      : escapeHtml(text)
     const languageClass = language ? ' language-' + language : ''
     return '<pre><code class="hljs' + languageClass + '">' + code + '</code></pre>\n'
   }
@@ -197,23 +203,18 @@ app.config.globalProperties.$toLocale = function(to) {
 }
 
 app.config.globalProperties.$formatSize = function(size) {
-  if (size > 1024 * 1024 * 1024 * 1024) {
+  if (!Number.isFinite(Number(size))) {
+    return '0 B'
+  }
+  size = Number(size)
+  if (size >= 1024 * 1024 * 1024 * 1024) {
     return (size / 1024 / 1024 / 1024 / 1024).toFixed(2) + ' TB'
-  } else if (size > 1024 * 1024 * 1024) {
+  } else if (size >= 1024 * 1024 * 1024) {
     return (size / 1024 / 1024 / 1024).toFixed(2) + ' GB'
-  } else if (size > 1024 * 1024) {
+  } else if (size >= 1024 * 1024) {
     return (size / 1024 / 1024).toFixed(2) + ' MB'
-  } else if (size > 1024) {
+  } else if (size >= 1024) {
     return (size / 1024).toFixed(2) + ' KB'
   }
   return size.toString() + ' B'
 }
-
-
-
-// new Vue({
-//   store,
-//   // router,
-//   // i18n,
-//   // ...App
-// }).$mount('#app')

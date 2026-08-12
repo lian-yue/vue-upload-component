@@ -20,7 +20,7 @@
             <a rel="license noopener" class="nav-link" href="https://www.lianyue.org" target="_blank">{{$t('header.blog')}}</a>
           </li>
         </ul>
-        <ul class="navbar-nav ml-md-auto">
+        <ul class="navbar-nav ms-md-auto">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" @click.prevent="onLocale(true)" @focus="onLocale(true)" @blur="onLocale(false)">
               {{$t('header.locale')}}
@@ -73,8 +73,8 @@
 #sidebar-nav {
   padding-top: 1rem;
   padding-bottom: 1rem;
-  margin-right: -15px;
-  margin-left: -15px;
+  margin-right: calc(-.5 * var(--bs-gutter-x));
+  margin-left: calc(-.5 * var(--bs-gutter-x));
   max-height: 100%;
   overflow-y: auto;
 }
@@ -153,7 +153,8 @@ pre {
   z-index: 1072;
 }
 .source-code {
-  font-size: 2em;
+  overflow-wrap: anywhere;
+  font-size: clamp(1.25rem, 5vw, 2em);
   font-weight: bold;
   color: #f00;
 }

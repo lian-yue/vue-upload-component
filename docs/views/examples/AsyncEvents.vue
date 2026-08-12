@@ -17,16 +17,16 @@
                 <file-upload class="btn btn-primary" post-action="/upload/post" extensions="gif,jpg,jpeg,png,webp"
                     accept="image/png,image/gif,image/jpeg,image/webp" :multiple="true" :size="1024 * 1024 * 10"
                     v-model="files" @input-filter="inputFilter" @input-file="inputFile" ref="upload">
-                    <i class="fa fa-plus"></i>
+                    <i class="fa-solid fa-plus"></i>
                     Select files
                 </file-upload>
                 <button type="button" class="btn btn-success" v-if="!upload || !upload.active"
                     @click.prevent="upload.active = true">
-                    <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                    <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
                     Start Upload
                 </button>
                 <button type="button" class="btn btn-danger" v-else @click.prevent="upload.active = false">
-                    <i class="fa fa-stop" aria-hidden="true"></i>
+                    <i class="fa-solid fa-stop" aria-hidden="true"></i>
                     Stop Upload
                 </button>
             </div>
@@ -85,8 +85,12 @@ export default {
 
                     // wait 2 seconds
                     setTimeout(async function () {
-                        newFile.md5 = await calculateMD5(newFile.file);
-                        upload.value.add(newFile, 0);
+                        try {
+                            newFile.md5 = await calculateMD5(newFile.file);
+                        } catch (error) {
+                            newFile.error = error?.message || error;
+                        }
+                        upload.value?.add(newFile, 0);
                     }, 2000);
                     return;
                 }

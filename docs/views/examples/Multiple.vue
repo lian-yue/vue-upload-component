@@ -26,17 +26,17 @@
       <div class="example-btn">
         <file-upload class="btn btn-primary" input-id="file1" post-action="/upload/post" v-model="files1" ref="upload1"
           drop=".upload-drop-container-1" :drop-directory="true" :multiple="true">
-          <i class="fa fa-plus"></i>
+          <i class="fa-solid fa-plus"></i>
           Select files
         </file-upload>
-        <label for="file1" class="btn btn-primary ml-2">Label Select files</label>
+        <label for="file1" class="btn btn-primary ms-2">Label Select files</label>
         <button type="button" class="btn btn-success" v-if="!$refs.upload1 || !$refs.upload1.active"
           @click.prevent="$refs.upload1.active = true">
-          <i class="fa fa-arrow-up" aria-hidden="true"></i>
+          <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
           Start Upload
         </button>
         <button type="button" class="btn btn-danger" v-else @click.prevent="$refs.upload1.active = false">
-          <i class="fa fa-stop" aria-hidden="true"></i>
+          <i class="fa-solid fa-stop" aria-hidden="true"></i>
           Stop Upload
         </button>
       </div>
@@ -76,17 +76,17 @@
       <div class="example-btn">
         <file-upload class="btn btn-primary" input-id="file2" post-action="/upload/post" v-model="files2" ref="upload2"
           drop=".upload-drop-container-2" :drop-directory="true" :multiple="true">
-          <i class="fa fa-plus"></i>
+          <i class="fa-solid fa-plus"></i>
           Select files
         </file-upload>
-        <label for="file2" class="btn btn-primary  ml-2">Label Select files</label>
+        <label for="file2" class="btn btn-primary ms-2">Label Select files</label>
         <button type="button" class="btn btn-success" v-if="!$refs.upload2 || !$refs.upload2.active"
           @click.prevent="$refs.upload2.active = true">
-          <i class="fa fa-arrow-up" aria-hidden="true"></i>
+          <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
           Start Upload
         </button>
         <button type="button" class="btn btn-danger" v-else @click.prevent="$refs.upload2.active = false">
-          <i class="fa fa-stop" aria-hidden="true"></i>
+          <i class="fa-solid fa-stop" aria-hidden="true"></i>
           Stop Upload
         </button>
       </div>

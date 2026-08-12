@@ -12,6 +12,18 @@ import packageInfo from './package.json' with { type: 'json' }
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url))
 
+function cssOnly(options) {
+  const plugin = pluginCSS(options)
+  const transform = plugin.transform
+  return {
+    ...plugin,
+    transform(code, id) {
+      const result = transform.call(this, code, id)
+      return result === '' ? { code: '', map: { mappings: '' } } : result
+    },
+  }
+}
+
 function baseConfig(css, ssr, umd, min, cssFile) {
   return {
     input: 'src/FileUpload.vue',
@@ -37,7 +49,7 @@ function baseConfig(css, ssr, umd, min, cssFile) {
         browser: true,
         mainFields: ['browser', 'module', 'main'],
       }),
-      css && pluginCSS({
+      css && cssOnly({
         output(styles) {
           writeFileSync(path.resolve(rootDir, 'dist', cssFile), `${styles.trimEnd()}\n`)
         },

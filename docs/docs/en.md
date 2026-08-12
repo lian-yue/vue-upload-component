@@ -10,32 +10,13 @@ npm install vue-upload-component --save
 ```
 
 ``` js
-const VueUploadComponent = require('vue-upload-component')
-Vue.component('file-upload', VueUploadComponent)
-```
-
-
-
-#### Vue3
-``` bash
-npm install vue-upload-component@next --save
-```
-
-``` js
-const VueUploadComponent = require('vue-upload-component')
-app.component('file-upload', VueUploadComponent)
-// or 
 import VueUploadComponent from 'vue-upload-component'
 app.component('file-upload', VueUploadComponent)
 ```
 
 ### Typescript
 ``` js
-import VueUploadComponent from 'vue-upload-component/src/FileUpload.vue'
-
-// or
 import VueUploadComponent from 'vue-upload-component'
-// vue-upload-component/dist/vue-upload-component.d.ts
 
 app.component('file-upload', VueUploadComponent)
 ```
@@ -51,20 +32,24 @@ app.component('file-upload', VueUploadComponent)
 unpkg
 
 ``` html
-<script src="https://unpkg.com/vue"></script>
-<script src="https://unpkg.com/vue-upload-component"></script>
+<script src="https://unpkg.com/vue@3.5.41/dist/vue.global.prod.js"></script>
+<script src="https://unpkg.com/vue-upload-component@3.1.17/dist/vue-upload-component.js"></script>
 <script>
-Vue.component('file-upload', VueUploadComponent)
+const app = Vue.createApp({})
+app.component('file-upload', VueUploadComponent)
+app.mount('#app')
 </script>
 ```
 
 jsDelivr
 
 ``` html
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue-upload-component"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.5.41/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-upload-component@3.1.17/dist/vue-upload-component.js"></script>
 <script>
-Vue.component('file-upload', VueUploadComponent)
+const app = Vue.createApp({})
+app.component('file-upload', VueUploadComponent)
+app.mount('#app')
 </script>
 ```
 
@@ -79,8 +64,8 @@ Vue.component('file-upload', VueUploadComponent)
 <head>
   <meta charset="utf-8">
   <title>Vue-upload-component Test</title>
-  <script src="https://unpkg.com/vue"></script>
-  <script src="https://unpkg.com/vue-upload-component"></script>
+  <script src="https://unpkg.com/vue@3.5.41/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/vue-upload-component@3.1.17/dist/vue-upload-component.js"></script>
 </head>
 <body>
 <div id="app">
@@ -101,9 +86,8 @@ Vue.component('file-upload', VueUploadComponent)
   <button v-show="$refs.upload && $refs.upload.active" @click.prevent="$refs.upload.active = false" type="button">Stop upload</button>
 </div>
 <script>
-new Vue({
-  el: '#app',
-  data: function () {
+const app = Vue.createApp({
+  data() {
     return {
       files: []
     }
@@ -143,15 +127,21 @@ new Vue({
         }
       }
 
-      // Create a blob field
-      newFile.blob = ''
-      let URL = window.URL || window.webkitURL
-      if (URL && URL.createObjectURL) {
-        newFile.blob = URL.createObjectURL(newFile.file)
+      const URLApi = window.URL || window.webkitURL
+      if (URLApi && !newFile && oldFile && oldFile.blob && oldFile.blob.startsWith('blob:')) {
+        URLApi.revokeObjectURL(oldFile.blob)
+      }
+      if (URLApi && newFile && newFile.file && (!oldFile || newFile.file !== oldFile.file)) {
+        if (oldFile && oldFile.blob && oldFile.blob.startsWith('blob:')) {
+          URLApi.revokeObjectURL(oldFile.blob)
+        }
+        newFile.blob = URLApi.createObjectURL(newFile.file)
       }
     }
-  }
-});
+  },
+})
+app.component('file-upload', VueUploadComponent)
+app.mount('#app')
 </script>
 </body>
 </html>
@@ -410,7 +400,7 @@ or
 }
 </style>
 <script>
-import FileUpload from 'vue-upload-component/dist/vue-upload-component.part.js'
+import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.ssr.js'
 export default {
   components: {
     FileUpload,
@@ -423,36 +413,6 @@ export default {
 }
 </script>
 ```
-
-
-** OR **
-
-
-```js
-import FileUpload from 'vue-upload-component/src'
-```
-
-
-webpack.config.js
-
-```js
-const nodeExternals = require('webpack-node-externals');
-{
-  //.....
-  externals: [
-    nodeExternals({whitelist:[/^vue-upload-component\/src/]})
-  ]
-  //.....
-}
-```
-
-* [https://github.com/liady/webpack-node-externals](https://github.com/liady/webpack-node-externals)
-
-* [**`vue-hackernews` demo**](https://github.com/lian-yue/vue-hackernews-2.0/)
-
-* [**View changes**](https://github.com/lian-yue/vue-hackernews-2.0/commit/bd6c58a30cc6b8ba6c0148e737b3ce9336b99cf8)
-
-
 
 
 ## Options / Props
@@ -642,6 +602,34 @@ The `accept` attribute of the input tag, MIME type
 
 
 
+### capture
+
+The `capture` attribute of the input tag. Use `user` for the front camera or `environment` for the rear camera on supported devices.
+
+* **Type:** `Boolean | 'user' | 'environment'`
+
+* **Default:** `undefined`
+
+* **Usage:**
+  ```html
+  <file-upload accept="image/*" capture="environment"></file-upload>
+  ```
+
+
+### disabled
+
+Disables file selection and drag-and-drop handling.
+
+* **Type:** `Boolean`
+
+* **Default:** `false`
+
+* **Usage:**
+  ```html
+  <file-upload :disabled="true"></file-upload>
+  ```
+
+
 ### multiple
 
 The `multiple` attribute of the input tag
@@ -682,13 +670,27 @@ Whether it is a upload folder
 
 
 
+### create-directory
+
+Adds directory entries as zero-byte files with the MIME type `text/directory` when reading a dropped or selected directory.
+
+* **Type:** `Boolean`
+
+* **Default:** `false`
+
+* **Usage:**
+  ```html
+  <file-upload directory multiple create-directory></file-upload>
+  ```
+
+
 ### extensions
 
 Allow upload file extensions
 
 * **Type:** `Array | String | RegExp`
 
-* **Default:** `undefined`
+* **Default:** `[]`
 
 * **Usage:**
   ```html
@@ -792,9 +794,7 @@ All the options to handle chunk uploads
 * **Default:**
 ```js
 {
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers: {},
     action: '',
     minSize: 1048576,
     maxActive: 3,
@@ -805,6 +805,8 @@ All the options to handle chunk uploads
     handler: ChunkUploadDefaultHandler
 }
 ```
+
+`startBody`, `uploadBody`, and `finishBody` can add phase-specific request fields.
 
 ### drop
 
@@ -957,10 +959,9 @@ Add, update, remove pre-filter
           }
 
           // Create the 'blob' field for thumbnail preview
-          newFile.blob = ''
-          let URL = window.URL || window.webkitURL
-          if (URL && URL.createObjectURL) {
-            newFile.blob = URL.createObjectURL(newFile.file)
+          const URLApi = window.URL || window.webkitURL
+          if (URLApi) {
+            newFile.blob = URLApi.createObjectURL(newFile.file)
           }
         }
 
@@ -979,6 +980,10 @@ Add, update, remove pre-filter
 
           // Refused to remove the file
           // return prevent()
+          const URLApi = window.URL || window.webkitURL
+          if (URLApi && oldFile.blob && oldFile.blob.startsWith('blob:')) {
+            URLApi.revokeObjectURL(oldFile.blob)
+          }
         }
       }
     }

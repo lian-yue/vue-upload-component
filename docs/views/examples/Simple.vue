@@ -25,15 +25,15 @@
           @input-filter="inputFilter"
           @input-file="inputFile"
           ref="upload">
-          <i class="fa fa-plus"></i>
+          <i class="fa-solid fa-plus"></i>
           Select files
         </file-upload>
         <button type="button" class="btn btn-success" v-if="!upload || !upload.active" @click.prevent="upload.active = true">
-          <i class="fa fa-arrow-up" aria-hidden="true"></i>
+          <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
           Start Upload
         </button>
         <button type="button" class="btn btn-danger"  v-else @click.prevent="upload.active = false">
-          <i class="fa fa-stop" aria-hidden="true"></i>
+          <i class="fa-solid fa-stop" aria-hidden="true"></i>
           Stop Upload
         </button>
       </div>

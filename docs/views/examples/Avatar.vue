@@ -52,7 +52,7 @@
 }
 .example-avatar .avatar-edit-image {
   max-width: 100%;
-  height: 80vh;
+  height: min(70vh, 40rem);
 }
 .example-avatar .avatar-edit-image img {
   max-width: 100%;
@@ -60,6 +60,12 @@
 }
 .example-avatar .avatar-edit-image cropper-canvas {
   height: 100%;
+}
+
+@media (max-height: 640px) {
+  .example-avatar .avatar-edit-image {
+    height: 55vh;
+  }
 }
 
 
@@ -92,7 +98,6 @@
 
 
 <script>
-import Cropper from 'cropperjs'
 import FileUpload from 'vue-upload-component'
 export default {
   components: {
@@ -114,7 +119,13 @@ export default {
           if (!this.$refs.editImage) {
             return
           }
-          const cropper = new Cropper(this.$refs.editImage)
+          const CropperConstructor = window.Cropper && window.Cropper.default
+          if (typeof CropperConstructor !== 'function') {
+            this.alert('Cropper.js failed to load')
+            this.edit = false
+            return
+          }
+          const cropper = new CropperConstructor(this.$refs.editImage)
           const selection = cropper.getCropperSelection()
           const cropperImage = cropper.getCropperImage()
           if (selection) {
@@ -137,15 +148,31 @@ export default {
           this.cropper = cropper
         })
       } else {
-        if (this.cropper) {
-          this.cropper.destroy()
-          this.cropper = false
-        }
+        this.destroyCropper()
       }
     }
   },
 
+  beforeUnmount() {
+    this.destroyCropper()
+    this.files.forEach((file) => this.revokeObjectURL(file.url))
+  },
+
   methods: {
+    destroyCropper() {
+      if (this.cropper) {
+        this.cropper.destroy()
+        this.cropper = false
+      }
+    },
+
+    revokeObjectURL(url) {
+      const URLApi = window.URL || window.webkitURL
+      if (URLApi && typeof url === 'string' && url.startsWith('blob:')) {
+        URLApi.revokeObjectURL(url)
+      }
+    },
+
     async editSave() {
       const oldFile = this.files[0]
       const selection = this.cropper && this.cropper.getCropperSelection()
@@ -190,6 +217,10 @@ export default {
     },
 
     inputFilter(newFile, oldFile, prevent) {
+      if (!newFile && oldFile) {
+        this.revokeObjectURL(oldFile.url)
+      }
+
       if (newFile && !oldFile) {
         if (!/\.(gif|jpg|jpeg|png|webp)$/i.test(newFile.name)) {
           this.alert('Your choice is not a picture')
@@ -198,10 +229,11 @@ export default {
       }
 
       if (newFile && (!oldFile || newFile.file !== oldFile.file)) {
+        this.revokeObjectURL(oldFile && oldFile.url)
         newFile.url = ''
-        let URL = window.URL || window.webkitURL
-        if (URL && URL.createObjectURL) {
-          newFile.url = URL.createObjectURL(newFile.file)
+        const URLApi = window.URL || window.webkitURL
+        if (URLApi && URLApi.createObjectURL) {
+          newFile.url = URLApi.createObjectURL(newFile.file)
         }
       }
     }

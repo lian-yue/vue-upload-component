@@ -38,6 +38,8 @@ export const sendRequest = (xhr, body) => {
       }
     }
     xhr.onerror = () => reject(xhr.response)
+    xhr.onabort = () => reject(new Error('abort'))
+    xhr.ontimeout = () => reject(new Error('timeout'))
     xhr.send(JSON.stringify(body))
   })
 }
@@ -49,12 +51,16 @@ export const sendRequest = (xhr, body) => {
  * @param {Object} data
  */
 export const sendFormRequest = (xhr, data) => {
-  const body = new FormData()
-  for (let name in data) {
-    body.append(name, data[name])
-  }
-
   return new Promise((resolve, reject) => {
+    const body = new FormData()
+    for (const name in data) {
+      const value = data[name]
+      if (value && typeof value === 'object' && !(typeof Blob !== 'undefined' && value instanceof Blob)) {
+        body.append(name, JSON.stringify(value))
+      } else if (value !== null && value !== undefined) {
+        body.append(name, value)
+      }
+    }
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         let response
@@ -69,6 +75,8 @@ export const sendFormRequest = (xhr, data) => {
       }
     }
     xhr.onerror = () => reject(xhr.response)
+    xhr.onabort = () => reject(new Error('abort'))
+    xhr.ontimeout = () => reject(new Error('timeout'))
     xhr.send(body)
   })
 }

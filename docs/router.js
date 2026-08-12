@@ -2,22 +2,17 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 
 import i18n from './i18n'
 import RouterComponent from './views/Router'
-import DocumentComponent from './views/Document'
-import ExampleComponent from './views/Example'
-
-import FullExampleComponent from './views/examples/Full'
-import SimpleExampleComponent from './views/examples/Simple'
-import AvatarExampleComponent from './views/examples/Avatar'
-import DragExampleComponent from './views/examples/Drag'
-import MultipleExampleComponent from './views/examples/Multiple'
-import ChunkExampleComponent from './views/examples/Chunk'
-import VuexExampleComponent from './views/examples/Vuex'
-import TypescriptExampleComponent from './views/examples/Typescript'
-import AsyncEventsExampleComponent from './views/examples/AsyncEvents'
-
-
-// console.log(i18n)
-
+const DocumentComponent = () => import('./views/Document')
+const ExampleComponent = () => import('./views/Example')
+const FullExampleComponent = () => import('./views/examples/Full')
+const SimpleExampleComponent = () => import('./views/examples/Simple')
+const AvatarExampleComponent = () => import('./views/examples/Avatar')
+const DragExampleComponent = () => import('./views/examples/Drag')
+const MultipleExampleComponent = () => import('./views/examples/Multiple')
+const ChunkExampleComponent = () => import('./views/examples/Chunk')
+const VuexExampleComponent = () => import('./views/examples/Vuex')
+const TypescriptExampleComponent = () => import('./views/examples/Typescript')
+const AsyncEventsExampleComponent = () => import('./views/examples/AsyncEvents')
 
 let examples = [{
     path: '',
@@ -68,10 +63,18 @@ const router = createRouter({
     if (savedPosition) {
       return savedPosition
     } else if (to.hash) {
-      return { el: to.hash, top: document.querySelector('#header').offsetHeight }
+      try {
+        const el = document.getElementById(decodeURIComponent(to.hash.slice(1)))
+        if (el) {
+          return { el, top: document.querySelector('#header')?.offsetHeight || 0 }
+        }
+      } catch (error) {
+        return { left: 0, top: 0 }
+      }
     } else {
       return { left: 0, top: 0 }
     }
+    return { left: 0, top: 0 }
   },
   routes: [{
     path: '/:locale(' + i18n.global.availableLocales.join('|') + ')?',

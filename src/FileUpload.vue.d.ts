@@ -28,6 +28,8 @@ export interface Data {
     };
     destroy: boolean;
     uploading: number;
+    activeUploadIds: Set<string>;
+    activeUploadTokens: Map<string, number>;
     features: Features;
     dropElement: null | HTMLElement;
     dropTimeout: null | number;
@@ -82,6 +84,7 @@ declare const _default: import("vue").DefineComponent<import("vue").ExtractPropT
         type: PropType<boolean | "environment" | "user">;
     };
     disabled: {
+        type: BooleanConstructor;
         default: boolean;
     };
     multiple: {
@@ -172,10 +175,12 @@ declare const _default: import("vue").DefineComponent<import("vue").ExtractPropT
     className(): Array<string | undefined>;
     forId(): string;
     iMaximum(): number;
+    iThread(): number;
     iExtensions(): RegExp | undefined;
     iDirectory(): any;
 }, {
     newId(): string;
+    ensureUniqueId(file: VueUploadItem, addFiles: VueUploadItem[]): void;
     clear(): true;
     get(id: string | VueUploadItem): VueUploadItem | false;
     add(_files: VueUploadItem | Blob | Array<VueUploadItem | Blob>, index?: number | boolean): VueUploadItem | VueUploadItem[] | undefined;
@@ -188,6 +193,7 @@ declare const _default: import("vue").DefineComponent<import("vue").ExtractPropT
         [key: string]: any;
     }): VueUploadItem | false;
     emitFilter(newFile: VueUploadItem | undefined, oldFile: VueUploadItem | undefined): boolean;
+    resumeChunkUpload(file: VueUploadItem): boolean;
     emitFile(newFile: VueUploadItem | undefined, oldFile: VueUploadItem | undefined): void;
     emitInput(): void;
     upload(id: VueUploadItem | string): Promise<VueUploadItem>;
@@ -196,7 +202,7 @@ declare const _default: import("vue").DefineComponent<import("vue").ExtractPropT
      *
      * @param Object file
      */
-    shouldUseChunkUpload(file: VueUploadItem): boolean | 0 | undefined;
+    shouldUseChunkUpload(file: VueUploadItem): boolean;
     /**
      * Upload a file using Chunk method
      *
@@ -235,6 +241,7 @@ declare const _default: import("vue").DefineComponent<import("vue").ExtractPropT
         type: PropType<boolean | "environment" | "user">;
     };
     disabled: {
+        type: BooleanConstructor;
         default: boolean;
     };
     multiple: {

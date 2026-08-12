@@ -26,6 +26,7 @@ module.exports = {
     publicPath: './',
     filename: 'docs/dist/[name].js',
     chunkFilename: 'docs/dist/[chunkhash:8].[name].chunk.js',
+    assetModuleFilename: 'docs/dist/assets/[name].[contenthash:8][ext]',
   },
 
   resolve: {

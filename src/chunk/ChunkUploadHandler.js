@@ -2,7 +2,7 @@ import {
   default as request,
   createRequest,
   sendFormRequest
-} from '../utils/request'
+} from '../utils/request.js'
 
 export default class ChunkUploadHandler {
   /**
@@ -18,6 +18,10 @@ export default class ChunkUploadHandler {
     this.sessionId = null
     this.chunkSize = null
     this.speedInterval = null
+    this.finishing = false
+    this.settled = false
+    this.paused = false
+    this.resuming = false
   }
 
   /**
@@ -105,6 +109,9 @@ export default class ChunkUploadHandler {
    * - Gets the progress of all the chunks that are being uploaded
    */
   get progress() {
+    if (!this.chunks.length) {
+      return 0
+    }
     const completedProgress = (this.chunksUploaded.length / this.chunks.length) * 100
     const uploadingProgress = this.chunksUploading.reduce((progress, chunk) => {
       return progress + ((chunk.progress | 0) / this.chunks.length)
@@ -180,7 +187,13 @@ export default class ChunkUploadHandler {
    * - Sets the file not active
    */
   pause() {
-    this.file.active = false
+    this.paused = true
+    const file = this.options.onPause?.(this.file)
+    if (file) {
+      this.file = file
+    } else {
+      this.file.active = false
+    }
     this.stopChunks()
   }
 
@@ -202,7 +215,18 @@ export default class ChunkUploadHandler {
    * - Starts the following chunks
    */
   resume() {
-    this.file.active = true
+    if (this.settled) {
+      return
+    }
+    this.resuming = true
+    this.paused = false
+    const file = this.options.onResume?.(this.file)
+    if (file) {
+      this.file = file
+    } else {
+      this.file.active = true
+    }
+    this.resuming = false
     this.startChunking()
   }
 
@@ -214,9 +238,26 @@ export default class ChunkUploadHandler {
    * - reject   The file upload failed
    */
   upload() {
+    if (this.promise) {
+      return this.promise
+    }
     this.promise = new Promise((resolve, reject) => {
-      this.resolve = resolve
-      this.reject = reject
+      this.resolve = value => {
+        if (this.settled) {
+          return
+        }
+        this.settled = true
+        this.stopSpeedCalc()
+        resolve(value)
+      }
+      this.reject = error => {
+        if (this.settled) {
+          return
+        }
+        this.settled = true
+        this.stopChunks()
+        reject(error)
+      }
     })
     try {
       this.start()
@@ -248,23 +289,32 @@ export default class ChunkUploadHandler {
         name: this.fileName
       }
     }).then(res => {
+      if (this.settled) {
+        return
+      }
       if (res.status !== 'success') {
         this.file.response = res
         return this.reject('server')
       }
 
       const chunkSize = Number(res.data?.end_offset)
-      if (!Number.isFinite(chunkSize) || chunkSize <= 0) {
+      const sessionId = res.data?.session_id
+      if (!Number.isFinite(chunkSize) || chunkSize <= 0 || sessionId === null || sessionId === undefined || sessionId === '') {
         this.file.response = res
         return this.reject('server')
       }
 
-      this.sessionId = res.data.session_id
+      this.sessionId = sessionId
       this.chunkSize = chunkSize
 
       this.createChunks()
-      this.startChunking()
+      if (this.file.active) {
+        this.startChunking()
+      }
     }).catch(res => {
+      if (this.settled) {
+        return
+      }
       this.file.response = res
       this.reject('server')
     })
@@ -274,6 +324,9 @@ export default class ChunkUploadHandler {
    * Starts to upload chunks
    */
   startChunking() {
+    if (this.settled || !this.file.active || !this.readyToUpload) {
+      return
+    }
     for (let i = 0; i < this.maxActiveChunks; i++) {
       this.uploadNextChunk()
     }
@@ -287,7 +340,7 @@ export default class ChunkUploadHandler {
    * - Will start finish phase if there are no more chunks to upload
    */
   uploadNextChunk() {
-    if (this.file.active) {
+    if (!this.settled && !this.finishing && this.file.active) {
       if (this.hasChunksToUpload) {
         return this.uploadChunk(this.chunksToUpload[0])
       }
@@ -311,15 +364,22 @@ export default class ChunkUploadHandler {
     chunk.progress = 0
     chunk.active = true
     this.updateFileProgress()
-    chunk.xhr = createRequest({
-      method: 'POST',
-      headers: this.headers,
-      url: this.action
-    })
+    try {
+      chunk.xhr = createRequest({
+        method: 'POST',
+        headers: this.headers,
+        url: this.action
+      })
+    } catch (error) {
+      chunk.active = false
+      this.reject(error)
+      return
+    }
 
-    chunk.xhr.upload.addEventListener('progress', function (evt) {
+    chunk.xhr.upload.addEventListener('progress', (evt) => {
       if (evt.lengthComputable) {
         chunk.progress = Math.round(evt.loaded / evt.total * 100)
+        this.updateFileProgress()
       }
     }, false)
 
@@ -331,6 +391,9 @@ export default class ChunkUploadHandler {
       chunk: chunk.blob
     }).then(res => {
       chunk.active = false
+      if (this.settled) {
+        return
+      }
       if (res.status === 'success') {
         chunk.uploaded = true
       } else {
@@ -343,6 +406,9 @@ export default class ChunkUploadHandler {
       this.uploadNextChunk()
     }).catch(() => {
       chunk.active = false
+      if (this.settled || !this.file.active) {
+        return
+      }
       if (chunk.retries-- <= 0) {
         this.stopChunks()
         return this.reject('upload')
@@ -357,19 +423,37 @@ export default class ChunkUploadHandler {
    * Sends a request to the backend to finish the process
    */
   finish() {
+    if (this.settled || this.finishing || !this.file.active) {
+      return
+    }
+    this.finishing = true
     this.updateFileProgress()
     this.stopSpeedCalc()
 
-    request({
-      method: 'POST',
-      headers: { ...this.headers, 'Content-Type': 'application/json' },
-      url: this.action,
-      body: {
-        ...this.finishBody,
-        phase: 'finish',
-        session_id: this.sessionId
+    let finishRequest
+    try {
+      finishRequest = request({
+        method: 'POST',
+        headers: { ...this.headers, 'Content-Type': 'application/json' },
+        url: this.action,
+        body: {
+          ...this.finishBody,
+          phase: 'finish',
+          session_id: this.sessionId
+        }
+      })
+    } catch (error) {
+      this.finishing = false
+      this.file.response = error
+      this.reject('server')
+      return
+    }
+
+    finishRequest.then(res => {
+      this.finishing = false
+      if (this.settled || !this.file.active) {
+        return
       }
-    }).then(res => {
       this.file.response = res
       if (res.status !== 'success') {
         return this.reject('server')
@@ -377,6 +461,10 @@ export default class ChunkUploadHandler {
 
       this.resolve(res)
     }).catch(res => {
+      this.finishing = false
+      if (this.settled || !this.file.active) {
+        return
+      }
       this.file.response = res
       this.reject('server')
     })

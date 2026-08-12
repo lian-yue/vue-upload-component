@@ -1,7 +1,7 @@
 <template>
   <div class="example-full">
-    <button type="button" class="btn btn-danger float-right btn-is-option" @click.prevent="isOption = !isOption">
-      <i class="fa fa-cog" aria-hidden="true"></i>
+    <button type="button" class="btn btn-danger float-end btn-is-option" @click.prevent="isOption = !isOption">
+      <i class="fa-solid fa-gear" aria-hidden="true"></i>
       Options
     </button>
     <h1 id="example-title" class="example-title">Full Example</h1>
@@ -53,7 +53,7 @@
               </td>
               <td>{{ file.width || 0 }}</td>
               <td>{{ file.height || 0 }}</td>
-              <td>{{ "ext=" + (file.magic.ext || "") + ", mime=" + (file.magic.mime || "") }}</td>
+              <td>{{ "ext=" + (file.magic?.ext || "") + ", mime=" + (file.magic?.mime || "") }}</td>
               <td>{{ $formatSize(file.size) }}</td>
               <td>{{ $formatSize(file.speed) }}</td>
 
@@ -69,7 +69,7 @@
                   <div class="dropdown-menu">
                     <a :class="{ 'dropdown-item': true, disabled: file.active || file.success || file.error === 'compressing' || file.error === 'image parsing' }"
                       href="#"
-                      @click.prevent="file.active || file.success || file.error === 'compressing' ? false : onEditFileShow(file)">Edit</a>
+                      @click.prevent="file.active || file.success || file.error === 'compressing' || file.error === 'image parsing' ? false : onEditFileShow(file)">Edit</a>
                     <a :class="{ 'dropdown-item': true, disabled: !file.active }" href="#"
                       @click.prevent="file.active ? $refs.upload.update(file, { error: 'cancel' }) : false">Cancel</a>
 
@@ -93,7 +93,7 @@
         </table>
       </div>
       <div class="example-foorer">
-        <div class="footer-status float-right">
+        <div class="footer-status float-end">
           Drop: {{ $refs.upload ? $refs.upload.drop : false }},
           Active: {{ $refs.upload ? $refs.upload.active : false }},
           Uploaded: {{ $refs.upload ? $refs.upload.uploaded : true }},
@@ -106,22 +106,22 @@
             :create-directory="createDirectory" :size="size || 0" :thread="thread < 1 ? 1 : (thread > 5 ? 5 : thread)"
             :headers="headers" :data="data" :drop="drop" :drop-directory="dropDirectory" :add-index="addIndex"
             v-model="files" @input-filter="inputFilter" @input-file="inputFile" ref="upload">
-            <i class="fa fa-plus"></i>
+            <i class="fa-solid fa-plus"></i>
             Select
           </file-upload>
           <div class="dropdown-menu">
             <label class="dropdown-item" :for="name">Add files</label>
-            <a class="dropdown-item" href="#" @click="onAddFolder">Add folder</a>
+            <a class="dropdown-item" href="#" @click.prevent="onAddFolder">Add folder</a>
             <a class="dropdown-item" href="#" @click.prevent="addData.show = true">Add data</a>
           </div>
         </div>
         <button type="button" class="btn btn-success" v-if="!$refs.upload || !$refs.upload.active"
           @click.prevent="$refs.upload.active = true">
-          <i class="fa fa-arrow-up" aria-hidden="true"></i>
+          <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
           Start Upload
         </button>
         <button type="button" class="btn btn-danger" v-else @click.prevent="$refs.upload.active = false">
-          <i class="fa fa-stop" aria-hidden="true"></i>
+          <i class="fa-solid fa-stop" aria-hidden="true"></i>
           Stop Upload
         </button>
       </div>
@@ -146,13 +146,13 @@
         <label>PUT Upload:</label>
         <div class="form-check">
           <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="put-action" id="put-action" value="" v-model="putAction">
+            <input class="form-check-input" type="radio" name="put-action" id="put-action-off" value="" v-model="putAction">
             Off
           </label>
         </div>
         <div class="form-check">
           <label class="form-check-label">
-            <input class="form-check-input" type="radio" name="put-action" id="put-action" value="/upload/put"
+            <input class="form-check-input" type="radio" name="put-action" id="put-action-on" value="/upload/put"
               v-model="putAction"> On
           </label>
         </div>
@@ -223,7 +223,7 @@
         <small class="form-text text-muted">Automatically activate upload</small>
       </div>
       <div class="form-group">
-        <button type="button" class="btn btn-primary btn-lg btn-block"
+        <button type="button" class="btn btn-primary btn-lg w-100"
           @click.prevent="isOption = !isOption">Confirm</button>
       </div>
     </div>
@@ -238,9 +238,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Add data</h5>
-            <button type="button" class="close" @click.prevent="addData.show = false">
-              <span>&times;</span>
-            </button>
+            <button type="button" class="btn-close" aria-label="Close" @click.prevent="addData.show = false"></button>
           </div>
           <form @submit.prevent="onAddData">
             <div class="modal-body">
@@ -282,9 +280,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Edit file</h5>
-            <button type="button" class="close" @click.prevent="editFile.show = false">
-              <span>&times;</span>
-            </button>
+            <button type="button" class="btn-close" aria-label="Close" @click.prevent="editFile.show = false"></button>
           </div>
           <form @submit.prevent="onEditorFile">
             <div class="modal-body">
@@ -303,15 +299,15 @@
                 <div class="edit-image-tool">
                   <div class="btn-group" role="group">
                     <button type="button" class="btn btn-primary" @click="onEditFileRotate(-90)"
-                      title="cropperImage.$rotate('-90deg')"><i class="fa fa-undo" aria-hidden="true"></i></button>
+                      title="cropperImage.$rotate('-90deg')"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i></button>
                     <button type="button" class="btn btn-primary" @click="onEditFileRotate(90)"
-                      title="cropperImage.$rotate('90deg')"><i class="fa fa-repeat" aria-hidden="true"></i></button>
+                      title="cropperImage.$rotate('90deg')"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button>
                   </div>
                   <div class="btn-group" role="group">
                     <button type="button" class="btn btn-primary" @click="onEditFileCrop(true)"
-                      title="cropperSelection.$reset()"><i class="fa fa-check" aria-hidden="true"></i></button>
+                      title="cropperSelection.$reset()"><i class="fa-solid fa-check" aria-hidden="true"></i></button>
                     <button type="button" class="btn btn-primary" @click="onEditFileCrop(false)"
-                      title="cropperSelection.hidden = true"><i class="fa fa-remove" aria-hidden="true"></i></button>
+                      title="cropperSelection.hidden = true"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
                   </div>
                 </div>
               </div>
@@ -337,6 +333,10 @@
   display: block;
   visibility: hidden;
   transition: all .2s
+}
+
+.example-full .form-group {
+  margin-bottom: 1rem;
 }
 
 .example-full .btn-group:hover>.dropdown-menu {
@@ -365,6 +365,7 @@
 }
 
 .example-full .example-foorer {
+  display: flow-root;
   padding: .5rem 0;
   border-top: 1px solid #e9ecef;
   border-bottom: 1px solid #e9ecef;
@@ -420,6 +421,13 @@
   }
 }
 
+@media (max-width: 767.98px) {
+  .example-full .footer-status {
+    float: none !important;
+    margin-bottom: .75rem;
+  }
+}
+
 .example-full .edit-image-tool {
   margin-top: .6rem;
 }
@@ -460,7 +468,6 @@
 </style>
 
 <script>
-import Cropper from 'cropperjs'
 import Compressor from 'compressorjs'
 import { fileTypeFromBuffer } from "file-type";
 
@@ -526,10 +533,7 @@ export default {
       // 关闭了 自动删除 error
       if (!newValue && oldValue) {
         this.$refs.upload.update(this.editFile.id, { error: this.editFile.error || '' })
-        if (this.editFile.cropper) {
-          this.editFile.cropper.destroy()
-          this.editFile.cropper = null
-        }
+        this.destroyCropper()
       }
 
       if (newValue) {
@@ -537,7 +541,13 @@ export default {
           if (!this.$refs.editImage) {
             return
           }
-          const cropper = new Cropper(this.$refs.editImage)
+          const CropperConstructor = window.Cropper && window.Cropper.default
+          if (typeof CropperConstructor !== 'function') {
+            this.alert('Cropper.js failed to load')
+            this.editFile.show = false
+            return
+          }
+          const cropper = new CropperConstructor(this.$refs.editImage)
           const selection = cropper.getCropperSelection()
           const cropperImage = cropper.getCropperImage()
           if (selection) {
@@ -561,8 +571,31 @@ export default {
     },
   },
 
+  beforeUnmount() {
+    this.destroyCropper()
+    this.files.forEach((file) => this.revokeObjectURL(file.blob))
+  },
+
   methods: {
+    destroyCropper() {
+      if (this.editFile.cropper) {
+        this.editFile.cropper.destroy()
+        this.editFile.cropper = null
+      }
+    },
+
+    revokeObjectURL(url) {
+      const URLApi = window.URL || window.webkitURL
+      if (URLApi && typeof url === 'string' && url.startsWith('blob:')) {
+        URLApi.revokeObjectURL(url)
+      }
+    },
+
     inputFilter(newFile, oldFile, prevent) {
+      if (!newFile && oldFile) {
+        this.revokeObjectURL(oldFile.blob)
+      }
+
       if (newFile && !oldFile) {
         // Before adding a file
         // 添加文件前
@@ -622,10 +655,11 @@ export default {
       if (newFile && newFile.error === "" && newFile.file && (!oldFile || newFile.file !== oldFile.file)) {
         // Create a blob field
         // 创建 blob 字段
+        this.revokeObjectURL(oldFile && oldFile.blob)
         newFile.blob = ''
-        let URL = (window.URL || window.webkitURL)
-        if (URL) {
-          newFile.blob = URL.createObjectURL(newFile.file)
+        const URLApi = window.URL || window.webkitURL
+        if (URLApi) {
+          newFile.blob = URLApi.createObjectURL(newFile.file)
         }
 
         // Thumbnails
@@ -640,12 +674,19 @@ export default {
       // image 尺寸
       if (newFile && newFile.error === '' && newFile.type.substr(0, 6) === "image/" && newFile.blob && (!oldFile || newFile.blob !== oldFile.blob)) {
         newFile.error = 'image parsing'
+        const blob = newFile.blob
         let img = new Image();
         img.onload = () => {
-          this.$refs.upload.update(newFile, { error: '', height: img.height, width: img.width })
+          const currentFile = this.$refs.upload.get(newFile.id)
+          if (currentFile && currentFile.blob === blob) {
+            this.$refs.upload.update(currentFile, { error: '', height: img.height, width: img.width })
+          }
         }
         img.onerror = () => {
-          this.$refs.upload.update(newFile, { error: 'parsing image size' })
+          const currentFile = this.$refs.upload.get(newFile.id)
+          if (currentFile && currentFile.blob === blob) {
+            this.$refs.upload.update(currentFile, { error: 'parsing image size' })
+          }
         }
         img.src = newFile.blob
       }
@@ -705,7 +746,7 @@ export default {
 
 
     onEditFileShow(file) {
-      this.editFile = { ...file, show: true }
+      this.editFile = { ...file, show: true, imageChanged: false }
       this.$refs.upload.update(file, { error: 'edit' })
     },
 
@@ -720,10 +761,14 @@ export default {
         name: this.editFile.name,
         error: '',
       }
-      const selection = this.editFile.cropper && this.editFile.cropper.getCropperSelection()
-      if (selection && !selection.hidden) {
+      const cropper = this.editFile.cropper
+      const selection = cropper && cropper.getCropperSelection()
+      const cropperCanvas = cropper && cropper.getCropperCanvas()
+      if ((selection && !selection.hidden) || (this.editFile.imageChanged && cropperCanvas)) {
         try {
-          const canvas = await selection.$toCanvas()
+          const canvas = selection && !selection.hidden
+            ? await selection.$toCanvas()
+            : await cropperCanvas.$toCanvas()
           const blob = await new Promise((resolve, reject) => {
             canvas.toBlob((result) => {
               result ? resolve(result) : reject(new Error('crop'))
@@ -745,6 +790,7 @@ export default {
       const cropperImage = this.editFile.cropper && this.editFile.cropper.getCropperImage()
       if (cropperImage) {
         cropperImage.$rotate(angle + 'deg')
+        this.editFile.imageChanged = true
       }
     },
 
@@ -771,9 +817,7 @@ export default {
       document.querySelector("body").appendChild(input)
       input.click()
       input.onchange = (e) => {
-        this.$refs.upload.addInputFile(input).then(function () {
-          document.querySelector("body").removeChild(input)
-        })
+        this.$refs.upload.addInputFile(input).finally(() => input.remove())
       }
     },
 
