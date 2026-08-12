@@ -1,7 +1,7 @@
 /*!
  Name: vue-upload-component
  Component URI: https://github.com/lian-yue/vue-upload-component#readme
- Version: 3.1.17
+ Version: 3.2.0
  Author: LianYue
  License: Apache-2.0
  Description: Vue.js file upload component, Multi-file upload, Upload directory, Drag upload, Drag the directory, Upload multiple files at the same time, html4 (IE 9), `PUT` method, Customize the filter
@@ -108,6 +108,89 @@
     return sendRequest(xhr, options.body)
   }
 
+  const DEFAULT_WINDOW_MS = 3000;
+
+  function currentTime() {
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+      return performance.now()
+    }
+    return Date.now()
+  }
+
+  class UploadSpeedometer {
+    constructor(windowMs = DEFAULT_WINDOW_MS) {
+      this.windowMs = windowMs;
+      this.totalBytes = 0;
+      this.samples = [];
+      this.lastPublishedAt = null;
+    }
+
+    start(recordedAt = currentTime()) {
+      if (this.samples.length) {
+        return
+      }
+      this.samples.push({ time: recordedAt, bytes: this.totalBytes });
+      this.lastPublishedAt = recordedAt;
+    }
+
+    add(bytes, recordedAt = currentTime()) {
+      this.start(recordedAt);
+      if (Number.isFinite(bytes) && bytes > 0) {
+        this.totalBytes += bytes;
+      }
+      return this.measure(recordedAt)
+    }
+
+    tick(recordedAt = currentTime()) {
+      this.start(recordedAt);
+      return this.measure(recordedAt)
+    }
+
+    shouldPublish(intervalMs = 1000) {
+      if (!this.samples.length) {
+        return false
+      }
+      const recordedAt = this.samples[this.samples.length - 1].time;
+      if (recordedAt - this.lastPublishedAt < intervalMs) {
+        return false
+      }
+      this.lastPublishedAt = recordedAt;
+      return true
+    }
+
+    measure(recordedAt) {
+      const lastSample = this.samples[this.samples.length - 1];
+      const time = Math.max(lastSample.time, recordedAt);
+      if (time === lastSample.time) {
+        lastSample.bytes = this.totalBytes;
+      } else {
+        this.samples.push({ time, bytes: this.totalBytes });
+      }
+
+      const cutoff = time - this.windowMs;
+      while (this.samples.length > 2 && this.samples[1].time <= cutoff) {
+        this.samples.shift();
+      }
+
+      const first = this.samples[0];
+      const second = this.samples[1];
+      let baselineTime = first.time;
+      let baselineBytes = first.bytes;
+      if (first.time < cutoff && second) {
+        const sampleDuration = second.time - first.time;
+        const cutoffRatio = sampleDuration > 0 ? (cutoff - first.time) / sampleDuration : 1;
+        baselineTime = cutoff;
+        baselineBytes = first.bytes + ((second.bytes - first.bytes) * cutoffRatio);
+      }
+
+      const duration = time - baselineTime;
+      if (duration <= 0) {
+        return 0
+      }
+      return Math.max(0, Math.round(((this.totalBytes - baselineBytes) * 1000) / duration))
+    }
+  }
+
   class ChunkUploadHandler {
     /**
      * Constructor
@@ -121,7 +204,8 @@
       this.chunks = [];
       this.sessionId = null;
       this.chunkSize = null;
-      this.speedInterval = null;
+      this.speedometer = null;
+      this.lastTransferSpeed = 0;
       this.finishing = false;
       this.settled = false;
       this.paused = false;
@@ -213,15 +297,16 @@
      * - Gets the progress of all the chunks that are being uploaded
      */
     get progress() {
-      if (!this.chunks.length) {
+      if (!this.chunks.length || !this.fileSize) {
         return 0
       }
-      const completedProgress = (this.chunksUploaded.length / this.chunks.length) * 100;
-      const uploadingProgress = this.chunksUploading.reduce((progress, chunk) => {
-        return progress + ((chunk.progress | 0) / this.chunks.length)
+      const uploadedBytes = this.chunks.reduce((bytes, chunk) => {
+        if (chunk.uploaded) {
+          return bytes + chunk.blob.size
+        }
+        return chunk.active ? bytes + Math.min(chunk.loaded || 0, chunk.blob.size) : bytes
       }, 0);
-
-      return Math.min(completedProgress + uploadingProgress, 100)
+      return Math.min((uploadedBytes / this.fileSize) * 100, 100)
     }
 
     /**
@@ -271,6 +356,8 @@
           blob: this.file.file.slice(start, end),
           startOffset: start,
           active: false,
+          loaded: 0,
+          transferred: 0,
           retries: this.maxRetries
         });
         start = end;
@@ -431,11 +518,10 @@
       if (this.settled || !this.file.active || !this.readyToUpload) {
         return
       }
+      this.startSpeedCalc();
       for (let i = 0; i < this.maxActiveChunks; i++) {
         this.uploadNextChunk();
       }
-
-      this.startSpeedCalc();
     }
 
     /**
@@ -466,6 +552,8 @@
      */
     uploadChunk(chunk) {
       chunk.progress = 0;
+      chunk.loaded = 0;
+      chunk.transferred = 0;
       chunk.active = true;
       this.updateFileProgress();
       try {
@@ -482,9 +570,16 @@
 
       chunk.xhr.upload.addEventListener('progress', (evt) => {
         if (evt.lengthComputable) {
-          chunk.progress = Math.round(evt.loaded / evt.total * 100);
+          const transferred = Math.max(0, evt.loaded - chunk.transferred);
+          chunk.transferred = evt.loaded;
+          chunk.loaded = evt.total > 0 ? Math.min(chunk.blob.size, (evt.loaded / evt.total) * chunk.blob.size) : 0;
+          chunk.progress = evt.total > 0 ? (evt.loaded / evt.total) * 100 : 0;
+          this.updateSpeed(transferred);
           this.updateFileProgress();
         }
+      }, false);
+      chunk.xhr.upload.addEventListener('loadstart', () => {
+        this.speedometer?.start();
       }, false);
 
       sendFormRequest(chunk.xhr, {
@@ -576,18 +671,22 @@
 
 
     /**
-     * Sets an interval to calculate and
-     * set upload speed every 3 seconds
+     * Starts the rolling upload speed calculation
      */
     startSpeedCalc() {
-      this.file.speed = 0;
-      let lastUploadedBytes = 0;
-      if (!this.speedInterval) {
-        this.speedInterval = window.setInterval(() => {
-          let uploadedBytes = (this.progress / 100) * this.fileSize;
-          this.file.speed = (uploadedBytes - lastUploadedBytes);
-          lastUploadedBytes = uploadedBytes;
-        }, 1000);
+      if (!this.speedometer) {
+        this.file.speed = 0;
+        this.lastTransferSpeed = 0;
+        this.speedometer = new UploadSpeedometer();
+      }
+    }
+
+    updateSpeed(transferred) {
+      if (this.speedometer) {
+        this.lastTransferSpeed = this.speedometer.add(transferred);
+        if (this.speedometer.shouldPublish()) {
+          this.file.speed = this.lastTransferSpeed;
+        }
       }
     }
 
@@ -595,9 +694,10 @@
      * Removes the upload speed interval
      */
     stopSpeedCalc() {
-      this.speedInterval && window.clearInterval(this.speedInterval);
-      this.speedInterval = null;
-      this.file.speed = 0;
+      if (this.speedometer && this.lastTransferSpeed) {
+        this.file.speed = this.lastTransferSpeed;
+      }
+      this.speedometer = null;
     }
   }
 
@@ -1625,8 +1725,12 @@
           },
           uploadXhr(xhr, ufile, body) {
               let file = ufile;
-              let speedTime = 0;
               let speedLoaded = 0;
+              let lastTransferSpeed = 0;
+              const speedometer = new UploadSpeedometer();
+              xhr.upload.onloadstart = () => {
+                  speedometer.start();
+              };
               // 进度条
               xhr.upload.onprogress = (e) => {
                   // 还未开始上传 已删除 未激活
@@ -1637,17 +1741,16 @@
                   if (!e.lengthComputable || !file || !file.fileObject || !file.active) {
                       return;
                   }
-                  // 进度 速度 每秒更新一次
-                  const speedTime2 = Math.round(Date.now() / 1000);
-                  if (speedTime2 === speedTime) {
-                      return;
-                  }
-                  speedTime = speedTime2;
-                  file = this.update(file, {
-                      progress: (e.loaded / e.total * 100).toFixed(2),
-                      speed: e.loaded - speedLoaded,
-                  });
+                  const transferred = Math.max(0, e.loaded - speedLoaded);
                   speedLoaded = e.loaded;
+                  lastTransferSpeed = speedometer.add(transferred);
+                  const data = {
+                      progress: (e.loaded / e.total * 100).toFixed(2),
+                  };
+                  if (speedometer.shouldPublish()) {
+                      data.speed = lastTransferSpeed;
+                  }
+                  file = this.update(file, data);
               };
               // 检查激活状态
               let interval = window.setInterval(() => {
@@ -1716,7 +1819,7 @@
                       if (file.success) {
                           return resolve(file);
                       }
-                      const data = {};
+                      const data = { speed: lastTransferSpeed || file.speed || 0 };
                       switch (e.type) {
                           case 'timeout':
                           case 'abort':

@@ -3,6 +3,7 @@ import {
   createRequest,
   sendFormRequest
 } from '../utils/request.js'
+import UploadSpeedometer from '../utils/UploadSpeedometer.js'
 
 export default class ChunkUploadHandler {
   /**
@@ -17,7 +18,8 @@ export default class ChunkUploadHandler {
     this.chunks = []
     this.sessionId = null
     this.chunkSize = null
-    this.speedInterval = null
+    this.speedometer = null
+    this.lastTransferSpeed = 0
     this.finishing = false
     this.settled = false
     this.paused = false
@@ -109,15 +111,16 @@ export default class ChunkUploadHandler {
    * - Gets the progress of all the chunks that are being uploaded
    */
   get progress() {
-    if (!this.chunks.length) {
+    if (!this.chunks.length || !this.fileSize) {
       return 0
     }
-    const completedProgress = (this.chunksUploaded.length / this.chunks.length) * 100
-    const uploadingProgress = this.chunksUploading.reduce((progress, chunk) => {
-      return progress + ((chunk.progress | 0) / this.chunks.length)
+    const uploadedBytes = this.chunks.reduce((bytes, chunk) => {
+      if (chunk.uploaded) {
+        return bytes + chunk.blob.size
+      }
+      return chunk.active ? bytes + Math.min(chunk.loaded || 0, chunk.blob.size) : bytes
     }, 0)
-
-    return Math.min(completedProgress + uploadingProgress, 100)
+    return Math.min((uploadedBytes / this.fileSize) * 100, 100)
   }
 
   /**
@@ -167,6 +170,8 @@ export default class ChunkUploadHandler {
         blob: this.file.file.slice(start, end),
         startOffset: start,
         active: false,
+        loaded: 0,
+        transferred: 0,
         retries: this.maxRetries
       })
       start = end
@@ -327,11 +332,10 @@ export default class ChunkUploadHandler {
     if (this.settled || !this.file.active || !this.readyToUpload) {
       return
     }
+    this.startSpeedCalc()
     for (let i = 0; i < this.maxActiveChunks; i++) {
       this.uploadNextChunk()
     }
-
-    this.startSpeedCalc()
   }
 
   /**
@@ -362,6 +366,8 @@ export default class ChunkUploadHandler {
    */
   uploadChunk(chunk) {
     chunk.progress = 0
+    chunk.loaded = 0
+    chunk.transferred = 0
     chunk.active = true
     this.updateFileProgress()
     try {
@@ -378,9 +384,16 @@ export default class ChunkUploadHandler {
 
     chunk.xhr.upload.addEventListener('progress', (evt) => {
       if (evt.lengthComputable) {
-        chunk.progress = Math.round(evt.loaded / evt.total * 100)
+        const transferred = Math.max(0, evt.loaded - chunk.transferred)
+        chunk.transferred = evt.loaded
+        chunk.loaded = evt.total > 0 ? Math.min(chunk.blob.size, (evt.loaded / evt.total) * chunk.blob.size) : 0
+        chunk.progress = evt.total > 0 ? (evt.loaded / evt.total) * 100 : 0
+        this.updateSpeed(transferred)
         this.updateFileProgress()
       }
+    }, false)
+    chunk.xhr.upload.addEventListener('loadstart', () => {
+      this.speedometer?.start()
     }, false)
 
     sendFormRequest(chunk.xhr, {
@@ -472,18 +485,22 @@ export default class ChunkUploadHandler {
 
 
   /**
-   * Sets an interval to calculate and
-   * set upload speed every 3 seconds
+   * Starts the rolling upload speed calculation
    */
   startSpeedCalc() {
-    this.file.speed = 0
-    let lastUploadedBytes = 0
-    if (!this.speedInterval) {
-      this.speedInterval = window.setInterval(() => {
-        let uploadedBytes = (this.progress / 100) * this.fileSize
-        this.file.speed = (uploadedBytes - lastUploadedBytes)
-        lastUploadedBytes = uploadedBytes
-      }, 1000)
+    if (!this.speedometer) {
+      this.file.speed = 0
+      this.lastTransferSpeed = 0
+      this.speedometer = new UploadSpeedometer()
+    }
+  }
+
+  updateSpeed(transferred) {
+    if (this.speedometer) {
+      this.lastTransferSpeed = this.speedometer.add(transferred)
+      if (this.speedometer.shouldPublish()) {
+        this.file.speed = this.lastTransferSpeed
+      }
     }
   }
 
@@ -491,8 +508,9 @@ export default class ChunkUploadHandler {
    * Removes the upload speed interval
    */
   stopSpeedCalc() {
-    this.speedInterval && window.clearInterval(this.speedInterval)
-    this.speedInterval = null
-    this.file.speed = 0
+    if (this.speedometer && this.lastTransferSpeed) {
+      this.file.speed = this.lastTransferSpeed
+    }
+    this.speedometer = null
   }
 }

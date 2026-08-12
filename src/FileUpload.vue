@@ -49,6 +49,7 @@ import { PropType, defineComponent } from "vue";
 
 // @ts-ignore
 import ChunkUploadDefaultHandler from './chunk/ChunkUploadHandler.js'
+import UploadSpeedometer from './utils/UploadSpeedometer.js'
 
 const CHUNK_DEFAULT_OPTIONS = {
   headers: {},
@@ -1201,8 +1202,13 @@ export default defineComponent({
 
     uploadXhr(xhr: XMLHttpRequest, ufile: VueUploadItem | undefined | false, body: FormData | Blob): Promise<VueUploadItem> {
       let file = ufile
-      let speedTime = 0
       let speedLoaded = 0
+      let lastTransferSpeed = 0
+      const speedometer = new UploadSpeedometer()
+
+      xhr.upload.onloadstart = () => {
+        speedometer.start()
+      }
 
       // 进度条
       xhr.upload.onprogress = (e: ProgressEvent) => {
@@ -1215,19 +1221,16 @@ export default defineComponent({
           return
         }
 
-        // 进度 速度 每秒更新一次
-        const speedTime2 = Math.round(Date.now() / 1000)
-        if (speedTime2 === speedTime) {
-          return
-        }
-        speedTime = speedTime2
-
-
-        file = this.update(file, {
-          progress: (e.loaded / e.total * 100).toFixed(2),
-          speed: e.loaded - speedLoaded,
-        })
+        const transferred = Math.max(0, e.loaded - speedLoaded)
         speedLoaded = e.loaded
+        lastTransferSpeed = speedometer.add(transferred)
+        const data: { progress: string; speed?: number } = {
+          progress: (e.loaded / e.total * 100).toFixed(2),
+        }
+        if (speedometer.shouldPublish()) {
+          data.speed = lastTransferSpeed
+        }
+        file = this.update(file, data)
       }
 
       // 检查激活状态
@@ -1306,7 +1309,7 @@ export default defineComponent({
             return resolve(file)
           }
 
-          const data: { [key: string]: any } = {}
+          const data: { [key: string]: any } = { speed: lastTransferSpeed || file.speed || 0 }
 
           switch (e.type) {
             case 'timeout':

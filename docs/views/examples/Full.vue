@@ -62,7 +62,8 @@
               <td v-else-if="file.active">active</td>
               <td v-else></td>
               <td>
-                <div class="btn-group">
+                <div class="btn-group" @mouseenter="positionActionMenu" @focusin="positionActionMenu"
+                  @click="positionActionMenu">
                   <button class="btn btn-secondary btn-sm dropdown-toggle" type="button">
                     Action
                   </button>
@@ -351,6 +352,18 @@
   margin-right: .6rem
 }
 
+.example-full .table-responsive .btn-group .dropdown-toggle {
+  margin-right: 0;
+}
+
+.example-full .table-responsive .btn-group .dropdown-menu {
+  position: fixed;
+}
+
+.example-full .table-responsive .btn-group:focus-within>.dropdown-menu {
+  visibility: visible;
+}
+
 .td-image-thumb {
   max-width: 4em;
   max-height: 4em;
@@ -512,6 +525,7 @@ export default {
       autoCompress: 1024 * 1024,
       uploadAuto: false,
       isOption: false,
+      actionMenuGroup: null,
 
       addData: {
         show: false,
@@ -571,7 +585,14 @@ export default {
     },
   },
 
+  mounted() {
+    window.addEventListener('resize', this.positionActiveActionMenu)
+    window.addEventListener('scroll', this.positionActiveActionMenu, true)
+  },
+
   beforeUnmount() {
+    window.removeEventListener('resize', this.positionActiveActionMenu)
+    window.removeEventListener('scroll', this.positionActiveActionMenu, true)
     this.destroyCropper()
     this.files.forEach((file) => this.revokeObjectURL(file.blob))
   },
@@ -589,6 +610,55 @@ export default {
       if (URLApi && typeof url === 'string' && url.startsWith('blob:')) {
         URLApi.revokeObjectURL(url)
       }
+    },
+
+    positionActionMenu(event) {
+      this.actionMenuGroup = event.currentTarget
+      this.updateActionMenuPosition(this.actionMenuGroup)
+    },
+
+    positionActiveActionMenu() {
+      if (this.actionMenuGroup) {
+        this.updateActionMenuPosition(this.actionMenuGroup)
+      }
+    },
+
+    updateActionMenuPosition(group) {
+      if (!group.isConnected) {
+        this.actionMenuGroup = null
+        return
+      }
+
+      const toggle = group.querySelector('.dropdown-toggle')
+      const menu = group.querySelector('.dropdown-menu')
+      if (!toggle || !menu) {
+        return
+      }
+
+      menu.style.maxHeight = ''
+      menu.style.overflowY = ''
+
+      const viewportGap = 4
+      const toggleRect = toggle.getBoundingClientRect()
+      const menuRect = menu.getBoundingClientRect()
+      const spaceBelow = window.innerHeight - toggleRect.bottom - viewportGap
+      const spaceAbove = toggleRect.top - viewportGap
+      const openAbove = menuRect.height > spaceBelow && spaceAbove > spaceBelow
+      const availableHeight = Math.max(0, openAbove ? spaceAbove : spaceBelow)
+      const left = Math.min(
+        Math.max(viewportGap, toggleRect.right - menuRect.width),
+        Math.max(viewportGap, window.innerWidth - menuRect.width - viewportGap),
+      )
+      const top = openAbove
+        ? Math.max(viewportGap, toggleRect.top - Math.min(menuRect.height, availableHeight))
+        : toggleRect.bottom
+
+      menu.style.top = `${top}px`
+      menu.style.right = 'auto'
+      menu.style.bottom = 'auto'
+      menu.style.left = `${left}px`
+      menu.style.maxHeight = `${availableHeight}px`
+      menu.style.overflowY = menuRect.height > availableHeight ? 'auto' : ''
     },
 
     inputFilter(newFile, oldFile, prevent) {

@@ -30,7 +30,7 @@ unpkg
 
 ``` html
 <script src="https://unpkg.com/vue@3.5.41/dist/vue.global.prod.js"></script>
-<script src="https://unpkg.com/vue-upload-component@3.1.17/dist/vue-upload-component.js"></script>
+<script src="https://unpkg.com/vue-upload-component@next/dist/vue-upload-component.js"></script>
 <script>
 const app = Vue.createApp({})
 app.component('file-upload', VueUploadComponent)
@@ -42,7 +42,7 @@ jsDelivr
 
 ``` html
 <script src="https://cdn.jsdelivr.net/npm/vue@3.5.41/dist/vue.global.prod.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue-upload-component@3.1.17/dist/vue-upload-component.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-upload-component@next/dist/vue-upload-component.js"></script>
 <script>
 const app = Vue.createApp({})
 app.component('file-upload', VueUploadComponent)
@@ -62,7 +62,7 @@ app.mount('#app')
   <meta charset="utf-8">
   <title>Vue-upload-component Test</title>
   <script src="https://unpkg.com/vue@3.5.41/dist/vue.global.prod.js"></script>
-  <script src="https://unpkg.com/vue-upload-component@3.1.17/dist/vue-upload-component.js"></script>
+  <script src="https://unpkg.com/vue-upload-component@next/dist/vue-upload-component.js"></script>
 </head>
 <body>
 <div id="app">

@@ -132,6 +132,38 @@ describe('FileUpload', () => {
     await expect(wrapper.vm.upload(file)).rejects.toThrow('direct failure')
   })
 
+  it('updates regular XHR speed once per second and preserves it on completion', async () => {
+    vi.useFakeTimers()
+    vi.spyOn(performance, 'now')
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(400)
+      .mockReturnValueOnce(1000)
+    const xhr = {
+      upload: {},
+      status: 200,
+      responseText: '',
+      setRequestHeader: vi.fn(),
+      getResponseHeader: vi.fn(() => null),
+      send: vi.fn(),
+      abort: vi.fn(),
+    }
+    const wrapper = mountUpload()
+    const file = wrapper.vm.add(new File(['x'.repeat(2000)], 'x.txt', { type: 'text/plain' }))
+    file.active = true
+
+    const upload = wrapper.vm.uploadXhr(xhr, file, file.file)
+    xhr.upload.onloadstart()
+    xhr.upload.onprogress({ lengthComputable: true, loaded: 1000, total: 2000 })
+
+    expect(wrapper.vm.get(file.id)).toMatchObject({ progress: '50.00', speed: 0 })
+
+    xhr.upload.onprogress({ lengthComputable: true, loaded: 2000, total: 2000 })
+    expect(wrapper.vm.get(file.id)).toMatchObject({ progress: '100.00', speed: 2000 })
+
+    xhr.onload({ type: 'load' })
+    await expect(upload).resolves.toMatchObject({ progress: '100.00', speed: 2000 })
+  })
+
   it('pauses an active chunk handler when the file is stopped', () => {
     const wrapper = mountUpload()
     const file = wrapper.vm.add(new File(['x'], 'x.txt', { type: 'text/plain' }))
