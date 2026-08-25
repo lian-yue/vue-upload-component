@@ -1621,6 +1621,8 @@ Upload progress
 
 Per second upload speed
 
+Reset to `0` when the file goes from inactive to active (retry / resume)
+
 * **Type:** `Number`
 
 * **Read only:** `true`

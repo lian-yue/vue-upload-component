@@ -164,6 +164,41 @@ describe('FileUpload', () => {
     await expect(upload).resolves.toMatchObject({ progress: '100.00', speed: 2000 })
   })
 
+  it('resets the speed when an inactive file becomes active again', async () => {
+    vi.useFakeTimers()
+    vi.spyOn(performance, 'now')
+      .mockReturnValueOnce(0)
+      .mockReturnValueOnce(1000)
+    const xhr = {
+      upload: {},
+      status: 400,
+      responseText: '',
+      setRequestHeader: vi.fn(),
+      getResponseHeader: vi.fn(() => null),
+      send: vi.fn(),
+      abort: vi.fn(),
+    }
+    const wrapper = mountUpload()
+    const file = wrapper.vm.add(new File(['x'.repeat(2000)], 'x.txt', { type: 'text/plain' }))
+    file.active = true
+
+    const upload = wrapper.vm.uploadXhr(xhr, file, file.file)
+    xhr.upload.onloadstart()
+    xhr.upload.onprogress({ lengthComputable: true, loaded: 2000, total: 2000 })
+    xhr.onerror({ type: 'error' })
+    await expect(upload).rejects.toThrow('denied')
+
+    const failed = wrapper.vm.update(file, { active: false, success: false, error: 'denied' })
+    expect(failed).toMatchObject({ active: false, error: 'denied', speed: 2000 })
+
+    // 重试 不能沿用上一次上传的速度
+    const retried = wrapper.vm.update(failed, { active: true, error: '', progress: '0.00' })
+    expect(retried).toMatchObject({ active: true, speed: 0 })
+
+    const stopped = wrapper.vm.update(retried, { active: false, error: 'denied' })
+    expect(wrapper.vm.update(stopped, { active: true, error: '', speed: 123 })).toMatchObject({ speed: 123 })
+  })
+
   it('pauses an active chunk handler when the file is stopped', () => {
     const wrapper = mountUpload()
     const file = wrapper.vm.add(new File(['x'], 'x.txt', { type: 'text/plain' }))

@@ -1439,6 +1439,10 @@ var script = defineComponent({
                 if (file.fileObject && file.active && !newFile.active && !newFile.error && !newFile.success && !newFile.chunk?.paused) {
                     newFile.error = 'abort';
                 }
+                // 从 非激活 变为 激活 速度归零 不能沿用上一次上传的速度
+                if (newFile.fileObject && newFile.active && !file.active && data.speed === undefined) {
+                    newFile.speed = 0;
+                }
                 if (this.emitFilter(newFile, file)) {
                     return false;
                 }
