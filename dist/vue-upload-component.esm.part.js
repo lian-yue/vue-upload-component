@@ -1653,6 +1653,11 @@ var script = defineComponent({
                 ...this.chunkOptions,
                 onPause: (handlerFile) => {
                     const currentFile = this.get(fileId);
+                    if (!currentFile) {
+                        // 文件已移除，先停用旧处理器，避免取消请求后继续重试。
+                        handlerFile.active = false;
+                        return handlerFile;
+                    }
                     if (currentFile && currentFile.active) {
                         return this.update(currentFile, { active: false }) || handlerFile;
                     }

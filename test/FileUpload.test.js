@@ -419,6 +419,71 @@ describe('FileUpload', () => {
     expect(wrapper.vm.activeUploadIds.size).toBe(0)
   })
 
+  it.each(['remove', 'clear'])('stops chunk requests without retrying after %s and allows a new upload', async (method) => {
+    vi.useFakeTimers()
+    const requests = []
+    let completeUploads = false
+    class PendingXMLHttpRequest {
+      constructor() {
+        this.upload = { addEventListener: vi.fn() }
+        this.abort = vi.fn(() => this.onabort?.({ type: 'abort' }))
+      }
+
+      open() {}
+      setRequestHeader() {}
+
+      send(body) {
+        this.body = body
+        requests.push(this)
+        if (typeof body === 'string' || completeUploads) {
+          const data = typeof body === 'string' ? JSON.parse(body) : null
+          this.status = 200
+          this.response = data?.phase === 'start'
+            ? { status: 'success', data: { session_id: 'session', end_offset: 4 } }
+            : { status: 'success' }
+          queueMicrotask(() => this.onload?.({ type: 'load' }))
+        }
+      }
+    }
+    vi.stubGlobal('XMLHttpRequest', PendingXMLHttpRequest)
+    const wrapper = mountUpload({ chunkEnabled: true, chunk: { action: '/chunk', minSize: 0 } })
+    let handler
+    try {
+      const file = wrapper.vm.add(new File(['abcdefghijkl'], 'file.txt'))
+      wrapper.vm.active = true
+      await nextTick()
+      await vi.runAllTimersAsync()
+      handler = wrapper.vm.get(file.id).chunk
+      expect(handler.maxRetries).toBe(5)
+      const chunkRequests = requests.filter(xhr => xhr.body instanceof FormData)
+      expect(chunkRequests).toHaveLength(3)
+
+      wrapper.vm[method](file.id)
+      await vi.runAllTimersAsync()
+      expect(chunkRequests.every(xhr => xhr.abort.mock.calls.length === 1)).toBe(true)
+      expect(requests).toHaveLength(4)
+      expect(wrapper.vm.files).toHaveLength(0)
+      expect(wrapper.vm.uploading).toBe(0)
+      expect(wrapper.vm.activeUploadIds.size).toBe(0)
+      expect(wrapper.vm.activeUploadTokens.size).toBe(0)
+
+      completeUploads = true
+      const nextFile = wrapper.vm.add(new File(['abcdefghijkl'], 'file.txt'))
+      wrapper.vm.active = true
+      await nextTick()
+      await vi.runAllTimersAsync()
+      expect(wrapper.vm.get(nextFile.id)).toMatchObject({ active: false, success: true, error: '' })
+      expect(wrapper.vm.uploading).toBe(0)
+    } finally {
+      if (handler) {
+        handler.file.active = false
+        handler.stopChunks()
+      }
+      wrapper.unmount()
+      vi.unstubAllGlobals()
+    }
+  })
+
   it('rejects an id update that collides with another file', () => {
     const wrapper = mountUpload({ multiple: true })
     const files = wrapper.vm.add([

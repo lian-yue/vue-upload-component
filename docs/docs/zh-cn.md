@@ -1298,6 +1298,8 @@ vue 2.x 的结果
 
 移除某个文件对象
 
+移除正在分块上传的文件会取消该文件进行中的分块请求，并停止后续分块发送和重试。服务端已接收的数据不会被删除。
+
 * **参数:**
 
   * `id: File | Object | String`
@@ -1314,7 +1316,7 @@ vue 2.x 的结果
         <button type="button" @click.prevent="remove(file)">移除</button>
       </li>
     </ul>
-    <file-upload v-model="files"></file-upload>
+    <file-upload ref="upload" v-model="files"></file-upload>
   </template>
   <script>
   export default {

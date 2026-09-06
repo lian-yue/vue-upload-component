@@ -1297,6 +1297,8 @@ Update a file object
 
 Remove a file object
 
+Removing a file during a chunk upload aborts its in-flight chunk requests and stops further chunks and retries. Data already received by the server is not deleted.
+
 * **Arguments:**
 
   * `id: File | Object | String`
@@ -1313,7 +1315,7 @@ Remove a file object
         <button type="button" @click.prevent="remove(file)">Remove</button>
       </li>
     </ul>
-    <file-upload v-model="files"></file-upload>
+    <file-upload ref="upload" v-model="files"></file-upload>
   </template>
   <script>
   export default {
