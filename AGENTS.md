@@ -1,40 +1,53 @@
-# Collaboration Guide
+# 项目协作规范
 
-This file defines the normal workflow for this repository. Hard project boundaries are in `AGENTS.override.md`; more specific instructions closer to a target file take precedence.
+本文件是 vue-upload-component 的统一协作规则。用户当前明确要求优先；子目录的 `AGENTS.md` 可补充本地约束，不得放宽本文件的边界。`CLAUDE.md` 通过软链接引用本文件，不维护另一份规则。
 
-## Start with the repository
+## 开始与修改范围
 
-- Reconstruct the complete request from the current conversation before acting, especially after a summarized or interrupted task.
-- Read the relevant implementation, tests, documentation, and configuration before changing them.
-- Confirm ownership and call paths rather than designing from assumptions.
-- Preserve unrelated user changes and make the smallest coherent change that solves the requested problem.
+- 先结合最近对话和未完成请求确认完整目标；摘要恢复或跨轮次继续时，不把最后一句自动当成新任务。
+- 按需读取相关实现、调用方、测试、文档和配置，确认实际行为与文件归属后再修改。
+- 修复、实现、整理或更新请求授权直接相关的必要修改。遵守用户限定的文件和目录；只要求检查或明确只读时，只报告问题。
+- 只做完成任务所需的修改，不顺带重构、格式化、改名或升级依赖。范围外问题说明位置、影响和建议。
+- 只有无法确定且会实质影响结果的歧义，或必须扩大授权范围时，才停下确认；小歧义采用最小、可逆的假设继续，交付时说明。已有授权不重复确认。
 
-## Repository responsibilities
+## 文件职责
 
-- `src/` contains the published component, types, request helpers, and chunk-upload implementation.
-- `docs/` contains the documentation application, examples, translations, and the HTML template.
-- `test/` contains automated behavior tests.
-- Root JavaScript, TypeScript, Babel, ESLint, Vitest, Rollup, Webpack, browser, and package files define development, build, test, and release behavior.
-- `TESTING.md` is the authority for verification scope and commands. Keep command details there instead of duplicating them in other instructions.
+- `src/`：组件、类型、请求辅助逻辑和分块上传实现。
+- `docs/`：文档应用、示例、翻译和 HTML 模板；`test/`：自动化测试；根配置文件：开发、构建、检查和发布配置。
+- `dist/`、`docs/dist/`、根 `index.html` 和生成的声明副本（包括 `src/FileUpload.vue.d.ts`）是构建产物。修改其源文件或构建配置，需要时通过 `npm run build` 重新生成，不手改副本。
+- 默认审查维护源文件；只有产物检查或打包问题确实需要时，才检查生成内容。
 
-## Implementation and documentation
+## 实现与公共行为
 
-- Follow the existing Vue, JavaScript, and TypeScript style in the target area.
-- Keep state and behavior near the component or helper that owns them. Add abstractions only when there is a concrete repeated responsibility or contract.
-- Validate external input and preserve useful error context. Do not hide failures with broad fallbacks.
-- Synchronize public behavior changes across source types, tests, English and Chinese documentation, and examples.
-- Keep English and Chinese content semantically aligned when editing user-facing documentation.
-- Keep generated files tied to their declared source and build process.
+- 遵循所在区域的 Vue、JavaScript 和 TypeScript 风格，按职责命名。复用现有实现，让状态和逻辑靠近所属组件或辅助模块；不为预留需求增加抽象、包装或全局开关。
+- 校验外部输入，保留错误上下文，正确处理实际涉及的取消、失败和资源释放，不用宽泛兜底隐藏错误。可配置策略不写死在实现中；默认值、协议常量和格式限制等稳定约束可直接定义。
+- 修改 `src/` 下手写维护的 `.js`、`.ts` 或 `.vue` 时，重点核对受影响的 props、事件、方法、类型、请求流程、上传路径和错误处理。
+- 不因清理或依赖升级顺带改变公共默认值和 API 行为。现有兼容能力及其必要实现、测试和文档应保留，尤其是 HTML4 上传路径；可以在任务范围内修复兼容实现的缺陷，删除或削弱兼容能力需用户明确授权。
+- 不新增无必要的兼容层。用户明确要求替换或迁移时，在授权范围内同步迁移调用方、配置、测试和文档，清理失效旧入口；不能用兼容包装掩盖未完成的迁移。
+- 公共行为变更同步更新受影响的类型定义、测试、中英文文档和示例；文档与源码不一致时先核实原因，不为迎合旧文档改变实现。
 
-## Dependencies and configuration
+## 依赖与文档资源
 
-- Upgrade only dependencies included in the task. Update `package.json` and `package-lock.json` together.
-- Check changelogs or official APIs for major upgrades and update every affected integration.
-- Keep configuration simple and explicit. Do not add one-off compatibility wrappers or global switches without a real project requirement.
-- Use stable configuration values for policy; do not hard-code changeable application behavior inside implementation code.
+- 仅调整任务涉及的依赖，保持版本相互兼容，同步更新 `package.json` 和 `package-lock.json`。
+- 升级时核对 peer 范围、实际运行 API、构建与类型检查；大版本升级查阅官方变更说明，并逐项核对受影响的集成。
+- `docs/index.template.html` 中通过 CDN 加载的第三方资源使用固定版本，不使用浮动版本；用户明确要求前，不将这些资源改为本地复制或打包。
 
-## Verification and delivery
+## 文档与表达
 
-- Choose checks from `TESTING.md` based on the affected behavior. Documentation-only edits need content and link checks, not unrelated behavior tests.
-- Never describe an unrun, skipped, or non-matching check as passed.
-- Report the files changed, checks actually run and their results, and any relevant boundary that remains unverified.
+- 用短句、常用词和源码中的真实名称，说明当前行为、必要条件和失败结果，不堆术语或保留失效的专项说明。
+- 同一规则只保留一个权威位置，其它文件给链接或短指引。`README.md` 负责项目介绍和导航，`docs/` 负责用法与示例，[TESTING.md](TESTING.md) 负责验证范围和命令。
+- 注释说明契约、原因和不明显的限制，不复述语法；随相关实现更新，不批量改写无关注释。中英文用户文档保持含义一致。
+- 修改文档后重新通读，检查重复、冲突、文件引用和链接；删除或搬走内容前，确认仍有效的信息已有归属。
+
+## 验证与交付
+
+- 行为变更补充或调整有意义的测试；验证范围、命令和结果记录按 `TESTING.md` 执行。
+- 完成本次适用的全部检查并处理发现的问题后停止；只有新改动、已查明的失败原因或未解决的问题需要时才重跑或扩大检查。无法完成的检查或处理须说明原因，不宣称完成。
+- 交付简洁说明修改内容、验证结果、必要的假设和未验证边界。区分事实与推断，不用未经核实的结论代替证据；复用结果须注明。
+
+## 工具、缓存与删除
+
+- 只有用户明确要求 Git 工作时，才查看或操作其授权的 Git 状态、差异、历史、分支或远端，不顺带检查。
+- 直接编辑目标文件，让改动可核对；生成和格式化使用项目约定的工具，并限制在任务范围内。执行命令前核对参数、工作目录和路径，正确引用文本，防止被当成命令执行。
+- 工具原生缓存默认使用并复用其默认位置；仅在不可写、确认故障或工具要求隔离时切换，并说明原因。自建持久缓存放在稳定的用户缓存目录；测试结果的复用条件、临时产物和测试数据规则见 `TESTING.md`。
+- 未经明确授权，不覆盖、丢弃或重置用户改动与历史。删除项目文件前查清源码、配置、文档、测试和构建引用，先处理有效引用；清理临时文件时只删除本次明确拥有且已核实路径的内容，不扩大目录或清空共享缓存。

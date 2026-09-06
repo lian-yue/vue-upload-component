@@ -1,68 +1,59 @@
-# Testing Guide
+# 测试与验证
 
-This file is the single repository-level authority for verification scope and commands. Run the smallest set that proves the affected behavior, then use the full release gate only when the task warrants it.
+本文件统一说明验证范围、命令和结果记录；协作边界遵循 [AGENTS.md](AGENTS.md)。从项目根目录执行命令，按实际影响选择检查，不把下列入口当成每次必跑的清单。
 
-## Automated checks
+## 选择检查
 
-Run focused tests while developing when possible:
+- 先确定本次改变的行为和受影响的调用路径，选择能覆盖它们的最小测试集合。共享组件或上传流程修改也按影响选择，不自动扩成全套。
+- 纯文字、注释或文档链接修改只检查内容、引用和链接；涉及可执行示例、配置或工具指令时，按对应行为验证。
 
-```sh
-npm test -- FileUpload.test.js
-npm test -- ChunkUploadHandler.test.js
-```
+| 适用情况 | 验证入口 |
+| --- | --- |
+| 组件状态、事件或上传调度变化 | `npm test -- FileUpload.test.js` |
+| 分块上传行为变化 | `npm test -- ChunkUploadHandler.test.js` |
+| 速度统计行为变化 | `npm test -- UploadSpeedometer.test.js` |
+| 维护源码、测试、文档应用代码或检查配置变化 | `npm run lint` |
+| 组件、TypeScript、声明或类型检查配置变化 | `npm run typecheck` |
+| 影响库或文档构建的实现、依赖、配置变化，或需要生成发布产物 | `npm run build` |
+| 测试运行器或共享测试基础发生变化，无法可靠缩小范围，或用户明确要求全套 | `npm test` |
 
-Use these repository checks for their matching change types:
+表中的测试文件是现有入口，不代表覆盖全部行为。能定位具体用例时，用 `-t` 按包含 suite 名的完整测试名称筛选；正则需锚定并转义名称中的特殊字符。无法可靠缩到用例时才运行相关测试文件；跨职责修改组合相关入口，新增测试使用实际文件名。类型检查范围以 `tsconfig.json` 为准，不能将其结果描述为所有文档示例均已通过类型检查。
 
-```sh
-npm run lint
-npm run typecheck
-npm test
-npm run build
-```
+## 浏览器验证
 
-- Run lint for maintained source, tests, documentation application code, or configuration changes.
-- Run type checking for component, TypeScript, declaration, public API, or build-pipeline changes.
-- Run the relevant tests for behavior changes; run the full suite for shared component or upload-flow changes.
-- Run the build for dependency, bundler, declaration, packaging, documentation application, or release-output changes.
-- Do not run behavior tests for prose-only documentation changes unless the change also affects executable examples or configuration.
+- 需要验证交互行为时运行 `npm run dev`，使用终端显示的本地地址。文档采用 hash 路由，例如 `/#/en/examples/full`；共享行为或语言导航变化时，同时检查受影响的英文和中文页面。
+- 上传变更只检查实际受影响的入口和结果，如文件选择、拖放、多文件、目录、更新或移除、POST、PUT、分块上传、取消和失败处理。自动化测试使用 `happy-dom`，不能据此宣称真实浏览器或 HTML4 上传路径已验证。
+- 上传请求使用 [webpack.config.js](webpack.config.js) 中的本地端点，不依赖不可控的外部上传服务。普通上传端点会随机延迟并返回成功、403 或 500；[分块上传模拟接口](src/utils/chunkUpload.js) 也会随机延迟和返回失败。核对响应及组件处理，不能仅凭一次失败判定回归，也不能把重试成功当成缺陷已修复；需要稳定复现时使用固定响应的测试替身。
+- 图像编辑修改只检查受影响的示例；Cropper CDN 版本或两处共用的行为变化时，检查 `/#/en/examples/avatar` 和 `/#/en/examples/full`。覆盖各页面实际提供且受影响的裁剪、旋转、保存、取消或关闭操作，以及保存后的尺寸和文件状态。
+- 图像尺寸或布局变化时，选择相关的横图、竖图、大图以及窄屏或低高度视口；确认编辑区和操作按钮可用。浏览器检查同时留意控制台错误，区分资源加载失败与应用错误。
 
-## Browser verification
+## 依赖与打包
 
-Use `npm run dev` for changes that affect interactive examples. Verify the affected routes in both supported languages when shared behavior or navigation changes.
+依赖兼容性和 CDN 维护规则见 `AGENTS.md`。升级后验证实际受影响的运行、构建或类型检查入口，再按任务需要选择以下检查：
 
-For file upload changes, cover the relevant input paths: picker, drag and drop, multiple files, directories, update/remove, POST or PUT, chunk upload, and error handling. Use the local development endpoints configured in `webpack.config.js`; do not depend on an uncontrolled external upload service.
+| 适用情况 | 验证入口 |
+| --- | --- |
+| 依赖升级后的安装树和顶层依赖关系检查 | `npm ls --depth=0` |
+| 任务需要核对依赖更新情况 | `npm outdated` |
+| 任务涉及依赖安全检查 | `npm audit` |
+| 包入口、发布文件清单变化或发布验证 | `npm pack --dry-run` |
 
-For image editing or Cropper.js changes, verify at minimum:
+打包检查需要最新构建产物时先构建，避免把旧产物当成本次结果。发布验证按实际发布内容组合自动化、构建、打包和浏览器检查，不给普通修复追加发布清单。上述检查不执行发布。
 
-- `/en/examples/avatar` and `/en/examples/full`;
-- selecting portrait, landscape, and large images;
-- crop, rotate, confirm, and cancel actions;
-- the saved image dimensions and the updated file entry;
-- no runtime errors in the browser console;
-- the dialog and action buttons remain visible in short desktop and mobile-sized viewports.
+## 测试数据与环境
 
-## Dependency and package verification
+- 单元测试保持确定性，使用可控的请求、时间和随机输入，不依赖真实外部服务；每个测试独立持有可变状态并恢复替换的对象。
+- 运行日志、覆盖率报告、临时上传和测试生成文件放在系统临时目录；测试数据中只有需长期维护的静态 fixture 或基线放入仓库。
+- 缓存位置、清理权限和构建产物的维护规则见 `AGENTS.md`，构建输出不按临时测试文件处理。
+- registry、网络、peer 依赖、权限和平台限制单独记录。失败时先区分实现、测试与环境原因，后续是否修复或重跑按 `AGENTS.md` 执行。
 
-For dependency upgrades, check the resolved tree and outdated packages in addition to the relevant automated and browser checks:
+## 结果复用
 
-```sh
-npm ls --depth=0
-npm outdated
-npm audit
-npm pack --dry-run
-```
+- 未修改且结果仍有效的检查可以复用成功记录。须能确认记录对应同一入口和参数，且被测实现、测试、依赖、配置、工具链及相关环境未变；其它无关文件的修改不要求重跑。
+- 原生编译或转换缓存不等于测试成功记录，不能仅凭缓存目录存在就跳过检查。自行保存的结果须有可靠的输入身份和完整成功记录，不为小检查临时搭建结果缓存系统。
+- 用户明确要求本次实跑，或已有结果失效、相关外部状态无法确认时，执行已选最小检查；继续复用有效的编译和转换缓存。失败、跳过、零匹配及环境阻塞不能作为成功结果复用。
 
-Record registry, network, peer-dependency, or platform failures separately from code failures. Do not force a nominally newer version when its peer ranges make the repository invalid.
+## 结果记录
 
-## Test data and outputs
-
-- Unit tests must be deterministic and must not require real external services.
-- Keep mutable test state isolated per test. Put runtime logs, coverage data, temporary uploads, and generated test artifacts in the system temporary directory.
-- Only maintained fixtures belong in the repository.
-- Build outputs are generated by `npm run build`. Validate the source and build result; do not manually review or edit generated bundles unless artifact contents are the subject of the task.
-
-## Release gate and reporting
-
-Before a release-oriented dependency or source change is complete, run the applicable full gate: lint, type checking, the full test suite, build, package dry-run, and required browser flows.
-
-For every delivery, record the exact commands run and distinguish passed, failed, skipped, not matched, environment-blocked, and not run checks. A successful build does not replace browser verification for interactive behavior, and a manual example check does not replace automated tests.
+- 记录实际执行或复用的入口、覆盖的行为及结果；区分通过、缓存复用、失败、跳过、零匹配、环境阻塞和未运行。复用时说明所用记录及仍有效的依据，不写成本次重新运行。`npm outdated` 发现新版本或 `npm audit` 报告问题时，说明具体发现，不等同于行为测试失败。
+- 构建通过不能替代交互行为的浏览器验证；手动示例检查也不能替代自动化测试。记录浏览器检查的页面、操作和实际观察，不把未覆盖的行为或环境写成已验证。
