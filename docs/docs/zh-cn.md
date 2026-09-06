@@ -3,7 +3,7 @@
 ### NPM
 
 ``` bash
-npm install vue-upload-component --save
+npm install vue-upload-component@next --save
 ```
 
 ``` js
@@ -207,48 +207,162 @@ export default {
 
 
 ### 扩展分片上传
-  **CustomUpload.js**
-  ```js
-//   import axios from 'axios'
-//   import VueUploadComponent from 'vue-upload-component'
-//   import { STORAGE_CREATE, STORAGE_UPDATE, STORAGE_UPLOAD } from 'src/urls'
-//
-//   VueUploadComponent.props.partThread = {
-//     type: Number,
-//     default: 2,
-//   }
-//   VueUploadComponent.props.partTimeout = {
-//     type: String,
-//     default: '',
-//   }
-//
-//   VueUploadComponent.Methods.partInit = async functuon (file) {
-//     let data = await axios({
-//       method: 'post',
-//       size: file.size,
-//       name: file.name,
-//     })
-//     return data
-//   }
-//   VueUploadComponent.props.customAction.default = async function (_file, component) {
-//     let file = _file
-//     let fileObject = file.file
-//
-//     // 创建 文件
-//     let data = await axios({
-//       method: 'post',
-//     })
-// component.partMethod, component.partAction, { user: 'me' }, {}, { size: fileObject.size, name: file.name }, {}, 2)
-//     file = component.update(file, { storage })
-//     if (!file || !file.fileObject || !file.active) {
-//       throw new Error('abort')
-//     }
-//     if (file.error) {
-//       throw new Error(file.error)
-//     }
-//
-//   }
-  ```
+
+组件 3.x 已内置分片上传处理器。使用默认协议时，不需要创建 `CustomUpload.js`，也不需要复制组件源码。前端配置分片接口，后端实现下面的 `start`、`upload`、`finish` 三个阶段即可。
+
+#### Vue 3 示例
+
+下面是一个完整的 Vue 3 单文件组件，可保存为项目中的 `.vue` 文件。它使用组件 3.x（npm 的 `next` 标签）。将 `/upload/post` 和 `/upload/chunk` 替换为自己的后端接口。
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import FileUpload from 'vue-upload-component'
+
+const upload = ref(null)
+const files = ref([])
+const chunk = {
+  action: '/upload/chunk',
+  minSize: 1048576,
+  maxActive: 3,
+  maxRetries: 5,
+}
+
+function startUpload() {
+  if (upload.value) {
+    upload.value.active = true
+  }
+}
+</script>
+
+<template>
+  <FileUpload
+    ref="upload"
+    v-model="files"
+    post-action="/upload/post"
+    chunk-enabled
+    :chunk="chunk"
+    :size="0"
+    multiple
+  >
+    选择文件
+  </FileUpload>
+  <button type="button" :disabled="!files.length" @click="startUpload">
+    开始上传
+  </button>
+  <ul>
+    <li v-for="file in files" :key="file.id">
+      {{ file.name }} — {{ file.error || (file.success ? '成功' : '等待或上传中') }}
+    </li>
+  </ul>
+</template>
+```
+
+队列未启动时，选择文件只会加入列表，需要点击“开始上传”启动队列。队列运行中追加的文件会自动继续上传；队列结束后再添加文件，需要再次点击“开始上传”。本例中，大于 1 MiB（1048576 字节）的文件走分片接口，小于或等于该大小的文件走普通 `post-action` 接口。
+
+| 配置 | 含义 |
+| --- | --- |
+| `chunk-enabled` | 启用分片上传，默认关闭。 |
+| `chunk.action` | 三个分片阶段共用的接口 URL。 |
+| `chunk.minSize` | 启用分片的文件大小阈值，不是每片大小。 |
+| `chunk.maxActive` | 每个文件同时上传的最大分片数。 |
+| `chunk.maxRetries` | 单片上传失败后的最多重试次数，不包含首次请求。 |
+| `size` | 组件允许的最大文件大小；`0` 表示不限制。 |
+
+实际每片大小由后端在 `start` 响应的 `data.end_offset` 中返回。后端和反向代理的大小限制仍需自行配置。
+
+[分片上传示例](https://lian-yue.github.io/vue-upload-component/#/zh-cn/examples/chunk)及其[源码](https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Chunk.vue)还演示了并发分片、重试和暂停/继续。该示例页面设置了 10 MiB 的文件大小上限，上传更大的文件时应调整 `size`。
+
+#### start
+
+向 `chunk.action` 发送 `POST`，请求体为 JSON：
+
+```json
+{
+  "phase": "start",
+  "name": "large.bin",
+  "size": 2621440,
+  "mime_type": "application/octet-stream"
+}
+```
+
+后端创建上传会话，返回成功状态、非空会话 ID 和每片的字节数：
+
+```json
+{
+  "status": "success",
+  "data": {
+    "session_id": "upload-1",
+    "end_offset": 1048576
+  }
+}
+```
+
+`end_offset` 在此协议中表示每片大小，应为正整数字节数。上例会把 2.5 MiB 的文件分成 3 片。
+
+#### upload
+
+每片向同一个 `chunk.action` 发送 `POST`，使用 `multipart/form-data`：
+
+| 字段 | 内容 |
+| --- | --- |
+| `phase` | `upload` |
+| `session_id` | `start` 返回的会话 ID，例如 `upload-1`。 |
+| `start_offset` | 当前分片在原文件中的起始字节偏移。 |
+| `chunk` | 当前分片的二进制内容。 |
+
+上例三片的偏移分别是 `0`、`1048576`、`2097152`，大小分别是 `1048576`、`1048576`、`524288` 字节。后端需要按会话和偏移保存分片，支持并发导致的乱序到达，以及重试带来的重复请求。
+
+每片保存成功后返回：
+
+```json
+{ "status": "success" }
+```
+
+单片请求失败或响应的 `status` 不是 `success` 时，处理器按 `maxRetries` 重试；超过次数后，该文件上传失败。
+
+#### finish
+
+所有分片上传成功后，向同一个 `chunk.action` 发送 JSON：
+
+```json
+{
+  "phase": "finish",
+  "session_id": "upload-1"
+}
+```
+
+后端应检查分片是否完整、合并并保存文件，再返回：
+
+```json
+{ "status": "success" }
+```
+
+各阶段的成功响应都应使用成功的 HTTP 状态码，并包含 JSON 字段 `status: "success"`。`start` 和 `finish` 请求失败不会按 `maxRetries` 自动重试；上传结果通过 `file.success`、`file.error` 和 `file.response` 查看。
+
+分片保存、完整性校验和合并由后端实现。仓库中的 [`src/utils/chunkUpload.js`](https://github.com/lian-yue/vue-upload-component/blob/master/src/utils/chunkUpload.js) 只是文档演示用的模拟接口，会随机返回失败，不会保存或合并文件。
+
+#### 自定义处理器
+
+仅需附加请求字段时，使用 `chunk.startBody`、`chunk.uploadBody`、`chunk.finishBody`；分片请求头使用 `chunk.headers`，无需自定义处理器。
+
+如果后端使用不同的分片协议，可以参考或继承 [`ChunkUploadHandler`](https://github.com/lian-yue/vue-upload-component/blob/master/src/chunk/ChunkUploadHandler.js)，在自己的项目中实现一个处理器类。文件可以放在任意可导入的位置，例如 `src/upload/CustomUpload.js`；这个路径不是组件要求，也不是组件自动加载的文件。
+
+处理器通过 `new Handler(file, options)` 创建，必须提供返回 Promise 的 `upload()` 方法：整个文件上传成功时兑现，失败时拒绝。需要暂停/继续时，还应实现对应方法；继承默认处理器可以复用已有生命周期处理。
+
+实现并导出自定义类后，在使用它的 Vue 组件中导入，再通过 `chunk.handler` 指定。例如组件位于 `src/UploadExample.vue` 时：
+
+```js
+import CustomUpload from './upload/CustomUpload.js'
+
+const chunk = {
+  action: '/upload/chunk',
+  minSize: 1048576,
+  handler: CustomUpload,
+}
+```
+
+将该对象传给上例的 `:chunk="chunk"`。它替换默认处理器；使用内置协议时保留默认处理器即可。
 
 
 ## 选项 / 属性
@@ -643,7 +757,7 @@ input 标签的 `capture` 属性。受支持的设备可用 `user` 调用前置�
   }
   ```
 
-可通过 `startBody`、`uploadBody` 和 `finishBody` 分别附加各阶段的请求字段。
+完整配置和请求协议见[扩展分片上传](#入门开始-扩展分片上传)。
 
 
 ### drop

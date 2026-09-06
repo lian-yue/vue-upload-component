@@ -6,7 +6,7 @@
 ### NPM
 
 ``` bash
-npm install vue-upload-component --save
+npm install vue-upload-component@next --save
 ```
 
 ``` js
@@ -149,211 +149,162 @@ app.mount('#app')
 
 ### Chunk Upload
 
-This package allows chunk uploads, which means you can upload a file in different parts.
-
-This process is divided in three phases: <strong>start</strong>, <strong>upload</strong>,<strong>finish</strong></p>
-
-#### start
-
-This is the first phase of the process. We'll tell the backend that we are going to upload a file, with certain `size`, `name` and `mime_type`.
-
-Use the option `startBody` to add more parameters to the body of this request.
-
-The backend should provide a `session_id` (to identify the upload) and a `end_offset` which is the size of every chunk
-
-##### HTTP start phase example
-
-Request body example:
-```
-{
-  "phase": "start",
-  "mime_type": "image/png",
-  "size": 12669430,
-  "name":"hubbleimage1stscihp1809af6400x4800.png"
-}
-```
-
-Response body example:
-```
-{
-  "data": {
-    "end_offset": 6291456,
-    "session_id": "61db8102-fca6-44ae-81e2-a499d438e7a5"
-  },
-  "status": "success"
-}
-
-```
-
-#### upload
-
-In this phase we'll upload every chunk until all of them are uploaded. This step allows some failures in the backend, and will retry up to `maxRetries` times.
-
-We'll send the `session_id`, `start_offset` and `chunk` (the sliced blob - part of file we are uploading). We expect the backend to return `{ status: 'success' }`, we'll retry otherwise.
-
-Use the option `uploadBody` to add more parameters to the body of this request.
-
-##### HTTP upload phase example with 3 chunks
-
-Request body example - chunk 1 from 3:
-```
-------WebKitFormBoundaryuI0uiY8h7MCbcysx
-Content-Disposition: form-data; name="phase"
-
-upload
-------WebKitFormBoundaryuI0uiY8h7MCbcysx
-Content-Disposition: form-data; name="session_id"
-
-61db8102-fca6-44ae-81e2-a499d438e7a5
-------WebKitFormBoundaryuI0uiY8h7MCbcysx
-Content-Disposition: form-data; name="start_offset"
-
-0
-------WebKitFormBoundaryuI0uiY8h7MCbcysx
-Content-Disposition: form-data; name="chunk"; filename="blob"
-Content-Type: application/octet-stream
-
-
-------WebKitFormBoundaryuI0uiY8h7MCbcysx--
-```
-
-Response body example - chunk 1 from 3:
-```
-{
-  "status": "success"
-}
-```
-
-Request body example - chunk 2 from 3:
-```
-------WebKitFormBoundary4cjBupFqrx1SrHoR
-Content-Disposition: form-data; name="phase"
-
-upload
-------WebKitFormBoundary4cjBupFqrx1SrHoR
-Content-Disposition: form-data; name="session_id"
-
-61db8102-fca6-44ae-81e2-a499d438e7a5
-------WebKitFormBoundary4cjBupFqrx1SrHoR
-Content-Disposition: form-data; name="start_offset"
-
-6291456
-------WebKitFormBoundary4cjBupFqrx1SrHoR
-Content-Disposition: form-data; name="chunk"; filename="blob"
-Content-Type: application/octet-stream
-
-
-------WebKitFormBoundary4cjBupFqrx1SrHoR-
-```
-
-Response body example - chunk 2 from 3:
-```
-{
-  "status": "success"
-}
-```
-
-Request body example - chunk 3 from 3:
-```
-------WebKitFormBoundarypWxg4xnB5QBDoFys
-Content-Disposition: form-data; name="phase"
-
-upload
-------WebKitFormBoundarypWxg4xnB5QBDoFys
-Content-Disposition: form-data; name="session_id"
-
-61db8102-fca6-44ae-81e2-a499d438e7a5
-------WebKitFormBoundarypWxg4xnB5QBDoFys
-Content-Disposition: form-data; name="start_offset"
-
-12582912
-------WebKitFormBoundarypWxg4xnB5QBDoFys
-Content-Disposition: form-data; name="chunk"; filename="blob"
-Content-Type: application/octet-stream
-
-
-------WebKitFormBoundarypWxg4xnB5QBDoFys--
-```
-
-Response body example - chunk 1 from 3:
-```
-{
-  "status": "success"
-}
-```
-
-#### finish
-
-In this phase we tell the backend that there are no more chunks to upload, so it can wrap everything. We send the `session_id` in this phase.
-
-Use the option `finishBody` to add more parameters to the body of this request.
-
-##### HTTP finish phase example
-
-Request body example:
-```
-{
-  "phase": "finish",
-  "session_id": "61db8102-fca6-44ae-81e2-a499d438e7a5"
-}
-```
-
-Response body example:
-```
-{
-  "status": "success"
-}
-```
+Component 3.x includes a chunk upload handler. The default protocol does not require a `CustomUpload.js` file or a copy of the component source. Configure the frontend endpoint and implement the `start`, `upload`, and `finish` phases on the backend.
 
 #### Example
 
-In the following example we are going to add `Chunk Upload Functionality`. This component will use `Chunk Upload` when the size of the file is > `1MB`, it will behave as the `Simple example` when the size of the file is lower.
+This is a complete Vue 3 single-file component that you can save as a `.vue` file in your project. It uses component 3.x (the npm `next` tag). Replace `/upload/post` and `/upload/chunk` with your backend endpoints.
 
-```html
-  <file-upload
+```vue
+<script setup>
+import { ref } from 'vue'
+import FileUpload from 'vue-upload-component'
+
+const upload = ref(null)
+const files = ref([])
+const chunk = {
+  action: '/upload/chunk',
+  minSize: 1048576,
+  maxActive: 3,
+  maxRetries: 5,
+}
+
+function startUpload() {
+  if (upload.value) {
+    upload.value.active = true
+  }
+}
+</script>
+
+<template>
+  <FileUpload
     ref="upload"
     v-model="files"
-    post-action="/post.method"
-    put-action="/put.method"
-
+    post-action="/upload/post"
     chunk-enabled
-    :chunk="{
-      action: '/upload/chunk',
-      minSize: 1048576,
-      maxActive: 3,
-      maxRetries: 5,
-
-      // Example in the case your backend also needs the user id to operate
-      startBody: {
-        user_id: user.id
-      }
-    }"
-
-    @input-file="inputFile"
-    @input-filter="inputFilter"
+    :chunk="chunk"
+    :size="0"
+    multiple
   >
-  Upload file
-  </file-upload>
+    Select files
+  </FileUpload>
+  <button type="button" :disabled="!files.length" @click="startUpload">
+    Start upload
+  </button>
+  <ul>
+    <li v-for="file in files" :key="file.id">
+      {{ file.name }} — {{ file.error || (file.success ? 'Success' : 'Pending or uploading') }}
+    </li>
+  </ul>
+</template>
 ```
+
+While the queue is stopped, selecting files only adds them to the list; click “Start upload” to start the queue. Files added while the queue is running are uploaded automatically. After the queue finishes, adding more files requires clicking “Start upload” again. In this example, files larger than 1 MiB (1048576 bytes) use the chunk endpoint. Files at or below that size use the ordinary `post-action` endpoint.
+
+| Option | Meaning |
+| --- | --- |
+| `chunk-enabled` | Enables chunk uploads; disabled by default. |
+| `chunk.action` | Endpoint URL shared by all three chunk phases. |
+| `chunk.minSize` | File size threshold for using chunks, not the size of each chunk. |
+| `chunk.maxActive` | Maximum number of chunks uploaded concurrently per file. |
+| `chunk.maxRetries` | Maximum retries after a chunk upload fails, excluding the first request. |
+| `size` | Maximum file size accepted by the component; `0` means no limit. |
+
+The backend supplies the actual chunk size in `data.end_offset` in the `start` response. Backend and reverse proxy size limits must still be configured separately.
+
+The [chunk upload example](https://lian-yue.github.io/vue-upload-component/#/en/examples/chunk) and its [source](https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Chunk.vue) also demonstrate concurrent chunks, retries, and pause/resume. That example page limits files to 10 MiB; adjust `size` to upload larger files.
+
+#### start
+
+Send a `POST` to `chunk.action` with a JSON body:
+
+```json
+{
+  "phase": "start",
+  "name": "large.bin",
+  "size": 2621440,
+  "mime_type": "application/octet-stream"
+}
+```
+
+The backend creates an upload session and returns a success status, a non-empty session ID, and the number of bytes per chunk:
+
+```json
+{
+  "status": "success",
+  "data": {
+    "session_id": "upload-1",
+    "end_offset": 1048576
+  }
+}
+```
+
+In this protocol, `end_offset` means the chunk size and should be a positive integer byte count. The example splits a 2.5 MiB file into three chunks.
+
+#### upload
+
+Send each chunk as a `POST` to the same `chunk.action`, using `multipart/form-data`:
+
+| Field | Content |
+| --- | --- |
+| `phase` | `upload` |
+| `session_id` | Session ID from `start`, such as `upload-1`. |
+| `start_offset` | Starting byte offset of this chunk in the original file. |
+| `chunk` | Binary contents of this chunk. |
+
+The three offsets in the example are `0`, `1048576`, and `2097152`. Their sizes are `1048576`, `1048576`, and `524288` bytes. Store chunks by session and offset. The backend must handle out-of-order arrival from concurrent uploads and duplicate requests from retries.
+
+After saving each chunk, return:
+
+```json
+{ "status": "success" }
+```
+
+If a chunk request fails or its response `status` is not `success`, the handler retries according to `maxRetries`. The file upload fails when the retry limit is exceeded.
+
+#### finish
+
+After all chunks have uploaded successfully, send JSON to the same `chunk.action`:
+
+```json
+{
+  "phase": "finish",
+  "session_id": "upload-1"
+}
+```
+
+The backend should check that all chunks are present, merge and save the file, then return:
+
+```json
+{ "status": "success" }
+```
+
+Successful responses in every phase should use a successful HTTP status code and include the JSON field `status: "success"`. Failed `start` and `finish` requests are not automatically retried through `maxRetries`. Inspect `file.success`, `file.error`, and `file.response` for the upload result.
+
+Chunk storage, completeness checks, and merging are backend responsibilities. The repository's [`src/utils/chunkUpload.js`](https://github.com/lian-yue/vue-upload-component/blob/master/src/utils/chunkUpload.js) is only a documentation demo endpoint: it randomly returns failures and does not store or merge files.
 
 #### Extending the handler
 
-We are using the class `src/chunk/ChunkUploadHandler` class to implement this protocol. You can extend this class (or even create a different one from scratch) to implement your own way to communicat with the backend.
+To add request fields, use `chunk.startBody`, `chunk.uploadBody`, and `chunk.finishBody`. Use `chunk.headers` for chunk request headers. These options do not require a custom handler.
 
-This class must implement a method called `upload` which **must** return a promise. This promise will be used by the `FileUpload` component to determinate whether the file was uploaded or failed.
+For a different backend protocol, refer to or extend [`ChunkUploadHandler`](https://github.com/lian-yue/vue-upload-component/blob/master/src/chunk/ChunkUploadHandler.js) and implement a handler class in your own project. Save it anywhere you can import it, for example `src/upload/CustomUpload.js`. This path is not required or automatically loaded by the component.
 
-Use the `handler` parameter to use a different Handler
+The component creates the handler with `new Handler(file, options)`. It must provide an `upload()` method returning a Promise that resolves when the entire file upload succeeds and rejects on failure. Implement the corresponding methods if pause/resume is needed; extending the default handler lets you reuse its lifecycle handling.
 
-```html
- :chunk="{
-   action: '/upload/chunk',
-   minSize: 1048576,
-   maxActive: 3,
-   maxRetries: 5,
+After implementing and exporting your class, import it into the consuming Vue component and supply it as `chunk.handler`. For example, from `src/UploadExample.vue`:
 
-   handler: MyHandlerClass
- }
+```js
+import CustomUpload from './upload/CustomUpload.js'
+
+const chunk = {
+  action: '/upload/chunk',
+  minSize: 1048576,
+  handler: CustomUpload,
+}
 ```
+
+Pass this object through `:chunk="chunk"` in the example above. It replaces the default handler; keep the default handler when using the built-in protocol.
+
 
 ### SSR (Server isomorphism)
 
@@ -806,7 +757,7 @@ All the options to handle chunk uploads
 }
 ```
 
-`startBody`, `uploadBody`, and `finishBody` can add phase-specific request fields.
+See [Chunk Upload](#getting-started-chunk-upload) for the complete configuration and request protocol.
 
 ### drop
 
