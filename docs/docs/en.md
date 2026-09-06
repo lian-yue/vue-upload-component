@@ -820,11 +820,21 @@ Drag and drop upload
 
 * **Details:**
 
-  If set to `true`, read the parent component as a container
+  When set to `true`, use the parent component's root element as the drop container if it contains the upload component. Otherwise, try the app's root element with the same check, then fall back to the upload component's actual DOM parent. Text and comment placeholders are not used as containers. This also supports uploads inside Teleport modals.
+
+  To choose a specific area, pass a CSS selector or DOM element. Use `drop="body"` explicitly to receive drops across the page.
 
 * **Usage:**
   ```html
   <file-upload :drop="true"></file-upload>
+  ```
+
+  ```html
+  <teleport to="body">
+    <div class="upload-modal">
+      <file-upload :drop="true"></file-upload>
+    </div>
+  </teleport>
   ```
 
 

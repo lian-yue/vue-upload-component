@@ -658,11 +658,21 @@ input 标签的 `capture` 属性。受支持的设备可用 `user` 调用前置�
 
 * **详细:**
 
-  如果设置成 `true` 则读取父组件作为容器  
+  设置为 `true` 时，如果父组件的根元素包含上传组件，就使用它作为拖放容器。否则，按同样条件尝试应用根元素，最后回退到上传组件实际的 DOM 父元素。文本和注释占位节点不会作为容器，因此也支持 Teleport 弹窗内的上传组件。
+
+  如需指定区域，可以传入 CSS 选择器或 DOM 元素。需要整个页面接收拖放时，显式使用 `drop="body"`。
 
 * **示例:**
   ```html
   <file-upload :drop="true"></file-upload>
+  ```
+
+  ```html
+  <teleport to="body">
+    <div class="upload-modal">
+      <file-upload :drop="true"></file-upload>
+    </div>
+  </teleport>
   ```
 
 

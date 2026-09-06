@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { Fragment, h, nextTick, Teleport } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import FileUpload from '../src/FileUpload.vue'
 
@@ -15,6 +15,130 @@ function mountUpload(props = {}) {
 afterEach(() => {
   vi.useRealTimers()
   vi.restoreAllMocks()
+})
+
+describe('FileUpload drop containers', () => {
+  const wrappers = []
+  const elements = []
+
+  function createContainer() {
+    const element = document.createElement('div')
+    document.body.appendChild(element)
+    elements.push(element)
+    return element
+  }
+
+  async function mountHost(component, props = {}) {
+    const wrapper = mount(component, { attachTo: createContainer(), props })
+    wrappers.push(wrapper)
+    // happy-dom omits input.ondrop; these tests cover container binding, not feature detection.
+    const uploads = component === FileUpload ? [wrapper] : wrapper.findAllComponents(FileUpload)
+    for (const upload of uploads) upload.vm.features.drop = true
+    await nextTick()
+    await nextTick()
+    return wrapper
+  }
+
+  function dropFile(element, name) {
+    const event = new Event('drop', { bubbles: true, cancelable: true })
+    Object.defineProperty(event, 'dataTransfer', {
+      value: { files: [new File(['file'], name)], items: [] },
+    })
+    element.dispatchEvent(event)
+    return event
+  }
+
+  afterEach(() => {
+    for (const wrapper of wrappers.splice(0)) wrapper.unmount()
+    for (const element of elements.splice(0)) element.remove()
+  })
+
+  it('keeps the parent component container including siblings outside the upload button', async () => {
+    const Parent = {
+      render: () => h('section', [
+        h('div', [h(FileUpload, { drop: true, multiple: true })]),
+        h('p', { class: 'inside' }, 'Drop here'),
+      ]),
+    }
+    const host = await mountHost({
+      render: () => h('main', [h(Parent), h('p', { class: 'outside' }, 'Outside')]),
+    })
+    const upload = host.findComponent(FileUpload)
+
+    expect(upload.vm.dropElement).toBe(host.find('section').element)
+    dropFile(host.find('.inside').element, 'inside.txt')
+    dropFile(host.find('.outside').element, 'outside.txt')
+    expect(upload.vm.files.map(file => file.name)).toEqual(['inside.txt'])
+  })
+
+  it.each(['fragment', 'disabled teleport'])('keeps the containing app root fallback for a %s parent', async (kind) => {
+    const Parent = {
+      render: () => h(kind === 'fragment' ? Fragment : Teleport,
+        kind === 'fragment' ? null : { to: document.body, disabled: true },
+        [h('div', [h(FileUpload, { drop: true })])]),
+    }
+    const host = await mountHost({
+      render: () => h('main', [h(Parent), h('p', { class: 'root-sibling' }, 'Drop here')]),
+    })
+    const upload = host.findComponent(FileUpload)
+
+    expect(upload.vm.dropElement).toBe(host.element)
+    dropFile(host.find('.root-sibling').element, 'root.txt')
+    expect(upload.vm.files.map(file => file.name)).toEqual(['root.txt'])
+  })
+
+  it.each([false, true])('uses the actual modal container when teleported (element wrapper: %s)', async (wrapped) => {
+    const portal = createContainer()
+    const Modal = {
+      render() {
+        const modal = h(Teleport, { to: portal }, [
+          h('section', { class: 'modal-drop' }, [
+            h(FileUpload, { drop: true, multiple: true }),
+            h('p', { class: 'modal-sibling' }, 'Drop here'),
+          ]),
+        ])
+        return wrapped ? h('div', [modal]) : modal
+      },
+    }
+    const host = await mountHost({ render: () => h('main', [h(Modal)]) })
+    const upload = host.findComponent(FileUpload)
+    const modal = portal.querySelector('.modal-drop')
+
+    expect(upload.vm.dropElement).toBe(modal)
+    dropFile(portal.querySelector('.modal-sibling'), 'modal.txt')
+    dropFile(host.element, 'outside.txt')
+    expect(upload.vm.files.map(file => file.name)).toEqual(['modal.txt'])
+
+    host.unmount()
+    wrappers.splice(wrappers.indexOf(host), 1)
+    expect(dropFile(modal, 'after-unmount.txt').defaultPrevented).toBe(false)
+  })
+
+  it.each(['selector', 'element', 'body'])('preserves explicit %s targets and removes old listeners when changed or disabled', async (kind) => {
+    const target = createContainer()
+    target.id = 'explicit-upload-drop'
+    const nextTarget = createContainer()
+    const drop = kind === 'selector' ? '#explicit-upload-drop' : kind === 'body' ? 'body' : target
+    const upload = await mountHost(FileUpload, { drop, multiple: true })
+    const firstTarget = kind === 'body' ? document.body : target
+
+    expect(upload.vm.dropElement).toBe(firstTarget)
+    dropFile(firstTarget, 'first.txt')
+    expect(upload.vm.files.map(file => file.name)).toEqual(['first.txt'])
+
+    await upload.setProps({ drop: nextTarget })
+    dropFile(firstTarget, 'old-target.txt')
+    dropFile(nextTarget, 'second.txt')
+    expect(upload.vm.files.map(file => file.name)).toEqual(['first.txt', 'second.txt'])
+
+    await upload.setProps({ disabled: true })
+    dropFile(nextTarget, 'disabled.txt')
+    expect(upload.vm.files).toHaveLength(2)
+
+    await upload.setProps({ drop: false })
+    expect(upload.vm.dropElement).toBeNull()
+    expect(dropFile(nextTarget, 'after-disable.txt').defaultPrevented).toBe(false)
+  })
 })
 
 describe('FileUpload', () => {

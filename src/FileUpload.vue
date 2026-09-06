@@ -1705,14 +1705,18 @@ export default defineComponent({
           el = null
         }
       } else if (newDrop === true) {
-        // @ts-ignore
-        el = this.$parent?.$el
-        if (!el || el?.nodeType === 8) {
-          // @ts-ignore
-          el = this.$root.$el
-          if (!el || el?.nodeType === 8) {
-            el = document.body
-          }
+        const uploadEl = this.$el as HTMLElement
+        const parentEl = this.$parent?.$el as HTMLElement | undefined
+        const rootEl = this.$root?.$el as HTMLElement | undefined
+
+        // Preserve the existing container when it contains the rendered upload element.
+        if (parentEl?.nodeType === 1 && parentEl.contains(uploadEl)) {
+          el = parentEl
+        } else if (rootEl?.nodeType === 1 && rootEl.contains(uploadEl)) {
+          el = rootEl
+        } else {
+          // Teleport and fragment roots may not identify an ancestor in the actual DOM.
+          el = uploadEl.parentElement
         }
       } else {
         el = newDrop
