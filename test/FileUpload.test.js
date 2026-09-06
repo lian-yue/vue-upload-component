@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { Fragment, h, nextTick, Teleport } from 'vue'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import FileUpload from '../src/FileUpload.vue'
 
 function mountUpload(props = {}) {
@@ -11,6 +11,146 @@ function mountUpload(props = {}) {
     },
   })
 }
+
+describe('FileUpload XHR request ownership', () => {
+  let wrapper
+  let requests
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.spyOn(Math, 'random').mockReturnValue(0)
+    requests = []
+    class ControlledXMLHttpRequest {
+      constructor() {
+        this.upload = {}
+        this.status = 0
+        this.responseText = ''
+        this.send = vi.fn()
+        this.abort = vi.fn(() => this.onabort?.({ type: 'abort' }))
+        requests.push(this)
+      }
+
+      open() {}
+      setRequestHeader() {}
+      getResponseHeader() { return 'application/json' }
+
+      respond(status, source) {
+        this.status = status
+        this.responseText = JSON.stringify({ source })
+        this.onload({ type: 'load' })
+      }
+    }
+    vi.stubGlobal('XMLHttpRequest', ControlledXMLHttpRequest)
+    wrapper = mountUpload({ postAction: '/upload' })
+  })
+
+  afterEach(() => {
+    wrapper.unmount()
+    for (const xhr of requests) xhr.abort()
+    vi.clearAllTimers()
+    vi.unstubAllGlobals()
+  })
+
+  async function startUpload() {
+    const file = wrapper.vm.add(new File(['0123456789'], 'file.txt'))
+    wrapper.vm.update(file, { active: true })
+    await nextTick()
+    await vi.advanceTimersByTimeAsync(50)
+    expect(requests).toHaveLength(1)
+    expect(requests[0].send).toHaveBeenCalledOnce()
+    return file.id
+  }
+
+  function restart(id) {
+    wrapper.vm.update(id, { active: false })
+    wrapper.vm.update(id, { active: true, error: '', progress: '0.00' })
+  }
+
+  it.each([200, 500])('ignores an old %i response before the retry request starts', async (status) => {
+    const id = await startUpload()
+    restart(id)
+    requests[0].respond(status, 'old')
+    expect(wrapper.vm.get(id).response).toEqual({})
+    await vi.advanceTimersByTimeAsync(50)
+
+    expect(requests).toHaveLength(2)
+    expect(wrapper.vm.get(id)).toMatchObject({ active: true, success: false, error: '', response: {} })
+    requests[1].respond(200, 'new')
+    await vi.advanceTimersByTimeAsync(0)
+    expect(wrapper.vm.get(id)).toMatchObject({ active: false, success: true, error: '', response: { source: 'new' } })
+  })
+
+  it('ignores old progress and errors while the retry request is running', async () => {
+    const id = await startUpload()
+    restart(id)
+    await vi.advanceTimersByTimeAsync(50)
+    expect(requests).toHaveLength(2)
+
+    requests[0].upload.onprogress({ lengthComputable: true, loaded: 9, total: 10 })
+    expect(wrapper.vm.get(id)).toMatchObject({ progress: '0.00', speed: 0 })
+    requests[0].respond(500, 'old')
+    await vi.advanceTimersByTimeAsync(100)
+    expect(requests[1].abort).not.toHaveBeenCalled()
+    expect(wrapper.vm.get(id)).toMatchObject({ active: true, error: '' })
+    expect(wrapper.vm.get(id).response).toEqual({})
+
+    requests[1].respond(200, 'new')
+    await vi.advanceTimersByTimeAsync(0)
+    expect(wrapper.vm.get(id)).toMatchObject({ success: true, response: { source: 'new' } })
+  })
+
+  it('aborts the obsolete request and preserves a real retry error', async () => {
+    const id = await startUpload()
+    restart(id)
+    await vi.advanceTimersByTimeAsync(100)
+
+    expect(requests[0].abort).toHaveBeenCalledOnce()
+    expect(requests[1].abort).not.toHaveBeenCalled()
+    requests[1].respond(500, 'new')
+    await vi.advanceTimersByTimeAsync(0)
+    expect(wrapper.vm.get(id)).toMatchObject({ active: false, success: false, error: 'server', response: { source: 'new' } })
+  })
+
+  it('does not send a request cancelled while its xhr is being attached', async () => {
+    let cancelled = false
+    await wrapper.setProps({
+      onInputFile(file) {
+        if (file?.xhr && !cancelled) {
+          cancelled = true
+          wrapper.vm.update(file, { active: false })
+        }
+      },
+    })
+    const file = wrapper.vm.add(new File(['x'], 'file.txt'))
+    wrapper.vm.update(file, { active: true })
+    await nextTick()
+    await vi.advanceTimersByTimeAsync(50)
+
+    expect(requests).toHaveLength(1)
+    expect(requests[0].send).not.toHaveBeenCalled()
+    expect(wrapper.vm.get(file.id)).toMatchObject({ active: false, error: 'abort' })
+  })
+
+  it('keeps the current request valid when file metadata changes', async () => {
+    const id = await startUpload()
+    wrapper.vm.update(id, { name: 'renamed.txt', data: { label: 'updated' } })
+    requests[0].upload.onprogress({ lengthComputable: true, loaded: 5, total: 10 })
+    expect(wrapper.vm.get(id).progress).toBe('50.00')
+    requests[0].respond(200, 'current')
+    await vi.advanceTimersByTimeAsync(0)
+    expect(wrapper.vm.get(id)).toMatchObject({ name: 'renamed.txt', success: true, error: '', data: { label: 'updated' } })
+  })
+
+  it('preserves the missing-file error when an active file is removed', async () => {
+    const uploadXhr = vi.spyOn(wrapper.vm, 'uploadXhr')
+    const id = await startUpload()
+    const result = uploadXhr.mock.results[0].value.catch(error => error)
+    wrapper.vm.remove(id)
+    await vi.advanceTimersByTimeAsync(100)
+    expect(await result).toMatchObject({ message: 'not_exists' })
+    expect(requests[0].abort).toHaveBeenCalledOnce()
+  })
+})
 
 afterEach(() => {
   vi.useRealTimers()

@@ -1211,6 +1211,10 @@ export default defineComponent({
 
     uploadXhr(xhr: XMLHttpRequest, ufile: VueUploadItem | undefined | false, body: FormData | Blob): Promise<VueUploadItem> {
       let file = ufile
+      const uploadId = file ? file.id : ''
+      const uploadToken = this.activeUploadTokens.get(uploadId)
+      // 同一文件重新激活后，旧请求不能更新新一轮上传。
+      const isCurrentUpload = () => this.activeUploadTokens.get(uploadId) === uploadToken
       let speedLoaded = 0
       let lastTransferSpeed = 0
       const speedometer = new UploadSpeedometer()
@@ -1222,7 +1226,7 @@ export default defineComponent({
       // 进度条
       xhr.upload.onprogress = (e: ProgressEvent) => {
         // 还未开始上传 已删除 未激活
-        if (!file) {
+        if (!file || !isCurrentUpload()) {
           return
         }
         file = this.get(file)
@@ -1244,7 +1248,7 @@ export default defineComponent({
 
       // 检查激活状态
       let interval: number | undefined = window.setInterval(() => {
-        if (file) {
+        if (file && isCurrentUpload()) {
           if ((file = this.get(file))) {
             if (file?.fileObject && !file.success && !file.error && file.active) {
               return
@@ -1292,6 +1296,9 @@ export default defineComponent({
           // 不存在直接响应
           if (!file) {
             return reject(new Error('not_exists'))
+          }
+          if (!isCurrentUpload()) {
+            return reject(new Error('abort'))
           }
 
           // 不是文件对象
@@ -1406,7 +1413,7 @@ export default defineComponent({
           file = this.update(file, { xhr })
 
           // 开始上传
-          if (!file) {
+          if (!file || !isCurrentUpload()) {
             stopInterval()
             reject(new Error('abort'))
             return

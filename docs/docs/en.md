@@ -1255,6 +1255,8 @@ Add files that are dragged or pasted into the upload list
 
 Update a file object
 
+Cancel a regular POST/PUT upload with `update(file, { active: false })`, then retry with `update(file, { active: true, error: '' })`. When retrying immediately, progress, responses, and errors from the previous request cannot overwrite the new upload's state.
+
 * **Arguments:**
 
   * `id: File | Object | String`

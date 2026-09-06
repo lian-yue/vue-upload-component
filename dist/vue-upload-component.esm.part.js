@@ -1722,6 +1722,10 @@ var script = defineComponent({
         },
         uploadXhr(xhr, ufile, body) {
             let file = ufile;
+            const uploadId = file ? file.id : '';
+            const uploadToken = this.activeUploadTokens.get(uploadId);
+            // 同一文件重新激活后，旧请求不能更新新一轮上传。
+            const isCurrentUpload = () => this.activeUploadTokens.get(uploadId) === uploadToken;
             let speedLoaded = 0;
             let lastTransferSpeed = 0;
             const speedometer = new UploadSpeedometer();
@@ -1731,7 +1735,7 @@ var script = defineComponent({
             // 进度条
             xhr.upload.onprogress = (e) => {
                 // 还未开始上传 已删除 未激活
-                if (!file) {
+                if (!file || !isCurrentUpload()) {
                     return;
                 }
                 file = this.get(file);
@@ -1751,7 +1755,7 @@ var script = defineComponent({
             };
             // 检查激活状态
             let interval = window.setInterval(() => {
-                if (file) {
+                if (file && isCurrentUpload()) {
                     if ((file = this.get(file))) {
                         if (file?.fileObject && !file.success && !file.error && file.active) {
                             return;
@@ -1796,6 +1800,9 @@ var script = defineComponent({
                     // 不存在直接响应
                     if (!file) {
                         return reject(new Error('not_exists'));
+                    }
+                    if (!isCurrentUpload()) {
+                        return reject(new Error('abort'));
                     }
                     // 不是文件对象
                     if (!file.fileObject) {
@@ -1901,7 +1908,7 @@ var script = defineComponent({
                     // @ts-ignore
                     file = this.update(file, { xhr });
                     // 开始上传
-                    if (!file) {
+                    if (!file || !isCurrentUpload()) {
                         stopInterval();
                         reject(new Error('abort'));
                         return;

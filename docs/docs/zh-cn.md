@@ -1256,6 +1256,8 @@ vue 2.x 的结果
 
 更新某个对象
 
+普通 POST/PUT 上传可通过 `update(file, { active: false })` 取消，再通过 `update(file, { active: true, error: '' })` 重试。立即重试时，旧请求的进度、响应和错误不会覆盖新一轮上传的状态。
+
 * **参数:**
 
   * `id: File | Object | String`
