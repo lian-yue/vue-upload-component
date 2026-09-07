@@ -11,12 +11,536 @@ import VueUploadComponent from 'vue-upload-component'
 app.component('file-upload', VueUploadComponent)
 ```
 
-### Typescript
-``` js
-import VueUploadComponent from 'vue-upload-component'
-app.component('file-upload', VueUploadComponent)
+### JavaScript
+
+将下面的示例保存为 `src/App.vue`。默认启用包名导入，其他方式都作为注释列出并说明用途。请只保留一个生效的 `FileUpload` 导入；选择 part 版本时，还需启用配套的 CSS 导入。
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import FileUpload from 'vue-upload-component' // 推荐的包入口，包含样式
+// import FileUpload from 'vue-upload-component/src/FileUpload.vue' // Vue 单文件源码，需要编译 Vue、TypeScript 和 CSS
+// import FileUpload from '../../../src/FileUpload.vue' // 仅仓库内开发使用，按文件位置调整相对路径
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.js' // UMD/CommonJS 版本，包含样式
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.min.js' // 压缩的 UMD/CommonJS 版本，包含样式
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.js' // ESM 版本，包含样式
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.min.js' // 压缩的 ESM 版本，包含样式
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.part.js' // UMD/CommonJS 版本，样式需单独引入
+// import 'vue-upload-component/dist/vue-upload-component.part.css' // 与上一行的 part 版本配套启用
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.part.js' // ESM 版本，样式需单独引入
+// import 'vue-upload-component/dist/vue-upload-component.esm.part.css' // 与上一行的 ESM part 版本配套启用
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.ssr.js' // 仅服务端使用的 UMD/CommonJS SSR 版本
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.ssr.js' // 仅服务端使用的 ESM SSR 版本
+
+const files = ref([])
+const upload = ref(null)
+
+function startUpload() {
+  if (upload.value) upload.value.active = true
+}
+</script>
+
+<template>
+  <FileUpload
+    ref="upload"
+    v-model="files"
+    post-action="/upload/post"
+    multiple
+  >
+    选择文件
+  </FileUpload>
+  <button type="button" :disabled="!files.length" @click="startUpload">
+    开始上传
+  </button>
+  <ul>
+    <li v-for="file in files" :key="file.id">{{ file.name }}</li>
+  </ul>
+</template>
 ```
 
+选择文件后先加入队列，点击“开始上传”才会发送。请将 `/upload/post` 替换为自己的后端接口；构建工具不会实现上传服务。
+
+SSR 版本仅用于服务端渲染，客户端及需要 hydration 的 Vue 组件应使用普通入口或源码入口。包入口和 `src/FileUpload.vue` 配有类型声明。在显式的 `dist` 路径中，目前仅 `dist/vue-upload-component.js` 配有对应声明，其余变体在严格 TypeScript 项目中可能报 TS7016。这些选项用于选择模块格式和样式加载方式，组件用法一致。
+
+#### 构建配置
+
+使用 Vue 3 和组件 3.x。默认包名导入加载构建后的库。如果启用源码导入，即使调用侧使用 JavaScript，组件自身仍含有 TypeScript，所以构建必须处理 `.vue`、TypeScript 和 CSS。默认入口和源码入口包含样式；part 版本需要启用上面配套的 CSS 导入。
+
+```bash
+npm install vue@^3.5.41 vue-upload-component@next
+```
+
+创建 `src/main.js`，内容如下。
+
+```js
+import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')
+```
+
+下面选择一种构建工具即可。已有项目可以保留原入口，将相关配置合并到现有配置中。
+
+##### Vite
+
+```bash
+npm install -D vite@^8 @vitejs/plugin-vue@^6 typescript@^6 vue-tsc@^3
+```
+
+创建 `vite.config.mjs`：
+
+```js
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+export default defineConfig({
+  plugins: [vue()],
+})
+```
+
+在项目根目录创建 `index.html`。
+
+```html
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8"><title>上传示例</title></head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+```
+
+运行 `npx vite` 启动开发服务，或运行 `npx vite build` 构建。Vue 插件会处理组件里的 TypeScript 和样式；Vite 不需要配置 `ts-loader`。
+
+##### Webpack
+
+```bash
+npm install -D webpack@^5 webpack-cli@^7 vue-loader@^17 @vue/compiler-sfc@^3.5.41 typescript@^6 ts-loader@^9 css-loader@^7 style-loader@^4 vue-tsc@^3
+```
+
+`@vue/compiler-sfc` 与 `vue` 应使用相同版本。创建 `webpack.config.cjs`：
+
+```js
+const path = require('node:path')
+const webpack = require('webpack')
+const { VueLoaderPlugin } = require('vue-loader')
+
+module.exports = {
+  mode: 'development',
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'app.js',
+  },
+  resolve: {
+    extensions: ['.ts', '.js', '.vue'],
+  },
+  module: {
+    rules: [
+      { test: /\.vue$/, loader: 'vue-loader' },
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        options: {
+          appendTsSuffixTo: [/\.vue$/],
+          transpileOnly: true,
+        },
+      },
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+    ],
+  },
+  plugins: [
+    new VueLoaderPlugin(),
+    new webpack.DefinePlugin({
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_DEVTOOLS__: false,
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
+    }),
+  ],
+}
+```
+
+JavaScript 项目也需要保留 TypeScript 规则。不要让这些 loader 规则排除组件的 `node_modules/vue-upload-component/src` 目录。`VueLoaderPlugin` 会将规则应用到 `.vue` 文件中的脚本和样式块。
+
+运行 `npx webpack --config webpack.config.cjs`。加载构建结果时，创建 `dist/index.html`，并通过你的 HTTP 服务提供 `dist` 目录：
+
+```html
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8"><title>上传示例</title></head>
+  <body>
+    <div id="app"></div>
+    <script defer src="./app.js"></script>
+  </body>
+</html>
+```
+
+##### Nuxt 3 / 4
+
+在已有的 Nuxt 应用中安装组件：
+
+```bash
+npm install vue-upload-component@next
+```
+
+将下面的配置合并到 `nuxt.config.ts`（或 `nuxt.config.js`）：
+
+```js
+import { defineNuxtConfig } from 'nuxt/config'
+
+export default defineNuxtConfig({
+  build: {
+    transpile: ['vue-upload-component'],
+  },
+})
+```
+
+Nuxt 4 中，将示例组件保存为 `app/components/UploadExample.vue`，并在 `app/app.vue` 中使用 `<UploadExample />`。Nuxt 3 的默认位置是 `components/UploadExample.vue` 和 `app.vue`。选定的导入保留在该组件中。Nuxt 负责创建应用及 SSR，因此不需要添加前面手动创建应用的入口文件。
+
+Nuxt 中建议保留默认包名导入。源码方式能够构建，但 Nuxt 默认的 `noUncheckedIndexedAccess`、`verbatimModuleSyntax` 设置会在 `nuxt typecheck` 时报告组件源码内部的类型错误。除非项目明确使用兼容的 TypeScript 设置，否则请保持源码导入行被注释。
+
+运行 `npx nuxt dev` 或 `npx nuxt build`。保留 Nuxt 生成的 TypeScript 配置；需要类型检查时，安装 `typescript@^6`、`vue-tsc@^3`，再运行 `npx nuxt typecheck`。
+
+##### Rsbuild
+
+Rsbuild 2 需要安装匹配的 Vue 插件：
+
+```bash
+npm install -D @rsbuild/core@^2 @rsbuild/plugin-vue@^2 typescript@^6 vue-tsc@^3
+```
+
+创建 `rsbuild.config.mjs`，并使用前面的 `src/App.vue`、`src/main.js`：
+
+```js
+import { defineConfig } from '@rsbuild/core'
+import { pluginVue } from '@rsbuild/plugin-vue'
+
+export default defineConfig({
+  plugins: [pluginVue()],
+  source: {
+    entry: { index: './src/main.js' },
+    include: [/node_modules[\\/]vue-upload-component[\\/]src/],
+  },
+  html: {
+    mountId: 'app',
+  },
+})
+```
+
+Vue 插件负责处理单文件组件，`source.include` 同时将包内的 JavaScript 辅助文件纳入编译。Rsbuild 会生成带有 `app` 挂载节点的 HTML。运行 `npx rsbuild dev` 或 `npx rsbuild build`，类型检查使用 `npx vue-tsc --noEmit`。
+
+##### 已有 Vue CLI 项目
+
+Vue CLI 已进入维护模式；这里针对已经使用 Vue 3 的 Vue CLI 5 项目。即使 `App.vue` 使用 JavaScript，源码导入也需要启用 TypeScript 插件：
+
+```bash
+npm install -D @vue/cli-plugin-typescript@^5 typescript@^6
+```
+
+将下面的配置合并到 `vue.config.js`，保留项目其他已有入口和设置：
+
+```js
+module.exports = {
+  transpileDependencies: ['vue-upload-component'],
+  pages: {
+    index: { entry: 'src/main.js' },
+  },
+}
+```
+
+显式指定入口可以避免 TypeScript 插件将本 JavaScript 示例的入口改为 `main.ts`。保留 CLI 项目的 `public/index.html` 及其 `<div id="app"></div>` 挂载节点。旧项目升级到 TypeScript 6 时，也要同步调整编译选项；下面的最小配置适用于本示例。合并时保留项目自定义的路径和类型设置。运行已有的 `npm run serve` 或 `npm run build` 脚本。
+
+##### 类型检查与导入路径
+
+Vite、Webpack、Rsbuild 和 Vue CLI 5 可以使用下面的最小 `tsconfig.json`。已有项目合并这些选项时，应保留自身的自定义设置。Nuxt 应保留框架生成的配置。
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "allowJs": true,
+    "types": [],
+    "lib": ["ES2020", "DOM"]
+  },
+  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.vue"]
+}
+```
+
+运行 `npx vue-tsc --noEmit` 检查类型。Vite 转译和 Webpack 的 `transpileOnly` 设置都不能替代类型检查。
+
+在正常安装 npm 包的应用中，这个源码导入不需要配置别名。如果项目为包名设置了别名，请只匹配完整包名，或单独映射 `vue-upload-component/src` 前缀，否则可能将该导入重定向到错误文件。这个路径必须经过 Vue 构建工具处理，不能直接交给 Node 或浏览器 `<script>` 标签加载。
+
+官方参考：[Vite](https://vite.dev/guide/features.html#vue)、[Vue Loader](https://vue-loader.vuejs.org/guide/pre-processors.html#typescript)、[Nuxt](https://nuxt.com/docs/4.x/api/nuxt-config#transpile)、[Rsbuild](https://rsbuild.rs/plugins/list/plugin-vue)、[Vue CLI](https://cli.vuejs.org/config/#transpiledependencies)。
+
+### TypeScript
+
+将下面的示例保存为 `src/App.vue`。默认启用包名导入，它提供 `VueUploadItem` 和组件类型。请只保留一个生效的 `FileUpload` 导入；其他方式及其样式导入都列为注释。
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FileUpload from 'vue-upload-component' // 推荐的包入口，包含样式
+// import FileUpload from 'vue-upload-component/src/FileUpload.vue' // Vue 单文件源码，需要编译 Vue、TypeScript 和 CSS
+// import FileUpload from '../../../src/FileUpload.vue' // 仅仓库内开发使用，按文件位置调整相对路径
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.js' // UMD/CommonJS 版本，包含样式
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.min.js' // 压缩的 UMD/CommonJS 版本，包含样式
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.js' // ESM 版本，包含样式
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.min.js' // 压缩的 ESM 版本，包含样式
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.part.js' // UMD/CommonJS 版本，样式需单独引入
+// import 'vue-upload-component/dist/vue-upload-component.part.css' // 与上一行的 part 版本配套启用
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.part.js' // ESM 版本，样式需单独引入
+// import 'vue-upload-component/dist/vue-upload-component.esm.part.css' // 与上一行的 ESM part 版本配套启用
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.ssr.js' // 仅服务端使用的 UMD/CommonJS SSR 版本
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.ssr.js' // 仅服务端使用的 ESM SSR 版本
+import type { VueUploadItem } from 'vue-upload-component'
+
+const files = ref<VueUploadItem[]>([])
+const upload = ref<InstanceType<typeof FileUpload> | null>(null)
+
+function startUpload() {
+  if (upload.value) upload.value.active = true
+}
+</script>
+
+<template>
+  <FileUpload
+    ref="upload"
+    v-model="files"
+    post-action="/upload/post"
+    multiple
+  >
+    选择文件
+  </FileUpload>
+  <button type="button" :disabled="!files.length" @click="startUpload">
+    开始上传
+  </button>
+  <ul>
+    <li v-for="file in files" :key="file.id">{{ file.name }}</li>
+  </ul>
+</template>
+```
+
+选择文件后先加入队列，点击“开始上传”才会发送。请将 `/upload/post` 替换为自己的后端接口；构建工具不会实现上传服务。
+
+SSR 版本仅用于服务端渲染，客户端及需要 hydration 的 Vue 组件应使用普通入口或源码入口。包入口和 `src/FileUpload.vue` 配有类型声明。在显式的 `dist` 路径中，目前仅 `dist/vue-upload-component.js` 配有对应声明，其余变体在严格 TypeScript 项目中可能报 TS7016。这些选项用于选择模块格式和样式加载方式，组件用法一致。
+
+#### 构建配置
+
+使用 Vue 3 和组件 3.x。默认包名导入加载构建后的库。如果启用源码导入，即使调用侧使用 JavaScript，组件自身仍含有 TypeScript，所以构建必须处理 `.vue`、TypeScript 和 CSS。默认入口和源码入口包含样式；part 版本需要启用上面配套的 CSS 导入。
+
+```bash
+npm install vue@^3.5.41 vue-upload-component@next
+```
+
+创建 `src/main.ts`，内容如下。
+
+```js
+import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')
+```
+
+下面选择一种构建工具即可。已有项目可以保留原入口，将相关配置合并到现有配置中。
+
+##### Vite
+
+```bash
+npm install -D vite@^8 @vitejs/plugin-vue@^6 typescript@^6 vue-tsc@^3
+```
+
+创建 `vite.config.mjs`：
+
+```js
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+export default defineConfig({
+  plugins: [vue()],
+})
+```
+
+在项目根目录创建 `index.html`。
+
+```html
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8"><title>上传示例</title></head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
+```
+
+运行 `npx vite` 启动开发服务，或运行 `npx vite build` 构建。Vue 插件会处理组件里的 TypeScript 和样式；Vite 不需要配置 `ts-loader`。
+
+##### Webpack
+
+```bash
+npm install -D webpack@^5 webpack-cli@^7 vue-loader@^17 @vue/compiler-sfc@^3.5.41 typescript@^6 ts-loader@^9 css-loader@^7 style-loader@^4 vue-tsc@^3
+```
+
+`@vue/compiler-sfc` 与 `vue` 应使用相同版本。创建 `webpack.config.cjs`：
+
+```js
+const path = require('node:path')
+const webpack = require('webpack')
+const { VueLoaderPlugin } = require('vue-loader')
+
+module.exports = {
+  mode: 'development',
+  entry: './src/main.ts',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'app.js',
+  },
+  resolve: {
+    extensions: ['.ts', '.js', '.vue'],
+  },
+  module: {
+    rules: [
+      { test: /\.vue$/, loader: 'vue-loader' },
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        options: {
+          appendTsSuffixTo: [/\.vue$/],
+          transpileOnly: true,
+        },
+      },
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+    ],
+  },
+  plugins: [
+    new VueLoaderPlugin(),
+    new webpack.DefinePlugin({
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_DEVTOOLS__: false,
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
+    }),
+  ],
+}
+```
+
+JavaScript 项目也需要保留 TypeScript 规则。不要让这些 loader 规则排除组件的 `node_modules/vue-upload-component/src` 目录。`VueLoaderPlugin` 会将规则应用到 `.vue` 文件中的脚本和样式块。
+
+运行 `npx webpack --config webpack.config.cjs`。加载构建结果时，创建 `dist/index.html`，并通过你的 HTTP 服务提供 `dist` 目录：
+
+```html
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8"><title>上传示例</title></head>
+  <body>
+    <div id="app"></div>
+    <script defer src="./app.js"></script>
+  </body>
+</html>
+```
+
+##### Nuxt 3 / 4
+
+在已有的 Nuxt 应用中安装组件：
+
+```bash
+npm install vue-upload-component@next
+```
+
+将下面的配置合并到 `nuxt.config.ts`（或 `nuxt.config.js`）：
+
+```js
+import { defineNuxtConfig } from 'nuxt/config'
+
+export default defineNuxtConfig({
+  build: {
+    transpile: ['vue-upload-component'],
+  },
+})
+```
+
+Nuxt 4 中，将示例组件保存为 `app/components/UploadExample.vue`，并在 `app/app.vue` 中使用 `<UploadExample />`。Nuxt 3 的默认位置是 `components/UploadExample.vue` 和 `app.vue`。选定的导入保留在该组件中。Nuxt 负责创建应用及 SSR，因此不需要添加前面手动创建应用的入口文件。
+
+Nuxt 中建议保留默认包名导入。源码方式能够构建，但 Nuxt 默认的 `noUncheckedIndexedAccess`、`verbatimModuleSyntax` 设置会在 `nuxt typecheck` 时报告组件源码内部的类型错误。除非项目明确使用兼容的 TypeScript 设置，否则请保持源码导入行被注释。
+
+运行 `npx nuxt dev` 或 `npx nuxt build`。保留 Nuxt 生成的 TypeScript 配置；需要类型检查时，安装 `typescript@^6`、`vue-tsc@^3`，再运行 `npx nuxt typecheck`。
+
+##### Rsbuild
+
+Rsbuild 2 需要安装匹配的 Vue 插件：
+
+```bash
+npm install -D @rsbuild/core@^2 @rsbuild/plugin-vue@^2 typescript@^6 vue-tsc@^3
+```
+
+创建 `rsbuild.config.mjs`，并使用前面的 `src/App.vue`、`src/main.ts`：
+
+```js
+import { defineConfig } from '@rsbuild/core'
+import { pluginVue } from '@rsbuild/plugin-vue'
+
+export default defineConfig({
+  plugins: [pluginVue()],
+  source: {
+    entry: { index: './src/main.ts' },
+    include: [/node_modules[\\/]vue-upload-component[\\/]src/],
+  },
+  html: {
+    mountId: 'app',
+  },
+})
+```
+
+Vue 插件负责处理单文件组件，`source.include` 同时将包内的 JavaScript 辅助文件纳入编译。Rsbuild 会生成带有 `app` 挂载节点的 HTML。运行 `npx rsbuild dev` 或 `npx rsbuild build`，类型检查使用 `npx vue-tsc --noEmit`。
+
+##### 已有 Vue CLI 项目
+
+Vue CLI 已进入维护模式；这里针对已经使用 Vue 3 的 Vue CLI 5 项目。即使 `App.vue` 使用 JavaScript，源码导入也需要启用 TypeScript 插件：
+
+```bash
+npm install -D @vue/cli-plugin-typescript@^5 typescript@^6
+```
+
+将下面的配置合并到 `vue.config.js`，保留项目其他已有入口和设置：
+
+```js
+module.exports = {
+  transpileDependencies: ['vue-upload-component'],
+  pages: {
+    index: { entry: 'src/main.ts' },
+  },
+}
+```
+
+保留 CLI 项目的 `public/index.html` 及其 `<div id="app"></div>` 挂载节点。旧项目升级到 TypeScript 6 时，也要同步调整编译选项；下面的最小配置适用于本示例。合并时保留项目自定义的路径和类型设置。运行已有的 `npm run serve` 或 `npm run build` 脚本。
+
+##### 类型检查与导入路径
+
+Vite、Webpack、Rsbuild 和 Vue CLI 5 可以使用下面的最小 `tsconfig.json`。已有项目合并这些选项时，应保留自身的自定义设置。Nuxt 应保留框架生成的配置。
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "allowJs": true,
+    "types": [],
+    "lib": ["ES2020", "DOM"]
+  },
+  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.vue"]
+}
+```
+
+运行 `npx vue-tsc --noEmit` 检查类型。Vite 转译和 Webpack 的 `transpileOnly` 设置都不能替代类型检查。
+
+在正常安装 npm 包的应用中，这个源码导入不需要配置别名。如果项目为包名设置了别名，请只匹配完整包名，或单独映射 `vue-upload-component/src` 前缀，否则可能将该导入重定向到错误文件。这个路径必须经过 Vue 构建工具处理，不能直接交给 Node 或浏览器 `<script>` 标签加载。
+
+官方参考：[Vite](https://vite.dev/guide/features.html#vue)、[Vue Loader](https://vue-loader.vuejs.org/guide/pre-processors.html#typescript)、[Nuxt](https://nuxt.com/docs/4.x/api/nuxt-config#transpile)、[Rsbuild](https://rsbuild.rs/plugins/list/plugin-vue)、[Vue CLI](https://cli.vuejs.org/config/#transpiledependencies)。
 
 ### Curated
 

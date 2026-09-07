@@ -14,12 +14,536 @@ import VueUploadComponent from 'vue-upload-component'
 app.component('file-upload', VueUploadComponent)
 ```
 
-### Typescript
-``` js
-import VueUploadComponent from 'vue-upload-component'
+### JavaScript
 
-app.component('file-upload', VueUploadComponent)
+Save this example as `src/App.vue`. The package-name import is enabled by default. The alternatives are listed as comments with their intended uses. Keep only one `FileUpload` import active; when choosing a part build, also enable its matching CSS import.
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import FileUpload from 'vue-upload-component' // Recommended package entry; includes styles
+// import FileUpload from 'vue-upload-component/src/FileUpload.vue' // Vue SFC source; compile Vue, TypeScript and CSS
+// import FileUpload from '../../../src/FileUpload.vue' // Repository development only; adjust the relative path
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.js' // UMD/CommonJS build with styles
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.min.js' // Minified UMD/CommonJS build with styles
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.js' // ESM build with styles
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.min.js' // Minified ESM build with styles
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.part.js' // UMD/CommonJS build with separate CSS
+// import 'vue-upload-component/dist/vue-upload-component.part.css' // Enable together with the preceding part build
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.part.js' // ESM build with separate CSS
+// import 'vue-upload-component/dist/vue-upload-component.esm.part.css' // Enable together with the preceding ESM part build
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.ssr.js' // Server-only UMD/CommonJS SSR build
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.ssr.js' // Server-only ESM SSR build
+
+const files = ref([])
+const upload = ref(null)
+
+function startUpload() {
+  if (upload.value) upload.value.active = true
+}
+</script>
+
+<template>
+  <FileUpload
+    ref="upload"
+    v-model="files"
+    post-action="/upload/post"
+    multiple
+  >
+    Select files
+  </FileUpload>
+  <button type="button" :disabled="!files.length" @click="startUpload">
+    Start upload
+  </button>
+  <ul>
+    <li v-for="file in files" :key="file.id">{{ file.name }}</li>
+  </ul>
+</template>
 ```
+
+Selecting files adds them to the queue. Click “Start upload” to send them. Replace `/upload/post` with your backend endpoint; the build tools do not implement the upload service.
+
+SSR variants are only for server rendering; keep a normal or source entry in client-side and hydrated Vue components. The package entry and `src/FileUpload.vue` have type declarations. Among the explicit `dist` paths, only `dist/vue-upload-component.js` currently has a matching declaration file; the other variants may report TS7016 in strict TypeScript projects. These alternatives select the module format and how styles are loaded; the public upload API remains the same.
+
+#### Build configuration
+
+Use Vue 3 and component 3.x. The default package import loads the built library. If you enable the source import, the component itself contains TypeScript even in a JavaScript application, so the build must handle `.vue`, TypeScript and CSS. The default and source entries include styles; part builds require the matching CSS import shown above.
+
+```bash
+npm install vue@^3.5.41 vue-upload-component@next
+```
+
+Create `src/main.js` with the following contents.
+
+```js
+import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')
+```
+
+Choose one of the following build tools. An existing project can keep its current entry point and merge the relevant configuration.
+
+##### Vite
+
+```bash
+npm install -D vite@^8 @vitejs/plugin-vue@^6 typescript@^6 vue-tsc@^3
+```
+
+Create `vite.config.mjs`:
+
+```js
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+export default defineConfig({
+  plugins: [vue()],
+})
+```
+
+Create `index.html` in the project root.
+
+```html
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8"><title>Upload example</title></head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+```
+
+Run `npx vite` for development or `npx vite build` to build. The Vue plugin handles the component's TypeScript and styles; `ts-loader` is not needed with Vite.
+
+##### Webpack
+
+```bash
+npm install -D webpack@^5 webpack-cli@^7 vue-loader@^17 @vue/compiler-sfc@^3.5.41 typescript@^6 ts-loader@^9 css-loader@^7 style-loader@^4 vue-tsc@^3
+```
+
+Use the same version of `@vue/compiler-sfc` and `vue`. Create `webpack.config.cjs`:
+
+```js
+const path = require('node:path')
+const webpack = require('webpack')
+const { VueLoaderPlugin } = require('vue-loader')
+
+module.exports = {
+  mode: 'development',
+  entry: './src/main.js',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'app.js',
+  },
+  resolve: {
+    extensions: ['.ts', '.js', '.vue'],
+  },
+  module: {
+    rules: [
+      { test: /\.vue$/, loader: 'vue-loader' },
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        options: {
+          appendTsSuffixTo: [/\.vue$/],
+          transpileOnly: true,
+        },
+      },
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+    ],
+  },
+  plugins: [
+    new VueLoaderPlugin(),
+    new webpack.DefinePlugin({
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_DEVTOOLS__: false,
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
+    }),
+  ],
+}
+```
+
+Keep the TypeScript rule for JavaScript applications too. Do not exclude the component's `node_modules/vue-upload-component/src` directory from these loader rules. `VueLoaderPlugin` applies the rules to the script and style blocks inside the `.vue` file.
+
+Run `npx webpack --config webpack.config.cjs`. To load the result, create `dist/index.html` and serve the `dist` directory with your HTTP server:
+
+```html
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8"><title>Upload example</title></head>
+  <body>
+    <div id="app"></div>
+    <script defer src="./app.js"></script>
+  </body>
+</html>
+```
+
+##### Nuxt 3 / 4
+
+In an existing Nuxt application, install the component:
+
+```bash
+npm install vue-upload-component@next
+```
+
+Add the following to `nuxt.config.ts` (or `nuxt.config.js`):
+
+```js
+import { defineNuxtConfig } from 'nuxt/config'
+
+export default defineNuxtConfig({
+  build: {
+    transpile: ['vue-upload-component'],
+  },
+})
+```
+
+In Nuxt 4, save the example component as `app/components/UploadExample.vue` and render `<UploadExample />` from `app/app.vue`. In Nuxt 3, the default locations are `components/UploadExample.vue` and `app.vue`. Keep the chosen import inside that component. Nuxt manages application creation and SSR, so do not add the manual application entry shown above.
+
+Use the default package-name import in Nuxt. The source alternative can be built, but Nuxt's default `noUncheckedIndexedAccess` and `verbatimModuleSyntax` settings currently report errors inside the library source during `nuxt typecheck`. Keep the source import commented unless your project deliberately uses compatible TypeScript settings.
+
+Run `npx nuxt dev` or `npx nuxt build`. Keep Nuxt's generated TypeScript configuration; for type checking, install `typescript@^6` and `vue-tsc@^3`, then run `npx nuxt typecheck`.
+
+##### Rsbuild
+
+For Rsbuild 2, install the matching Vue plugin:
+
+```bash
+npm install -D @rsbuild/core@^2 @rsbuild/plugin-vue@^2 typescript@^6 vue-tsc@^3
+```
+
+Create `rsbuild.config.mjs` and use the `src/App.vue` and `src/main.js` files shown above:
+
+```js
+import { defineConfig } from '@rsbuild/core'
+import { pluginVue } from '@rsbuild/plugin-vue'
+
+export default defineConfig({
+  plugins: [pluginVue()],
+  source: {
+    entry: { index: './src/main.js' },
+    include: [/node_modules[\\/]vue-upload-component[\\/]src/],
+  },
+  html: {
+    mountId: 'app',
+  },
+})
+```
+
+The Vue plugin handles the SFC; `source.include` also includes the package's JavaScript helpers for compilation. Rsbuild generates the HTML with the `app` mount element. Run `npx rsbuild dev` or `npx rsbuild build`, and use `npx vue-tsc --noEmit` for type checking.
+
+##### Existing Vue CLI projects
+
+Vue CLI is in maintenance mode; this configuration is for an existing Vue CLI 5 project using Vue 3. Source imports require its TypeScript plugin even when `App.vue` uses JavaScript:
+
+```bash
+npm install -D @vue/cli-plugin-typescript@^5 typescript@^6
+```
+
+Merge the following into `vue.config.js`. Keep any other existing page entries and settings:
+
+```js
+module.exports = {
+  transpileDependencies: ['vue-upload-component'],
+  pages: {
+    index: { entry: 'src/main.js' },
+  },
+}
+```
+
+The explicit entry keeps the TypeScript plugin from switching this JavaScript example to `main.ts`. Keep the CLI project's `public/index.html` with its `<div id="app"></div>` mount element. If upgrading an older project to TypeScript 6, update its compiler options too; the minimal configuration below is compatible with this example. Preserve project-specific paths and types when merging. Run the existing `npm run serve` or `npm run build` scripts.
+
+##### Type checking and import paths
+
+For Vite, Webpack, Rsbuild and Vue CLI 5, a minimal `tsconfig.json` is shown below. Merge these options into existing projects while retaining their custom settings. Nuxt applications should keep their framework-generated configuration.
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "allowJs": true,
+    "types": [],
+    "lib": ["ES2020", "DOM"]
+  },
+  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.vue"]
+}
+```
+
+Run `npx vue-tsc --noEmit` to check types. Vite transpilation and Webpack's `transpileOnly` setting do not replace type checking.
+
+The source import does not require an alias in an installed npm application. If your project aliases the package name, use an exact package-name match or separately map the `vue-upload-component/src` prefix; otherwise it can redirect this import to the wrong file. This path must go through a Vue build tool and cannot be loaded directly by Node or a browser `<script>` tag.
+
+Official references: [Vite](https://vite.dev/guide/features.html#vue), [Vue Loader](https://vue-loader.vuejs.org/guide/pre-processors.html#typescript), [Nuxt](https://nuxt.com/docs/4.x/api/nuxt-config#transpile), [Rsbuild](https://rsbuild.rs/plugins/list/plugin-vue), [Vue CLI](https://cli.vuejs.org/config/#transpiledependencies).
+
+### TypeScript
+
+Save this example as `src/App.vue`. The package-name import is enabled by default and provides `VueUploadItem` and the component type. Keep only one `FileUpload` import active; alternatives and their styles are commented below.
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import FileUpload from 'vue-upload-component' // Recommended package entry; includes styles
+// import FileUpload from 'vue-upload-component/src/FileUpload.vue' // Vue SFC source; compile Vue, TypeScript and CSS
+// import FileUpload from '../../../src/FileUpload.vue' // Repository development only; adjust the relative path
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.js' // UMD/CommonJS build with styles
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.min.js' // Minified UMD/CommonJS build with styles
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.js' // ESM build with styles
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.min.js' // Minified ESM build with styles
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.part.js' // UMD/CommonJS build with separate CSS
+// import 'vue-upload-component/dist/vue-upload-component.part.css' // Enable together with the preceding part build
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.part.js' // ESM build with separate CSS
+// import 'vue-upload-component/dist/vue-upload-component.esm.part.css' // Enable together with the preceding ESM part build
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.ssr.js' // Server-only UMD/CommonJS SSR build
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.ssr.js' // Server-only ESM SSR build
+import type { VueUploadItem } from 'vue-upload-component'
+
+const files = ref<VueUploadItem[]>([])
+const upload = ref<InstanceType<typeof FileUpload> | null>(null)
+
+function startUpload() {
+  if (upload.value) upload.value.active = true
+}
+</script>
+
+<template>
+  <FileUpload
+    ref="upload"
+    v-model="files"
+    post-action="/upload/post"
+    multiple
+  >
+    Select files
+  </FileUpload>
+  <button type="button" :disabled="!files.length" @click="startUpload">
+    Start upload
+  </button>
+  <ul>
+    <li v-for="file in files" :key="file.id">{{ file.name }}</li>
+  </ul>
+</template>
+```
+
+Selecting files adds them to the queue. Click “Start upload” to send them. Replace `/upload/post` with your backend endpoint; the build tools do not implement the upload service.
+
+SSR variants are only for server rendering; keep a normal or source entry in client-side and hydrated Vue components. The package entry and `src/FileUpload.vue` have type declarations. Among the explicit `dist` paths, only `dist/vue-upload-component.js` currently has a matching declaration file; the other variants may report TS7016 in strict TypeScript projects. These alternatives select the module format and how styles are loaded; the public upload API remains the same.
+
+#### Build configuration
+
+Use Vue 3 and component 3.x. The default package import loads the built library. If you enable the source import, the component itself contains TypeScript even in a JavaScript application, so the build must handle `.vue`, TypeScript and CSS. The default and source entries include styles; part builds require the matching CSS import shown above.
+
+```bash
+npm install vue@^3.5.41 vue-upload-component@next
+```
+
+Create `src/main.ts` with the following contents.
+
+```js
+import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')
+```
+
+Choose one of the following build tools. An existing project can keep its current entry point and merge the relevant configuration.
+
+##### Vite
+
+```bash
+npm install -D vite@^8 @vitejs/plugin-vue@^6 typescript@^6 vue-tsc@^3
+```
+
+Create `vite.config.mjs`:
+
+```js
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+export default defineConfig({
+  plugins: [vue()],
+})
+```
+
+Create `index.html` in the project root.
+
+```html
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8"><title>Upload example</title></head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
+```
+
+Run `npx vite` for development or `npx vite build` to build. The Vue plugin handles the component's TypeScript and styles; `ts-loader` is not needed with Vite.
+
+##### Webpack
+
+```bash
+npm install -D webpack@^5 webpack-cli@^7 vue-loader@^17 @vue/compiler-sfc@^3.5.41 typescript@^6 ts-loader@^9 css-loader@^7 style-loader@^4 vue-tsc@^3
+```
+
+Use the same version of `@vue/compiler-sfc` and `vue`. Create `webpack.config.cjs`:
+
+```js
+const path = require('node:path')
+const webpack = require('webpack')
+const { VueLoaderPlugin } = require('vue-loader')
+
+module.exports = {
+  mode: 'development',
+  entry: './src/main.ts',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'app.js',
+  },
+  resolve: {
+    extensions: ['.ts', '.js', '.vue'],
+  },
+  module: {
+    rules: [
+      { test: /\.vue$/, loader: 'vue-loader' },
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        options: {
+          appendTsSuffixTo: [/\.vue$/],
+          transpileOnly: true,
+        },
+      },
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+    ],
+  },
+  plugins: [
+    new VueLoaderPlugin(),
+    new webpack.DefinePlugin({
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_DEVTOOLS__: false,
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: false,
+    }),
+  ],
+}
+```
+
+Keep the TypeScript rule for JavaScript applications too. Do not exclude the component's `node_modules/vue-upload-component/src` directory from these loader rules. `VueLoaderPlugin` applies the rules to the script and style blocks inside the `.vue` file.
+
+Run `npx webpack --config webpack.config.cjs`. To load the result, create `dist/index.html` and serve the `dist` directory with your HTTP server:
+
+```html
+<!doctype html>
+<html>
+  <head><meta charset="UTF-8"><title>Upload example</title></head>
+  <body>
+    <div id="app"></div>
+    <script defer src="./app.js"></script>
+  </body>
+</html>
+```
+
+##### Nuxt 3 / 4
+
+In an existing Nuxt application, install the component:
+
+```bash
+npm install vue-upload-component@next
+```
+
+Add the following to `nuxt.config.ts` (or `nuxt.config.js`):
+
+```js
+import { defineNuxtConfig } from 'nuxt/config'
+
+export default defineNuxtConfig({
+  build: {
+    transpile: ['vue-upload-component'],
+  },
+})
+```
+
+In Nuxt 4, save the example component as `app/components/UploadExample.vue` and render `<UploadExample />` from `app/app.vue`. In Nuxt 3, the default locations are `components/UploadExample.vue` and `app.vue`. Keep the chosen import inside that component. Nuxt manages application creation and SSR, so do not add the manual application entry shown above.
+
+Use the default package-name import in Nuxt. The source alternative can be built, but Nuxt's default `noUncheckedIndexedAccess` and `verbatimModuleSyntax` settings currently report errors inside the library source during `nuxt typecheck`. Keep the source import commented unless your project deliberately uses compatible TypeScript settings.
+
+Run `npx nuxt dev` or `npx nuxt build`. Keep Nuxt's generated TypeScript configuration; for type checking, install `typescript@^6` and `vue-tsc@^3`, then run `npx nuxt typecheck`.
+
+##### Rsbuild
+
+For Rsbuild 2, install the matching Vue plugin:
+
+```bash
+npm install -D @rsbuild/core@^2 @rsbuild/plugin-vue@^2 typescript@^6 vue-tsc@^3
+```
+
+Create `rsbuild.config.mjs` and use the `src/App.vue` and `src/main.ts` files shown above:
+
+```js
+import { defineConfig } from '@rsbuild/core'
+import { pluginVue } from '@rsbuild/plugin-vue'
+
+export default defineConfig({
+  plugins: [pluginVue()],
+  source: {
+    entry: { index: './src/main.ts' },
+    include: [/node_modules[\\/]vue-upload-component[\\/]src/],
+  },
+  html: {
+    mountId: 'app',
+  },
+})
+```
+
+The Vue plugin handles the SFC; `source.include` also includes the package's JavaScript helpers for compilation. Rsbuild generates the HTML with the `app` mount element. Run `npx rsbuild dev` or `npx rsbuild build`, and use `npx vue-tsc --noEmit` for type checking.
+
+##### Existing Vue CLI projects
+
+Vue CLI is in maintenance mode; this configuration is for an existing Vue CLI 5 project using Vue 3. Source imports require its TypeScript plugin even when `App.vue` uses JavaScript:
+
+```bash
+npm install -D @vue/cli-plugin-typescript@^5 typescript@^6
+```
+
+Merge the following into `vue.config.js`. Keep any other existing page entries and settings:
+
+```js
+module.exports = {
+  transpileDependencies: ['vue-upload-component'],
+  pages: {
+    index: { entry: 'src/main.ts' },
+  },
+}
+```
+
+Keep the CLI project's `public/index.html` with its `<div id="app"></div>` mount element. If upgrading an older project to TypeScript 6, update its compiler options too; the minimal configuration below is compatible with this example. Preserve project-specific paths and types when merging. Run the existing `npm run serve` or `npm run build` scripts.
+
+##### Type checking and import paths
+
+For Vite, Webpack, Rsbuild and Vue CLI 5, a minimal `tsconfig.json` is shown below. Merge these options into existing projects while retaining their custom settings. Nuxt applications should keep their framework-generated configuration.
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "allowJs": true,
+    "types": [],
+    "lib": ["ES2020", "DOM"]
+  },
+  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.vue"]
+}
+```
+
+Run `npx vue-tsc --noEmit` to check types. Vite transpilation and Webpack's `transpileOnly` setting do not replace type checking.
+
+The source import does not require an alias in an installed npm application. If your project aliases the package name, use an exact package-name match or separately map the `vue-upload-component/src` prefix; otherwise it can redirect this import to the wrong file. This path must go through a Vue build tool and cannot be loaded directly by Node or a browser `<script>` tag.
+
+Official references: [Vite](https://vite.dev/guide/features.html#vue), [Vue Loader](https://vue-loader.vuejs.org/guide/pre-processors.html#typescript), [Nuxt](https://nuxt.com/docs/4.x/api/nuxt-config#transpile), [Rsbuild](https://rsbuild.rs/plugins/list/plugin-vue), [Vue CLI](https://cli.vuejs.org/config/#transpiledependencies).
 
 ### Curated
 

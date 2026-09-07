@@ -40,10 +40,11 @@ function baseConfig(css, ssr, umd, min, cssFile) {
  */` : '',
       globals: {
         vue: 'Vue',
+        'vue/server-renderer': 'VueServerRenderer',
       },
       name: 'VueUploadComponent',
     },
-    external: ['vue'],
+    external: ['vue', 'vue/server-renderer'],
     plugins: [
       resolve({
         browser: true,

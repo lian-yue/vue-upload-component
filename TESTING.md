@@ -12,6 +12,7 @@
 | 组件状态、事件或上传调度变化 | `npm test -- FileUpload.test.js` |
 | 分块上传行为变化 | `npm test -- ChunkUploadHandler.test.js` |
 | 速度统计行为变化 | `npm test -- UploadSpeedometer.test.js` |
+| SSR 构建或渲染依赖变化 | 先 `npm run build`，再 `npm test -- SSR.test.js`；直接加载生成的 UMD、ESM SSR 产物，覆盖开发和生产环境的插槽渲染 |
 | 维护源码、测试、文档应用代码或检查配置变化 | `npm run lint` |
 | 组件、TypeScript、声明或类型检查配置变化 | `npm run typecheck` |
 | 影响库或文档构建的实现、依赖、配置变化，或需要生成发布产物 | `npm run build` |

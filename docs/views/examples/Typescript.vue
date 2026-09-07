@@ -53,8 +53,20 @@
 
 <script lang="ts">
 import {ref, SetupContext} from 'vue'
-import  FileUpload from '../../../src/FileUpload.vue'
-import type  { VueUploadItem } from '../../../src/FileUpload.vue'
+import FileUpload from 'vue-upload-component' // Recommended package entry; includes styles
+// import FileUpload from 'vue-upload-component/src/FileUpload.vue' // Vue SFC source; compile Vue, TypeScript and CSS
+// import FileUpload from '../../../src/FileUpload.vue' // Repository development only; adjust the relative path
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.js' // UMD/CommonJS build with styles
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.min.js' // Minified UMD/CommonJS build with styles
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.js' // ESM build with styles
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.min.js' // Minified ESM build with styles
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.part.js' // UMD/CommonJS build with separate CSS
+// import 'vue-upload-component/dist/vue-upload-component.part.css' // Enable together with the preceding part build
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.part.js' // ESM build with separate CSS
+// import 'vue-upload-component/dist/vue-upload-component.esm.part.css' // Enable together with the preceding ESM part build
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.ssr.js' // Server-only UMD/CommonJS SSR build
+// import FileUpload from 'vue-upload-component/dist/vue-upload-component.esm.ssr.js' // Server-only ESM SSR build
+import type { VueUploadItem } from 'vue-upload-component'
 export default {
   components: {
     FileUpload,
