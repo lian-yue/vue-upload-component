@@ -71,3 +71,5 @@ https://lian-yue.github.io/vue-upload-component/#/zh-cn/documents
 # Special thanks (特别感谢)
 
 - [@josec89](https://github.com/josec89)
+- Anthropic, for supporting this project through the [Claude for Open Source](https://claude.com/contact-sales/claude-for-oss) program.\
+  感谢 Anthropic 通过 [Claude for Open Source](https://claude.com/contact-sales/claude-for-oss) 计划支持本项目。
