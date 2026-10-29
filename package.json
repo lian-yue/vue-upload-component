@@ -80,7 +80,7 @@
     "express": "^5.2.1",
     "file-type": "^22.0.1",
     "globals": "^17.11.0",
-    "happy-dom": "^20.11.2",
+    "happy-dom": "^21.0.4",
     "html-loader": "^5.1.0",
     "html-webpack-plugin": "^5.6.8",
     "marked": "^18.0.9",
